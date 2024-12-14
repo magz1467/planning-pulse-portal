@@ -10,7 +10,7 @@ export const SearchForm = () => {
           Recent
         </Button>
         <Button variant="outline" className="flex-1">
-          Major Projects
+          Completed
         </Button>
       </div>
       
