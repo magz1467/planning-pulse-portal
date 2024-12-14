@@ -25,6 +25,26 @@ const Index = () => {
             />
           </div>
         </div>
+
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">
+            The easy way to have your say on local developments
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-3">1. Easily search and view local applications</h3>
+              <p className="text-gray-600">Find and explore planning applications in your area with our simple search tools.</p>
+            </div>
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-3">2. Easily comment and feedback to the developer</h3>
+              <p className="text-gray-600">Share your thoughts and concerns directly with developers through our platform.</p>
+            </div>
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold mb-3">3. Feedback automatically submitted to the local authority</h3>
+              <p className="text-gray-600">Your feedback is automatically forwarded to the relevant local authority for consideration.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
