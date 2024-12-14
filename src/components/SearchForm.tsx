@@ -1,10 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, MessageSquare, Send } from "lucide-react";
 
 export const SearchForm = () => {
   return (
     <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
+      {/* Icons Section */}
+      <div className="grid grid-cols-3 gap-8 mb-6">
+        <div className="text-center">
+          <Search className="w-12 h-12 text-primary mx-auto mb-2" />
+          <p className="text-sm text-gray-600">Search Applications</p>
+        </div>
+        <div className="text-center">
+          <MessageSquare className="w-12 h-12 text-primary mx-auto mb-2" />
+          <p className="text-sm text-gray-600">Comment & Feedback</p>
+        </div>
+        <div className="text-center">
+          <Send className="w-12 h-12 text-primary mx-auto mb-2" />
+          <p className="text-sm text-gray-600">Submit to Authority</p>
+        </div>
+      </div>
+
+      {/* Search Section */}
       <div className="flex gap-4 mb-6">
         <Button variant="outline" className="flex-1 bg-primary-light text-primary hover:bg-primary hover:text-white">
           Recent
