@@ -24,9 +24,9 @@ const Index = () => {
             
             <div className="hidden md:block">
               <img 
-                src="/placeholder.svg"
-                alt="Architect reviewing development plans" 
-                className="rounded-lg shadow-xl w-full h-auto"
+                src="/lovable-uploads/bd79aa29-e80b-4e54-9b5f-7a1a4fe7ea48.png"
+                alt="Construction professional reviewing site plans" 
+                className="rounded-lg shadow-xl w-full h-auto object-cover"
               />
             </div>
           </div>
