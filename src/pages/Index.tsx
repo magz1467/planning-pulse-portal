@@ -16,14 +16,6 @@ const Index = () => {
             <Stats />
             <SearchForm />
           </div>
-          
-          <div className="hidden md:block">
-            <img 
-              src="/lovable-uploads/d35bc425-d18f-4222-b9d7-d9418f84b37d.png"
-              alt="Planning Pulse interface demonstration" 
-              className="rounded-lg shadow-xl"
-            />
-          </div>
         </div>
       </div>
     </div>
