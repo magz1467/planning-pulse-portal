@@ -20,7 +20,7 @@ const Index = () => {
                 <p className="text-gray-600 text-sm md:text-base">
                   Have your say on planning applications in your area.
                 </p>
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white rounded-xl shadow-sm p-2">
                   <Stats />
                 </div>
                 <div className="bg-white rounded-xl shadow-sm">
