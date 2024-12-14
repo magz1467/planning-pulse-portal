@@ -11,7 +11,7 @@ const Index = () => {
               <span className="text-primary">The smarter way</span> to track planning applications
             </h1>
             <p className="text-gray-600 mb-6 text-sm md:text-base">
-              Stay informed about planning applications in your area. Join over 50,000 residents and participate in your community's development.
+              Have your say on planning applications in your area.
             </p>
             <Stats />
             <SearchForm />
