@@ -10,7 +10,7 @@ const Index = () => {
       <Header />
       <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-12 md:py-24">
-          <div className="grid md:grid-cols-2 gap-12 items-start">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-3">
                 <span className="text-primary">The smarter way</span> to track planning applications
@@ -22,7 +22,7 @@ const Index = () => {
               <SearchForm />
             </div>
             
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center">
               <img 
                 src="/lovable-uploads/bd79aa29-e80b-4e54-9b5f-7a1a4fe7ea48.png"
                 alt="Construction professional reviewing site plans" 
