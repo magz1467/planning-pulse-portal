@@ -16,6 +16,14 @@ const Index = () => {
             <Stats />
             <SearchForm />
           </div>
+          
+          <div className="hidden md:block">
+            <img 
+              src="/placeholder.svg"
+              alt="Architect reviewing development plans" 
+              className="rounded-lg shadow-xl w-full h-auto"
+            />
+          </div>
         </div>
       </div>
     </div>
