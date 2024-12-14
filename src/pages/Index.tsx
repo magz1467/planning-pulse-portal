@@ -23,23 +23,6 @@ const Index = () => {
                 <div className="bg-white rounded-xl shadow-sm p-4">
                   <Stats />
                 </div>
-                {/* Icons Section */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="grid grid-cols-3 gap-8">
-                    <div className="text-center">
-                      <Search className="w-12 h-12 text-primary mx-auto mb-2" />
-                      <p className="text-sm text-gray-600">Search Applications</p>
-                    </div>
-                    <div className="text-center">
-                      <MessageSquare className="w-12 h-12 text-primary mx-auto mb-2" />
-                      <p className="text-sm text-gray-600">Comment & Feedback</p>
-                    </div>
-                    <div className="text-center">
-                      <Send className="w-12 h-12 text-primary mx-auto mb-2" />
-                      <p className="text-sm text-gray-600">Submit to Authority</p>
-                    </div>
-                  </div>
-                </div>
                 <div className="bg-white rounded-xl shadow-sm">
                   <SearchForm />
                 </div>
