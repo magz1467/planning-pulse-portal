@@ -13,17 +13,17 @@ const Index = () => {
         <div className="bg-gradient-to-b from-white to-gray-50 py-12 md:py-24">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-3">
+              <div className="space-y-3"> {/* Reduced space-y from default to 3 */}
+                <h1 className="text-3xl md:text-4xl font-bold">
                   <span className="text-primary">The smarter way</span> to track planning applications
                 </h1>
-                <p className="text-gray-600 mb-6 text-sm md:text-base">
+                <p className="text-gray-600 text-sm md:text-base">
                   Have your say on planning applications in your area.
                 </p>
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div className="bg-white rounded-xl shadow-sm p-4"> {/* Reduced padding from 6 to 4 */}
                   <Stats />
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="bg-white rounded-xl shadow-sm">
                   <SearchForm />
                 </div>
               </div>
