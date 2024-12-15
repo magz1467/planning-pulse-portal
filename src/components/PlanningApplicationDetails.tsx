@@ -1,6 +1,4 @@
 import { Application } from "@/types/planning";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 import { ApplicationHeader } from "./planning-details/ApplicationHeader";
 import { ApplicationImage } from "./planning-details/ApplicationImage";
 import { ApplicationDetails } from "./planning-details/ApplicationDetails";
@@ -26,17 +24,6 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div className="relative">
-      <div className="flex justify-end p-2 border-b">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-8 w-8"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-
       <div className="p-6 space-y-4">
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
