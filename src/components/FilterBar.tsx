@@ -1,4 +1,4 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 
@@ -25,17 +25,21 @@ export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => 
   };
 
   const hasActiveFilters = activeFilters.status || activeFilters.type;
+  const activeFilterText = activeFilters.status || activeFilters.type || "Filter";
 
   return (
     <div className="flex gap-4 p-4 bg-white border-b border-gray-200">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-[140px] justify-between">
-            <span>{activeFilters.status || "Status"}</span>
+          <Button variant="outline" className="w-[180px] justify-between">
+            <span>{activeFilterText}</span>
             <Filter className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem disabled className="text-sm font-semibold">
+            Status
+          </DropdownMenuItem>
           {statusOptions.map((status) => (
             <DropdownMenuItem
               key={status}
@@ -45,17 +49,12 @@ export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => 
               {status}
             </DropdownMenuItem>
           ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-[180px] justify-between">
-            <span>{activeFilters.type || "Type"}</span>
-            <Filter className="ml-2 h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
+          
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem disabled className="text-sm font-semibold">
+            Type
+          </DropdownMenuItem>
           {typeOptions.map((type) => (
             <DropdownMenuItem
               key={type}
