@@ -20,9 +20,9 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
   const handleEmailSubmit = (email: string) => {
     setIsSubscribed(true)
     toast({
-      title: "Alert set up successfully",
-      description: `You will receive email alerts at ${email} for new planning applications near ${postcode}`,
-      duration: 3000,
+      title: "Subscription pending",
+      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts near ${postcode}. The email might take a few minutes to arrive.`,
+      duration: 5000,
     })
   }
 
