@@ -4,8 +4,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from "@/components/ui/carousel";
 
 interface CarouselViewProps {
@@ -25,6 +23,7 @@ export const CarouselView = ({
         opts={{
           align: "center",
           loop: true,
+          dragFree: true,
         }}
       >
         <CarouselContent>
@@ -38,8 +37,6 @@ export const CarouselView = ({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2" />
-        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2" />
       </Carousel>
     </div>
   );
