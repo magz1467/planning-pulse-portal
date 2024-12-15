@@ -22,7 +22,7 @@ const defaultIcon = new L.Icon({
 });
 
 const searchIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -143,7 +143,7 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer 
-          defaultCenter={coordinates}
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
@@ -163,8 +163,8 @@ const MapView = () => {
           {filteredApplications.map((application) => {
             // Increased offset for better spread
             const offset = {
-              lat: (application.id % 3 - 1) * 0.008, // Increased from 0.003
-              lng: (Math.floor(application.id / 3) - 1) * 0.008 // Increased from 0.003
+              lat: (application.id % 3 - 1) * 0.008,
+              lng: (Math.floor(application.id / 3) - 1) * 0.008
             };
             
             return (
