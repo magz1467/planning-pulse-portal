@@ -34,7 +34,6 @@ export const MapContainerComponent = ({
         zoom={getZoomLevel()}
         scrollWheelZoom={true}
         className="w-full h-full"
-        zoomControl={false}
       >
         <ZoomControl position="topleft" />
         

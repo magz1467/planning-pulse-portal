@@ -47,12 +47,12 @@ export const PlanningApplicationDetails = ({
             <div className="flex items-center gap-2">
               <ThumbsUp className="h-5 w-5 text-primary" />
               <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
-              <span className="text-gray-500 text-sm">people found this helpful</span>
+              <span className="text-gray-500 text-sm">people like this development</span>
             </div>
             <div className="flex items-center gap-2">
               <ThumbsDown className="h-5 w-5 text-[#ea384c]" />
               <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-              <span className="text-gray-500 text-sm">people found this unhelpful</span>
+              <span className="text-gray-500 text-sm">people dislike this development</span>
             </div>
           </div>
         </Card>
