@@ -108,7 +108,9 @@ export const PlanningApplicationDetails = ({
 
         <div className="border-t pt-6">
           <h4 className="font-semibold mb-2">Description</h4>
-          <p className="text-gray-600 text-sm">{application.description}</p>
+          <p className="text-gray-600 text-sm">
+            {application.description || "No detailed description available for this planning application"}
+          </p>
         </div>
 
         <CommentList comments={comments} />
