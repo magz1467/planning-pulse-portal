@@ -5,22 +5,23 @@ interface CommentListProps {
 }
 
 export const CommentList = ({ comments }: CommentListProps) => {
-  if (comments.length === 0) return null;
+  const formatDate = (timestamp: string) => {
+    return new Date(timestamp).toLocaleDateString();
+  };
 
   return (
-    <div className="border-t pt-6">
-      <h4 className="font-semibold mb-4">Other Comments</h4>
-      <div className="space-y-4">
-        {comments.map((comment) => (
-          <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">{comment.text}</p>
-            <div className="flex justify-between mt-2 text-xs text-gray-400">
-              <span>{comment.author}</span>
-              <span>{comment.date}</span>
-            </div>
+    <div className="space-y-4">
+      {comments.map((comment) => (
+        <div key={comment.id} className="border-b pb-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-semibold">{comment.author}</span>
+            <span className="text-sm text-gray-500">
+              {formatDate(comment.timestamp)}
+            </span>
           </div>
-        ))}
-      </div>
+          <p>{comment.content}</p>
+        </div>
+      ))}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { Marker, Popup } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { applicationIcon, selectedApplicationIcon } from "./MapMarkers";
+import { useMemo } from "react";
 
 interface ApplicationMarkersProps {
   applications: Application[];
@@ -28,12 +29,17 @@ export const ApplicationMarkers = ({
     ];
   };
 
+  // Memoize the coordinates so they don't change on re-renders
+  const applicationCoordinates = useMemo(() => {
+    return applications.map((_, index) => generateRandomCoordinates(index));
+  }, [applications.length, baseCoordinates[0], baseCoordinates[1]]);
+
   return (
     <>
       {applications.map((app, index) => (
         <Marker
           key={app.id}
-          position={generateRandomCoordinates(index)}
+          position={applicationCoordinates[index]}
           eventHandlers={{
             click: () => onMarkerClick(app.id),
           }}
