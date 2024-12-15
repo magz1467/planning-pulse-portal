@@ -14,10 +14,20 @@ export const ApplicationMarkers = ({
   baseCoordinates,
   onMarkerClick,
 }: ApplicationMarkersProps) => {
-  // Function to generate mock coordinates around the base location
-  const generateCoordinates = (index: number): LatLngTuple => {
-    const offset = 0.002 * index;
-    return [baseCoordinates[0] + offset, baseCoordinates[1] + offset];
+  // Function to generate random coordinates within a radius around the base location
+  const generateRandomCoordinates = (index: number): LatLngTuple => {
+    // Generate random angle and distance
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = Math.random() * 0.01; // Adjust this value to control spread radius
+
+    // Calculate offset using trigonometry
+    const latOffset = distance * Math.cos(angle);
+    const lngOffset = distance * Math.sin(angle);
+
+    return [
+      baseCoordinates[0] + latOffset,
+      baseCoordinates[1] + lngOffset
+    ];
   };
 
   return (
@@ -25,7 +35,7 @@ export const ApplicationMarkers = ({
       {applications.map((app, index) => (
         <Marker
           key={app.id}
-          position={generateCoordinates(index)}
+          position={generateRandomCoordinates(index)}
           eventHandlers={{
             click: () => onMarkerClick(app.id),
           }}
