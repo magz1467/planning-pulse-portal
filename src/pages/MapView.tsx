@@ -7,7 +7,7 @@ import { PlanningApplicationList } from '@/components/PlanningApplicationList';
 import { PlanningApplicationDetails } from '@/components/PlanningApplicationDetails';
 import { Application } from '@/types/planning';
 import { FilterBar } from '@/components/FilterBar';
-import type { LatLngExpression } from 'leaflet';
+import type { LatLngExpression, LatLngTuple } from 'leaflet';
 
 // Fix Leaflet icon issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -90,7 +90,7 @@ const mockPlanningApplications: Application[] = [
 const MapView = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
-  const [coordinates, setCoordinates] = useState<LatLngExpression | null>(null);
+  const [coordinates, setCoordinates] = useState<LatLngTuple | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
   const [filteredApplications, setFilteredApplications] = useState(mockPlanningApplications);
   const [activeFilters, setActiveFilters] = useState<{
@@ -164,7 +164,7 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer 
-          center={coordinates}
+          center={coordinates as LatLngExpression}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
@@ -173,9 +173,10 @@ const MapView = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
+          
           {/* Search location marker */}
           <Marker 
-            position={coordinates}
+            position={coordinates as LatLngExpression}
             icon={searchIcon}
           >
             <Popup>
@@ -185,15 +186,14 @@ const MapView = () => {
           
           {/* Application markers */}
           {filteredApplications.map((application) => {
-            // Increased offset for better spread
             const offset = {
               lat: (application.id % 3 - 1) * 0.008,
               lng: (Math.floor(application.id / 3) - 1) * 0.008
             };
             
             const position: LatLngExpression = [
-              (coordinates as L.LatLngTuple)[0] + offset.lat,
-              (coordinates as L.LatLngTuple)[1] + offset.lng
+              coordinates[0] + offset.lat,
+              coordinates[1] + offset.lng
             ];
 
             return (
