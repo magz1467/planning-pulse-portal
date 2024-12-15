@@ -1,9 +1,8 @@
-import { Marker, Popup } from "react-leaflet";
+import { Marker } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { applicationIcon, selectedApplicationIcon } from "./MapMarkers";
 import { useMemo } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ApplicationMarkersProps {
   applications: Application[];
@@ -18,8 +17,6 @@ export const ApplicationMarkers = ({
   onMarkerClick,
   selectedId,
 }: ApplicationMarkersProps) => {
-  const isMobile = useIsMobile();
-  
   const generateRandomCoordinates = (index: number): LatLngTuple => {
     const angle = Math.random() * 2 * Math.PI;
     const distance = Math.random() * 0.01;
@@ -47,16 +44,7 @@ export const ApplicationMarkers = ({
             click: () => onMarkerClick(app.id),
           }}
           icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
-        >
-          {isMobile && (
-            <Popup>
-              <div>
-                <h3 className="font-semibold">{app.title}</h3>
-                <p className="text-sm">{app.address}</p>
-              </div>
-            </Popup>
-          )}
-        </Marker>
+        />
       ))}
     </>
   );
