@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import { Application } from "@/types/planning";
@@ -183,6 +183,7 @@ const MapView = () => {
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
+          zoomControl={!isMobile} // Disable zoom controls on mobile
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -202,6 +203,8 @@ const MapView = () => {
             onMarkerClick={handleMarkerClick}
             selectedId={selectedApplication}
           />
+          
+          {!isMobile && <ZoomControl position="bottomright" />} {/* Add zoom controls only for desktop */}
         </MapContainer>
 
         {isMobile && (
