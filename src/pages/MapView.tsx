@@ -2,34 +2,13 @@ import { useLocation } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
-import L from 'leaflet';
 import { PlanningApplicationList } from '@/components/PlanningApplicationList';
 import { PlanningApplicationDetails } from '@/components/PlanningApplicationDetails';
 import { Application } from '@/types/planning';
 import { FilterBar } from '@/components/FilterBar';
-import type { LatLngExpression, LatLngTuple } from 'leaflet';
-
-// Fix Leaflet icon issues
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-
-// Create custom icons
-const defaultIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-const searchIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+import { ApplicationMarkers } from '@/components/map/ApplicationMarkers';
+import { searchIcon } from '@/components/map/MapMarkers';
+import type { LatLngTuple } from 'leaflet';
 
 // Mock data for planning applications
 const mockPlanningApplications: Application[] = [
@@ -136,10 +115,6 @@ const MapView = () => {
     }));
   };
 
-  const handleMarkerClick = (applicationId: number) => {
-    setSelectedApplication(applicationId);
-  };
-
   if (!coordinates) {
     return <div className="flex items-center justify-center h-screen">Loading map...</div>;
   }
@@ -164,7 +139,7 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer 
-          center={coordinates as LatLngExpression}
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
@@ -175,46 +150,18 @@ const MapView = () => {
           />
           
           {/* Search location marker */}
-          <Marker 
-            position={coordinates as LatLngExpression}
-            icon={searchIcon}
-          >
+          <Marker position={coordinates} icon={searchIcon}>
             <Popup>
               Search Location: {postcode}
             </Popup>
           </Marker>
           
           {/* Application markers */}
-          {filteredApplications.map((application) => {
-            const offset = {
-              lat: (application.id % 3 - 1) * 0.008,
-              lng: (Math.floor(application.id / 3) - 1) * 0.008
-            };
-            
-            const position: LatLngExpression = [
-              coordinates[0] + offset.lat,
-              coordinates[1] + offset.lng
-            ];
-
-            return (
-              <Marker
-                key={application.id}
-                position={position}
-                icon={defaultIcon}
-                eventHandlers={{
-                  click: () => handleMarkerClick(application.id),
-                }}
-              >
-                <Popup>
-                  <div>
-                    <h3 className="font-semibold">{application.title}</h3>
-                    <p className="text-sm">{application.address}</p>
-                    <p className="text-xs mt-1">Status: {application.status}</p>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
+          <ApplicationMarkers 
+            applications={filteredApplications}
+            baseCoordinates={coordinates}
+            onMarkerClick={setSelectedApplication}
+          />
         </MapContainer>
       </div>
     </div>
