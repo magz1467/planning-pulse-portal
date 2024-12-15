@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Filter, X } from "lucide-react";
+import { Filter } from "lucide-react";
 
 interface FilterBarProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -37,6 +37,17 @@ export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          {hasActiveFilters && (
+            <>
+              <DropdownMenuItem
+                onClick={handleClearFilters}
+                className="cursor-pointer text-blue-600 font-medium"
+              >
+                Clear filters
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem disabled className="text-sm font-semibold">
             Status
           </DropdownMenuItem>
@@ -66,17 +77,6 @@ export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => 
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-
-      {hasActiveFilters && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleClearFilters}
-          className="ml-2"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      )}
     </div>
   );
 };
