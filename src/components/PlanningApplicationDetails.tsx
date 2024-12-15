@@ -1,9 +1,9 @@
-import { Application } from "@/types/planning";
+import { Application, Comment } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft } from "lucide-react";
-import { CommentForm } from "@/components/CommentForm";
+import { CommentForm } from "@/components/comments/CommentForm";
 import { useState } from "react";
 
 interface PlanningApplicationDetailsProps {
@@ -18,7 +18,7 @@ export const PlanningApplicationDetails = ({
   const [comments, setComments] = useState<Comment[]>([]);
 
   const handleCommentSubmit = (content: string) => {
-    const newComment = {
+    const newComment: Comment = {
       id: comments.length + 1,
       content,
       author: "Anonymous",

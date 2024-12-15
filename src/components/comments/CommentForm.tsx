@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Comment } from "@/types/planning";
 
 interface CommentFormProps {
-  onSubmit: (comment: Comment) => void;
+  onSubmit: (content: string) => void;
 }
 
 export const CommentForm = ({ onSubmit }: CommentFormProps) => {
@@ -13,15 +13,8 @@ export const CommentForm = ({ onSubmit }: CommentFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
-    const newComment: Comment = {
-      id: Date.now(),
-      content,
-      author: "Anonymous",
-      timestamp: new Date().toISOString(),
-    };
-
-    onSubmit(newComment);
+    
+    onSubmit(content);
     setContent("");
   };
 
