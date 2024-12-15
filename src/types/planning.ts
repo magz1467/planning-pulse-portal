@@ -5,21 +5,20 @@ export interface Application {
   status: string;
   distance: string;
   reference: string;
+  description: string;
+  applicant: string;
+  submissionDate: string;
+  decisionDue: string;
   type: string;
-  description?: string;
-  applicant?: string;
-  submissionDate?: string;
-  decisionDue?: string;
-  ward?: string;
-  officer?: string;
-  consultationEnd?: string;
-  image?: string;
+  ward: string;
+  officer: string;
+  consultationEnd: string;
+  image: string;
 }
 
 export interface Comment {
   id: number;
-  text: string;
+  content: string;
   author: string;
-  timestamp: Date;
-  date: Date;
+  timestamp: string;
 }
