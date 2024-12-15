@@ -81,7 +81,6 @@ const MapView = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Left sidebar */}
       <div className="w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
         {selectedApplication === null ? (
           <PlanningApplicationList
@@ -97,11 +96,10 @@ const MapView = () => {
         )}
       </div>
 
-      {/* Map container */}
       <div className="w-2/3">
         <MapContainer
-          defaultCenter={coordinates}
-          defaultZoom={13}
+          center={coordinates}
+          zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >

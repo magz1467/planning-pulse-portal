@@ -3,10 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Application } from "@/types/planning";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface PlanningApplicationDetailsProps {
   application: Application;
   onClose: () => void;
+}
+
+interface Comment {
+  id: number;
+  text: string;
+  author: string;
+  date: string;
 }
 
 export const PlanningApplicationDetails = ({
@@ -14,6 +22,8 @@ export const PlanningApplicationDetails = ({
   onClose,
 }: PlanningApplicationDetailsProps) => {
   const { toast } = useToast();
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState("");
 
   const handleFeedback = (type: 'positive' | 'negative') => {
     toast({
@@ -23,10 +33,22 @@ export const PlanningApplicationDetails = ({
     });
   };
 
-  const handleCommentSubmit = (comment: string) => {
+  const handleCommentSubmit = () => {
+    if (!commentText.trim()) return;
+
+    const newComment: Comment = {
+      id: comments.length + 1,
+      text: commentText,
+      author: "Anonymous User",
+      date: new Date().toLocaleDateString()
+    };
+
+    setComments([...comments, newComment]);
+    setCommentText("");
+    
     toast({
-      title: "Comment submitted",
-      description: "Thank you for your detailed feedback.",
+      title: "Comment submitted successfully",
+      description: "Your comment has been sent to the planning developer for review.",
       duration: 3000,
     });
   };
@@ -115,14 +137,33 @@ export const PlanningApplicationDetails = ({
           <Textarea
             placeholder="Share your thoughts about this planning application..."
             className="mb-4"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
           />
           <Button
-            onClick={() => handleCommentSubmit("Comment text")}
+            onClick={handleCommentSubmit}
             className="w-full"
           >
             Submit Comment
           </Button>
         </div>
+
+        {comments.length > 0 && (
+          <div className="border-t pt-6">
+            <h4 className="font-semibold mb-4">Other Comments</h4>
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">{comment.text}</p>
+                  <div className="flex justify-between mt-2 text-xs text-gray-400">
+                    <span>{comment.author}</span>
+                    <span>{comment.date}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
