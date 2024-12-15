@@ -8,7 +8,7 @@ export const Services = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-gray-50 rounded-xl shadow-sm overflow-hidden">
             <img
-              src="/photo-1581091226825-a6a2a5aee158"
+              src="/lovable-uploads/bbc0ab46-b246-4a14-b768-a9ee0b4cd8e0.png"
               alt="Resident using the platform"
               className="w-full h-48 object-cover"
             />
@@ -22,7 +22,7 @@ export const Services = () => {
 
           <div className="bg-gray-50 rounded-xl shadow-sm overflow-hidden">
             <img
-              src="/photo-1486312338219-ce68d2c6f44d"
+              src="/lovable-uploads/00c352b2-8697-4425-a649-17b25f1c6db3.png"
               alt="Developer reviewing feedback"
               className="w-full h-48 object-cover"
             />
@@ -36,7 +36,7 @@ export const Services = () => {
 
           <div className="bg-gray-50 rounded-xl shadow-sm overflow-hidden">
             <img
-              src="/photo-1487058792275-0ad4aaf24ca7"
+              src="/lovable-uploads/ea10c55a-9324-434a-8bbf-c2de0a2f9b25.png"
               alt="Local authority dashboard"
               className="w-full h-48 object-cover"
             />
