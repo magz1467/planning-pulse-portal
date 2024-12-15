@@ -1,4 +1,4 @@
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Application, Comment } from "@/types/planning";
 import { useToast } from "@/hooks/use-toast";
@@ -30,17 +30,39 @@ export const PlanningApplicationDetails = ({
     setComments([...comments, newComment]);
   };
 
+  const handleShare = () => {
+    const shareText = `Check out this planning application: ${application.title} at ${application.address}. Reference: ${application.reference}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    toast({
+      title: "Sharing via WhatsApp",
+      description: "Opening WhatsApp to share this application",
+      duration: 3000,
+    });
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Application Details</h2>
-        <Button
-          variant="ghost"
-          onClick={onClose}
-          className="text-gray-500"
-        >
-          ✕
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleShare}
+            className="text-gray-500"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="text-gray-500"
+          >
+            ✕
+          </Button>
+        </div>
       </div>
       
       <div className="space-y-6">
