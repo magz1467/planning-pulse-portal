@@ -26,7 +26,7 @@ export const EmailDialog = ({ open, onOpenChange, onSubmit }: EmailDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="z-[2000] relative">
         <DialogHeader>
           <DialogTitle>Set up planning alerts</DialogTitle>
           <DialogDescription>
