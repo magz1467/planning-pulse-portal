@@ -157,7 +157,7 @@ const MapView = () => {
   return (
     <div className="flex flex-col h-screen">
       <MapHeader />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
           <DesktopSidebar
             applications={filteredApplications}
@@ -169,7 +169,7 @@ const MapView = () => {
             onClose={() => setSelectedApplication(null)}
           />
         )}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative h-full">
           <MapContainerComponent
             coordinates={coordinates}
             postcode={postcode}
