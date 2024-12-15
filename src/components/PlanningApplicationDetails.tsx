@@ -28,7 +28,7 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 animate-slide-up">
       <Button
         variant="ghost"
         className="mb-4 pl-0 hover:pl-2 transition-all"
