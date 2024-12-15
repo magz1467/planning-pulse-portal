@@ -18,14 +18,14 @@ export const MapHeader = () => {
   return (
     <header className="border-b bg-white">
       <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
             <Home className="h-6 w-6" />
             PlanningPulse
           </Link>
           
-          <form onSubmit={handleSubmit} className="w-1/3">
-            <div className="relative">
+          <form onSubmit={handleSubmit} className="flex-1 flex justify-center mx-4">
+            <div className="relative w-1/3">
               <Input 
                 type="text" 
                 placeholder="Search new location" 
