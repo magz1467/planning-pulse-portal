@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CarouselView } from "./mobile/CarouselView";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -45,25 +45,34 @@ export const MobileApplicationCards = ({
 
   if (!applications.length) {
     return (
-      <div className="fixed bottom-4 left-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50">
+      <div style={{ position: 'fixed', bottom: '16px', left: '16px', right: '16px', zIndex: 9999 }} className="bg-white p-4 rounded-lg shadow-lg">
         <p className="text-center text-gray-500">No applications found in this area</p>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[1000]">
+    <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <div 
-          className="h-2 w-12 bg-gray-200 rounded-full mx-auto mb-2 cursor-pointer" 
-          onClick={() => setIsOpen(!isOpen)}
-        />
+        <SheetTrigger asChild>
+          <div 
+            className="h-2 w-12 bg-gray-200 rounded-full mx-auto mb-2 cursor-pointer" 
+            onClick={() => setIsOpen(!isOpen)}
+          />
+        </SheetTrigger>
         <SheetContent 
           side="bottom" 
-          className="p-0 h-[45vh] rounded-t-xl bg-white"
+          className="p-0 h-[45vh] rounded-t-xl bg-white shadow-lg"
+          style={{ 
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+          }}
         >
-          <div className="flex flex-col h-full">
-            <div className="p-2 border-b bg-white">
+          <div className="flex flex-col h-full bg-white">
+            <div className="p-2 border-b bg-white sticky top-0">
               <div 
                 className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
                 onClick={() => setIsOpen(false)}
