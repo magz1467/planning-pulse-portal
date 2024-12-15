@@ -141,17 +141,20 @@ const MapView = () => {
       {/* Map */}
       <div className="flex-1 relative">
         <MapContainer
-          center={coordinates}
+          center={coordinates as [number, number]}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
         >
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <Marker position={coordinates} icon={searchIcon}>
+          <Marker 
+            position={coordinates as [number, number]} 
+            icon={searchIcon}
+          >
             <Popup>Search Location: {postcode}</Popup>
           </Marker>
           
