@@ -1,26 +1,24 @@
 import { Marker, Popup } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { applicationIcon } from "./MapMarkers";
+import { applicationIcon, selectedApplicationIcon } from "./MapMarkers";
 
 interface ApplicationMarkersProps {
   applications: Application[];
   baseCoordinates: LatLngTuple;
   onMarkerClick: (id: number) => void;
+  selectedId: number | null;
 }
 
 export const ApplicationMarkers = ({
   applications,
   baseCoordinates,
   onMarkerClick,
+  selectedId,
 }: ApplicationMarkersProps) => {
-  // Function to generate random coordinates within a radius around the base location
   const generateRandomCoordinates = (index: number): LatLngTuple => {
-    // Generate random angle and distance
     const angle = Math.random() * 2 * Math.PI;
-    const distance = Math.random() * 0.01; // Adjust this value to control spread radius
-
-    // Calculate offset using trigonometry
+    const distance = Math.random() * 0.01;
     const latOffset = distance * Math.cos(angle);
     const lngOffset = distance * Math.sin(angle);
 
@@ -39,7 +37,7 @@ export const ApplicationMarkers = ({
           eventHandlers={{
             click: () => onMarkerClick(app.id),
           }}
-          icon={applicationIcon}
+          icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
         >
           <Popup>
             <div>
