@@ -42,7 +42,7 @@ export const DesktopSidebar = ({
         />
       ) : (
         <div className="relative">
-          <div className="flex items-center justify-between border-b p-4">
+          <div className="flex items-center justify-between border-b py-2 px-4">
             <h2 className="font-semibold">Planning Application Details</h2>
             <Button
               variant="ghost"
