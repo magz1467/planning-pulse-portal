@@ -6,6 +6,7 @@ import L from 'leaflet';
 import { PlanningApplicationList } from '@/components/PlanningApplicationList';
 import { PlanningApplicationDetails } from '@/components/PlanningApplicationDetails';
 import { Application } from '@/types/planning';
+import { FilterBar } from '@/components/FilterBar';
 
 // Fix Leaflet icon issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -56,6 +57,11 @@ const MapView = () => {
   const postcode = location.state?.postcode;
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
+  const [filteredApplications, setFilteredApplications] = useState(mockPlanningApplications);
+  const [activeFilters, setActiveFilters] = useState<{
+    status?: string;
+    type?: string;
+  }>({});
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -75,20 +81,41 @@ const MapView = () => {
     }
   }, [postcode]);
 
-  if (!coordinates) {
-    return <div className="flex items-center justify-center h-screen">Loading map...</div>;
-  }
+  useEffect(() => {
+    let filtered = mockPlanningApplications;
+    
+    if (activeFilters.status) {
+      filtered = filtered.filter(app => app.status === activeFilters.status);
+    }
+    if (activeFilters.type) {
+      filtered = filtered.filter(app => app.type === activeFilters.type);
+    }
+    
+    setFilteredApplications(filtered);
+  }, [activeFilters]);
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
 
   const handleMarkerClick = (applicationId: number) => {
     setSelectedApplication(applicationId);
   };
 
+  if (!coordinates) {
+    return <div className="flex items-center justify-center h-screen">Loading map...</div>;
+  }
+
   return (
     <div className="flex h-screen">
       <div className="w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
+        <FilterBar onFilterChange={handleFilterChange} activeFilters={activeFilters} />
         {selectedApplication === null ? (
           <PlanningApplicationList
-            applications={mockPlanningApplications}
+            applications={filteredApplications}
             postcode={postcode}
             onSelectApplication={setSelectedApplication}
           />
@@ -116,8 +143,7 @@ const MapView = () => {
               Postcode: {postcode}
             </Popup>
           </Marker>
-          {mockPlanningApplications.map((application) => {
-            // Generate a consistent offset for each application based on its ID
+          {filteredApplications.map((application) => {
             const offset = {
               lat: (application.id % 3 - 1) * 0.003,
               lng: (Math.floor(application.id / 3) - 1) * 0.003
