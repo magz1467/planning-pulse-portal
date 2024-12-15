@@ -26,7 +26,6 @@ export const MobileApplicationCards = ({
       if (index !== -1) {
         setCurrentIndex(index);
       }
-      setIsFullScreen(true);
     }
   }, [selectedId, applications]);
 
@@ -55,15 +54,10 @@ export const MobileApplicationCards = ({
   const selectedApp = applications.find(app => app.id === selectedId);
   const currentApp = applications[currentIndex];
 
+  if (!applications.length) return null;
+
   return (
-    <Drawer
-      open={true}
-      onOpenChange={(open) => {
-        if (!open) {
-          setIsFullScreen(false);
-        }
-      }}
-    >
+    <Drawer open={true}>
       <DrawerContent className="fixed inset-x-0 bottom-0 mt-24 rounded-t-[10px]">
         <div className="p-2 border-b">
           <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto" />

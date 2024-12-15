@@ -145,13 +145,6 @@ const MapView = () => {
     setSelectedApplication(id);
   };
 
-  const handleFilterChange = (filterType: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
-  };
-
   if (!coordinates) {
     return <div className="flex items-center justify-center h-screen">Loading map...</div>;
   }
@@ -189,7 +182,7 @@ const MapView = () => {
           />
         </MapContainer>
 
-        {isMobile && filteredApplications.length > 0 && (
+        {isMobile && (
           <MobileApplicationCards
             applications={filteredApplications}
             selectedId={selectedApplication}
