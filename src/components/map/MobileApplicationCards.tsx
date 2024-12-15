@@ -36,10 +36,13 @@ export const MobileApplicationCards = ({
   if (!applications.length) return null;
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger className="fixed bottom-0 left-0 right-0 h-1 bg-transparent" />
-      <SheetContent side="bottom" className="h-[40vh] p-0 pt-2">
-        <div className="flex flex-col h-full">
+    <Sheet defaultOpen open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger className="fixed bottom-0 left-0 right-0 h-2 bg-transparent" />
+      <SheetContent 
+        side="bottom" 
+        className="h-[45vh] p-0 pt-2 fixed bottom-0 left-0 right-0 rounded-t-xl"
+      >
+        <div className="flex flex-col h-full overflow-hidden">
           <div className="p-2 border-b">
             <div 
               className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
@@ -47,19 +50,21 @@ export const MobileApplicationCards = ({
             />
           </div>
           
-          {isFullScreen && selectedApp ? (
-            <FullScreenDetails
-              application={selectedApp}
-              onClose={() => setIsFullScreen(false)}
-              onCommentSubmit={handleCommentSubmit}
-            />
-          ) : (
-            <CarouselView
-              applications={applications}
-              selectedId={selectedId}
-              onSelectApplication={handleCardClick}
-            />
-          )}
+          <div className="flex-1 overflow-y-auto">
+            {isFullScreen && selectedApp ? (
+              <FullScreenDetails
+                application={selectedApp}
+                onClose={() => setIsFullScreen(false)}
+                onCommentSubmit={handleCommentSubmit}
+              />
+            ) : (
+              <CarouselView
+                applications={applications}
+                selectedId={selectedId}
+                onSelectApplication={handleCardClick}
+              />
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>

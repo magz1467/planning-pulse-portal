@@ -20,17 +20,17 @@ export const CarouselView = ({
   onSelectApplication,
 }: CarouselViewProps) => {
   return (
-    <div className="p-4 min-h-[200px]">
+    <div className="p-4 min-h-[200px] relative">
       <Carousel
         opts={{
           align: "center",
           loop: true,
         }}
-        className="w-full max-w-sm mx-auto relative"
+        className="w-full max-w-sm mx-auto"
       >
         <CarouselContent>
           {applications.map((app) => (
-            <CarouselItem key={app.id} className="basis-full">
+            <CarouselItem key={app.id} className="basis-full pl-4">
               <ApplicationCard
                 application={app}
                 isSelected={selectedId === app.id}
@@ -39,8 +39,8 @@ export const CarouselView = ({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute -left-4" />
-        <CarouselNext className="absolute -right-4" />
+        <CarouselPrevious className="absolute -left-2" />
+        <CarouselNext className="absolute -right-2" />
       </Carousel>
     </div>
   );
