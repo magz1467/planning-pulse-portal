@@ -1,4 +1,4 @@
-import { ThumbsUp, ThumbsDown, Share2 } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Application, Comment } from "@/types/planning";
 import { useToast } from "@/hooks/use-toast";
@@ -57,10 +57,11 @@ export const PlanningApplicationDetails = ({
           </Button>
           <Button
             variant="ghost"
+            size="icon"
             onClick={onClose}
             className="text-gray-500"
           >
-            ✕
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
