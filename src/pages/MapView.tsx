@@ -6,9 +6,9 @@ import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
 import { searchIcon } from "@/components/map/MapMarkers";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
   {
@@ -68,14 +68,13 @@ const mockPlanningApplications: Application[] = [
 const MapView = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
-  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+  const [coordinates, setCoordinates] = useState<LatLngTuple | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
   const [filteredApplications, setFilteredApplications] = useState(mockPlanningApplications);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
     type?: string;
   }>({});
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -118,9 +117,6 @@ const MapView = () => {
 
   const handleMarkerClick = (id: number) => {
     setSelectedApplication(id);
-    if (isMobile) {
-      setIsFullScreen(true);
-    }
   };
 
   if (!coordinates) {
@@ -144,15 +140,6 @@ const MapView = () => {
 
       {/* Map */}
       <div className="flex-1 relative">
-        {isMobile && isFullScreen && (
-          <Button
-            variant="secondary"
-            className="absolute top-4 right-4 z-[1000]"
-            onClick={() => setIsFullScreen(false)}
-          >
-            Show List
-          </Button>
-        )}
         <MapContainer
           center={coordinates}
           zoom={13}
@@ -161,10 +148,10 @@ const MapView = () => {
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attributionControl={false}
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
-          <Marker position={coordinates}>
+          <Marker position={coordinates} icon={searchIcon}>
             <Popup>Search Location: {postcode}</Popup>
           </Marker>
           
@@ -176,7 +163,7 @@ const MapView = () => {
         </MapContainer>
 
         {/* Mobile Cards */}
-        {isMobile && !isFullScreen && (
+        {isMobile && (
           <MobileApplicationCards
             applications={filteredApplications}
             selectedId={selectedApplication}

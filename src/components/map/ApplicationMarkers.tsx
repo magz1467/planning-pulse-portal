@@ -31,6 +31,7 @@ export const ApplicationMarkers = ({
           <Marker
             key={application.id}
             position={position}
+            icon={defaultIcon}
             eventHandlers={{
               click: () => onMarkerClick(application.id),
             }}
