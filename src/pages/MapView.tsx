@@ -7,6 +7,7 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { AlertSignup } from "@/components/AlertSignup";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -103,6 +104,7 @@ const MapView = () => {
         {selectedApplication === null ? (
           <div className="p-4">
             <h2 className="text-xl font-semibold mb-4">Planning Applications</h2>
+            <AlertSignup postcode={postcode} />
             <div className="space-y-4">
               {mockPlanningApplications.map((application) => (
                 <div
@@ -225,7 +227,7 @@ const MapView = () => {
       {/* Map container */}
       <div className="w-2/3">
         <MapContainer
-          center={coordinates}
+          center={coordinates as L.LatLngExpression}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
@@ -239,7 +241,6 @@ const MapView = () => {
               Postcode: {postcode}
             </Popup>
           </Marker>
-          {/* Add markers for mock planning applications */}
           {mockPlanningApplications.map((application) => (
             <Marker
               key={application.id}
