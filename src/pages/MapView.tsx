@@ -1,14 +1,14 @@
 import { useLocation } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
 import { searchIcon } from "@/components/map/MapMarkers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
-import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { MobileSearchBar } from "@/components/map/mobile/MobileSearchBar";
+import { findClosestApplication } from "@/utils/distance";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -112,13 +112,42 @@ const MapView = () => {
   const isMobile = useIsMobile();
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  const generateRandomCoordinates = (index: number): LatLngTuple => {
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = Math.random() * 0.01;
+    const latOffset = distance * Math.cos(angle);
+    const lngOffset = distance * Math.sin(angle);
+
+    return [
+      coordinates![0] + latOffset,
+      coordinates![1] + lngOffset
+    ];
+  };
+
+  // Memoize the coordinates so they don't change on re-renders
+  const applicationCoordinates = useMemo(() => {
+    if (!coordinates) return [];
+    return filteredApplications.map((_, index) => generateRandomCoordinates(index));
+  }, [filteredApplications.length, coordinates]);
+
   useEffect(() => {
     const fetchCoordinates = async () => {
       try {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
         if (data.status === 200) {
-          setCoordinates([data.result.latitude, data.result.longitude]);
+          const newCoordinates: LatLngTuple = [data.result.latitude, data.result.longitude];
+          setCoordinates(newCoordinates);
+          
+          // When coordinates are set and we're on mobile, automatically select the closest application
+          if (isMobile && filteredApplications.length > 0) {
+            const closestId = findClosestApplication(
+              filteredApplications,
+              newCoordinates,
+              filteredApplications.map((_, index) => generateRandomCoordinates(index))
+            );
+            setSelectedApplication(closestId);
+          }
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
@@ -128,7 +157,7 @@ const MapView = () => {
     if (postcode) {
       fetchCoordinates();
     }
-  }, [postcode]);
+  }, [postcode, isMobile, filteredApplications]);
 
   useEffect(() => {
     let filtered = mockPlanningApplications;
