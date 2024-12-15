@@ -63,7 +63,15 @@ export const MobileApplicationCards = ({
         <SheetContent 
           side="bottom" 
           className="p-0 h-[45vh] rounded-t-xl bg-white shadow-lg"
-          style={{ position: 'relative' }}
+          style={{ 
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1100,
+            transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+            transition: 'transform 0.3s ease-out'
+          }}
         >
           <div className="flex flex-col h-full bg-white">
             <div className="p-1 border-b bg-white sticky top-0">
