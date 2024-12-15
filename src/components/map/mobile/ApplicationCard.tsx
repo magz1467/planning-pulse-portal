@@ -1,5 +1,9 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ApplicationCardProps {
   application: Application;
@@ -8,6 +12,27 @@ interface ApplicationCardProps {
 }
 
 export const ApplicationCard = ({ application, isSelected, onClick }: ApplicationCardProps) => {
+  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+  const { toast } = useToast();
+
+  const handleFeedback = (type: 'up' | 'down', e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when clicking feedback buttons
+    
+    if (feedback === type) {
+      setFeedback(null);
+      toast({
+        title: "Feedback removed",
+        description: "Your feedback has been removed",
+      });
+    } else {
+      setFeedback(type);
+      toast({
+        title: "Thank you for your feedback",
+        description: type === 'up' ? "We're glad this was helpful!" : "We'll work on improving this",
+      });
+    }
+  };
+
   return (
     <Card
       className={`overflow-hidden cursor-pointer transition-all p-4 ${
@@ -27,6 +52,22 @@ export const ApplicationCard = ({ application, isSelected, onClick }: Applicatio
       <p className="text-sm text-gray-600 mt-2 truncate">
         {application.address}
       </p>
+      <div className="flex justify-end gap-2 mt-2">
+        <Button
+          variant={feedback === 'up' ? "default" : "outline"}
+          size="sm"
+          onClick={(e) => handleFeedback('up', e)}
+        >
+          <ThumbsUp className={`h-4 w-4 ${feedback === 'up' ? 'text-white' : 'text-gray-600'}`} />
+        </Button>
+        <Button
+          variant={feedback === 'down' ? "default" : "outline"}
+          size="sm"
+          onClick={(e) => handleFeedback('down', e)}
+        >
+          <ThumbsDown className={`h-4 w-4 ${feedback === 'down' ? 'text-white' : 'text-gray-600'}`} />
+        </Button>
+      </div>
     </Card>
   );
 };
