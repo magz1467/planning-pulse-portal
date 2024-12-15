@@ -1,15 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useState } from "react";
 
 export const SearchForm = () => {
+  const [activeTab, setActiveTab] = useState<'recent' | 'completed'>('recent');
+
   return (
     <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
       <div className="flex gap-4 mb-6">
-        <Button variant="outline" className="flex-1 bg-primary-light text-primary hover:bg-primary hover:text-white">
+        <Button 
+          variant="outline" 
+          className={`flex-1 ${
+            activeTab === 'recent' 
+              ? 'bg-primary-light text-primary hover:bg-primary hover:text-white' 
+              : 'hover:bg-primary-light hover:text-primary'
+          }`}
+          onClick={() => setActiveTab('recent')}
+        >
           Recent
         </Button>
-        <Button variant="outline" className="flex-1">
+        <Button 
+          variant="outline" 
+          className={`flex-1 ${
+            activeTab === 'completed' 
+              ? 'bg-primary-light text-primary hover:bg-primary hover:text-white' 
+              : 'hover:bg-primary-light hover:text-primary'
+          }`}
+          onClick={() => setActiveTab('completed')}
+        >
           Completed
         </Button>
       </div>
