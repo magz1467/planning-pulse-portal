@@ -34,8 +34,9 @@ export const MapContainerComponent = ({
         zoom={getZoomLevel()}
         scrollWheelZoom={true}
         className="w-full h-full"
+        zoomControl={false}
       >
-        <ZoomControl position="bottomright" />
+        <ZoomControl position="topleft" />
         
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
