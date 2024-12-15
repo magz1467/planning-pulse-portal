@@ -21,12 +21,12 @@ export const MapContainerComponent = ({
   onMarkerClick,
 }: MapContainerProps) => {
   return (
-    <div className="absolute inset-0">
+    <div className="w-full h-full">
       <LeafletMapContainer
         center={coordinates}
         zoom={13}
         scrollWheelZoom={true}
-        style={{ height: "100%", width: "100%" }}
+        className="w-full h-full"
       >
         <ZoomControl position="bottomright" />
         
