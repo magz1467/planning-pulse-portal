@@ -43,7 +43,7 @@ const mockPlanningApplications: Application[] = [
     applicant: "Mr. James Smith",
     submissionDate: "15/01/2024",
     decisionDue: "15/03/2024",
-    type: "Householder Planning Permission",
+    type: "Extension Residential",
     ward: "Central Ward",
     officer: "Sarah Johnson",
     consultationEnd: "28/02/2024"
@@ -54,7 +54,8 @@ const mockPlanningApplications: Application[] = [
     address: "45 Market Square",
     status: "Under Review",
     distance: "0.5 miles",
-    reference: "APP/2024/002"
+    reference: "APP/2024/002",
+    type: "Extension Commercial"
   },
   {
     id: 3,
@@ -62,7 +63,26 @@ const mockPlanningApplications: Application[] = [
     address: "78 Park Lane",
     status: "Approved",
     distance: "0.8 miles",
-    reference: "APP/2024/003"
+    reference: "APP/2024/003",
+    type: "New Build Residential"
+  },
+  {
+    id: 4,
+    title: "Office Complex Development",
+    address: "90 Business Park",
+    status: "Under Review",
+    distance: "1.2 miles",
+    reference: "APP/2024/004",
+    type: "New Build Commercial"
+  },
+  {
+    id: 5,
+    title: "Residential Complex",
+    address: "120 New Street",
+    status: "Declined",
+    distance: "1.5 miles",
+    reference: "APP/2024/005",
+    type: "New Build Residential"
   }
 ];
 
@@ -143,17 +163,20 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer 
-          center={coordinates}
+          center={coordinates as [number, number]}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {/* Search location marker */}
-          <Marker position={coordinates} icon={searchIcon}>
+          <Marker 
+            position={coordinates} 
+            icon={searchIcon}
+          >
             <Popup>
               Search Location: {postcode}
             </Popup>
