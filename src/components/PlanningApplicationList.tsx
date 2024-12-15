@@ -69,12 +69,13 @@ export const PlanningApplicationList = ({
                   }`} />
                 </Button>
                 <Button
-                  variant={feedbackStates[application.id] === 'down' ? "default" : "outline"}
+                  variant={feedbackStates[application.id] === 'down' ? "outline" : "outline"}
                   size="sm"
                   onClick={(e) => handleFeedback(application.id, 'down', e)}
+                  className={feedbackStates[application.id] === 'down' ? 'bg-[#ea384c]/10' : ''}
                 >
                   <ThumbsDown className={`h-4 w-4 ${
-                    feedbackStates[application.id] === 'down' ? 'text-white' : 'text-gray-600'
+                    feedbackStates[application.id] === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
                   }`} />
                 </Button>
               </div>

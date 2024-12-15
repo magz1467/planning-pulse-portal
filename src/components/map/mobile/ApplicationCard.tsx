@@ -61,11 +61,12 @@ export const ApplicationCard = ({ application, isSelected, onClick }: Applicatio
           <ThumbsUp className={`h-4 w-4 ${feedback === 'up' ? 'text-white' : 'text-gray-600'}`} />
         </Button>
         <Button
-          variant={feedback === 'down' ? "default" : "outline"}
+          variant={feedback === 'down' ? "outline" : "outline"}
           size="sm"
           onClick={(e) => handleFeedback('down', e)}
+          className={feedback === 'down' ? 'bg-[#ea384c]/10' : ''}
         >
-          <ThumbsDown className={`h-4 w-4 ${feedback === 'down' ? 'text-white' : 'text-gray-600'}`} />
+          <ThumbsDown className={`h-4 w-4 ${feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'}`} />
         </Button>
       </div>
     </Card>
