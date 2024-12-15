@@ -38,7 +38,7 @@ export const FullScreenDetails = ({
   };
 
   return (
-    <div className="h-[80vh] overflow-y-auto bg-white p-6">
+    <div className="h-[80vh] overflow-y-auto bg-white p-6 animate-slide-up">
       <Button
         variant="ghost"
         className="mb-4 pl-0 hover:pl-2 transition-all"
