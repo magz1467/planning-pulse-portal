@@ -183,8 +183,9 @@ const MapView = () => {
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
-          zoomControl={!isMobile} // Disable zoom controls on mobile
         >
+          {!isMobile && <ZoomControl position="bottomright" />}
+          
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -203,11 +204,9 @@ const MapView = () => {
             onMarkerClick={handleMarkerClick}
             selectedId={selectedApplication}
           />
-          
-          {!isMobile && <ZoomControl position="bottomright" />} {/* Add zoom controls only for desktop */}
         </MapContainer>
 
-        {isMobile && (
+        {isMobile && filteredApplications.length > 0 && (
           <MobileApplicationCards
             applications={filteredApplications}
             selectedId={selectedApplication}
