@@ -10,10 +10,24 @@ import { FilterBar } from '@/components/FilterBar';
 
 // Fix Leaflet icon issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+
+// Create custom icons
+const defaultIcon = new L.Icon({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const searchIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
 
 // Mock data for planning applications
@@ -128,8 +142,8 @@ const MapView = () => {
       </div>
 
       <div className="w-2/3">
-        <MapContainer
-          center={coordinates}
+        <MapContainer 
+          defaultCenter={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
@@ -138,15 +152,19 @@ const MapView = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={coordinates}>
+          {/* Search location marker */}
+          <Marker position={coordinates} icon={searchIcon}>
             <Popup>
-              Postcode: {postcode}
+              Search Location: {postcode}
             </Popup>
           </Marker>
+          
+          {/* Application markers */}
           {filteredApplications.map((application) => {
+            // Increased offset for better spread
             const offset = {
-              lat: (application.id % 3 - 1) * 0.003,
-              lng: (Math.floor(application.id / 3) - 1) * 0.003
+              lat: (application.id % 3 - 1) * 0.008, // Increased from 0.003
+              lng: (Math.floor(application.id / 3) - 1) * 0.008 // Increased from 0.003
             };
             
             return (
@@ -156,6 +174,7 @@ const MapView = () => {
                   coordinates[0] + offset.lat,
                   coordinates[1] + offset.lng
                 ]}
+                icon={defaultIcon}
                 eventHandlers={{
                   click: () => handleMarkerClick(application.id),
                 }}
