@@ -42,14 +42,17 @@ export const DesktopSidebar = ({
         />
       ) : (
         <div className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-4 top-4"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center justify-between border-b p-4">
+            <h2 className="font-semibold">Planning Application Details</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="ml-2"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
           <PlanningApplicationDetails
             application={selectedApplicationData!}
             onClose={onClose}
