@@ -15,7 +15,6 @@ export const MobileApplicationCards = ({
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [comments, setComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     if (selectedId) {
@@ -32,8 +31,9 @@ export const MobileApplicationCards = ({
     }
   };
 
-  const handleCommentSubmit = (newComment: Comment) => {
-    setComments([...comments, newComment]);
+  const handleCommentSubmit = (content: string) => {
+    // Handle comment submission
+    console.log("New comment:", content);
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
@@ -47,7 +47,6 @@ export const MobileApplicationCards = ({
       {isFullScreen && selectedApp ? (
         <FullScreenDetails
           application={selectedApp}
-          comments={comments}
           onClose={() => setIsFullScreen(false)}
           onCommentSubmit={handleCommentSubmit}
         />
