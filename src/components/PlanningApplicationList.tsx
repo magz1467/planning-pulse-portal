@@ -23,8 +23,13 @@ export const PlanningApplicationList = ({
     e.stopPropagation(); // Prevent card click when clicking feedback buttons
     
     setFeedbackStates(prev => {
-      const newState = type === prev[id] ? null : type;
-      return { ...prev, [id]: newState };
+      // If clicking the same button, remove the feedback
+      if (prev[id] === type) {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      }
+      // Otherwise, set new feedback (this allows switching between up/down)
+      return { ...prev, [id]: type };
     });
 
     toast({
