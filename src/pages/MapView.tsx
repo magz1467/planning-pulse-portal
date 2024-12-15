@@ -141,7 +141,7 @@ const MapView = () => {
       {/* Map */}
       <div className="flex-1 relative">
         <MapContainer
-          center={coordinates as [number, number]}
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
@@ -152,7 +152,7 @@ const MapView = () => {
           />
           
           <Marker 
-            position={coordinates as [number, number]} 
+            position={coordinates}
             icon={searchIcon}
           >
             <Popup>Search Location: {postcode}</Popup>
