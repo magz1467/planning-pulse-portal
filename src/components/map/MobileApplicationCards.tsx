@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { CarouselView } from "./mobile/CarouselView";
 
 interface MobileApplicationCardsProps {
@@ -36,37 +36,42 @@ export const MobileApplicationCards = ({
   if (!applications.length) return null;
 
   return (
-    <Sheet defaultOpen open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger className="fixed bottom-0 left-0 right-0 h-2 bg-transparent" />
-      <SheetContent 
-        side="bottom" 
-        className="h-[45vh] p-0 pt-2 fixed bottom-0 left-0 right-0 rounded-t-xl"
-      >
-        <div className="flex flex-col h-full overflow-hidden">
-          <div className="p-2 border-b">
-            <div 
-              className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
-              onClick={() => setIsOpen(false)}
-            />
-          </div>
-          
-          <div className="flex-1 overflow-y-auto">
-            {isFullScreen && selectedApp ? (
-              <FullScreenDetails
-                application={selectedApp}
-                onClose={() => setIsFullScreen(false)}
-                onCommentSubmit={handleCommentSubmit}
+    <div className="fixed inset-x-0 bottom-0 z-50">
+      <Sheet defaultOpen open={isOpen} onOpenChange={setIsOpen}>
+        <div 
+          className="w-full h-2 bg-gray-200 rounded-t-lg cursor-pointer" 
+          onClick={() => setIsOpen(!isOpen)}
+        />
+        <SheetContent 
+          side="bottom" 
+          className="p-0 h-[45vh] rounded-t-xl border-t-0"
+        >
+          <div className="flex flex-col h-full">
+            <div className="p-2 border-b">
+              <div 
+                className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
+                onClick={() => setIsOpen(false)}
               />
-            ) : (
-              <CarouselView
-                applications={applications}
-                selectedId={selectedId}
-                onSelectApplication={handleCardClick}
-              />
-            )}
+            </div>
+            
+            <div className="flex-1 overflow-y-auto">
+              {isFullScreen && selectedApp ? (
+                <FullScreenDetails
+                  application={selectedApp}
+                  onClose={() => setIsFullScreen(false)}
+                  onCommentSubmit={handleCommentSubmit}
+                />
+              ) : (
+                <CarouselView
+                  applications={applications}
+                  selectedId={selectedId}
+                  onSelectApplication={handleCardClick}
+                />
+              )}
+            </div>
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
+    </div>
   );
 };
