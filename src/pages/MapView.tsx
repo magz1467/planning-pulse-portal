@@ -110,21 +110,23 @@ const MapView = () => {
 
   useEffect(() => {
     const fetchCoordinates = async () => {
+      if (!postcode) return;
+      
       try {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
         if (data.status === 200) {
           setCoordinates([data.result.latitude, data.result.longitude]);
+          // Reset selected application when location changes
+          setSelectedApplication(null);
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
       }
     };
 
-    if (postcode) {
-      fetchCoordinates();
-    }
-  }, [postcode]);
+    fetchCoordinates();
+  }, [postcode]); // Now the effect runs whenever postcode changes
 
   useEffect(() => {
     let filtered = mockPlanningApplications;
