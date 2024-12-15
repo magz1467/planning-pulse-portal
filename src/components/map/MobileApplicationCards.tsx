@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { CarouselView } from "./mobile/CarouselView";
+import { useToast } from "@/components/ui/use-toast";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
@@ -17,6 +18,7 @@ export const MobileApplicationCards = ({
 }: MobileApplicationCardsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
+  const { toast } = useToast();
 
   const handleCardClick = (id: number) => {
     if (selectedId === id) {
@@ -24,56 +26,68 @@ export const MobileApplicationCards = ({
     } else {
       setIsFullScreen(false);
       onSelectApplication(id);
+      toast({
+        title: "Application Selected",
+        description: "Tap again to view full details",
+      });
     }
   };
 
   const handleCommentSubmit = (content: string) => {
     console.log("New comment:", content);
+    toast({
+      title: "Comment Submitted",
+      description: "Your comment has been recorded",
+    });
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
 
-  if (!applications.length) return null;
+  if (!applications.length) {
+    return (
+      <div className="fixed bottom-4 left-4 right-4 bg-white p-4 rounded-lg shadow-lg">
+        <p className="text-center text-gray-500">No applications found in this area</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 pointer-events-none">
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-auto">
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <div 
-            className="h-2 bg-gray-200 rounded-t-lg cursor-pointer mx-auto w-12 mb-1" 
-            onClick={() => setIsOpen(!isOpen)}
-          />
-          <SheetContent 
-            side="bottom" 
-            className="p-0 h-[45vh] rounded-t-xl border-t-0"
-          >
-            <div className="flex flex-col h-full">
-              <div className="p-2 border-b">
-                <div 
-                  className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
-                  onClick={() => setIsOpen(false)}
-                />
-              </div>
-              
-              <div className="flex-1 overflow-y-auto">
-                {isFullScreen && selectedApp ? (
-                  <FullScreenDetails
-                    application={selectedApp}
-                    onClose={() => setIsFullScreen(false)}
-                    onCommentSubmit={handleCommentSubmit}
-                  />
-                ) : (
-                  <CarouselView
-                    applications={applications}
-                    selectedId={selectedId}
-                    onSelectApplication={handleCardClick}
-                  />
-                )}
-              </div>
+    <div className="fixed inset-x-0 bottom-0 z-50">
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <div 
+          className="h-2 w-12 bg-gray-200 rounded-full mx-auto mb-2 cursor-pointer" 
+          onClick={() => setIsOpen(!isOpen)}
+        />
+        <SheetContent 
+          side="bottom" 
+          className="p-0 h-[45vh] rounded-t-xl"
+        >
+          <div className="flex flex-col h-full">
+            <div className="p-2 border-b">
+              <div 
+                className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
+                onClick={() => setIsOpen(false)}
+              />
             </div>
-          </SheetContent>
-        </Sheet>
-      </div>
+            
+            <div className="flex-1 overflow-y-auto">
+              {isFullScreen && selectedApp ? (
+                <FullScreenDetails
+                  application={selectedApp}
+                  onClose={() => setIsFullScreen(false)}
+                  onCommentSubmit={handleCommentSubmit}
+                />
+              ) : (
+                <CarouselView
+                  applications={applications}
+                  selectedId={selectedId}
+                  onSelectApplication={handleCardClick}
+                />
+              )}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

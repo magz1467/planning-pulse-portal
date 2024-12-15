@@ -30,7 +30,7 @@ export const CarouselView = ({
       >
         <CarouselContent>
           {applications.map((app) => (
-            <CarouselItem key={app.id} className="md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={app.id} className="basis-full sm:basis-1/2 md:basis-1/3">
               <div className="p-1">
                 <ApplicationCard
                   application={app}

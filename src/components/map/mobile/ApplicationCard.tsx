@@ -16,7 +16,7 @@ export const ApplicationCard = ({ application, isSelected, onClick }: Applicatio
   const { toast } = useToast();
 
   const handleFeedback = (type: 'up' | 'down', e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click when clicking feedback buttons
+    e.stopPropagation();
     
     if (feedback === type) {
       setFeedback(null);
@@ -36,7 +36,7 @@ export const ApplicationCard = ({ application, isSelected, onClick }: Applicatio
   return (
     <Card
       className={`overflow-hidden cursor-pointer transition-all p-4 ${
-        isSelected ? "border-primary" : ""
+        isSelected ? "border-primary shadow-lg" : "border-gray-200"
       }`}
       onClick={onClick}
     >
