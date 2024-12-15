@@ -18,7 +18,7 @@ export const ApplicationMarkers = ({ applications, baseCoordinates, onMarkerClic
           lng: (Math.floor(application.id / 3) - 1) * 0.008
         };
         
-        const position: [number, number] = [
+        const position: LatLngTuple = [
           baseCoordinates[0] + offset.lat,
           baseCoordinates[1] + offset.lng
         ];

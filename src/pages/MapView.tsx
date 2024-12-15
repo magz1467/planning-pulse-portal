@@ -9,8 +9,11 @@ import { FilterBar } from '@/components/FilterBar';
 import { ApplicationMarkers } from '@/components/map/ApplicationMarkers';
 import { searchIcon } from '@/components/map/MapMarkers';
 import type { LatLngTuple } from 'leaflet';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
-// Mock data for planning applications
 const mockPlanningApplications: Application[] = [
   {
     id: 1,
@@ -76,6 +79,8 @@ const MapView = () => {
     status?: string;
     type?: string;
   }>({});
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -115,52 +120,85 @@ const MapView = () => {
     }));
   };
 
+  const handleMarkerClick = (id: number) => {
+    setSelectedApplication(id);
+    if (isMobile) {
+      setIsFullScreen(true);
+    }
+  };
+
   if (!coordinates) {
     return <div className="flex items-center justify-center h-screen">Loading map...</div>;
   }
 
+  const selectedApplicationData = selectedApplication 
+    ? mockPlanningApplications.find(app => app.id === selectedApplication)
+    : null;
+
   return (
-    <div className="flex h-screen">
-      <div className="w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
+    <div className="flex flex-col md:flex-row h-screen">
+      {/* Sidebar */}
+      <div className={`${isMobile && isFullScreen ? 'hidden' : 'w-full md:w-1/3'} overflow-y-auto border-r border-gray-200 bg-white`}>
         <FilterBar onFilterChange={handleFilterChange} activeFilters={activeFilters} />
         {selectedApplication === null ? (
           <PlanningApplicationList
             applications={filteredApplications}
             postcode={postcode}
-            onSelectApplication={setSelectedApplication}
+            onSelectApplication={handleMarkerClick}
           />
         ) : (
-          <PlanningApplicationDetails
-            application={mockPlanningApplications.find(app => app.id === selectedApplication)!}
-            onClose={() => setSelectedApplication(null)}
-          />
+          <div className="relative">
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 top-4"
+                onClick={() => setSelectedApplication(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+            <PlanningApplicationDetails
+              application={selectedApplicationData!}
+              onClose={() => setSelectedApplication(null)}
+            />
+          </div>
         )}
       </div>
 
-      <div className="w-2/3">
+      {/* Map */}
+      <div className={`${isMobile && !isFullScreen ? 'h-[50vh]' : 'flex-1'} relative`}>
+        {isMobile && isFullScreen && (
+          <Button
+            variant="secondary"
+            className="absolute top-4 right-4 z-[1000]"
+            onClick={() => setIsFullScreen(false)}
+          >
+            Show List
+          </Button>
+        )}
         <MapContainer 
-          center={coordinates}
+          center={coordinates as [number, number]}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
+          attributionControl={true}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
-          {/* Search location marker */}
           <Marker position={coordinates} icon={searchIcon}>
             <Popup>
               Search Location: {postcode}
             </Popup>
           </Marker>
           
-          {/* Application markers */}
           <ApplicationMarkers 
             applications={filteredApplications}
             baseCoordinates={coordinates}
-            onMarkerClick={setSelectedApplication}
+            onMarkerClick={handleMarkerClick}
           />
         </MapContainer>
       </div>
