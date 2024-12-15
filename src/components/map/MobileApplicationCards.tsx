@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CarouselView } from "./mobile/CarouselView";
 
 interface MobileApplicationCardsProps {
@@ -36,32 +36,32 @@ export const MobileApplicationCards = ({
   if (!applications.length) return null;
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger asChild>
-        <div className="h-1" />
-      </DrawerTrigger>
-      <DrawerContent className="fixed inset-x-0 bottom-0 mt-24 rounded-t-[10px]">
-        <div className="p-2 border-b">
-          <div 
-            className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
-            onClick={() => setIsOpen(false)}
-          />
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTrigger className="fixed bottom-0 left-0 right-0 h-1 bg-transparent" />
+      <SheetContent side="bottom" className="h-[40vh] p-0 pt-2">
+        <div className="flex flex-col h-full">
+          <div className="p-2 border-b">
+            <div 
+              className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
+              onClick={() => setIsOpen(false)}
+            />
+          </div>
+          
+          {isFullScreen && selectedApp ? (
+            <FullScreenDetails
+              application={selectedApp}
+              onClose={() => setIsFullScreen(false)}
+              onCommentSubmit={handleCommentSubmit}
+            />
+          ) : (
+            <CarouselView
+              applications={applications}
+              selectedId={selectedId}
+              onSelectApplication={handleCardClick}
+            />
+          )}
         </div>
-        
-        {isFullScreen && selectedApp ? (
-          <FullScreenDetails
-            application={selectedApp}
-            onClose={() => setIsFullScreen(false)}
-            onCommentSubmit={handleCommentSubmit}
-          />
-        ) : (
-          <CarouselView
-            applications={applications}
-            selectedId={selectedId}
-            onSelectApplication={handleCardClick}
-          />
-        )}
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 };

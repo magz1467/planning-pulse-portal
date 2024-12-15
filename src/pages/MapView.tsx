@@ -117,7 +117,6 @@ const MapView = () => {
         const data = await response.json();
         if (data.status === 200) {
           setCoordinates([data.result.latitude, data.result.longitude]);
-          // Reset selected application when location changes
           setSelectedApplication(null);
         }
       } catch (error) {
@@ -126,7 +125,7 @@ const MapView = () => {
     };
 
     fetchCoordinates();
-  }, [postcode]); // Now the effect runs whenever postcode changes
+  }, [postcode]);
 
   useEffect(() => {
     let filtered = mockPlanningApplications;
@@ -159,7 +158,7 @@ const MapView = () => {
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       <MapHeader />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
           <DesktopSidebar
             applications={filteredApplications}
