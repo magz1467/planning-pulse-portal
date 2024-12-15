@@ -1,18 +1,14 @@
-import { useLocation } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { useEffect, useState } from 'react';
-import { PlanningApplicationList } from '@/components/PlanningApplicationList';
-import { PlanningApplicationDetails } from '@/components/PlanningApplicationDetails';
-import { Application } from '@/types/planning';
-import { FilterBar } from '@/components/FilterBar';
-import { ApplicationMarkers } from '@/components/map/ApplicationMarkers';
-import { searchIcon } from '@/components/map/MapMarkers';
-import type { LatLngTuple } from 'leaflet';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { useLocation } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useState } from "react";
+import { Application } from "@/types/planning";
+import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
+import { searchIcon } from "@/components/map/MapMarkers";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
+import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 
 const mockPlanningApplications: Application[] = [
   {
@@ -72,7 +68,7 @@ const mockPlanningApplications: Application[] = [
 const MapView = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
-  const [coordinates, setCoordinates] = useState<LatLngTuple | null>(null);
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
   const [filteredApplications, setFilteredApplications] = useState(mockPlanningApplications);
   const [activeFilters, setActiveFilters] = useState<{
@@ -91,7 +87,7 @@ const MapView = () => {
           setCoordinates([data.result.latitude, data.result.longitude]);
         }
       } catch (error) {
-        console.error('Error fetching coordinates:', error);
+        console.error("Error fetching coordinates:", error);
       }
     };
 
@@ -131,43 +127,23 @@ const MapView = () => {
     return <div className="flex items-center justify-center h-screen">Loading map...</div>;
   }
 
-  const selectedApplicationData = selectedApplication 
-    ? mockPlanningApplications.find(app => app.id === selectedApplication)
-    : null;
-
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Sidebar */}
-      <div className={`${isMobile && isFullScreen ? 'hidden' : 'w-full md:w-1/3'} overflow-y-auto border-r border-gray-200 bg-white`}>
-        <FilterBar onFilterChange={handleFilterChange} activeFilters={activeFilters} />
-        {selectedApplication === null ? (
-          <PlanningApplicationList
-            applications={filteredApplications}
-            postcode={postcode}
-            onSelectApplication={handleMarkerClick}
-          />
-        ) : (
-          <div className="relative">
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 top-4"
-                onClick={() => setSelectedApplication(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-            <PlanningApplicationDetails
-              application={selectedApplicationData!}
-              onClose={() => setSelectedApplication(null)}
-            />
-          </div>
-        )}
-      </div>
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <DesktopSidebar
+          applications={filteredApplications}
+          selectedApplication={selectedApplication}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+          onSelectApplication={handleMarkerClick}
+          onClose={() => setSelectedApplication(null)}
+        />
+      )}
 
       {/* Map */}
-      <div className={`${isMobile && !isFullScreen ? 'h-[50vh]' : 'flex-1'} relative`}>
+      <div className="flex-1 relative">
         {isMobile && isFullScreen && (
           <Button
             variant="secondary"
@@ -177,12 +153,11 @@ const MapView = () => {
             Show List
           </Button>
         )}
-        <MapContainer 
-          center={coordinates as [number, number]}
+        <MapContainer
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
-          style={{ height: '100%', width: '100%' }}
-          attributionControl={true}
+          style={{ height: "100%" }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -190,17 +165,24 @@ const MapView = () => {
           />
           
           <Marker position={coordinates} icon={searchIcon}>
-            <Popup>
-              Search Location: {postcode}
-            </Popup>
+            <Popup>Search Location: {postcode}</Popup>
           </Marker>
           
-          <ApplicationMarkers 
+          <ApplicationMarkers
             applications={filteredApplications}
             baseCoordinates={coordinates}
             onMarkerClick={handleMarkerClick}
           />
         </MapContainer>
+
+        {/* Mobile Cards */}
+        {isMobile && !isFullScreen && (
+          <MobileApplicationCards
+            applications={filteredApplications}
+            selectedId={selectedApplication}
+            onSelectApplication={handleMarkerClick}
+          />
+        )}
       </div>
     </div>
   );
