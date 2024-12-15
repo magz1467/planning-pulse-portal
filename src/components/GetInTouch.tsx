@@ -1,4 +1,15 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+
 export const GetInTouch = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   return (
     <div className="bg-gray-50 py-24">
       <div className="container mx-auto px-4">
@@ -10,15 +21,26 @@ export const GetInTouch = () => {
             <p className="text-lg text-gray-600 mb-8">
               If you are a developer or a council, get in touch to hear more about our partnership options.
             </p>
-            <a 
-              href="mailto:contact@planningpulse.com" 
+            <button 
+              onClick={() => setIsDialogOpen(true)}
               className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"
             >
               Contact Us
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Contact Information</DialogTitle>
+            <DialogDescription>
+              Please email marcogeraghty@gmail.com for more details.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
