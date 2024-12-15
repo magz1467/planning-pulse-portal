@@ -44,15 +44,15 @@ export const PlanningApplicationDetails = ({
         <Card className="p-4">
           <h3 className="font-semibold mb-4">Community Feedback</h3>
           <div className="flex gap-8">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <ThumbsUp className="h-5 w-5 text-primary" />
               <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
-              <span className="text-gray-500 text-sm">people like this development</span>
+              <span className="text-gray-500 text-sm">people like this</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <ThumbsDown className="h-5 w-5 text-[#ea384c]" />
               <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-              <span className="text-gray-500 text-sm">people dislike this development</span>
+              <span className="text-gray-500 text-sm">people dislike this</span>
             </div>
           </div>
         </Card>
