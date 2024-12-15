@@ -19,7 +19,7 @@ export const ApplicationCard = ({ application, isSelected, onClick }: Applicatio
     >
       <AspectRatio ratio={16 / 9}>
         <Image
-          src={application.image || "/lovable-uploads/ed8c75b6-7e73-4720-818d-f78fbcf2d94a.png"}
+          src={application.image}
           alt={application.title}
           className="object-cover w-full h-full"
         />

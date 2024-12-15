@@ -4,6 +4,8 @@ import { Share2, ThumbsUp, ThumbsDown, X } from "lucide-react";
 import { CommentList } from "../../comments/CommentList";
 import { CommentForm } from "../../comments/CommentForm";
 import { useToast } from "@/hooks/use-toast";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import Image from "@/components/ui/image";
 
 interface FullScreenDetailsProps {
   application: Application;
@@ -64,6 +66,14 @@ export const FullScreenDetails = ({
             </Button>
           </div>
         </div>
+
+        <AspectRatio ratio={16 / 9} className="mb-6">
+          <Image
+            src={application.image || "/lovable-uploads/ed8c75b6-7e73-4720-818d-f78fbcf2d94a.png"}
+            alt={application.title}
+            className="object-cover w-full h-full rounded-lg"
+          />
+        </AspectRatio>
 
         <div className="space-y-6">
           <div>
