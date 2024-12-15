@@ -45,14 +45,14 @@ export const MobileApplicationCards = ({
 
   if (!applications.length) {
     return (
-      <div style={{ position: 'fixed', bottom: '16px', left: '16px', right: '16px', zIndex: 9999 }} className="bg-white p-4 rounded-lg shadow-lg">
+      <div className="fixed bottom-4 left-4 right-4 bg-white p-4 rounded-lg shadow-lg" style={{ zIndex: 1100 }}>
         <p className="text-center text-gray-500">No applications found in this area</p>
       </div>
     );
   }
 
   return (
-    <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+    <div className="fixed inset-x-0 bottom-0" style={{ zIndex: 1100 }}>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <div 
@@ -63,13 +63,7 @@ export const MobileApplicationCards = ({
         <SheetContent 
           side="bottom" 
           className="p-0 h-[45vh] rounded-t-xl bg-white shadow-lg"
-          style={{ 
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-          }}
+          style={{ position: 'relative' }}
         >
           <div className="flex flex-col h-full bg-white">
             <div className="p-2 border-b bg-white sticky top-0">

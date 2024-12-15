@@ -20,20 +20,20 @@ export const MapContainerComponent = ({
   selectedApplication,
   onMarkerClick,
 }: MapContainerProps) => {
-  // Determine zoom level based on number of applications
   const getZoomLevel = () => {
-    if (applications.length <= 2) return 15; // Very close zoom for 1-2 applications
-    if (applications.length <= 5) return 14; // Slightly zoomed out for 3-5 applications
-    return 13; // Default zoom level for more applications
+    if (applications.length <= 2) return 15;
+    if (applications.length <= 5) return 14;
+    return 13;
   };
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative" style={{ zIndex: 0 }}>
       <LeafletMapContainer
         center={coordinates}
         zoom={getZoomLevel()}
         scrollWheelZoom={true}
         className="w-full h-full"
+        style={{ position: 'absolute', inset: 0 }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
