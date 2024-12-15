@@ -7,6 +7,7 @@ import { PlanningApplicationList } from '@/components/PlanningApplicationList';
 import { PlanningApplicationDetails } from '@/components/PlanningApplicationDetails';
 import { Application } from '@/types/planning';
 import { FilterBar } from '@/components/FilterBar';
+import type { LatLngExpression } from 'leaflet';
 
 // Fix Leaflet icon issues
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -89,7 +90,7 @@ const mockPlanningApplications: Application[] = [
 const MapView = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
-  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
+  const [coordinates, setCoordinates] = useState<LatLngExpression | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
   const [filteredApplications, setFilteredApplications] = useState(mockPlanningApplications);
   const [activeFilters, setActiveFilters] = useState<{
@@ -163,18 +164,18 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer 
-          center={coordinates as [number, number]}
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {/* Search location marker */}
           <Marker 
-            position={coordinates} 
+            position={coordinates}
             icon={searchIcon}
           >
             <Popup>
@@ -190,13 +191,15 @@ const MapView = () => {
               lng: (Math.floor(application.id / 3) - 1) * 0.008
             };
             
+            const position: LatLngExpression = [
+              (coordinates as L.LatLngTuple)[0] + offset.lat,
+              (coordinates as L.LatLngTuple)[1] + offset.lng
+            ];
+
             return (
               <Marker
                 key={application.id}
-                position={[
-                  coordinates[0] + offset.lat,
-                  coordinates[1] + offset.lng
-                ]}
+                position={position}
                 icon={defaultIcon}
                 eventHandlers={{
                   click: () => handleMarkerClick(application.id),
