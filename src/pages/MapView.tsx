@@ -79,6 +79,10 @@ const MapView = () => {
     return <div className="flex items-center justify-center h-screen">Loading map...</div>;
   }
 
+  const handleMarkerClick = (applicationId: number) => {
+    setSelectedApplication(applicationId);
+  };
+
   return (
     <div className="flex h-screen">
       <div className="w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
@@ -98,8 +102,8 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer
-          center={coordinates as L.LatLngExpression}
-          zoom={13}
+          defaultCenter={coordinates}
+          defaultZoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
         >
@@ -112,23 +116,34 @@ const MapView = () => {
               Postcode: {postcode}
             </Popup>
           </Marker>
-          {mockPlanningApplications.map((application) => (
-            <Marker
-              key={application.id}
-              position={[
-                coordinates[0] + (Math.random() - 0.5) * 0.01,
-                coordinates[1] + (Math.random() - 0.5) * 0.01
-              ]}
-            >
-              <Popup>
-                <div>
-                  <h3 className="font-semibold">{application.title}</h3>
-                  <p className="text-sm">{application.address}</p>
-                  <p className="text-xs mt-1">Status: {application.status}</p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {mockPlanningApplications.map((application) => {
+            // Generate a consistent offset for each application based on its ID
+            const offset = {
+              lat: (application.id % 3 - 1) * 0.003,
+              lng: (Math.floor(application.id / 3) - 1) * 0.003
+            };
+            
+            return (
+              <Marker
+                key={application.id}
+                position={[
+                  coordinates[0] + offset.lat,
+                  coordinates[1] + offset.lng
+                ]}
+                eventHandlers={{
+                  click: () => handleMarkerClick(application.id),
+                }}
+              >
+                <Popup>
+                  <div>
+                    <h3 className="font-semibold">{application.title}</h3>
+                    <p className="text-sm">{application.address}</p>
+                    <p className="text-xs mt-1">Status: {application.status}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>
