@@ -8,17 +8,19 @@ import { GetInTouch } from "@/components/GetInTouch";
 
 const Index = () => {
   return (
-    <>
+    <div className="flex flex-col min-h-screen overflow-x-hidden">
       <Header />
-      <div className="min-h-screen bg-gray-50">
-        <Hero />
-        <Features />
-        <Mission />
-        <Services />
-        <GetInTouch />
-      </div>
+      <main className="flex-grow w-full">
+        <div className="relative">
+          <Hero />
+          <Features />
+          <Mission />
+          <Services />
+          <GetInTouch />
+        </div>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 };
 
