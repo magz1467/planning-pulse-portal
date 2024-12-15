@@ -14,7 +14,7 @@ export const MobileApplicationCards = ({
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg z-[1000] pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl shadow-lg z-[1000] pb-safe">
       <div className="p-2 border-b">
         <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto" />
       </div>

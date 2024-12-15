@@ -154,17 +154,18 @@ const MapView = () => {
           </Button>
         )}
         <MapContainer
-          center={coordinates}
+          center={coordinates as [number, number]}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
+          attributionControl={true}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
-          <Marker position={coordinates} icon={searchIcon}>
+          <Marker position={coordinates as [number, number]} icon={searchIcon}>
             <Popup>Search Location: {postcode}</Popup>
           </Marker>
           
