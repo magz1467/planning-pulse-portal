@@ -8,6 +8,7 @@ import { searchIcon } from "@/components/map/MapMarkers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
 import { MobileSearchBar } from "@/components/map/mobile/MobileSearchBar";
+import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -145,12 +146,30 @@ const MapView = () => {
     setSelectedApplication(id);
   };
 
+  const handleFilterChange = (filterType: string, value: string) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
   if (!coordinates) {
     return <div className="flex items-center justify-center h-screen">Loading map...</div>;
   }
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
+      {!isMobile && (
+        <DesktopSidebar
+          applications={filteredApplications}
+          selectedApplication={selectedApplication}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+          onSelectApplication={handleMarkerClick}
+          onClose={() => setSelectedApplication(null)}
+        />
+      )}
       <div className="flex-1 relative">
         {isMobile && <MobileSearchBar />}
         
