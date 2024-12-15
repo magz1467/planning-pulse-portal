@@ -25,7 +25,7 @@ export const MapHeader = () => {
           </Link>
           
           <form onSubmit={handleSubmit} className="flex-1 flex justify-center mx-4">
-            <div className="relative w-1/3">
+            <div className="relative w-1/2">
               <Input 
                 type="text" 
                 placeholder="Search new location" 
