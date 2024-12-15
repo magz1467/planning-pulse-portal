@@ -2,7 +2,7 @@ import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ThumbsUp, ThumbsDown } from "lucide-react";
+import { X, ThumbsUp, ThumbsDown } from "lucide-react";
 import { CommentForm } from "@/components/comments/CommentForm";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -38,17 +38,17 @@ export const FullScreenDetails = ({
   };
 
   return (
-    <div key={application.id} className="h-[80vh] overflow-y-auto bg-white p-6 animate-slide-up">
+    <div key={application.id} className="h-[80vh] overflow-y-auto bg-white p-6 animate-slide-up relative">
       <Button
         variant="ghost"
-        className="mb-4 pl-0 hover:pl-2 transition-all"
+        size="icon"
+        className="absolute right-4 top-2"
         onClick={onClose}
       >
-        <ChevronLeft className="mr-2 h-4 w-4" />
-        Back to list
+        <X className="h-4 w-4" />
       </Button>
 
-      <div className="space-y-6">
+      <div className="space-y-4 mt-6">
         <div>
           <h2 className="text-2xl font-bold mb-2">{application.title}</h2>
           <p className="text-gray-600 mb-2">{application.address}</p>
