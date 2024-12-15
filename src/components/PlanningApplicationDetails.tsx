@@ -89,6 +89,8 @@ export const PlanningApplicationDetails = ({
           <p className="text-gray-600 text-sm">{application.description}</p>
         </div>
 
+        <CommentList comments={comments} />
+
         <div className="border-t pt-6">
           <h4 className="font-semibold mb-4">Quick Feedback</h4>
           <div className="flex gap-4">
@@ -110,7 +112,6 @@ export const PlanningApplicationDetails = ({
         </div>
 
         <CommentForm onCommentSubmit={handleCommentSubmit} />
-        <CommentList comments={comments} />
       </div>
     </div>
   );
