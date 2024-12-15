@@ -17,8 +17,10 @@ export const PlanningApplicationDetails = ({
 }: PlanningApplicationDetailsProps) => {
   const { toast } = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
+  const [selectedFeedback, setSelectedFeedback] = useState<'positive' | 'negative' | null>(null);
 
   const handleFeedback = (type: 'positive' | 'negative') => {
+    setSelectedFeedback(type);
     toast({
       title: "Thank you for your feedback",
       description: "Your response has been recorded.",
@@ -121,19 +123,28 @@ export const PlanningApplicationDetails = ({
           <div className="flex gap-4">
             <Button
               variant="outline"
-              className="flex-1"
+              className={`flex-1 ${
+                selectedFeedback === 'positive' ? 'bg-[#F2FCE2] border-primary text-primary' : ''
+              }`}
               onClick={() => handleFeedback('positive')}
             >
               <ThumbsUp className="mr-2" /> Support
             </Button>
             <Button
               variant="outline"
-              className="flex-1"
+              className={`flex-1 ${
+                selectedFeedback === 'negative' ? 'bg-[#FFDEE2] border-destructive text-destructive' : ''
+              }`}
               onClick={() => handleFeedback('negative')}
             >
               <ThumbsDown className="mr-2" /> Object
             </Button>
           </div>
+          {selectedFeedback && (
+            <p className="text-sm text-gray-600 text-center mt-2">
+              Thanks, feedback submitted
+            </p>
+          )}
         </div>
 
         <CommentForm onCommentSubmit={handleCommentSubmit} />
