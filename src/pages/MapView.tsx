@@ -8,6 +8,7 @@ import { searchIcon } from "@/components/map/MapMarkers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import { MobileSearchBar } from "@/components/map/mobile/MobileSearchBar";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -76,6 +77,7 @@ const MapView = () => {
     type?: string;
   }>({});
   const isMobile = useIsMobile();
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -108,15 +110,18 @@ const MapView = () => {
     setFilteredApplications(filtered);
   }, [activeFilters]);
 
+  const handleMarkerClick = (id: number) => {
+    setSelectedApplication(id);
+    if (isMobile) {
+      setIsFullScreen(true);
+    }
+  };
+
   const handleFilterChange = (filterType: string, value: string) => {
     setActiveFilters(prev => ({
       ...prev,
       [filterType]: value
     }));
-  };
-
-  const handleMarkerClick = (id: number) => {
-    setSelectedApplication(id);
   };
 
   if (!coordinates) {
@@ -138,19 +143,21 @@ const MapView = () => {
       )}
 
       <div className="flex-1 relative">
+        {isMobile && <MobileSearchBar />}
+        
         <MapContainer
-          center={coordinates as [number, number]}
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
         >
           <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
           <Marker 
-            position={coordinates as [number, number]}
+            position={coordinates}
             icon={searchIcon}
           >
             <Popup>Search Location: {postcode}</Popup>

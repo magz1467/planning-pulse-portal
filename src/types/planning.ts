@@ -21,4 +21,5 @@ export interface Comment {
   text: string;
   author: string;
   timestamp: Date;
+  date: Date;
 }

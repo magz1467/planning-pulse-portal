@@ -1,5 +1,5 @@
 import { Application, Comment } from "@/types/planning";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CarouselView } from "./mobile/CarouselView";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
 
@@ -16,6 +16,12 @@ export const MobileApplicationCards = ({
 }: MobileApplicationCardsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
+
+  useEffect(() => {
+    if (selectedId) {
+      setIsFullScreen(true);
+    }
+  }, [selectedId]);
 
   const handleCardClick = (id: number) => {
     if (selectedId === id) {
