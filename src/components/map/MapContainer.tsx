@@ -1,4 +1,4 @@
-import { MapContainer as LeafletMapContainer, TileLayer, ZoomControl } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import { Marker, Popup } from "react-leaflet";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { searchIcon } from "./MapMarkers";
@@ -35,8 +35,6 @@ export const MapContainerComponent = ({
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        <ZoomControl position="topleft" />
-        
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
