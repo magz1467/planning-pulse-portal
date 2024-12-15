@@ -14,3 +14,10 @@ export interface Application {
   officer?: string;
   consultationEnd?: string;
 }
+
+export interface Comment {
+  id: number;
+  text: string;
+  author: string;
+  date: string;
+}

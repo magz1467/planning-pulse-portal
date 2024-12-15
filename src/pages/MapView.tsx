@@ -98,7 +98,7 @@ const MapView = () => {
 
       <div className="w-2/3">
         <MapContainer
-          center={coordinates}
+          center={coordinates as L.LatLngExpression}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
