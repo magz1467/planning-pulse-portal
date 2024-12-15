@@ -4,6 +4,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
 
 interface CarouselViewProps {
@@ -23,12 +25,12 @@ export const CarouselView = ({
         opts={{
           align: "center",
           loop: true,
-          dragFree: true,
         }}
+        className="w-full max-w-xs mx-auto relative"
       >
         <CarouselContent>
           {applications.map((app) => (
-            <CarouselItem key={app.id}>
+            <CarouselItem key={app.id} className="basis-full">
               <ApplicationCard
                 application={app}
                 isSelected={selectedId === app.id}
@@ -37,6 +39,8 @@ export const CarouselView = ({
             </CarouselItem>
           ))}
         </CarouselContent>
+        <CarouselPrevious className="absolute left-0" />
+        <CarouselNext className="absolute right-0" />
       </Carousel>
     </div>
   );
