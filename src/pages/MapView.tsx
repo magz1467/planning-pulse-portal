@@ -1,14 +1,13 @@
 import { useLocation } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
 import { searchIcon } from "@/components/map/MapMarkers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
 import { MobileSearchBar } from "@/components/map/mobile/MobileSearchBar";
-import { findClosestApplication } from "@/utils/distance";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -110,25 +109,6 @@ const MapView = () => {
     type?: string;
   }>({});
   const isMobile = useIsMobile();
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  const generateRandomCoordinates = (index: number): LatLngTuple => {
-    const angle = Math.random() * 2 * Math.PI;
-    const distance = Math.random() * 0.01;
-    const latOffset = distance * Math.cos(angle);
-    const lngOffset = distance * Math.sin(angle);
-
-    return [
-      coordinates![0] + latOffset,
-      coordinates![1] + lngOffset
-    ];
-  };
-
-  // Memoize the coordinates so they don't change on re-renders
-  const applicationCoordinates = useMemo(() => {
-    if (!coordinates) return [];
-    return filteredApplications.map((_, index) => generateRandomCoordinates(index));
-  }, [filteredApplications.length, coordinates]);
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -136,18 +116,7 @@ const MapView = () => {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
         if (data.status === 200) {
-          const newCoordinates: LatLngTuple = [data.result.latitude, data.result.longitude];
-          setCoordinates(newCoordinates);
-          
-          // When coordinates are set and we're on mobile, automatically select the closest application
-          if (isMobile && filteredApplications.length > 0) {
-            const closestId = findClosestApplication(
-              filteredApplications,
-              newCoordinates,
-              filteredApplications.map((_, index) => generateRandomCoordinates(index))
-            );
-            setSelectedApplication(closestId);
-          }
+          setCoordinates([data.result.latitude, data.result.longitude]);
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
@@ -157,7 +126,7 @@ const MapView = () => {
     if (postcode) {
       fetchCoordinates();
     }
-  }, [postcode, isMobile, filteredApplications]);
+  }, [postcode]);
 
   useEffect(() => {
     let filtered = mockPlanningApplications;
@@ -174,9 +143,6 @@ const MapView = () => {
 
   const handleMarkerClick = (id: number) => {
     setSelectedApplication(id);
-    if (isMobile) {
-      setIsFullScreen(true);
-    }
   };
 
   const handleFilterChange = (filterType: string, value: string) => {
@@ -192,18 +158,6 @@ const MapView = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {!isMobile && (
-        <DesktopSidebar
-          applications={filteredApplications}
-          selectedApplication={selectedApplication}
-          postcode={postcode}
-          activeFilters={activeFilters}
-          onFilterChange={handleFilterChange}
-          onSelectApplication={handleMarkerClick}
-          onClose={() => setSelectedApplication(null)}
-        />
-      )}
-
       <div className="flex-1 relative">
         {isMobile && <MobileSearchBar />}
         
@@ -213,7 +167,7 @@ const MapView = () => {
           scrollWheelZoom={true}
           style={{ height: "100%" }}
         >
-          {!isMobile && <ZoomControl position="bottomright" />}
+          <ZoomControl position="bottomright" />
           
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
