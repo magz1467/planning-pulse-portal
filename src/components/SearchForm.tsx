@@ -21,7 +21,7 @@ export const SearchForm = () => {
             <Input 
               type="text" 
               placeholder="Enter a postcode" 
-              className="w-full pl-4 pr-10 py-3 border rounded-md"
+              className="w-full pl-4 pr-10 py-3 border border-primary-light rounded-md focus:ring-primary focus:border-primary"
             />
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           </div>
