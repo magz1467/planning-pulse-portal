@@ -20,11 +20,18 @@ export const MapContainerComponent = ({
   selectedApplication,
   onMarkerClick,
 }: MapContainerProps) => {
+  // Determine zoom level based on number of applications
+  const getZoomLevel = () => {
+    if (applications.length <= 2) return 15; // Very close zoom for 1-2 applications
+    if (applications.length <= 5) return 14; // Slightly zoomed out for 3-5 applications
+    return 13; // Default zoom level for more applications
+  };
+
   return (
     <div className="w-full h-full">
       <LeafletMapContainer
         center={coordinates}
-        zoom={13}
+        zoom={getZoomLevel()}
         scrollWheelZoom={true}
         className="w-full h-full"
       >
