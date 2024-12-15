@@ -2,16 +2,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Home } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 export const MapHeader = () => {
   const [postcode, setPostcode] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (postcode.trim()) {
-      navigate('/map', { state: { postcode: postcode.trim() } });
+      // If we're already on the map page, reload with new state
+      if (location.pathname === '/map') {
+        navigate('/map', { 
+          state: { postcode: postcode.trim() }, 
+          replace: true 
+        });
+      } else {
+        navigate('/map', { 
+          state: { postcode: postcode.trim() } 
+        });
+      }
+      
+      toast({
+        title: "Searching new location",
+        description: `Showing results for ${postcode.trim()}`,
+      });
     }
   };
 
