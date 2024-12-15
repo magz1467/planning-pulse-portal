@@ -1,14 +1,11 @@
 import { useLocation } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import { Application } from "@/types/planning";
-import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
-import { searchIcon } from "@/components/map/MapMarkers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
-import { MobileSearchBar } from "@/components/map/mobile/MobileSearchBar";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import { MapHeader } from "@/components/map/MapHeader";
+import { MapContainerComponent } from "@/components/map/MapContainer";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -158,56 +155,37 @@ const MapView = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
-      {!isMobile && (
-        <DesktopSidebar
-          applications={filteredApplications}
-          selectedApplication={selectedApplication}
-          postcode={postcode}
-          activeFilters={activeFilters}
-          onFilterChange={handleFilterChange}
-          onSelectApplication={handleMarkerClick}
-          onClose={() => setSelectedApplication(null)}
-        />
-      )}
-      <div className="flex-1 relative">
-        {isMobile && <MobileSearchBar />}
-        
-        <MapContainer
-          center={coordinates}
-          zoom={13}
-          scrollWheelZoom={true}
-          style={{ height: "100%" }}
-        >
-          <ZoomControl position="bottomright" />
-          
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          
-          <Marker 
-            position={coordinates}
-            icon={searchIcon}
-          >
-            <Popup>Search Location: {postcode}</Popup>
-          </Marker>
-          
-          <ApplicationMarkers
+    <div className="flex flex-col h-screen">
+      <MapHeader />
+      <div className="flex flex-1 overflow-hidden">
+        {!isMobile && (
+          <DesktopSidebar
             applications={filteredApplications}
-            baseCoordinates={coordinates}
-            onMarkerClick={handleMarkerClick}
-            selectedId={selectedApplication}
-          />
-        </MapContainer>
-
-        {isMobile && (
-          <MobileApplicationCards
-            applications={filteredApplications}
-            selectedId={selectedApplication}
+            selectedApplication={selectedApplication}
+            postcode={postcode}
+            activeFilters={activeFilters}
+            onFilterChange={handleFilterChange}
             onSelectApplication={handleMarkerClick}
+            onClose={() => setSelectedApplication(null)}
           />
         )}
+        <div className="flex-1 relative">
+          <MapContainerComponent
+            coordinates={coordinates}
+            postcode={postcode}
+            applications={filteredApplications}
+            selectedApplication={selectedApplication}
+            onMarkerClick={handleMarkerClick}
+          />
+
+          {isMobile && (
+            <MobileApplicationCards
+              applications={filteredApplications}
+              selectedId={selectedApplication}
+              onSelectApplication={handleMarkerClick}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
