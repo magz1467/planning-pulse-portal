@@ -26,16 +26,18 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute right-2 top-2 z-10"
-        onClick={onClose}
-      >
-        <X className="h-4 w-4" />
-      </Button>
+      <div className="flex justify-end p-2 border-b">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-8 w-8"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
 
-      <div className="p-6 animate-slide-up space-y-4">
+      <div className="p-6 space-y-4">
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
         <ApplicationDetails application={application} />
