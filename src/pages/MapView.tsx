@@ -42,15 +42,17 @@ const MapView = () => {
   return (
     <div className="h-screen w-full">
       <MapContainer
-        center={coordinates}
+        center={coordinates as L.LatLngExpression}
         zoom={13}
+        scrollWheelZoom={false}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attributionControl={true}
         />
-        <Marker position={coordinates}>
+        <Marker position={coordinates as L.LatLngExpression}>
           <Popup>
             Postcode: {postcode}
           </Popup>
