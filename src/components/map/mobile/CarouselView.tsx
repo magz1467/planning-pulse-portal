@@ -26,11 +26,11 @@ export const CarouselView = ({
           align: "center",
           loop: true,
         }}
-        className="w-full max-w-sm mx-auto relative"
+        className="w-full relative"
       >
         <CarouselContent>
           {applications.map((app) => (
-            <CarouselItem key={app.id}>
+            <CarouselItem key={app.id} className="md:basis-1/2 lg:basis-1/3">
               <div className="p-1">
                 <ApplicationCard
                   application={app}
@@ -41,8 +41,12 @@ export const CarouselView = ({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute -left-4" />
-        <CarouselNext className="absolute -right-4" />
+        <div className="absolute -left-4 top-1/2 -translate-y-1/2">
+          <CarouselPrevious />
+        </div>
+        <div className="absolute -right-4 top-1/2 -translate-y-1/2">
+          <CarouselNext />
+        </div>
       </Carousel>
     </div>
   );
