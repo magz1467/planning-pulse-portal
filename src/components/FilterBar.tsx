@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 
 interface FilterBarProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -18,6 +18,13 @@ export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => 
     "Extension Residential",
     "Extension Commercial",
   ];
+
+  const handleClearFilters = () => {
+    onFilterChange("status", "");
+    onFilterChange("type", "");
+  };
+
+  const hasActiveFilters = activeFilters.status || activeFilters.type;
 
   return (
     <div className="flex gap-4 p-4 bg-white border-b border-gray-200">
@@ -60,6 +67,17 @@ export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => 
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {hasActiveFilters && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleClearFilters}
+          className="ml-2"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   );
 };
