@@ -16,18 +16,24 @@ const Header = () => {
                 <NavigationMenuTrigger>Services</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid gap-3 p-6 w-[400px]">
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium leading-none">For Residents</h4>
-                      <p className="text-sm text-muted-foreground">Search and comment on local planning applications</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium leading-none">For Developers</h4>
-                      <p className="text-sm text-muted-foreground">Submit and manage planning applications</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium leading-none">For Local Authorities</h4>
-                      <p className="text-sm text-muted-foreground">Streamline your planning process</p>
-                    </div>
+                    <Link to="/services/residents" className="block">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium leading-none">For Residents</h4>
+                        <p className="text-sm text-muted-foreground">Search and comment on local planning applications</p>
+                      </div>
+                    </Link>
+                    <Link to="/services/developers" className="block">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium leading-none">For Developers</h4>
+                        <p className="text-sm text-muted-foreground">Submit and manage planning applications</p>
+                      </div>
+                    </Link>
+                    <Link to="/services/councils" className="block">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium leading-none">For Local Authorities</h4>
+                        <p className="text-sm text-muted-foreground">Streamline your planning process</p>
+                      </div>
+                    </Link>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
