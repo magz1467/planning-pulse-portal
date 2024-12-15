@@ -21,32 +21,34 @@ export const MapContainerComponent = ({
   onMarkerClick,
 }: MapContainerProps) => {
   return (
-    <LeafletMapContainer
-      center={coordinates}
-      zoom={13}
-      scrollWheelZoom={true}
-      style={{ height: "100%" }}
-    >
-      <ZoomControl position="bottomright" />
-      
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      
-      <Marker 
-        position={coordinates}
-        icon={searchIcon}
+    <div className="absolute inset-0">
+      <LeafletMapContainer
+        center={coordinates}
+        zoom={13}
+        scrollWheelZoom={true}
+        style={{ height: "100%", width: "100%" }}
       >
-        <Popup>Search Location: {postcode}</Popup>
-      </Marker>
-      
-      <ApplicationMarkers
-        applications={applications}
-        baseCoordinates={coordinates}
-        onMarkerClick={onMarkerClick}
-        selectedId={selectedApplication}
-      />
-    </LeafletMapContainer>
+        <ZoomControl position="bottomright" />
+        
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        
+        <Marker 
+          position={coordinates}
+          icon={searchIcon}
+        >
+          <Popup>Search Location: {postcode}</Popup>
+        </Marker>
+        
+        <ApplicationMarkers
+          applications={applications}
+          baseCoordinates={coordinates}
+          onMarkerClick={onMarkerClick}
+          selectedId={selectedApplication}
+        />
+      </LeafletMapContainer>
+    </div>
   );
 };
