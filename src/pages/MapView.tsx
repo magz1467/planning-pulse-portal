@@ -99,7 +99,7 @@ const MapView = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Left sidebar with either list or detailed view */}
+      {/* Left sidebar */}
       <div className="w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
         {selectedApplication === null ? (
           <div className="p-4">
@@ -227,7 +227,7 @@ const MapView = () => {
       {/* Map container */}
       <div className="w-2/3">
         <MapContainer
-          center={coordinates as L.LatLngExpression}
+          center={coordinates}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%' }}
@@ -236,7 +236,7 @@ const MapView = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={coordinates as L.LatLngExpression}>
+          <Marker position={coordinates}>
             <Popup>
               Postcode: {postcode}
             </Popup>
@@ -247,7 +247,7 @@ const MapView = () => {
               position={[
                 coordinates[0] + (Math.random() - 0.5) * 0.01,
                 coordinates[1] + (Math.random() - 0.5) * 0.01
-              ] as L.LatLngExpression}
+              ]}
             >
               <Popup>
                 <div>
