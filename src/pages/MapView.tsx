@@ -125,7 +125,6 @@ const MapView = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Desktop Sidebar */}
       {!isMobile && (
         <DesktopSidebar
           applications={filteredApplications}
@@ -138,21 +137,20 @@ const MapView = () => {
         />
       )}
 
-      {/* Map */}
       <div className="flex-1 relative">
         <MapContainer
-          center={coordinates}
+          center={coordinates as [number, number]}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: "100%" }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
           <Marker 
-            position={coordinates}
+            position={coordinates as [number, number]}
             icon={searchIcon}
           >
             <Popup>Search Location: {postcode}</Popup>
@@ -165,7 +163,6 @@ const MapView = () => {
           />
         </MapContainer>
 
-        {/* Mobile Cards */}
         {isMobile && (
           <MobileApplicationCards
             applications={filteredApplications}

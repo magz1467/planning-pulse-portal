@@ -1,7 +1,7 @@
 import { Marker, Popup } from "react-leaflet";
 import { Application } from "@/types/planning";
-import { defaultIcon } from "./MapMarkers";
-import type { LatLngTuple } from "leaflet";
+import { LatLngTuple } from "leaflet";
+import { applicationIcon } from "./MapMarkers";
 
 interface ApplicationMarkersProps {
   applications: Application[];
@@ -14,38 +14,31 @@ export const ApplicationMarkers = ({
   baseCoordinates,
   onMarkerClick,
 }: ApplicationMarkersProps) => {
+  // Function to generate mock coordinates around the base location
+  const generateCoordinates = (index: number): LatLngTuple => {
+    const offset = 0.002 * index;
+    return [baseCoordinates[0] + offset, baseCoordinates[1] + offset];
+  };
+
   return (
     <>
-      {applications.map((application) => {
-        const offset = {
-          lat: (application.id % 3 - 1) * 0.008,
-          lng: (Math.floor(application.id / 3) - 1) * 0.008,
-        };
-
-        const position: LatLngTuple = [
-          baseCoordinates[0] + offset.lat,
-          baseCoordinates[1] + offset.lng,
-        ];
-
-        return (
-          <Marker
-            key={application.id}
-            position={position}
-            icon={defaultIcon}
-            eventHandlers={{
-              click: () => onMarkerClick(application.id),
-            }}
-          >
-            <Popup>
-              <div>
-                <h3 className="font-semibold">{application.title}</h3>
-                <p className="text-sm">{application.address}</p>
-                <p className="text-xs mt-1">Status: {application.status}</p>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
+      {applications.map((app, index) => (
+        <Marker
+          key={app.id}
+          position={generateCoordinates(index)}
+          eventHandlers={{
+            click: () => onMarkerClick(app.id),
+          }}
+          icon={applicationIcon}
+        >
+          <Popup>
+            <div>
+              <h3 className="font-semibold">{app.title}</h3>
+              <p className="text-sm">{app.address}</p>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
     </>
   );
 };
