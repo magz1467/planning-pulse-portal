@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { CarouselView } from "./mobile/CarouselView";
 
 interface MobileApplicationCardsProps {
@@ -16,6 +16,7 @@ export const MobileApplicationCards = ({
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const handleCardClick = (id: number) => {
     if (selectedId === id) {
@@ -35,10 +36,16 @@ export const MobileApplicationCards = ({
   if (!applications.length) return null;
 
   return (
-    <Drawer open={true}>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger asChild>
+        <div className="h-1" />
+      </DrawerTrigger>
       <DrawerContent className="fixed inset-x-0 bottom-0 mt-24 rounded-t-[10px]">
         <div className="p-2 border-b">
-          <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto" />
+          <div 
+            className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
+            onClick={() => setIsOpen(false)}
+          />
         </div>
         
         {isFullScreen && selectedApp ? (

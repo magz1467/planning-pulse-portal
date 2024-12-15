@@ -20,13 +20,13 @@ export const CarouselView = ({
   onSelectApplication,
 }: CarouselViewProps) => {
   return (
-    <div className="p-4">
+    <div className="p-4 min-h-[200px]">
       <Carousel
         opts={{
           align: "center",
           loop: true,
         }}
-        className="w-full max-w-xs mx-auto relative"
+        className="w-full max-w-sm mx-auto relative"
       >
         <CarouselContent>
           {applications.map((app) => (
@@ -39,8 +39,8 @@ export const CarouselView = ({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute left-0" />
-        <CarouselNext className="absolute right-0" />
+        <CarouselPrevious className="absolute -left-4" />
+        <CarouselNext className="absolute -right-4" />
       </Carousel>
     </div>
   );
