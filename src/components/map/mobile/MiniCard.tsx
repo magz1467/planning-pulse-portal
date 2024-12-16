@@ -1,5 +1,5 @@
 import { Application } from "@/types/planning";
-import { ApplicationImage } from "./ApplicationImage";
+import { MapPin } from "lucide-react";
 
 interface MiniCardProps {
   application: Application;
@@ -9,20 +9,29 @@ interface MiniCardProps {
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   return (
     <div 
-      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4 cursor-pointer"
+      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
       onClick={onClick}
-      style={{ zIndex: 1000 }}
+      style={{ zIndex: 1500 }}
     >
-      <div className="flex gap-4">
-        <div className="w-24 h-24 flex-shrink-0">
-          <ApplicationImage src={application.image} alt={application.title} />
-        </div>
-        <div className="flex-1">
-          <h3 className="font-semibold text-primary line-clamp-1">{application.title}</h3>
-          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded inline-block mt-1">
+      <div className="flex gap-4 items-center">
+        {application.image && (
+          <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+            <img
+              src={application.image}
+              alt={application.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-primary truncate">{application.title}</h3>
+          <div className="flex items-center gap-1 mt-1 text-gray-600">
+            <MapPin className="w-3 h-3" />
+            <p className="text-sm truncate">{application.address}</p>
+          </div>
+          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded inline-block mt-2">
             {application.status}
           </span>
-          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{application.address}</p>
         </div>
       </div>
     </div>

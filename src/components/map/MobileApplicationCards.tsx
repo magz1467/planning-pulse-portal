@@ -41,7 +41,7 @@ export const MobileApplicationCards = ({
 
   if (showFullDetails && selectedApp) {
     return (
-      <div className="fixed inset-0 bg-white z-[1100] overflow-auto">
+      <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {
@@ -54,10 +54,14 @@ export const MobileApplicationCards = ({
     );
   }
 
-  return selectedApp ? (
-    <MiniCard
-      application={selectedApp}
-      onClick={() => setShowFullDetails(true)}
-    />
-  ) : null;
+  if (selectedApp && !showFullDetails) {
+    return (
+      <MiniCard
+        application={selectedApp}
+        onClick={() => setShowFullDetails(true)}
+      />
+    );
+  }
+
+  return null;
 };
