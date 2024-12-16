@@ -13,7 +13,9 @@ interface DesktopSidebarProps {
     status?: string;
     type?: string;
   };
+  activeSort: 'closingSoon' | 'newest' | null;
   onFilterChange: (filterType: string, value: string) => void;
+  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number) => void;
   onClose: () => void;
 }
@@ -23,7 +25,9 @@ export const DesktopSidebar = ({
   selectedApplication,
   postcode,
   activeFilters,
+  activeSort,
   onFilterChange,
+  onSortChange,
   onSelectApplication,
   onClose,
 }: DesktopSidebarProps) => {
@@ -33,7 +37,12 @@ export const DesktopSidebar = ({
 
   return (
     <div className="w-full md:w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
-      <FilterBar onFilterChange={onFilterChange} activeFilters={activeFilters} />
+      <FilterBar 
+        onFilterChange={onFilterChange} 
+        onSortChange={onSortChange}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+      />
       {selectedApplication === null ? (
         <PlanningApplicationList
           applications={applications}

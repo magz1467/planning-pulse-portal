@@ -116,6 +116,7 @@ export const MapContent = () => {
     status?: string;
     type?: string;
   }>({});
+  const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
@@ -152,15 +153,28 @@ export const MapContent = () => {
   useEffect(() => {
     let filtered = mockPlanningApplications;
     
+    // Apply filters
     if (activeFilters.status) {
       filtered = filtered.filter(app => app.status === activeFilters.status);
     }
     if (activeFilters.type) {
       filtered = filtered.filter(app => app.type === activeFilters.type);
     }
+
+    // Apply sorting
+    if (activeSort) {
+      filtered = [...filtered].sort((a, b) => {
+        if (activeSort === 'closingSoon') {
+          return new Date(a.decisionDue).getTime() - new Date(b.decisionDue).getTime();
+        } else if (activeSort === 'newest') {
+          return new Date(b.submissionDate).getTime() - new Date(a.submissionDate).getTime();
+        }
+        return 0;
+      });
+    }
     
     setFilteredApplications(filtered);
-  }, [activeFilters]);
+  }, [activeFilters, activeSort]);
 
   const handleMarkerClick = (id: number) => {
     setSelectedApplication(id);
@@ -171,6 +185,10 @@ export const MapContent = () => {
       ...prev,
       [filterType]: value
     }));
+  };
+
+  const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
+    setActiveSort(sortType);
   };
 
   if (!coordinates) {
@@ -189,10 +207,12 @@ export const MapContent = () => {
       selectedApplication={selectedApplication}
       filteredApplications={filteredApplications}
       activeFilters={activeFilters}
+      activeSort={activeSort}
       isMapView={isMapView}
       isMobile={isMobile}
       onMarkerClick={handleMarkerClick}
       onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
       onToggleView={() => setIsMapView(!isMapView)}
     />
   );
