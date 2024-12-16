@@ -67,7 +67,7 @@ export const MapLayout = ({
           />
         )}
         
-        <div className={`flex-1 h-full relative ${!isMapView && isMobile ? 'hidden' : ''}`}>
+        <div className={`flex-1 h-full relative ${!isMapView && isMobile ? 'hidden' : 'block'}`}>
           <MapContainerComponent
             coordinates={coordinates}
             postcode={postcode}
