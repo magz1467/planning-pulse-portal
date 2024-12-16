@@ -97,16 +97,27 @@ export const MapLayout = ({
               {filteredApplications.map((app) => (
                 <div
                   key={app.id}
-                  className="bg-white p-4 rounded-lg shadow-sm mb-4 cursor-pointer"
+                  className="bg-white p-4 rounded-lg shadow-sm mb-4 cursor-pointer flex gap-4"
                   onClick={() => onMarkerClick(app.id)}
                 >
-                  <h3 className="font-semibold text-primary">{app.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{app.address}</p>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
-                      {app.status}
-                    </span>
-                    <span className="text-xs text-gray-500">{app.distance}</span>
+                  {app.image && (
+                    <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+                      <img
+                        src={app.image}
+                        alt={app.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-primary">{app.title}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{app.address}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+                        {app.status}
+                      </span>
+                      <span className="text-xs text-gray-500">{app.distance}</span>
+                    </div>
                   </div>
                 </div>
               ))}
