@@ -1,11 +1,9 @@
 import { AlertSignup } from "@/components/AlertSignup";
 import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
-import { EmailDialog } from "./EmailDialog";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -19,8 +17,6 @@ export const PlanningApplicationList = ({
   onSelectApplication,
 }: PlanningApplicationListProps) => {
   const [feedbackStates, setFeedbackStates] = useState<Record<number, 'up' | 'down' | null>>({});
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [selectedApplicationId, setSelectedApplicationId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const handleFeedback = (id: number, type: 'up' | 'down', e: React.MouseEvent) => {
@@ -41,20 +37,6 @@ export const PlanningApplicationList = ({
         : type === 'up' 
           ? "We're glad this was helpful!" 
           : "We'll work on improving this",
-    });
-  };
-
-  const handleNotificationSignup = (applicationId: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedApplicationId(applicationId);
-    setShowEmailDialog(true);
-  };
-
-  const handleEmailSubmit = (email: string) => {
-    toast({
-      title: "Notification setup",
-      description: `We'll email you at ${email} when a decision is made on this application.`,
-      duration: 5000,
     });
   };
 
@@ -101,25 +83,9 @@ export const PlanningApplicationList = ({
                 </Button>
               </div>
             </div>
-            <div className="flex items-center space-x-2 mt-3 border-t pt-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full text-sm"
-                onClick={(e) => handleNotificationSignup(application.id, e)}
-              >
-                <Bell className="h-4 w-4 mr-2" />
-                Get notified when decided
-              </Button>
-            </div>
           </div>
         ))}
       </div>
-      <EmailDialog 
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        onSubmit={handleEmailSubmit}
-      />
     </div>
   );
 };
