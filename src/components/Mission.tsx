@@ -1,6 +1,6 @@
 import Image from "@/components/ui/image";
 
-export const Mission = () => {
+const Mission = () => {
   return (
     <div className="bg-gray-50 py-24">
       <div className="container mx-auto px-4">
@@ -35,3 +35,5 @@ export const Mission = () => {
     </div>
   );
 };
+
+export default Mission;

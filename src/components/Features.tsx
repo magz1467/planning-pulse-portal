@@ -1,6 +1,6 @@
 import { Search, MessageSquare, Send } from "lucide-react";
 
-export const Features = () => {
+const Features = () => {
   return (
     <div className="bg-white py-16">
       <div className="container mx-auto px-4">
@@ -28,3 +28,5 @@ export const Features = () => {
     </div>
   );
 };
+
+export default Features;
