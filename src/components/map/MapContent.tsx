@@ -6,6 +6,7 @@ import { LoadingOverlay } from "./LoadingOverlay";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
+import { Application } from "@/types/planning";
 
 const planningImages = [
   "/lovable-uploads/5138b4f3-8820-4457-9664-4a7f54b617a9.png",
