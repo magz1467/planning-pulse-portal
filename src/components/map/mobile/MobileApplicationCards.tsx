@@ -2,9 +2,9 @@ import React from 'react';
 import { Application } from "@/types/planning";
 import { useState } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { CarouselView } from "./mobile/CarouselView";
 import { useToast } from "@/components/ui/use-toast";
-import { ChevronUp } from "lucide-react";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
@@ -18,11 +18,28 @@ export const MobileApplicationCards = ({
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
-  const selectedApp = applications.find(app => app.id === selectedId);
+  // Update isOpen when selectedId changes
+  React.useEffect(() => {
+    if (selectedId !== null) {
+      setIsOpen(true);
+    }
+  }, [selectedId]);
 
-  if (!selectedApp) return null;
+  const handleCardClick = (id: number) => {
+    if (selectedId === id) {
+      setIsFullScreen(true);
+    } else {
+      setIsFullScreen(false);
+      onSelectApplication(id);
+      toast({
+        title: "Application Selected",
+        description: "Tap again to view full details",
+      });
+    }
+  };
 
   const handleCommentSubmit = (content: string) => {
     console.log("New comment:", content);
@@ -32,38 +49,76 @@ export const MobileApplicationCards = ({
     });
   };
 
+  const selectedApp = applications.find(app => app.id === selectedId);
+
+  if (!applications.length) {
+    return (
+      <div className="fixed bottom-0 left-4 right-4 bg-white p-4 rounded-lg shadow-lg mb-1" style={{ zIndex: 1100 }}>
+        <p className="text-center text-gray-500">No applications found in this area</p>
+      </div>
+    );
+  }
+
+  if (isFullScreen && selectedApp) {
+    return (
+      <div className="fixed inset-0 bg-white z-[1100] overflow-auto">
+        <FullScreenDetails
+          application={selectedApp}
+          onClose={() => setIsFullScreen(false)}
+          onCommentSubmit={handleCommentSubmit}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-x-0 bottom-0 animate-slide-up" style={{ zIndex: 1100 }}>
-      {isFullScreen ? (
-        <Sheet open={true} onOpenChange={() => setIsFullScreen(false)}>
-          <SheetContent side="bottom" className="h-[90vh] p-0">
-            <FullScreenDetails
-              application={selectedApp}
-              onClose={() => setIsFullScreen(false)}
-              onCommentSubmit={handleCommentSubmit}
-            />
-          </SheetContent>
-        </Sheet>
-      ) : (
-        <div 
-          className="bg-white p-4 rounded-t-xl shadow-lg cursor-pointer"
-          onClick={() => setIsFullScreen(true)}
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>
+          <div 
+            className="h-1 w-12 bg-gray-200 rounded-full mx-auto mb-0.5 cursor-pointer" 
+            onClick={() => setIsOpen(!isOpen)}
+          />
+        </SheetTrigger>
+        <SheetContent 
+          side="bottom" 
+          className="p-0 h-[45vh] rounded-t-xl bg-white shadow-lg"
+          style={{ 
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1100,
+            transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+            transition: 'transform 0.3s ease-out'
+          }}
         >
-          <div className="flex justify-center mb-2">
-            <ChevronUp className="h-5 w-5 text-gray-400" />
+          <div className="flex flex-col h-full bg-white">
+            <div className="p-0.5 border-b bg-white sticky top-0">
+              <div 
+                className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
+                onClick={() => setIsOpen(false)}
+              />
+            </div>
+            
+            <div className="flex-1 overflow-y-auto bg-white">
+              <div 
+                className="p-4 cursor-pointer"
+                onClick={() => setIsFullScreen(true)}
+              >
+                <h3 className="font-semibold text-primary">{selectedApp?.title}</h3>
+                <p className="text-sm text-gray-600 mt-1">{selectedApp?.address}</p>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+                    {selectedApp?.status}
+                  </span>
+                  <span className="text-xs text-gray-500">{selectedApp?.distance}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <h3 className="font-semibold text-primary mb-1">{selectedApp.title}</h3>
-          <p className="text-sm text-gray-600 mb-2">{selectedApp.address}</p>
-          
-          <div className="flex justify-between items-center">
-            <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
-              {selectedApp.status}
-            </span>
-            <span className="text-xs text-gray-500">{selectedApp.distance}</span>
-          </div>
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
