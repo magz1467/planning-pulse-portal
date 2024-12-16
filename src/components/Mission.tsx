@@ -1,3 +1,5 @@
+import Image from "@/components/ui/image";
+
 export const Mission = () => {
   return (
     <div className="bg-gray-50 py-24">
@@ -17,10 +19,13 @@ export const Mission = () => {
                 </p>
               </div>
               <div className="relative h-[400px]">
-                <img 
+                <Image 
                   src="/lovable-uploads/ecdf4ccf-de30-4de8-a738-6470bdc2d41c.png"
                   alt="Modern sustainable home design" 
                   className="rounded-lg shadow-xl w-full h-full object-cover"
+                  loading="lazy"
+                  width={800}
+                  height={600}
                 />
               </div>
             </div>

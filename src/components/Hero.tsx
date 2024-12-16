@@ -1,5 +1,6 @@
 import { Stats } from "@/components/Stats";
 import { SearchForm } from "@/components/SearchForm";
+import Image from "@/components/ui/image";
 
 export const Hero = () => {
   return (
@@ -22,10 +23,13 @@ export const Hero = () => {
           </div>
           
           <div className="hidden md:flex items-center">
-            <img 
+            <Image 
               src="/lovable-uploads/bd79aa29-e80b-4e54-9b5f-7a1a4fe7ea48.png"
               alt="Construction professional reviewing site plans" 
               className="rounded-lg shadow-xl w-full h-auto object-cover"
+              loading="eager"
+              width={800}
+              height={600}
             />
           </div>
         </div>
