@@ -1,9 +1,19 @@
-import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer, useMap } from "react-leaflet";
 import { Marker, Popup } from "react-leaflet";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { searchIcon } from "./MapMarkers";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
+
+// New component to handle map view updates
+const MapUpdater = ({ center }: { center: LatLngTuple }) => {
+  const map = useMap();
+  
+  // Update map view when center changes
+  map.setView(center, map.getZoom());
+  
+  return null;
+};
 
 interface MapContainerProps {
   coordinates: LatLngTuple;
@@ -35,6 +45,8 @@ export const MapContainerComponent = ({
         className="w-full h-full"
         style={{ position: 'absolute', inset: 0 }}
       >
+        <MapUpdater center={coordinates} />
+        
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
