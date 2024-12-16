@@ -15,7 +15,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     >
       <div className="flex gap-4 items-center">
         {application.image && (
-          <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+          <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
             <img
               src={application.image}
               alt={application.title}

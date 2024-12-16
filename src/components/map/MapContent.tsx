@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MapLayout } from "./layout/MapLayout";
@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { Application } from "@/types/planning";
+import { findClosestApplication } from "@/utils/distance";
 
 const planningImages = [
   "/lovable-uploads/5138b4f3-8820-4457-9664-4a7f54b617a9.png",
@@ -126,8 +127,25 @@ export const MapContent = () => {
     activeSort
   );
 
+  // Effect to select the closest application when coordinates change
+  useEffect(() => {
+    if (coordinates && filteredApplications.length > 0) {
+      // Create an array of coordinates for each application (mocked for demo)
+      const applicationCoordinates: [number, number][] = filteredApplications.map(() => [
+        coordinates[0] + (Math.random() - 0.5) * 0.01,
+        coordinates[1] + (Math.random() - 0.5) * 0.01
+      ]);
+
+      const closestId = findClosestApplication(
+        filteredApplications,
+        coordinates,
+        applicationCoordinates
+      );
+      setSelectedApplication(closestId);
+    }
+  }, [coordinates, filteredApplications]);
+
   const handleMarkerClick = (id: number) => {
-    // Only set selected application if explicitly clicked
     setSelectedApplication(id);
   };
 
