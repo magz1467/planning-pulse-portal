@@ -1,9 +1,8 @@
 import React from 'react';
 import { Application } from "@/types/planning";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { CarouselView } from "./mobile/CarouselView";
 import { useToast } from "@/components/ui/use-toast";
 
 interface MobileApplicationCardsProps {
@@ -17,29 +16,15 @@ export const MobileApplicationCards = ({
   selectedId,
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
   // Update isOpen when selectedId changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedId !== null) {
       setIsOpen(true);
     }
   }, [selectedId]);
-
-  const handleCardClick = (id: number) => {
-    if (selectedId === id) {
-      setIsFullScreen(!isFullScreen);
-    } else {
-      setIsFullScreen(false);
-      onSelectApplication(id);
-      toast({
-        title: "Application Selected",
-        description: "Tap again to view full details",
-      });
-    }
-  };
 
   const handleCommentSubmit = (content: string) => {
     console.log("New comment:", content);
@@ -55,6 +40,21 @@ export const MobileApplicationCards = ({
     return (
       <div className="fixed bottom-0 left-4 right-4 bg-white p-4 rounded-lg shadow-lg mb-1" style={{ zIndex: 1100 }}>
         <p className="text-center text-gray-500">No applications found in this area</p>
+      </div>
+    );
+  }
+
+  if (selectedApp) {
+    return (
+      <div className="fixed inset-0 bg-white z-[1100] overflow-auto">
+        <FullScreenDetails
+          application={selectedApp}
+          onClose={() => {
+            setIsOpen(false);
+            onSelectApplication(null);
+          }}
+          onCommentSubmit={handleCommentSubmit}
+        />
       </div>
     );
   }
@@ -90,18 +90,20 @@ export const MobileApplicationCards = ({
             </div>
             
             <div className="flex-1 overflow-y-auto bg-white">
-              {isFullScreen && selectedApp ? (
-                <FullScreenDetails
-                  application={selectedApp}
-                  onClose={() => setIsFullScreen(false)}
-                  onCommentSubmit={handleCommentSubmit}
-                />
-              ) : (
-                <CarouselView
-                  applications={applications}
-                  selectedId={selectedId}
-                  onSelectApplication={handleCardClick}
-                />
+              {selectedApp && (
+                <div 
+                  className="p-4 cursor-pointer"
+                  onClick={() => setIsOpen(true)}
+                >
+                  <h3 className="font-semibold text-primary">{selectedApp.title}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{selectedApp.address}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+                      {selectedApp.status}
+                    </span>
+                    <span className="text-xs text-gray-500">{selectedApp.distance}</span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
