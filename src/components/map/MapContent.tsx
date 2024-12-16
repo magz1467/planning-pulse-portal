@@ -8,6 +8,17 @@ import { MapHeader } from "./MapHeader";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
+const planningImages = [
+  "/lovable-uploads/5138b4f3-8820-4457-9664-4a7f54b617a9.png",
+  "/lovable-uploads/2a1a1b3d-4e95-4458-a340-d34de8863e11.png",
+  "/lovable-uploads/fee12637-0d93-4e12-8044-b053cc205245.png"
+];
+
+const getRandomImage = () => {
+  const randomIndex = Math.floor(Math.random() * planningImages.length);
+  return planningImages[randomIndex];
+};
+
 const mockPlanningApplications: Application[] = [
   {
     id: 1,
@@ -24,7 +35,7 @@ const mockPlanningApplications: Application[] = [
     ward: "Central Ward",
     officer: "Lisa Handy",
     consultationEnd: "28/02/2024",
-    image: "/lovable-uploads/ed8c75b6-7e73-4720-818d-f78fbcf2d94a.png"
+    image: getRandomImage()
   },
   {
     id: 2,
@@ -41,7 +52,7 @@ const mockPlanningApplications: Application[] = [
     ward: "Docklands",
     officer: "John Davies",
     consultationEnd: "15/02/2024",
-    image: "/lovable-uploads/bbc0ab46-b246-4a14-b768-a9ee0b4cd8e0.png"
+    image: getRandomImage()
   },
   {
     id: 3,
@@ -58,7 +69,7 @@ const mockPlanningApplications: Application[] = [
     ward: "Hampstead",
     officer: "Michael Brown",
     consultationEnd: "05/02/2024",
-    image: "/lovable-uploads/d35bc425-d18f-4222-b9d7-d9418f84b37d.png"
+    image: getRandomImage()
   },
   {
     id: 4,
@@ -75,7 +86,7 @@ const mockPlanningApplications: Application[] = [
     ward: "City Fringe",
     officer: "Emma Wilson",
     consultationEnd: "20/02/2024",
-    image: "/lovable-uploads/bd79aa29-e80b-4e54-9b5f-7a1a4fe7ea48.png"
+    image: getRandomImage()
   },
   {
     id: 5,
@@ -92,7 +103,7 @@ const mockPlanningApplications: Application[] = [
     ward: "Westminster",
     officer: "Robert Taylor",
     consultationEnd: "01/02/2024",
-    image: "/lovable-uploads/ea10c55a-9324-434a-8bbf-c2de0a2f9b25.png"
+    image: getRandomImage()
   }
 ];
 
