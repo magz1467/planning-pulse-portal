@@ -25,7 +25,7 @@ export const useAddressSuggestions = (search: string) => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        // First try postcode lookup
+        // Try postcode lookup first
         const postcodeResponse = await fetch(
           `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
         );
@@ -38,7 +38,13 @@ export const useAddressSuggestions = (search: string) => {
               `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
             );
             const details = await detailsResponse.json();
-            return details.result;
+            if (details.result) {
+              return {
+                ...details.result,
+                address: `${details.result.admin_ward || ''} ${details.result.admin_district}`.trim()
+              };
+            }
+            return null;
           });
           
           const results = await Promise.all(detailsPromises);
@@ -51,10 +57,11 @@ export const useAddressSuggestions = (search: string) => {
         );
         const addressData = await addressResponse.json();
         
-        if (addressData.result) {
+        if (addressData.result && addressData.result.length > 0) {
           return addressData.result.map((result: any) => ({
             ...result,
-            address: `${result.admin_ward || ''} ${result.admin_district}`.trim(),
+            postcode: result.postcode,
+            address: `${result.admin_ward || ''}, ${result.admin_district}, ${result.postcode}`.trim()
           }));
         }
         
