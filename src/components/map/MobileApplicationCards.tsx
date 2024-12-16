@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
 import { useToast } from "@/components/ui/use-toast";
 import { EmptyState } from "./mobile/EmptyState";
-import { ApplicationSheet } from "./mobile/ApplicationSheet";
+import { MiniCard } from "./mobile/MiniCard";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
@@ -16,12 +16,12 @@ export const MobileApplicationCards = ({
   selectedId,
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [showFullDetails, setShowFullDetails] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (selectedId !== null) {
-      setIsOpen(true);
+    if (selectedId === null) {
+      setShowFullDetails(false);
     }
   }, [selectedId]);
 
@@ -39,13 +39,13 @@ export const MobileApplicationCards = ({
     return <EmptyState />;
   }
 
-  if (selectedApp) {
+  if (showFullDetails && selectedApp) {
     return (
       <div className="fixed inset-0 bg-white z-[1100] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {
-            setIsOpen(false);
+            setShowFullDetails(false);
             onSelectApplication(null);
           }}
           onCommentSubmit={handleCommentSubmit}
@@ -54,13 +54,10 @@ export const MobileApplicationCards = ({
     );
   }
 
-  return (
-    <div className="fixed inset-x-0 bottom-0" style={{ zIndex: 1100 }}>
-      <ApplicationSheet
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        selectedApp={selectedApp}
-      />
-    </div>
-  );
+  return selectedApp ? (
+    <MiniCard
+      application={selectedApp}
+      onClick={() => setShowFullDetails(true)}
+    />
+  ) : null;
 };
