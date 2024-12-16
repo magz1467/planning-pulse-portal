@@ -17,8 +17,15 @@ export const MobileApplicationCards = ({
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+
+  // Update isOpen when selectedId changes
+  React.useEffect(() => {
+    if (selectedId !== null) {
+      setIsOpen(true);
+    }
+  }, [selectedId]);
 
   const handleCardClick = (id: number) => {
     if (selectedId === id) {
@@ -45,7 +52,7 @@ export const MobileApplicationCards = ({
 
   if (!applications.length) {
     return (
-      <div className="fixed bottom-0 left-4 right-4 bg-white p-4 rounded-lg shadow-lg" style={{ zIndex: 1100 }}>
+      <div className="fixed bottom-0 left-4 right-4 bg-white p-4 rounded-lg shadow-lg mb-1" style={{ zIndex: 1100 }}>
         <p className="text-center text-gray-500">No applications found in this area</p>
       </div>
     );
@@ -56,7 +63,7 @@ export const MobileApplicationCards = ({
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <div 
-            className="h-1 w-12 bg-gray-200 rounded-full mx-auto mb-1 cursor-pointer" 
+            className="h-1 w-12 bg-gray-200 rounded-full mx-auto mb-0.5 cursor-pointer" 
             onClick={() => setIsOpen(!isOpen)}
           />
         </SheetTrigger>
@@ -74,7 +81,7 @@ export const MobileApplicationCards = ({
           }}
         >
           <div className="flex flex-col h-full bg-white">
-            <div className="p-1 border-b bg-white sticky top-0">
+            <div className="p-0.5 border-b bg-white sticky top-0">
               <div 
                 className="w-12 h-1 bg-gray-300 rounded-full mx-auto cursor-pointer" 
                 onClick={() => setIsOpen(false)}
