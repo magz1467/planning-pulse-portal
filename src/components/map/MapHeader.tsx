@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Search, Home } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FilterBar } from "../FilterBar";
 import { MapListToggle } from "./mobile/MapListToggle";
@@ -31,7 +30,6 @@ export const MapHeader = ({
   const [postcode, setPostcode] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
   const isMobile = useIsMobile();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,11 +45,6 @@ export const MapHeader = ({
           state: { postcode: postcode.trim() } 
         });
       }
-      
-      toast({
-        title: "Searching new location",
-        description: `Showing results for ${postcode.trim()}`,
-      });
     }
   };
 
