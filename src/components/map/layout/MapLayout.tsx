@@ -67,7 +67,7 @@ export const MapLayout = ({
             onMarkerClick={onMarkerClick}
           />
 
-          {isMobile && (
+          {isMobile && selectedApplication !== null && (
             <MobileApplicationCards
               applications={filteredApplications}
               selectedId={selectedApplication}

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Application } from "@/types/planning";
 import { useState } from "react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { FullScreenDetails } from "./FullScreenDetails";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useToast } from "@/components/ui/use-toast";
 import { ChevronUp } from "lucide-react";
 
@@ -33,7 +33,7 @@ export const MobileApplicationCards = ({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0" style={{ zIndex: 1100 }}>
+    <div className="fixed inset-x-0 bottom-0 animate-slide-up" style={{ zIndex: 1100 }}>
       {isFullScreen ? (
         <Sheet open={true} onOpenChange={() => setIsFullScreen(false)}>
           <SheetContent side="bottom" className="h-[90vh] p-0">

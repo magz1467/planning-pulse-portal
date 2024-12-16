@@ -33,7 +33,6 @@ export const MapHeader = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (postcode.trim()) {
-      // If we're already on the map page, reload with new state
       if (location.pathname === '/map') {
         navigate('/map', { 
           state: { postcode: postcode.trim() }, 
@@ -54,7 +53,7 @@ export const MapHeader = ({
 
   return (
     <header className="border-b bg-white">
-      <div className="container mx-auto px-4 py-3">
+      <div className={`container mx-auto ${isMobile ? 'p-3' : 'px-4 py-3'}`}>
         {!isMobile && (
           <div className="flex items-center justify-between mb-3">
             <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
@@ -64,7 +63,7 @@ export const MapHeader = ({
           </div>
         )}
         
-        <form onSubmit={handleSubmit} className="flex-1 max-w-2xl mx-auto">
+        <form onSubmit={handleSubmit} className="flex-1">
           <div className="relative w-full">
             <Input 
               type="text" 
@@ -85,7 +84,7 @@ export const MapHeader = ({
         </form>
 
         {isMobile && onFilterChange && onToggleView && (
-          <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center justify-between mt-3 border-t pt-2">
             <FilterBar
               onFilterChange={onFilterChange}
               activeFilters={activeFilters}
