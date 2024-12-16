@@ -127,9 +127,9 @@ export const MapContent = () => {
     activeSort
   );
 
-  // Effect to select the closest application when coordinates change
+  // Effect to select the closest application when coordinates change - only on mobile
   useEffect(() => {
-    if (coordinates && filteredApplications.length > 0) {
+    if (coordinates && filteredApplications.length > 0 && isMobile) {
       // Create an array of coordinates for each application (mocked for demo)
       const applicationCoordinates: [number, number][] = filteredApplications.map(() => [
         coordinates[0] + (Math.random() - 0.5) * 0.01,
@@ -143,7 +143,7 @@ export const MapContent = () => {
       );
       setSelectedApplication(closestId);
     }
-  }, [coordinates, filteredApplications]);
+  }, [coordinates, filteredApplications, isMobile]);
 
   const handleMarkerClick = (id: number) => {
     setSelectedApplication(id);
