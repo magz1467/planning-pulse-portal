@@ -121,6 +121,7 @@ export const MapContent = () => {
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
 
+  // Update this useEffect to watch for postcode changes
   useEffect(() => {
     const fetchCoordinates = async () => {
       if (!postcode) return;
@@ -130,8 +131,9 @@ export const MapContent = () => {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
         if (data.status === 200) {
+          // Update coordinates with new location
           setCoordinates([data.result.latitude, data.result.longitude]);
-          // Select the first application by default on mobile after search
+          // Reset selected application when location changes
           if (isMobile && filteredApplications.length > 0) {
             setSelectedApplication(filteredApplications[0].id);
           } else {
@@ -147,8 +149,9 @@ export const MapContent = () => {
       }
     };
 
+    // Call fetchCoordinates whenever postcode changes
     fetchCoordinates();
-  }, [postcode, isMobile, filteredApplications]);
+  }, [postcode, isMobile, filteredApplications]); // Add postcode to dependencies
 
   useEffect(() => {
     let filtered = mockPlanningApplications;
