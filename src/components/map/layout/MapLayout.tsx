@@ -1,5 +1,3 @@
-import { Application } from "@/types/planning";
-import { LatLngTuple } from "leaflet";
 import { MobileApplicationCards } from "../MobileApplicationCards";
 import { DesktopSidebar } from "../DesktopSidebar";
 import { MapHeader } from "../MapHeader";
@@ -10,10 +8,10 @@ import { MapListToggle } from "../mobile/MapListToggle";
 
 interface MapLayoutProps {
   isLoading: boolean;
-  coordinates: LatLngTuple;
+  coordinates: [number, number];
   postcode: string;
   selectedApplication: number | null;
-  filteredApplications: Application[];
+  filteredApplications: any[];
   activeFilters: {
     status?: string;
     type?: string;
