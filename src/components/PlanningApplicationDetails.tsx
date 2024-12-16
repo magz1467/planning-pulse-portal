@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
+import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -21,6 +22,7 @@ export const PlanningApplicationDetails = ({
   onClose,
 }: PlanningApplicationDetailsProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const { toast } = useToast();
   
   if (!application) return null;
@@ -31,12 +33,21 @@ export const PlanningApplicationDetails = ({
     thumbsDown: 3
   };
 
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (email: string, radius: string) => {
     toast({
       title: "Notification setup",
       description: `We'll email you at ${email} when a decision is made on this application.`,
       duration: 5000,
     });
+  };
+
+  const handleFeedbackEmailSubmit = (email: string) => {
+    toast({
+      title: "Developer verification pending",
+      description: "We'll verify your email and send you access to view all feedback for this application.",
+      duration: 5000,
+    });
+    setShowFeedbackDialog(false);
   };
 
   return (
@@ -78,6 +89,18 @@ export const PlanningApplicationDetails = ({
           </div>
         </Card>
 
+        <Card className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold">Is this your development?</h3>
+              <p className="text-sm text-gray-600">Click here to verify and see full feedback</p>
+            </div>
+            <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
+              Get feedback
+            </Button>
+          </div>
+        </Card>
+
         <ApplicationComments />
       </div>
 
@@ -85,6 +108,12 @@ export const PlanningApplicationDetails = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+      />
+
+      <FeedbackEmailDialog
+        open={showFeedbackDialog}
+        onOpenChange={setShowFeedbackDialog}
+        onSubmit={handleFeedbackEmailSubmit}
       />
     </div>
   );
