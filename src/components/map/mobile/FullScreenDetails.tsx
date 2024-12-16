@@ -39,12 +39,13 @@ export const FullScreenDetails = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="sticky top-0 z-10 bg-white p-4 border-b">
+      <div className="sticky top-0 z-10 bg-white border-b flex items-center justify-between p-4">
+        <div className="h-4" /> {/* Spacer to maintain vertical centering */}
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-4"
           onClick={onClose}
+          className="absolute right-4 top-1/2 -translate-y-1/2"
         >
           <X className="h-4 w-4" />
         </Button>
