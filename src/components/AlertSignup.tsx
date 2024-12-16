@@ -17,11 +17,12 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
     setShowEmailDialog(true)
   }
 
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (email: string, radius: string) => {
     setIsSubscribed(true)
+    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
     toast({
       title: "Subscription pending",
-      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts near ${postcode}. The email might take a few minutes to arrive.`,
+      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
       duration: 5000,
     })
   }
