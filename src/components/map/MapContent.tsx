@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Application } from "@/types/planning";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { LatLngTuple } from "leaflet";
 import { MapLayout } from "./layout/MapLayout";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { useCoordinates } from "@/hooks/use-coordinates";
+import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 
 const planningImages = [
   "/lovable-uploads/5138b4f3-8820-4457-9664-4a7f54b617a9.png",
@@ -109,73 +109,24 @@ const mockPlanningApplications: Application[] = [
 export const MapContent = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
-  const [coordinates, setCoordinates] = useState<LatLngTuple | null>(null);
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
-  const [filteredApplications, setFilteredApplications] = useState(mockPlanningApplications);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
     type?: string;
   }>({});
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    const fetchCoordinates = async () => {
-      if (!postcode) return;
-      
-      setIsLoading(true);
-      try {
-        const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
-        const data = await response.json();
-        if (data.status === 200) {
-          setCoordinates([data.result.latitude, data.result.longitude]);
-          // Remove the automatic selection on mobile
-          setSelectedApplication(null);
-        }
-      } catch (error) {
-        console.error("Error fetching coordinates:", error);
-      } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
-      }
-    };
-
-    fetchCoordinates();
-    
-    // Scroll to top when coordinates change
-    window.scrollTo(0, 0);
-  }, [postcode]);
-
-  useEffect(() => {
-    let filtered = mockPlanningApplications;
-    
-    // Apply filters
-    if (activeFilters.status) {
-      filtered = filtered.filter(app => app.status === activeFilters.status);
-    }
-    if (activeFilters.type) {
-      filtered = filtered.filter(app => app.type === activeFilters.type);
-    }
-
-    // Apply sorting
-    if (activeSort) {
-      filtered = [...filtered].sort((a, b) => {
-        if (activeSort === 'closingSoon') {
-          return new Date(a.decisionDue).getTime() - new Date(b.decisionDue).getTime();
-        } else if (activeSort === 'newest') {
-          return new Date(b.submissionDate).getTime() - new Date(a.submissionDate).getTime();
-        }
-        return 0;
-      });
-    }
-    
-    setFilteredApplications(filtered);
-  }, [activeFilters, activeSort]);
+  
+  const { coordinates, isLoading } = useCoordinates(postcode);
+  const filteredApplications = useFilteredApplications(
+    mockPlanningApplications,
+    activeFilters,
+    activeSort
+  );
 
   const handleMarkerClick = (id: number) => {
+    // Only set selected application if explicitly clicked
     setSelectedApplication(id);
   };
 
