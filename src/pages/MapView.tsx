@@ -6,6 +6,7 @@ import { MobileApplicationCards } from "@/components/map/MobileApplicationCards"
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { MapHeader } from "@/components/map/MapHeader";
 import { MapContainerComponent } from "@/components/map/MapContainer";
+import { LoadingOverlay } from "@/components/map/LoadingOverlay";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -106,12 +107,14 @@ const MapView = () => {
     status?: string;
     type?: string;
   }>({});
+  const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchCoordinates = async () => {
       if (!postcode) return;
       
+      setIsLoading(true);
       try {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
@@ -121,6 +124,11 @@ const MapView = () => {
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
+      } finally {
+        // Add a minimum delay to show the loading state
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
       }
     };
 
@@ -157,6 +165,7 @@ const MapView = () => {
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
+      {isLoading && <LoadingOverlay />}
       <MapHeader />
       <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
