@@ -3,6 +3,7 @@ import { DesktopSidebar } from "../DesktopSidebar";
 import { MapHeader } from "../MapHeader";
 import { MapContainerComponent } from "../MapContainer";
 import { LoadingOverlay } from "../LoadingOverlay";
+import { FilterBar } from "@/components/FilterBar";
 
 interface MapLayoutProps {
   isLoading: boolean;

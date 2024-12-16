@@ -5,13 +5,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterBarProps {
   onFilterChange: (filterType: string, value: string) => void;
+  onSortChange?: (sortType: 'closingSoon' | 'newest' | null) => void;
   activeFilters: {
     status?: string;
     type?: string;
   };
+  activeSort?: 'closingSoon' | 'newest' | null;
 }
 
-export const FilterBar = ({ onFilterChange, activeFilters }: FilterBarProps) => {
+export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeSort }: FilterBarProps) => {
   const statusOptions = ["Under Review", "Approved", "Declined"];
   const typeOptions = [
     "New Build Residential",

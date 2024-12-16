@@ -5,22 +5,26 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { FilterBar } from "./FilterBar";
+import { FilterBar } from "../FilterBar";
 import { MapListToggle } from "./mobile/MapListToggle";
 
 interface MapHeaderProps {
   onFilterChange?: (filterType: string, value: string) => void;
+  onSortChange?: (sortType: 'closingSoon' | 'newest' | null) => void;
   activeFilters?: {
     status?: string;
     type?: string;
   };
+  activeSort?: 'closingSoon' | 'newest' | null;
   isMapView?: boolean;
   onToggleView?: () => void;
 }
 
 export const MapHeader = ({ 
   onFilterChange, 
+  onSortChange,
   activeFilters = {}, 
+  activeSort = null,
   isMapView = true, 
   onToggleView 
 }: MapHeaderProps) => {
@@ -87,7 +91,9 @@ export const MapHeader = ({
           <div className="flex items-center justify-between mt-3 border-t pt-2">
             <FilterBar
               onFilterChange={onFilterChange}
+              onSortChange={onSortChange}
               activeFilters={activeFilters}
+              activeSort={activeSort}
             />
             <MapListToggle
               isMapView={isMapView}
