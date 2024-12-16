@@ -9,6 +9,8 @@ import MapView from "./pages/MapView";
 import ResidentServices from "./pages/ResidentServices";
 import DeveloperServices from "./pages/DeveloperServices";
 import CouncilServices from "./pages/CouncilServices";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/services/residents" element={<ResidentServices />} />
           <Route path="/services/developers" element={<DeveloperServices />} />
           <Route path="/services/councils" element={<CouncilServices />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
