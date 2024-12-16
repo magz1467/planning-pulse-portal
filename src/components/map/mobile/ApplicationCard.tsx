@@ -1,48 +1,45 @@
-import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { useState, memo } from "react";
+import { MessageSquare, ThumbsUp, ThumbsDown } from "lucide-react";
+import { PlanningApplication } from "@/types/planning";
+import { ApplicationImage } from "./ApplicationImage";
+import { ApplicationMeta } from "./ApplicationMeta";
 import { useToast } from "@/components/ui/use-toast";
-import Image from "@/components/ui/image";
+import { useState } from "react";
 
 interface ApplicationCardProps {
-  application: Application;
-  isSelected: boolean;
-  onClick: () => void;
+  application: PlanningApplication;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
-export const ApplicationCard = memo(({ application, isSelected, onClick }: ApplicationCardProps) => {
-  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+export const ApplicationCard = ({
+  application,
+  isSelected = false,
+  onClick,
+}: ApplicationCardProps) => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!application) {
-    return null;
-  }
+  const handleFeedback = async (type: "support" | "object") => {
+    if (isSubmitting) return;
 
-  const handleFeedback = (type: 'up' | 'down', e: React.MouseEvent) => {
-    e.stopPropagation();
+    setIsSubmitting(true);
     try {
-      if (feedback === type) {
-        setFeedback(null);
-        toast({
-          title: "Feedback removed",
-          description: "Your feedback has been removed",
-        });
-      } else {
-        setFeedback(type);
-        toast({
-          title: "Thank you for your feedback",
-          description: type === 'up' ? "We're glad this was helpful!" : "We'll work on improving this",
-        });
-      }
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast({
+        title: "Feedback submitted",
+        description: `Thank you for your ${type === "support" ? "support" : "objection"}`,
+      });
     } catch (error) {
-      console.error('Error handling feedback:', error);
       toast({
         title: "Error",
-        description: "There was an error processing your feedback",
+        description: "Failed to submit feedback. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -54,49 +51,53 @@ export const ApplicationCard = memo(({ application, isSelected, onClick }: Appli
       onClick={onClick}
     >
       {application.image && (
-        <div className="aspect-video relative overflow-hidden rounded-lg mb-2">
-          <Image
-            src={application.image}
-            alt={application.title}
-            width={400}
-            height={225}
-            className="object-cover w-full h-full"
-            loading="lazy"
-          />
-        </div>
+        <ApplicationImage image={application.image} title={application.title} />
       )}
+
+      <h3 className="font-semibold text-primary truncate">{application.title}</h3>
       
-      <h3 className="font-semibold text-primary truncate">
-        {application.title}
-      </h3>
-      <div className="flex justify-between items-center mt-1">
-        <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
-          {application.status}
-        </span>
-        <span className="text-xs text-gray-500">{application.distance}</span>
-      </div>
-      <p className="text-sm text-gray-600 mt-1 truncate">
-        {application.address}
-      </p>
+      <ApplicationMeta status={application.status} distance={application.distance} />
+      
+      <p className="text-sm text-gray-600 mt-1 truncate">{application.address}</p>
+      
       <div className="flex justify-end gap-2 mt-2">
         <Button
-          variant={feedback === 'up' ? "default" : "outline"}
+          variant="outline"
           size="sm"
-          onClick={(e) => handleFeedback('up', e)}
+          className="text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleFeedback("support");
+          }}
+          disabled={isSubmitting}
         >
-          <ThumbsUp className={`h-4 w-4 ${feedback === 'up' ? 'text-white' : 'text-gray-600'}`} />
+          <ThumbsUp className="w-3 h-3 mr-1" />
+          Support
         </Button>
         <Button
-          variant={feedback === 'down' ? "outline" : "outline"}
+          variant="outline"
           size="sm"
-          onClick={(e) => handleFeedback('down', e)}
-          className={feedback === 'down' ? 'bg-[#ea384c]/10' : ''}
+          className="text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleFeedback("object");
+          }}
+          disabled={isSubmitting}
         >
-          <ThumbsDown className={`h-4 w-4 ${feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'}`} />
+          <ThumbsDown className="w-3 h-3 mr-1" />
+          Object
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          onClick={(e) => e.stopPropagation()}
+          disabled={isSubmitting}
+        >
+          <MessageSquare className="w-3 h-3 mr-1" />
+          Comment
         </Button>
       </div>
     </Card>
   );
-});
-
-ApplicationCard.displayName = 'ApplicationCard';
+};
