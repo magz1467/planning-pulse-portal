@@ -11,11 +11,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 interface PostcodeSearchProps {
   onSelect: (postcode: string) => void;
@@ -85,7 +80,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
                       <div className="flex flex-col">
                         <span className="font-medium">{suggestion.postcode}</span>
                         <span className="text-sm text-gray-500">
-                          {suggestion.admin_district}, {suggestion.country}
+                          {suggestion.address || `${suggestion.admin_district}, ${suggestion.country}`}
                         </span>
                       </div>
                     </CommandItem>

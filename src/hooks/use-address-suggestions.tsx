@@ -6,6 +6,7 @@ interface PostcodeSuggestion {
   country: string;
   nhs_ha: string;
   admin_district: string;
+  address?: string;
 }
 
 export const useAddressSuggestions = (search: string) => {
@@ -19,31 +20,47 @@ export const useAddressSuggestions = (search: string) => {
   }, [search]);
 
   return useQuery({
-    queryKey: ['postcode-suggestions', debouncedSearch],
+    queryKey: ['address-suggestions', debouncedSearch],
     queryFn: async () => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        const response = await fetch(
+        // First try postcode lookup
+        const postcodeResponse = await fetch(
           `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
         );
-        const data = await response.json();
+        const postcodeData = await postcodeResponse.json();
         
-        if (!data.result) return [];
+        if (postcodeData.result) {
+          // Fetch additional details for each postcode
+          const detailsPromises = postcodeData.result.map(async (postcode: string) => {
+            const detailsResponse = await fetch(
+              `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+            );
+            const details = await detailsResponse.json();
+            return details.result;
+          });
+          
+          const results = await Promise.all(detailsPromises);
+          return results.filter(Boolean);
+        }
         
-        // Fetch additional details for each postcode
-        const detailsPromises = data.result.map(async (postcode: string) => {
-          const detailsResponse = await fetch(
-            `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
-          );
-          const details = await detailsResponse.json();
-          return details.result;
-        });
+        // If no postcode results, try address lookup
+        const addressResponse = await fetch(
+          `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
+        );
+        const addressData = await addressResponse.json();
         
-        const results = await Promise.all(detailsPromises);
-        return results.filter(Boolean);
+        if (addressData.result) {
+          return addressData.result.map((result: any) => ({
+            ...result,
+            address: `${result.admin_ward || ''} ${result.admin_district}`.trim(),
+          }));
+        }
+        
+        return [];
       } catch (error) {
-        console.error('Error fetching postcode suggestions:', error);
+        console.error('Error fetching suggestions:', error);
         return [];
       }
     },
