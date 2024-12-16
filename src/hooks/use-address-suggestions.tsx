@@ -11,7 +11,6 @@ interface PostcodeSuggestion {
 export const useAddressSuggestions = (search: string) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   
-  // Use useEffect for debouncing
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -24,25 +23,31 @@ export const useAddressSuggestions = (search: string) => {
     queryFn: async () => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
-      const response = await fetch(
-        `https://api.postcodes.io/postcodes/${debouncedSearch}/autocomplete`
-      );
-      const data = await response.json();
-      
-      if (!data.result) return [];
-      
-      // Fetch additional details for each postcode
-      const detailsPromises = data.result.map(async (postcode: string) => {
-        const detailsResponse = await fetch(
-          `https://api.postcodes.io/postcodes/${postcode}`
+      try {
+        const response = await fetch(
+          `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
         );
-        const details = await detailsResponse.json();
-        return details.result;
-      });
-      
-      const results = await Promise.all(detailsPromises);
-      return results.filter(Boolean);
+        const data = await response.json();
+        
+        if (!data.result) return [];
+        
+        // Fetch additional details for each postcode
+        const detailsPromises = data.result.map(async (postcode: string) => {
+          const detailsResponse = await fetch(
+            `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+          );
+          const details = await detailsResponse.json();
+          return details.result;
+        });
+        
+        const results = await Promise.all(detailsPromises);
+        return results.filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching postcode suggestions:', error);
+        return [];
+      }
     },
     enabled: debouncedSearch.length >= 2,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 };

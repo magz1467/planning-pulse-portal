@@ -37,7 +37,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
 
   return (
     <div className={`relative ${className}`}>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open && search.length >= 2} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <div className="relative w-full">
             <Input
@@ -61,22 +61,27 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
         <PopoverContent className="p-0" align="start">
           <Command>
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup>
-                {suggestions.map((suggestion) => (
-                  <CommandItem
-                    key={suggestion.postcode}
-                    onSelect={() => handleSelect(suggestion.postcode)}
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{suggestion.postcode}</span>
-                      <span className="text-sm text-gray-500">
-                        {suggestion.admin_district}, {suggestion.country}
-                      </span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              {isLoading ? (
+                <CommandEmpty>Loading suggestions...</CommandEmpty>
+              ) : suggestions.length === 0 && search.length >= 2 ? (
+                <CommandEmpty>No results found.</CommandEmpty>
+              ) : (
+                <CommandGroup>
+                  {suggestions.map((suggestion) => (
+                    <CommandItem
+                      key={suggestion.postcode}
+                      onSelect={() => handleSelect(suggestion.postcode)}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{suggestion.postcode}</span>
+                        <span className="text-sm text-gray-500">
+                          {suggestion.admin_district}, {suggestion.country}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
             </CommandList>
           </Command>
         </PopoverContent>
