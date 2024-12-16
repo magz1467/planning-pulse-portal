@@ -4,7 +4,6 @@ import { Application } from "@/types/planning";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { LatLngTuple } from "leaflet";
 import { MapLayout } from "./layout/MapLayout";
-import { MapHeader } from "./MapHeader";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -131,7 +130,12 @@ export const MapContent = () => {
         const data = await response.json();
         if (data.status === 200) {
           setCoordinates([data.result.latitude, data.result.longitude]);
-          setSelectedApplication(null);
+          // Select the first application by default on mobile after search
+          if (isMobile && filteredApplications.length > 0) {
+            setSelectedApplication(filteredApplications[0].id);
+          } else {
+            setSelectedApplication(null);
+          }
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
@@ -143,7 +147,7 @@ export const MapContent = () => {
     };
 
     fetchCoordinates();
-  }, [postcode]);
+  }, [postcode, isMobile, filteredApplications]);
 
   useEffect(() => {
     let filtered = mockPlanningApplications;

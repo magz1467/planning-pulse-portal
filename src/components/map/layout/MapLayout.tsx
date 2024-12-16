@@ -3,8 +3,6 @@ import { DesktopSidebar } from "../DesktopSidebar";
 import { MapHeader } from "../MapHeader";
 import { MapContainerComponent } from "../MapContainer";
 import { LoadingOverlay } from "../LoadingOverlay";
-import { FilterBar } from "../FilterBar";
-import { MapListToggle } from "../mobile/MapListToggle";
 
 interface MapLayoutProps {
   isLoading: boolean;
@@ -39,20 +37,13 @@ export const MapLayout = ({
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
       {isLoading && <LoadingOverlay />}
-      <MapHeader />
       
-      {isMobile && (
-        <div className="flex items-center justify-between px-4 py-2 bg-white border-b">
-          <FilterBar
-            onFilterChange={onFilterChange}
-            activeFilters={activeFilters}
-          />
-          <MapListToggle
-            isMapView={isMapView}
-            onToggle={onToggleView}
-          />
-        </div>
-      )}
+      <MapHeader 
+        onFilterChange={onFilterChange}
+        activeFilters={activeFilters}
+        isMapView={isMapView}
+        onToggleView={onToggleView}
+      />
       
       <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
@@ -76,7 +67,7 @@ export const MapLayout = ({
             onMarkerClick={onMarkerClick}
           />
 
-          {isMobile && selectedApplication !== null && (
+          {isMobile && (
             <MobileApplicationCards
               applications={filteredApplications}
               selectedId={selectedApplication}
