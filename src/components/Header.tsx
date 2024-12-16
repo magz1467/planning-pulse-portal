@@ -1,4 +1,3 @@
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Link } from "react-router-dom";
 
 const Header = () => {
@@ -10,41 +9,23 @@ const Header = () => {
             PlanningPulse
           </Link>
           
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Services</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="grid gap-3 p-6 w-[400px]">
-                    <Link to="/services/residents" className="block">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium leading-none">For Residents</h4>
-                        <p className="text-sm text-muted-foreground">Search and comment on local planning applications</p>
-                      </div>
-                    </Link>
-                    <Link to="/services/developers" className="block">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium leading-none">For Developers</h4>
-                        <p className="text-sm text-muted-foreground">Submit and manage planning applications</p>
-                      </div>
-                    </Link>
-                    <Link to="/services/councils" className="block">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium leading-none">For Local Authorities</h4>
-                        <p className="text-sm text-muted-foreground">Streamline your planning process</p>
-                      </div>
-                    </Link>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/about" className="px-4 py-2">About</Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/contact" className="px-4 py-2">Contact</Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <nav className="flex items-center space-x-6">
+            <Link to="/services/residents" className="text-sm hover:text-primary">
+              For Residents
+            </Link>
+            <Link to="/services/developers" className="text-sm hover:text-primary">
+              For Developers
+            </Link>
+            <Link to="/services/councils" className="text-sm hover:text-primary">
+              For Councils
+            </Link>
+            <Link to="/about" className="text-sm hover:text-primary">
+              About
+            </Link>
+            <Link to="/contact" className="text-sm hover:text-primary">
+              Contact
+            </Link>
+          </nav>
         </div>
       </div>
     </header>
