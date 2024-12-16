@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useState, memo } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import Image from "@/components/ui/image";
 
 interface ApplicationCardProps {
   application: Application;
@@ -52,6 +53,19 @@ export const ApplicationCard = memo(({ application, isSelected, onClick }: Appli
       }`}
       onClick={onClick}
     >
+      {application.image && (
+        <div className="aspect-video relative overflow-hidden rounded-lg mb-4">
+          <Image
+            src={application.image}
+            alt={application.title}
+            width={400}
+            height={225}
+            className="object-cover w-full h-full"
+            loading="lazy"
+          />
+        </div>
+      )}
+      
       <h3 className="font-semibold text-primary truncate">
         {application.title}
       </h3>
