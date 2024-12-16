@@ -29,9 +29,14 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             <MapPin className="w-3 h-3" />
             <p className="text-sm truncate">{application.address}</p>
           </div>
-          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded inline-block mt-2">
-            {application.status}
-          </span>
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+              {application.status}
+            </span>
+            <span className="text-xs text-gray-500">
+              {application.distance}
+            </span>
+          </div>
         </div>
       </div>
     </div>
