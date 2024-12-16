@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, Home } from "lucide-react";
+import { Home } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FilterBar } from "../FilterBar";
 import { MapListToggle } from "./mobile/MapListToggle";
+import { PostcodeSearch } from "../PostcodeSearch";
 
 interface MapHeaderProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -61,23 +61,10 @@ export const MapHeader = ({
         )}
         
         <form onSubmit={handleSubmit} className="flex-1">
-          <div className="relative w-full">
-            <Input 
-              type="text" 
-              placeholder="Search new location" 
-              className="w-full pl-4 pr-10 py-2"
-              value={postcode}
-              onChange={(e) => setPostcode(e.target.value)}
-            />
-            <Button 
-              type="submit" 
-              size="icon" 
-              variant="ghost" 
-              className="absolute right-1 top-1/2 -translate-y-1/2"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
+          <PostcodeSearch
+            onSelect={setPostcode}
+            placeholder="Search new location"
+          />
         </form>
 
         {isMobile && onFilterChange && onToggleView && (
