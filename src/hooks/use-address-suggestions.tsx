@@ -25,33 +25,35 @@ export const useAddressSuggestions = (search: string) => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        // Try postcode lookup first
-        const postcodeResponse = await fetch(
-          `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
-        );
-        const postcodeData = await postcodeResponse.json();
-        
-        if (postcodeData.result) {
-          // Fetch additional details for each postcode
-          const detailsPromises = postcodeData.result.map(async (postcode: string) => {
-            const detailsResponse = await fetch(
-              `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
-            );
-            const details = await detailsResponse.json();
-            if (details.result) {
-              return {
-                ...details.result,
-                address: `${details.result.admin_ward || ''} ${details.result.admin_district}`.trim()
-              };
-            }
-            return null;
-          });
+        // Try postcode lookup first if it looks like a postcode (contains numbers)
+        if (/\d/.test(debouncedSearch)) {
+          const postcodeResponse = await fetch(
+            `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
+          );
+          const postcodeData = await postcodeResponse.json();
           
-          const results = await Promise.all(detailsPromises);
-          return results.filter(Boolean);
+          if (postcodeData.result) {
+            // Fetch additional details for each postcode
+            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
+              const detailsResponse = await fetch(
+                `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+              );
+              const details = await detailsResponse.json();
+              if (details.result) {
+                return {
+                  ...details.result,
+                  address: `${details.result.admin_ward || ''} ${details.result.admin_district}`.trim()
+                };
+              }
+              return null;
+            });
+            
+            const results = await Promise.all(detailsPromises);
+            return results.filter(Boolean);
+          }
         }
         
-        // If no postcode results, try address lookup
+        // If no postcode results or not a postcode search, try address lookup
         const addressResponse = await fetch(
           `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
         );
@@ -61,7 +63,21 @@ export const useAddressSuggestions = (search: string) => {
           return addressData.result.map((result: any) => ({
             ...result,
             postcode: result.postcode,
-            address: `${result.admin_ward || ''}, ${result.admin_district}, ${result.postcode}`.trim()
+            address: `${result.thoroughfare || result.admin_ward || ''}, ${result.admin_district}, ${result.postcode}`.trim()
+          }));
+        }
+
+        // If no results from postcodes.io, try a more general address search
+        const generalAddressResponse = await fetch(
+          `https://api.postcodes.io/postcodes?street=${encodeURIComponent(debouncedSearch)}`
+        );
+        const generalAddressData = await generalAddressResponse.json();
+
+        if (generalAddressData.result && generalAddressData.result.length > 0) {
+          return generalAddressData.result.map((result: any) => ({
+            ...result,
+            postcode: result.postcode,
+            address: `${result.thoroughfare || ''}, ${result.admin_district}, ${result.postcode}`.trim()
           }));
         }
         
