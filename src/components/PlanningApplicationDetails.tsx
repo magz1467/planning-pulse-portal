@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface PlanningApplicationDetailsProps {
-  application: Application;
+  application?: Application;
   onClose: () => void;
 }
 
@@ -16,6 +16,8 @@ export const PlanningApplicationDetails = ({
   application,
   onClose,
 }: PlanningApplicationDetailsProps) => {
+  if (!application) return null;
+
   // Mock data for feedback counts - in a real application, this would come from your backend
   const feedbackStats = {
     thumbsUp: 12,

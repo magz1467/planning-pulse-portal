@@ -2,10 +2,12 @@ import { Badge } from "@/components/ui/badge";
 import { Application } from "@/types/planning";
 
 interface ApplicationHeaderProps {
-  application: Application;
+  application?: Application;
 }
 
 export const ApplicationHeader = ({ application }: ApplicationHeaderProps) => {
+  if (!application) return null;
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-2">{application.title}</h2>

@@ -2,10 +2,12 @@ import { Card } from "@/components/ui/card";
 import { Application } from "@/types/planning";
 
 interface ApplicationDetailsProps {
-  application: Application;
+  application?: Application;
 }
 
 export const ApplicationDetails = ({ application }: ApplicationDetailsProps) => {
+  if (!application) return null;
+
   return (
     <Card className="p-4">
       <h3 className="font-semibold mb-2">Application Details</h3>

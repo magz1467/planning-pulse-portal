@@ -1,11 +1,11 @@
 import { Application } from "@/types/planning";
 
 interface ApplicationImageProps {
-  application: Application;
+  application?: Application;
 }
 
 export const ApplicationImage = ({ application }: ApplicationImageProps) => {
-  if (!application.image) return null;
+  if (!application?.image) return null;
 
   return (
     <div className="aspect-video relative overflow-hidden rounded-lg">
