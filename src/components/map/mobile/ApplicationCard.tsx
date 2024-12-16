@@ -48,13 +48,13 @@ export const ApplicationCard = memo(({ application, isSelected, onClick }: Appli
 
   return (
     <Card
-      className={`overflow-hidden cursor-pointer transition-all p-4 ${
+      className={`overflow-hidden cursor-pointer transition-all p-3 ${
         isSelected ? "border-primary shadow-lg" : "border-gray-200"
       }`}
       onClick={onClick}
     >
       {application.image && (
-        <div className="aspect-video relative overflow-hidden rounded-lg mb-4">
+        <div className="aspect-video relative overflow-hidden rounded-lg mb-2">
           <Image
             src={application.image}
             alt={application.title}
@@ -69,13 +69,13 @@ export const ApplicationCard = memo(({ application, isSelected, onClick }: Appli
       <h3 className="font-semibold text-primary truncate">
         {application.title}
       </h3>
-      <div className="flex justify-between items-center mt-2">
+      <div className="flex justify-between items-center mt-1">
         <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
           {application.status}
         </span>
         <span className="text-xs text-gray-500">{application.distance}</span>
       </div>
-      <p className="text-sm text-gray-600 mt-2 truncate">
+      <p className="text-sm text-gray-600 mt-1 truncate">
         {application.address}
       </p>
       <div className="flex justify-end gap-2 mt-2">
