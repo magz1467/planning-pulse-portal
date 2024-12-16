@@ -35,6 +35,14 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
     onSelect(postcode);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearch(value);
+    if (value.length >= 2 && !open) {
+      setOpen(true);
+    }
+  };
+
   return (
     <div className={`relative ${className}`}>
       <Popover open={open && search.length >= 2} onOpenChange={setOpen}>
@@ -44,8 +52,9 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
               type="text"
               placeholder={placeholder}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleInputChange}
               className="w-full pl-4 pr-10 py-2"
+              onFocus={() => search.length >= 2 && setOpen(true)}
             />
             <Button 
               type="submit" 
@@ -58,7 +67,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
             </Button>
           </div>
         </PopoverTrigger>
-        <PopoverContent className="p-0" align="start">
+        <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]" align="start">
           <Command>
             <CommandList>
               {isLoading ? (
