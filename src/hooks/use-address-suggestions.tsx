@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 interface PostcodeSuggestion {
@@ -11,8 +11,8 @@ interface PostcodeSuggestion {
 export const useAddressSuggestions = (search: string) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   
-  // Debounce the search input
-  useState(() => {
+  // Use useEffect for debouncing
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
     }, 300);
