@@ -121,7 +121,6 @@ export const MapContent = () => {
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
 
-  // Update this useEffect to watch for postcode changes
   useEffect(() => {
     const fetchCoordinates = async () => {
       if (!postcode) return;
@@ -131,14 +130,9 @@ export const MapContent = () => {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
         if (data.status === 200) {
-          // Update coordinates with new location
           setCoordinates([data.result.latitude, data.result.longitude]);
-          // Reset selected application when location changes
-          if (isMobile && filteredApplications.length > 0) {
-            setSelectedApplication(filteredApplications[0].id);
-          } else {
-            setSelectedApplication(null);
-          }
+          // Remove the automatic selection on mobile
+          setSelectedApplication(null);
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
@@ -149,9 +143,11 @@ export const MapContent = () => {
       }
     };
 
-    // Call fetchCoordinates whenever postcode changes
     fetchCoordinates();
-  }, [postcode, isMobile, filteredApplications]); // Add postcode to dependencies
+    
+    // Scroll to top when coordinates change
+    window.scrollTo(0, 0);
+  }, [postcode]);
 
   useEffect(() => {
     let filtered = mockPlanningApplications;
