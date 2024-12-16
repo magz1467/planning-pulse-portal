@@ -8,6 +8,8 @@ import { MapHeader } from "@/components/map/MapHeader";
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { LoadingOverlay } from "@/components/map/LoadingOverlay";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { MapListToggle } from "@/components/map/mobile/MapListToggle";
+import { FilterBar } from "@/components/FilterBar";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -109,6 +111,7 @@ const MapContent = () => {
     type?: string;
   }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -171,6 +174,20 @@ const MapContent = () => {
     <div className="flex flex-col h-screen w-full overflow-hidden">
       {isLoading && <LoadingOverlay />}
       <MapHeader />
+      
+      {isMobile && (
+        <div className="flex items-center justify-between px-4 py-2 bg-white border-b">
+          <FilterBar
+            onFilterChange={handleFilterChange}
+            activeFilters={activeFilters}
+          />
+          <MapListToggle
+            isMapView={isMapView}
+            onToggle={() => setIsMapView(!isMapView)}
+          />
+        </div>
+      )}
+      
       <div className="flex flex-1 overflow-hidden relative">
         {!isMobile && (
           <DesktopSidebar
@@ -183,7 +200,8 @@ const MapContent = () => {
             onClose={() => setSelectedApplication(null)}
           />
         )}
-        <div className="flex-1 h-full relative">
+        
+        <div className={`flex-1 h-full relative ${!isMapView && isMobile ? 'hidden' : ''}`}>
           <Suspense fallback={<LoadingOverlay />}>
             <MapContainerComponent
               coordinates={coordinates}
@@ -194,7 +212,7 @@ const MapContent = () => {
             />
           </Suspense>
 
-          {isMobile && (
+          {isMobile && selectedApplication !== null && (
             <MobileApplicationCards
               applications={filteredApplications}
               selectedId={selectedApplication}
@@ -202,6 +220,27 @@ const MapContent = () => {
             />
           )}
         </div>
+        
+        {isMobile && !isMapView && (
+          <div className="flex-1 overflow-y-auto bg-gray-50 p-4">
+            {filteredApplications.map((app) => (
+              <div
+                key={app.id}
+                className="bg-white p-4 rounded-lg shadow-sm mb-4 cursor-pointer"
+                onClick={() => handleMarkerClick(app.id)}
+              >
+                <h3 className="font-semibold text-primary">{app.title}</h3>
+                <p className="text-sm text-gray-600 mt-1">{app.address}</p>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+                    {app.status}
+                  </span>
+                  <span className="text-xs text-gray-500">{app.distance}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
