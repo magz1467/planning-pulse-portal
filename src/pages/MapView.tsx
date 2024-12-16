@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Application } from "@/types/planning";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileApplicationCards } from "@/components/map/MobileApplicationCards";
@@ -7,6 +7,7 @@ import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { MapHeader } from "@/components/map/MapHeader";
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { LoadingOverlay } from "@/components/map/LoadingOverlay";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { LatLngTuple } from "leaflet";
 
 const mockPlanningApplications: Application[] = [
@@ -97,7 +98,7 @@ const mockPlanningApplications: Application[] = [
   }
 ];
 
-const MapView = () => {
+const MapContent = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
   const [coordinates, setCoordinates] = useState<LatLngTuple | null>(null);
@@ -125,7 +126,6 @@ const MapView = () => {
       } catch (error) {
         console.error("Error fetching coordinates:", error);
       } finally {
-        // Add a minimum delay to show the loading state
         setTimeout(() => {
           setIsLoading(false);
         }, 1500);
@@ -160,7 +160,11 @@ const MapView = () => {
   };
 
   if (!coordinates) {
-    return <div className="flex items-center justify-center h-screen">Loading map...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading map...</p>
+      </div>
+    );
   }
 
   return (
@@ -180,13 +184,15 @@ const MapView = () => {
           />
         )}
         <div className="flex-1 h-full relative">
-          <MapContainerComponent
-            coordinates={coordinates}
-            postcode={postcode}
-            applications={filteredApplications}
-            selectedApplication={selectedApplication}
-            onMarkerClick={handleMarkerClick}
-          />
+          <Suspense fallback={<LoadingOverlay />}>
+            <MapContainerComponent
+              coordinates={coordinates}
+              postcode={postcode}
+              applications={filteredApplications}
+              selectedApplication={selectedApplication}
+              onMarkerClick={handleMarkerClick}
+            />
+          </Suspense>
 
           {isMobile && (
             <MobileApplicationCards
@@ -198,6 +204,14 @@ const MapView = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const MapView = () => {
+  return (
+    <ErrorBoundary>
+      <MapContent />
+    </ErrorBoundary>
   );
 };
 

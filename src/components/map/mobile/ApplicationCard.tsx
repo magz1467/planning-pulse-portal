@@ -2,7 +2,7 @@ import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ApplicationCardProps {
@@ -11,24 +11,36 @@ interface ApplicationCardProps {
   onClick: () => void;
 }
 
-export const ApplicationCard = ({ application, isSelected, onClick }: ApplicationCardProps) => {
+export const ApplicationCard = memo(({ application, isSelected, onClick }: ApplicationCardProps) => {
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
 
+  if (!application) {
+    return null;
+  }
+
   const handleFeedback = (type: 'up' | 'down', e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    if (feedback === type) {
-      setFeedback(null);
+    try {
+      if (feedback === type) {
+        setFeedback(null);
+        toast({
+          title: "Feedback removed",
+          description: "Your feedback has been removed",
+        });
+      } else {
+        setFeedback(type);
+        toast({
+          title: "Thank you for your feedback",
+          description: type === 'up' ? "We're glad this was helpful!" : "We'll work on improving this",
+        });
+      }
+    } catch (error) {
+      console.error('Error handling feedback:', error);
       toast({
-        title: "Feedback removed",
-        description: "Your feedback has been removed",
-      });
-    } else {
-      setFeedback(type);
-      toast({
-        title: "Thank you for your feedback",
-        description: type === 'up' ? "We're glad this was helpful!" : "We'll work on improving this",
+        title: "Error",
+        description: "There was an error processing your feedback",
+        variant: "destructive",
       });
     }
   };
@@ -71,4 +83,6 @@ export const ApplicationCard = ({ application, isSelected, onClick }: Applicatio
       </div>
     </Card>
   );
-};
+});
+
+ApplicationCard.displayName = 'ApplicationCard';
