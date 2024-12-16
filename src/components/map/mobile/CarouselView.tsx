@@ -1,16 +1,16 @@
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { ApplicationCard } from "./ApplicationCard";
-import { PlanningApplication } from "@/types/planning";
+import { Application } from "@/types/planning";
 
 interface CarouselViewProps {
-  applications: PlanningApplication[];
-  selectedApplication?: PlanningApplication | null;
-  onSelectApplication: (application: PlanningApplication) => void;
+  applications: Application[];
+  selectedId?: number | null;
+  onSelectApplication: (id: number) => void;
 }
 
 export const CarouselView = ({
   applications,
-  selectedApplication,
+  selectedId,
   onSelectApplication,
 }: CarouselViewProps) => {
   return (
@@ -25,8 +25,8 @@ export const CarouselView = ({
             <CarouselItem key={application.id} className="basis-4/5 md:basis-1/2">
               <ApplicationCard
                 application={application}
-                isSelected={selectedApplication?.id === application.id}
-                onClick={() => onSelectApplication(application)}
+                isSelected={selectedId === application.id}
+                onClick={() => onSelectApplication(application.id)}
               />
             </CarouselItem>
           ))}

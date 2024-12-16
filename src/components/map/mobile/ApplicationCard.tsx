@@ -1,14 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, ThumbsUp, ThumbsDown } from "lucide-react";
-import { PlanningApplication } from "@/types/planning";
+import { Application } from "@/types/planning";
 import { ApplicationImage } from "./ApplicationImage";
 import { ApplicationMeta } from "./ApplicationMeta";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
 interface ApplicationCardProps {
-  application: PlanningApplication;
+  application: Application;
   isSelected?: boolean;
   onClick?: () => void;
 }
@@ -51,7 +51,7 @@ export const ApplicationCard = ({
       onClick={onClick}
     >
       {application.image && (
-        <ApplicationImage image={application.image} title={application.title} />
+        <ApplicationImage src={application.image} alt={application.title} />
       )}
 
       <h3 className="font-semibold text-primary truncate">{application.title}</h3>

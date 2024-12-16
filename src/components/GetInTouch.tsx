@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 
-export const GetInTouch = () => {
+const GetInTouch = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
@@ -44,3 +44,5 @@ export const GetInTouch = () => {
     </div>
   );
 };
+
+export default GetInTouch;
