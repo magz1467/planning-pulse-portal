@@ -67,7 +67,10 @@ export const MapLayout = ({
           />
         )}
         
-        <div className={`flex-1 h-full relative ${!isMapView && isMobile ? 'hidden' : 'block'}`}>
+        <div 
+          className={`flex-1 relative ${isMobile ? (isMapView ? 'block' : 'hidden') : 'block'}`}
+          style={{ height: isMobile ? 'calc(100vh - 120px)' : '100%' }}
+        >
           <MapContainerComponent
             coordinates={coordinates}
             postcode={postcode}
@@ -86,7 +89,7 @@ export const MapLayout = ({
         </div>
         
         {isMobile && !isMapView && (
-          <div className="flex-1 overflow-y-auto bg-gray-50">
+          <div className="flex-1 overflow-y-auto bg-gray-50 h-full">
             <div className="p-4 space-y-4">
               {filteredApplications.map((app) => (
                 <div
