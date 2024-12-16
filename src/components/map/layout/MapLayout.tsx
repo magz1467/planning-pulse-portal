@@ -45,7 +45,9 @@ export const MapLayout = ({
       
       <MapHeader 
         onFilterChange={onFilterChange}
+        onSortChange={onSortChange}
         activeFilters={activeFilters}
+        activeSort={activeSort}
         isMapView={isMapView}
         onToggleView={onToggleView}
       />

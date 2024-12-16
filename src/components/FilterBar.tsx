@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { Filter, ArrowUpDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterBarProps {
@@ -31,8 +31,19 @@ export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeS
   const hasActiveFilters = activeFilters.status || activeFilters.type;
   const activeFilterText = activeFilters.status || activeFilters.type || "Filter";
 
+  const getSortButtonText = () => {
+    switch (activeSort) {
+      case 'closingSoon':
+        return 'Closing Soon';
+      case 'newest':
+        return 'Newest';
+      default:
+        return 'Sort';
+    }
+  };
+
   return (
-    <div className={isMobile ? "" : "flex gap-4 p-4 bg-white border-b border-gray-200"}>
+    <div className={`${isMobile ? "" : "flex gap-4 p-4 bg-white border-b border-gray-200"}`}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 
@@ -85,6 +96,41 @@ export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeS
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {onSortChange && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="outline" 
+              size={isMobile ? "sm" : "default"}
+              className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between`}
+            >
+              <span className="truncate">{getSortButtonText()}</span>
+              <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={() => onSortChange(null)}
+              className="cursor-pointer"
+            >
+              Default
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onSortChange('closingSoon')}
+              className="cursor-pointer"
+            >
+              Closing Soon
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onSortChange('newest')}
+              className="cursor-pointer"
+            >
+              Newest
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 };
