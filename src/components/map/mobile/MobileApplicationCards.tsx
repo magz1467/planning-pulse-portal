@@ -1,9 +1,9 @@
 import React from 'react';
 import { Application } from "@/types/planning";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { CarouselView } from "./mobile/CarouselView";
+import { CarouselView } from "./CarouselView";
 import { useToast } from "@/components/ui/use-toast";
 
 interface MobileApplicationCardsProps {
