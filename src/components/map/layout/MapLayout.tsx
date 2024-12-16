@@ -87,17 +87,11 @@ export const MapLayout = ({
         
         {isMobile && !isMapView && (
           <div className="flex-1 overflow-y-auto bg-gray-50">
-            <FilterBar
-              onFilterChange={onFilterChange}
-              onSortChange={onSortChange}
-              activeFilters={activeFilters}
-              activeSort={activeSort}
-            />
-            <div className="p-4">
+            <div className="p-4 space-y-4">
               {filteredApplications.map((app) => (
                 <div
                   key={app.id}
-                  className="bg-white p-4 rounded-lg shadow-sm mb-4 cursor-pointer flex gap-4"
+                  className="bg-white p-4 rounded-lg shadow-sm cursor-pointer flex gap-4"
                   onClick={() => onMarkerClick(app.id)}
                 >
                   {app.image && (
