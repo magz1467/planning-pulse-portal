@@ -3,7 +3,6 @@ import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { CarouselView } from "./CarouselView";
 import { useToast } from "@/components/ui/use-toast";
 
 interface MobileApplicationCardsProps {
@@ -17,29 +16,15 @@ export const MobileApplicationCards = ({
   selectedId,
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
   // Update isOpen when selectedId changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedId !== null) {
       setIsOpen(true);
     }
   }, [selectedId]);
-
-  const handleCardClick = (id: number) => {
-    if (selectedId === id) {
-      setIsFullScreen(true);
-    } else {
-      setIsFullScreen(false);
-      onSelectApplication(id);
-      toast({
-        title: "Application Selected",
-        description: "Tap again to view full details",
-      });
-    }
-  };
 
   const handleCommentSubmit = (content: string) => {
     console.log("New comment:", content);
@@ -59,12 +44,15 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (isFullScreen && selectedApp) {
+  if (selectedApp) {
     return (
       <div className="fixed inset-0 bg-white z-[1100] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
-          onClose={() => setIsFullScreen(false)}
+          onClose={() => {
+            setIsOpen(false);
+            onSelectApplication(null);
+          }}
           onCommentSubmit={handleCommentSubmit}
         />
       </div>
@@ -72,7 +60,7 @@ export const MobileApplicationCards = ({
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 animate-slide-up" style={{ zIndex: 1100 }}>
+    <div className="fixed inset-x-0 bottom-0" style={{ zIndex: 1100 }}>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <div 
@@ -102,19 +90,21 @@ export const MobileApplicationCards = ({
             </div>
             
             <div className="flex-1 overflow-y-auto bg-white">
-              <div 
-                className="p-4 cursor-pointer"
-                onClick={() => setIsFullScreen(true)}
-              >
-                <h3 className="font-semibold text-primary">{selectedApp?.title}</h3>
-                <p className="text-sm text-gray-600 mt-1">{selectedApp?.address}</p>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
-                    {selectedApp?.status}
-                  </span>
-                  <span className="text-xs text-gray-500">{selectedApp?.distance}</span>
+              {selectedApp && (
+                <div 
+                  className="p-4 cursor-pointer"
+                  onClick={() => setIsOpen(true)}
+                >
+                  <h3 className="font-semibold text-primary">{selectedApp.title}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{selectedApp.address}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+                      {selectedApp.status}
+                    </span>
+                    <span className="text-xs text-gray-500">{selectedApp.distance}</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </SheetContent>
