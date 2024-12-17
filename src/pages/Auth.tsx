@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { useToast } from "@/components/ui/use-toast";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -23,20 +24,14 @@ const AuthPage = () => {
       }
     });
 
-    // Listen for auth errors
+    // Listen for auth events
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
       if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
           description: "You have been signed out successfully",
-        });
-      }
-      if (event === 'USER_DELETED') {
-        toast({
-          title: "Account deleted",
-          description: "Your account has been deleted successfully",
         });
       }
       if (event === 'PASSWORD_RECOVERY') {
@@ -69,15 +64,7 @@ const AuthPage = () => {
             supabaseClient={supabase}
             appearance={{ theme: ThemeSupa }}
             theme="light"
-            providers={["google"]}
-            onError={(error) => {
-              console.error("Auth error:", error);
-              toast({
-                title: "Authentication Error",
-                description: error.message,
-                variant: "destructive",
-              });
-            }}
+            providers={[]}
           />
         </div>
       </div>
