@@ -15,11 +15,11 @@ export const MobileMenu = () => (
         <span className="sr-only">Open menu</span>
       </Button>
     </SheetTrigger>
-    <SheetContent>
-      <div className="text-xl font-bold text-primary pb-4 mb-6 border-b">
+    <SheetContent className="overflow-y-auto max-h-screen">
+      <div className="text-xl font-bold text-primary pb-4 mb-6 border-b sticky top-0 bg-background z-10">
         Menu
       </div>
-      <nav className="flex flex-col gap-4">
+      <nav className="flex flex-col gap-4 pb-safe">
         <Link to="/about" className="text-lg">
           About
         </Link>
