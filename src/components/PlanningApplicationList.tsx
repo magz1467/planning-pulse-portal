@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import Image from "@/components/ui/image";
+import { getStatusColor } from "@/utils/statusColors";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -13,26 +14,10 @@ export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
 }: PlanningApplicationListProps) => {
-  const getStatusColor = (status: string) => {
-    const statusLower = status.toLowerCase();
-    switch (statusLower) {
-      case 'declined':
-        return 'bg-[#ea384c]/10 text-[#ea384c]';
-      case 'under review':
-        return 'bg-[#F97316]/10 text-[#F97316]';
-      case 'approved':
-        return 'bg-[#22c55e]/10 text-[#22c55e]';
-      default:
-        return 'bg-[#22c55e]/10 text-[#22c55e]';
-    }
-  };
-
   const getImageUrl = (path: string) => {
-    // If the path already starts with http or https, return it as is
     if (path.startsWith('http')) {
       return path;
     }
-    // Otherwise, ensure it starts with a forward slash and return the full path
     return path.startsWith('/') ? path : `/${path}`;
   };
 

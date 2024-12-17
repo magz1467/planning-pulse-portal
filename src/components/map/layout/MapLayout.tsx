@@ -5,6 +5,7 @@ import { MapContainerComponent } from "../MapContainer";
 import { LoadingOverlay } from "../LoadingOverlay";
 import { FilterBar } from "@/components/FilterBar";
 import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
+import { getStatusColor } from "@/utils/statusColors";
 
 interface MapLayoutProps {
   isLoading: boolean;
@@ -132,7 +133,7 @@ export const MapLayout = ({
                       <h3 className="font-semibold text-primary">{app.title}</h3>
                       <p className="text-sm text-gray-600 mt-1">{app.address}</p>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+                        <span className={`text-xs px-2 py-1 rounded ${getStatusColor(app.status)}`}>
                           {app.status}
                         </span>
                         <span className="text-xs text-gray-500">{app.distance}</span>
