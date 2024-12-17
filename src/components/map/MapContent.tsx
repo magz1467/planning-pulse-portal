@@ -8,6 +8,8 @@ import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { Application } from "@/types/planning";
 import { findClosestApplication } from "@/utils/distance";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const planningImages = [
   "/lovable-uploads/5138b4f3-8820-4457-9664-4a7f54b617a9.png",
@@ -196,6 +198,7 @@ const mockPlanningApplications: Application[] = [
 export const MapContent = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
+  const initialTab = location.state?.tab || 'recent';
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
@@ -204,6 +207,7 @@ export const MapContent = () => {
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   
   const { coordinates, isLoading } = useCoordinates(postcode);
   const filteredApplications = useFilteredApplications(
@@ -211,6 +215,41 @@ export const MapContent = () => {
     activeFilters,
     activeSort
   );
+
+  const saveSearch = async (postcode: string, status: string) => {
+    try {
+      const { data: auth } = await supabase.auth.getSession();
+      const isLoggedIn = !!auth.session;
+
+      const { error } = await supabase
+        .from('Searches')
+        .insert([
+          {
+            "Post Code": postcode,
+            "Status": status,
+            "User_logged_in": isLoggedIn
+          }
+        ]);
+
+      if (error) {
+        console.error('Error saving search:', error);
+        toast({
+          title: "Error",
+          description: "There was a problem saving your search. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error saving search:', error);
+    }
+  };
+
+  // Save search when component mounts with postcode from location state
+  useEffect(() => {
+    if (postcode) {
+      saveSearch(postcode, initialTab);
+    }
+  }, [postcode, initialTab]);
 
   // Effect to select the closest application when coordinates change - only on mobile and map view
   useEffect(() => {
