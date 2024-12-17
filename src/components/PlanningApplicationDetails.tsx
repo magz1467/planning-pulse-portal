@@ -7,7 +7,7 @@ import { ApplicationComments } from "./planning-details/ApplicationComments";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
@@ -25,6 +25,14 @@ export const PlanningApplicationDetails = ({
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const { toast } = useToast();
   
+  useEffect(() => {
+    // Scroll to top when component mounts or application changes
+    const detailsContainer = document.querySelector('.planning-details-container');
+    if (detailsContainer) {
+      detailsContainer.scrollTop = 0;
+    }
+  }, [application]);
+
   if (!application) return null;
 
   // Mock data for feedback counts - in a real application, this would come from your backend
@@ -51,7 +59,7 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative planning-details-container">
       <div className="p-6 space-y-4">
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
