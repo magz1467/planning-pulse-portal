@@ -19,6 +19,7 @@ import Help from "./pages/Help";
 import Press from "./pages/Press";
 import Accessibility from "./pages/Accessibility";
 import Feedback from "./pages/Feedback";
+import Investors from "./pages/Investors";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/press" element={<Press />} />
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/investors" element={<Investors />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
