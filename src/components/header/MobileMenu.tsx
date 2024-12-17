@@ -16,6 +16,9 @@ export const MobileMenu = () => (
       </Button>
     </SheetTrigger>
     <SheetContent>
+      <div className="text-xl font-bold text-primary mb-6">
+        Menu
+      </div>
       <nav className="flex flex-col gap-4">
         <Link to="/services/residents" className="text-lg">
           Resident Services
@@ -32,14 +35,18 @@ export const MobileMenu = () => (
         <Link to="/contact" className="text-lg">
           Contact
         </Link>
-        <div className="h-px bg-gray-200 my-2" />
-        <Link to="/auth" className="text-lg">
-          Sign In
+        <div className="h-px bg-gray-200 my-4" />
+        <Link to="/auth">
+          <Button variant="default" className="w-full mb-3">
+            Sign In
+          </Button>
         </Link>
-        <Link to="/auth?mode=signup" className="text-lg">
-          Create Account
+        <Link to="/auth?mode=signup">
+          <Button variant="default" className="w-full mb-4">
+            Create Account
+          </Button>
         </Link>
-        <Link to="/privacy" className="text-lg">
+        <Link to="/privacy" className="text-sm text-gray-500 hover:text-primary">
           Privacy
         </Link>
       </nav>
