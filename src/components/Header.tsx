@@ -82,6 +82,12 @@ const Header = () => {
                   >
                     For Councils
                   </Link>
+                  <Link
+                    to="/services/residents"
+                    className="text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  >
+                    For Residents
+                  </Link>
                   <div className="pt-4 border-t">
                     <Button
                       variant="default"
@@ -99,6 +105,22 @@ const Header = () => {
                         Create account
                       </Button>
                     )}
+                  </div>
+                  <div className="pt-4 border-t">
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        to="/privacy"
+                        className="text-sm text-gray-600 hover:text-primary transition-colors"
+                      >
+                        Privacy Policy
+                      </Link>
+                      <Link
+                        to="/terms"
+                        className="text-sm text-gray-600 hover:text-primary transition-colors"
+                      >
+                        Terms of Service
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </SheetContent>
