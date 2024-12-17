@@ -6,7 +6,11 @@ import { LoadingOverlay } from "../LoadingOverlay";
 import { FilterBar } from "@/components/FilterBar";
 import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { getStatusColor } from "@/utils/statusColors";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Bell } from "lucide-react";
+import { EmailDialog } from "@/components/EmailDialog";
+import { useToast } from "@/components/ui/use-toast";
 
 interface MapLayoutProps {
   isLoading: boolean;
@@ -44,8 +48,18 @@ export const MapLayout = ({
 }: MapLayoutProps) => {
   const selectedApp = filteredApplications.find(app => app.id === selectedApplication);
   const detailsContainerRef = useRef<HTMLDivElement>(null);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const { toast } = useToast();
 
-  // Reset scroll position when selected application changes
+  const handleEmailSubmit = (email: string, radius: string) => {
+    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+    toast({
+      title: "Subscription pending",
+      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
+      duration: 5000,
+    });
+  };
+
   useEffect(() => {
     if (detailsContainerRef.current) {
       detailsContainerRef.current.scrollTop = 0;
@@ -122,39 +136,64 @@ export const MapLayout = ({
                 </div>
               </div>
             ) : (
-              <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4">
-                {filteredApplications.map((app) => (
-                  <div
-                    key={app.id}
-                    className="bg-white p-4 rounded-lg shadow-sm cursor-pointer flex gap-4"
-                    onClick={() => onMarkerClick(app.id)}
-                  >
-                    {app.image && (
-                      <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
-                        <img
-                          src={app.image}
-                          alt={app.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-primary">{app.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{app.address}</p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className={`text-xs px-2 py-1 rounded ${getStatusColor(app.status)}`}>
-                          {app.status}
-                        </span>
-                        <span className="text-xs text-gray-500">{app.distance}</span>
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="p-4 bg-white border-b">
+                  <div className="bg-primary/5 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Bell className="h-5 w-5 text-primary" />
+                      <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Stay informed about new planning applications near {postcode}
+                    </p>
+                    <Button 
+                      className="w-full"
+                      onClick={() => setShowEmailDialog(true)}
+                    >
+                      Get Alerts
+                    </Button>
+                  </div>
+                </div>
+                <div className="p-4 space-y-4">
+                  {filteredApplications.map((app) => (
+                    <div
+                      key={app.id}
+                      className="bg-white p-4 rounded-lg shadow-sm cursor-pointer flex gap-4"
+                      onClick={() => onMarkerClick(app.id)}
+                    >
+                      {app.image && (
+                        <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+                          <img
+                            src={app.image}
+                            alt={app.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-primary">{app.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{app.address}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className={`text-xs px-2 py-1 rounded ${getStatusColor(app.status)}`}>
+                            {app.status}
+                          </span>
+                          <span className="text-xs text-gray-500">{app.distance}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>
         )}
       </div>
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+      />
     </div>
   );
 };
