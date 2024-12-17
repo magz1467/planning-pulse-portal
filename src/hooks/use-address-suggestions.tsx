@@ -25,35 +25,7 @@ export const useAddressSuggestions = (search: string) => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        // Try postcode lookup first if it looks like a postcode (contains numbers)
-        if (/\d/.test(debouncedSearch)) {
-          const postcodeResponse = await fetch(
-            `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
-          );
-          const postcodeData = await postcodeResponse.json();
-          
-          if (postcodeData.result) {
-            // Fetch additional details for each postcode
-            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
-              const detailsResponse = await fetch(
-                `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
-              );
-              const details = await detailsResponse.json();
-              if (details.result) {
-                return {
-                  ...details.result,
-                  address: `${details.result.admin_ward || ''} ${details.result.admin_district}`.trim()
-                };
-              }
-              return null;
-            });
-            
-            const results = await Promise.all(detailsPromises);
-            return results.filter(Boolean);
-          }
-        }
-        
-        // If no postcode results or not a postcode search, try address lookup
+        // Try address lookup first
         const addressResponse = await fetch(
           `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
         );
@@ -67,7 +39,34 @@ export const useAddressSuggestions = (search: string) => {
           }));
         }
 
-        // If no results from postcodes.io, try a more general address search
+        // If no results, try postcode lookup
+        if (/\d/.test(debouncedSearch)) {
+          const postcodeResponse = await fetch(
+            `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
+          );
+          const postcodeData = await postcodeResponse.json();
+          
+          if (postcodeData.result) {
+            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
+              const detailsResponse = await fetch(
+                `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+              );
+              const details = await detailsResponse.json();
+              if (details.result) {
+                return {
+                  ...details.result,
+                  address: `${details.result.admin_ward || ''} ${details.result.admin_district}, ${details.result.postcode}`.trim()
+                };
+              }
+              return null;
+            });
+            
+            const results = await Promise.all(detailsPromises);
+            return results.filter(Boolean);
+          }
+        }
+        
+        // Try general address search as last resort
         const generalAddressResponse = await fetch(
           `https://api.postcodes.io/postcodes?street=${encodeURIComponent(debouncedSearch)}`
         );
