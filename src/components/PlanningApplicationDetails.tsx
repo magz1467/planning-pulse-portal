@@ -105,7 +105,7 @@ export const PlanningApplicationDetails = ({
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
         
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-center">
           <Button
             variant="outline"
             size="sm"
@@ -113,7 +113,7 @@ export const PlanningApplicationDetails = ({
             className="flex items-center gap-2"
           >
             <Share2 className="w-4 h-4" />
-            Share Application
+            Share link to application
           </Button>
         </div>
 
