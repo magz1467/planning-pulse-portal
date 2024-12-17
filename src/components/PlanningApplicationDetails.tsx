@@ -6,6 +6,7 @@ import { ApplicationDescription } from "./planning-details/ApplicationDescriptio
 import { ApplicationComments } from "./planning-details/ApplicationComments";
 import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
 import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
+import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -146,6 +147,7 @@ export const PlanningApplicationDetails = ({
         </Card>
 
         <ApplicationComments />
+        <ApplicationDocuments />
       </div>
 
       <EmailDialog 
