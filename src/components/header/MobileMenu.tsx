@@ -17,13 +17,13 @@ export const MobileMenu = () => (
     </SheetTrigger>
     <SheetContent>
       <nav className="flex flex-col gap-4">
-        <Link to="/resident-services" className="text-lg">
+        <Link to="/services/residents" className="text-lg">
           Resident Services
         </Link>
-        <Link to="/developer-services" className="text-lg">
+        <Link to="/services/developers" className="text-lg">
           Developer Services
         </Link>
-        <Link to="/council-services" className="text-lg">
+        <Link to="/services/councils" className="text-lg">
           Council Services
         </Link>
         <Link to="/about" className="text-lg">
@@ -31,6 +31,16 @@ export const MobileMenu = () => (
         </Link>
         <Link to="/contact" className="text-lg">
           Contact
+        </Link>
+        <div className="h-px bg-gray-200 my-2" />
+        <Link to="/auth" className="text-lg">
+          Sign In
+        </Link>
+        <Link to="/auth?mode=signup" className="text-lg">
+          Create Account
+        </Link>
+        <Link to="/privacy" className="text-lg">
+          Privacy
         </Link>
       </nav>
     </SheetContent>
