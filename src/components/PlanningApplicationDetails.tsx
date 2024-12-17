@@ -23,6 +23,7 @@ export const PlanningApplicationDetails = ({
 }: PlanningApplicationDetailsProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -37,8 +38,8 @@ export const PlanningApplicationDetails = ({
 
   // Mock data for feedback counts - in a real application, this would come from your backend
   const feedbackStats = {
-    thumbsUp: 12,
-    thumbsDown: 3
+    thumbsUp: feedback === 'up' ? 13 : 12,
+    thumbsDown: feedback === 'down' ? 4 : 3
   };
 
   const handleEmailSubmit = (email: string, radius: string) => {
@@ -58,6 +59,19 @@ export const PlanningApplicationDetails = ({
     setShowFeedbackDialog(false);
   };
 
+  const handleFeedback = (type: 'up' | 'down') => {
+    setFeedback(prev => prev === type ? null : type);
+    
+    toast({
+      title: type === feedback ? "Feedback removed" : "Thank you for your feedback",
+      description: type === feedback 
+        ? "Your feedback has been removed"
+        : type === 'up' 
+          ? "We're glad this was helpful!" 
+          : "We'll work on improving this",
+    });
+  };
+
   return (
     <div className="relative planning-details-container">
       <div className="p-6 space-y-4">
@@ -66,19 +80,35 @@ export const PlanningApplicationDetails = ({
         <ApplicationDetails application={application} />
         <ApplicationDescription application={application} />
         
-        <Card className="p-4">
+        <Card className="p-4 hover:border-primary transition-colors">
           <h3 className="font-semibold mb-4">Community Feedback</h3>
           <div className="flex gap-8">
-            <div className="flex items-center gap-2 flex-wrap">
-              <ThumbsUp className="h-5 w-5 text-primary" />
+            <Button
+              variant={feedback === 'up' ? "default" : "outline"}
+              onClick={() => handleFeedback('up')}
+              className="flex items-center gap-2"
+            >
+              <ThumbsUp className={`h-5 w-5 ${
+                feedback === 'up' ? 'text-white' : 'text-primary'
+              }`} />
               <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
-              <span className="text-gray-500 text-sm">people like this</span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <ThumbsDown className="h-5 w-5 text-[#ea384c]" />
+              <span className={`text-sm ${
+                feedback === 'up' ? 'text-white' : 'text-gray-500'
+              }`}>people like this</span>
+            </Button>
+            <Button
+              variant={feedback === 'down' ? "outline" : "outline"}
+              onClick={() => handleFeedback('down')}
+              className={`flex items-center gap-2 ${
+                feedback === 'down' ? 'bg-[#ea384c]/10' : ''
+              }`}
+            >
+              <ThumbsDown className={`h-5 w-5 ${
+                feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
+              }`} />
               <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-              <span className="text-gray-500 text-sm">people dislike this</span>
-            </div>
+              <span className="text-sm text-gray-500">people dislike this</span>
+            </Button>
           </div>
         </Card>
 
