@@ -20,9 +20,9 @@ export const PlanningApplicationList = ({
       case 'under review':
         return 'bg-[#F97316]/10 text-[#F97316]';
       case 'approved':
-        return 'bg-[#0EA5E9]/10 text-[#0EA5E9]';
+        return 'bg-[#22c55e]/10 text-[#22c55e]';
       default:
-        return 'bg-[#0EA5E9]/10 text-[#0EA5E9]';
+        return 'bg-[#22c55e]/10 text-[#22c55e]';
     }
   };
 
