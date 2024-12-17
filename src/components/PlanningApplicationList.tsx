@@ -35,11 +35,12 @@ export const PlanningApplicationList = ({
         >
           <div className="flex gap-4">
             {application.image && (
-              <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+              <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <img
                   src={application.image}
                   alt={application.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
             )}
