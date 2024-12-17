@@ -36,14 +36,34 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
     }
   };
 
+  const getImpactLabel = (impact: string) => {
+    switch (impact) {
+      case 'positive':
+        return 'May require additional capacity';
+      case 'negative':
+        return 'May increase pressure on service';
+      default:
+        return 'No significant impact expected';
+    }
+  };
+
   return (
     <Card className="p-4">
-      <h3 className="font-semibold mb-4">Expected Impact Areas</h3>
+      <h3 className="font-semibold mb-4">Impacted Services</h3>
       <div className="grid grid-cols-2 gap-4">
         {impactAreas.map((area) => (
-          <div key={area.name} className="flex items-center gap-2">
+          <div 
+            key={area.name} 
+            className="flex items-start gap-2 group"
+            title={getImpactLabel(area.impact)}
+          >
             {getImpactIcon(area.impact)}
-            <span className="text-sm text-gray-600">{area.name}</span>
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-600">{area.name}</span>
+              <span className="text-xs text-gray-400 hidden group-hover:block">
+                {getImpactLabel(area.impact)}
+              </span>
+            </div>
           </div>
         ))}
       </div>
