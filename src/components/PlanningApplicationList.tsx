@@ -40,6 +40,19 @@ export const PlanningApplicationList = ({
     });
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'declined':
+        return 'bg-[#ea384c]/10 text-[#ea384c]';
+      case 'under review':
+        return 'bg-[#F97316]/10 text-[#F97316]';
+      case 'approved':
+        return 'bg-primary/10 text-primary';
+      default:
+        return 'bg-primary/10 text-primary';
+    }
+  };
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-semibold mb-4">Planning Applications</h2>
@@ -54,7 +67,7 @@ export const PlanningApplicationList = ({
             <h3 className="font-semibold text-primary">{application.title}</h3>
             <p className="text-sm text-gray-600 mt-1">{application.address}</p>
             <div className="flex justify-between items-center mt-2">
-              <span className="text-xs bg-primary-light text-primary px-2 py-1 rounded">
+              <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
                 {application.status}
               </span>
               <span className="text-xs text-gray-500">{application.distance}</span>

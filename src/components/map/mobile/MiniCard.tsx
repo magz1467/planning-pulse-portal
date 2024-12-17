@@ -7,6 +7,19 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'declined':
+        return 'bg-[#ea384c]/10 text-[#ea384c]';
+      case 'under review':
+        return 'bg-[#F97316]/10 text-[#F97316]';
+      case 'approved':
+        return 'bg-primary/10 text-primary';
+      default:
+        return 'bg-primary/10 text-primary';
+    }
+  };
+
   return (
     <div 
       className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
@@ -30,7 +43,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             <p className="text-sm truncate">{application.address}</p>
           </div>
           <div className="flex items-center justify-between mt-2">
-            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
               {application.status}
             </span>
             <span className="text-xs text-gray-500">
