@@ -43,7 +43,7 @@ export const MapLayout = ({
   const selectedApp = filteredApplications.find(app => app.id === selectedApplication);
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden">
+    <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
       {isLoading && <LoadingOverlay />}
       
       <MapHeader 
@@ -55,7 +55,7 @@ export const MapLayout = ({
         onToggleView={onToggleView}
       />
       
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 min-h-0 relative">
         {!isMobile && (
           <DesktopSidebar
             applications={filteredApplications}
@@ -72,7 +72,7 @@ export const MapLayout = ({
         
         <div 
           className={`flex-1 relative ${isMobile ? (isMapView ? 'block' : 'hidden') : 'block'}`}
-          style={{ height: isMobile ? 'calc(100vh - 120px)' : '100%' }}
+          style={{ height: isMobile ? 'calc(100dvh - 120px)' : '100%' }}
         >
           <MapContainerComponent
             coordinates={coordinates}
@@ -92,7 +92,7 @@ export const MapLayout = ({
         </div>
         
         {isMobile && !isMapView && (
-          <div className="flex-1 overflow-hidden bg-gray-50 h-full flex flex-col">
+          <div className="flex-1 flex flex-col h-full max-h-[100dvh] overflow-hidden bg-gray-50">
             {selectedApplication !== null && selectedApp ? (
               <div className="h-full flex flex-col bg-white">
                 <div className="sticky top-0 z-50 border-b py-2 px-4 bg-white flex justify-between items-center shadow-sm">
@@ -104,7 +104,7 @@ export const MapLayout = ({
                     ×
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto overscroll-contain">
                   <PlanningApplicationDetails
                     application={selectedApp}
                     onClose={() => onMarkerClick(null)}
@@ -112,7 +112,7 @@ export const MapLayout = ({
                 </div>
               </div>
             ) : (
-              <div className="p-4 space-y-4 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-4">
                 {filteredApplications.map((app) => (
                   <div
                     key={app.id}
