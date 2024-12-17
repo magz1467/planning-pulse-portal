@@ -16,9 +16,9 @@ export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps)
 
   const getColor = (score: number) => {
     if (score < 30) {
-      return '#F2FCE2'; // Green for low impact
+      return '#22c55e'; // Using a more visible green color
     } else if (score >= 70) {
-      return '#ea384c'; // Red for high impact
+      return '#ea384c'; // Keep existing red for high impact
     } else {
       // For scores between 30-70, calculate the orange intensity
       const orangeIntensity = (score - 30) / 40; // 40 is the range (70-30)
