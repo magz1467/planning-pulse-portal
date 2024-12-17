@@ -84,14 +84,7 @@ export const DesktopSidebar = ({
       />
       {selectedApplication === null ? (
         <div className="flex flex-col h-full">
-          <div className="flex-grow">
-            <PlanningApplicationList
-              applications={applications}
-              postcode={postcode}
-              onSelectApplication={onSelectApplication}
-            />
-          </div>
-          <div className="p-4 border-t">
+          <div className="p-4 border-b">
             <div className="bg-primary/5 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Bell className="h-5 w-5 text-primary" />
@@ -113,6 +106,13 @@ export const DesktopSidebar = ({
                 </Button>
               </form>
             </div>
+          </div>
+          <div className="flex-grow">
+            <PlanningApplicationList
+              applications={applications}
+              postcode={postcode}
+              onSelectApplication={onSelectApplication}
+            />
           </div>
         </div>
       ) : (
