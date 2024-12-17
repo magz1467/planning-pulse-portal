@@ -37,12 +37,12 @@ export const MobileMenu = () => (
         </Link>
         <div className="h-px bg-gray-200 my-4" />
         <Link to="/auth">
-          <Button variant="outline" className="w-full mb-3 border-primary text-primary hover:bg-primary/10">
+          <Button variant="outline" className="w-full mb-2 border-primary text-primary hover:bg-primary/10">
             Sign In
           </Button>
         </Link>
         <Link to="/auth?mode=signup">
-          <Button variant="default" className="w-full mb-4">
+          <Button variant="default" className="w-full">
             Create Account
           </Button>
         </Link>
