@@ -54,8 +54,12 @@ const Header = () => {
           <div className="flex items-center">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="relative hover:bg-primary/10 transition-colors"
+                >
+                  <Menu className="h-7 w-7 text-primary" strokeWidth={2.5} />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
