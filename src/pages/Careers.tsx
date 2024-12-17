@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Header from "@/components/Header";
 
 const Careers = () => {
   const openRoles = [
@@ -22,6 +23,7 @@ const Careers = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8">Careers at PlanningPulse</h1>
         
