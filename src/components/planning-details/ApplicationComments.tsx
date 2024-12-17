@@ -22,7 +22,10 @@ export const ApplicationComments = ({ initialComments = [] }: ApplicationComment
 
   return (
     <Card className="p-4">
-      <h3 className="font-semibold mb-4">Comments</h3>
+      <h3 className="font-semibold mb-2">Have Your Say</h3>
+      <p className="text-sm text-gray-600 mb-4">
+        Your feedback submitted here will be shared directly with both the developer and the local council before the consultation deadline.
+      </p>
       <div className="space-y-4">
         {comments.map((comment) => (
           <div key={comment.id} className="border-b pb-4">
