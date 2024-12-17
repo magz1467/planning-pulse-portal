@@ -92,10 +92,10 @@ export const MapLayout = ({
         </div>
         
         {isMobile && !isMapView && (
-          <div className="flex-1 overflow-y-auto bg-gray-50 h-full">
+          <div className="flex-1 overflow-hidden bg-gray-50 h-full flex flex-col">
             {selectedApplication !== null && selectedApp ? (
-              <div className="h-full bg-white">
-                <div className="sticky top-0 border-b py-2 px-4 bg-white flex justify-between items-center">
+              <div className="h-full flex flex-col bg-white">
+                <div className="sticky top-0 z-50 border-b py-2 px-4 bg-white flex justify-between items-center shadow-sm">
                   <h2 className="font-semibold">Planning Application Details</h2>
                   <button 
                     onClick={() => onMarkerClick(null)}
@@ -104,13 +104,15 @@ export const MapLayout = ({
                     ×
                   </button>
                 </div>
-                <PlanningApplicationDetails
-                  application={selectedApp}
-                  onClose={() => onMarkerClick(null)}
-                />
+                <div className="flex-1 overflow-y-auto">
+                  <PlanningApplicationDetails
+                    application={selectedApp}
+                    onClose={() => onMarkerClick(null)}
+                  />
+                </div>
               </div>
             ) : (
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-4 overflow-y-auto">
                 {filteredApplications.map((app) => (
                   <div
                     key={app.id}
