@@ -26,6 +26,15 @@ export const PlanningApplicationList = ({
     }
   };
 
+  const getImageUrl = (path: string) => {
+    // If the path already starts with http or https, return it as is
+    if (path.startsWith('http')) {
+      return path;
+    }
+    // Otherwise, ensure it starts with a forward slash and return the full path
+    return path.startsWith('/') ? path : `/${path}`;
+  };
+
   return (
     <div className="divide-y">
       {applications.map((application) => (
@@ -38,7 +47,7 @@ export const PlanningApplicationList = ({
             <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
               {application.image ? (
                 <Image
-                  src={application.image}
+                  src={getImageUrl(application.image)}
                   alt={application.title}
                   width={96}
                   height={96}
