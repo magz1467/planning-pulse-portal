@@ -40,17 +40,17 @@ export const PlanningApplicationList = ({
       {applications.map((application) => (
         <div
           key={application.id}
-          className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => onSelectApplication(application.id)}
         >
-          <div className="flex gap-4">
-            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+          <div className="flex gap-3">
+            <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
               {application.image ? (
                 <Image
                   src={getImageUrl(application.image)}
                   alt={application.title}
-                  width={96}
-                  height={96}
+                  width={80}
+                  height={80}
                   className="w-full h-full object-cover"
                 />
               ) : (
