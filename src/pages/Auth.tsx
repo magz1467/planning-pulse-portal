@@ -4,18 +4,53 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
+import { useToast } from "@/components/ui/use-toast";
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if user is already logged in
     supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
       if (session) {
+        toast({
+          title: "Successfully signed in",
+          description: `Welcome ${session.user.email}!`,
+        });
         navigate("/");
       }
     });
-  }, [navigate]);
+
+    // Listen for auth errors
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        toast({
+          title: "Signed out",
+          description: "You have been signed out successfully",
+        });
+      }
+      if (event === 'USER_DELETED') {
+        toast({
+          title: "Account deleted",
+          description: "Your account has been deleted successfully",
+        });
+      }
+      if (event === 'PASSWORD_RECOVERY') {
+        toast({
+          title: "Password recovery",
+          description: "Check your email for the recovery link",
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -34,7 +69,15 @@ const AuthPage = () => {
             supabaseClient={supabase}
             appearance={{ theme: ThemeSupa }}
             theme="light"
-            providers={["google", "facebook", "apple"]}
+            providers={["google"]}
+            onError={(error) => {
+              console.error("Auth error:", error);
+              toast({
+                title: "Authentication Error",
+                description: error.message,
+                variant: "destructive",
+              });
+            }}
           />
         </div>
       </div>
