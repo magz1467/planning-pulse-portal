@@ -82,23 +82,24 @@ const Header = () => {
                   >
                     For Councils
                   </Link>
-                  <Button
-                    variant="ghost"
-                    onClick={handleAuthAction}
-                    className="justify-start p-0 h-auto hover:bg-transparent"
-                  >
-                    <span className="text-lg font-medium text-gray-900 hover:text-primary">
-                      {isAuthenticated ? "Sign out" : "Sign in"}
-                    </span>
-                  </Button>
-                  {!isAuthenticated && (
-                    <Link
-                      to="/auth"
-                      className="text-lg font-medium text-gray-900 hover:text-primary transition-colors"
+                  <div className="pt-4 border-t">
+                    <Button
+                      variant="default"
+                      onClick={handleAuthAction}
+                      className="w-full mb-3 bg-primary hover:bg-primary-dark text-white"
                     >
-                      Create account
-                    </Link>
-                  )}
+                      {isAuthenticated ? "Sign out" : "Sign in"}
+                    </Button>
+                    {!isAuthenticated && (
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate("/auth")}
+                        className="w-full border-primary text-primary hover:bg-primary hover:text-white"
+                      >
+                        Create account
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
