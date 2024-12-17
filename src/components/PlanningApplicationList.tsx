@@ -34,13 +34,17 @@ export const PlanningApplicationList = ({
           onClick={() => onSelectApplication(application.id)}
         >
           <div className="flex gap-4">
-            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
               {application.image ? (
                 <img
                   src={application.image}
                   alt={application.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover bg-gray-100"
                   loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/lovable-uploads/ed8c75b6-7e73-4720-818d-f78fbcf2d94a.png";
+                  }}
                 />
               ) : (
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
