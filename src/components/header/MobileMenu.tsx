@@ -64,6 +64,9 @@ export const MobileMenu = () => {
               <Link to="/content/heritage-conservation" className="block text-base pl-2">
                 Heritage & Conservation
               </Link>
+              <Link to="/content/planning-authorities" className="block text-base pl-2">
+                Planning Authorities Directory
+              </Link>
             </CollapsibleContent>
           </Collapsible>
 
