@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Header from "@/components/Header";
+import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Chatbot } from "@/components/Chatbot";
 import { ContactSection } from "@/components/ContactSection";

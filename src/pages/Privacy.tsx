@@ -1,7 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import { Header } from "@/components/Header";
 
 const Privacy = () => {
   return (
