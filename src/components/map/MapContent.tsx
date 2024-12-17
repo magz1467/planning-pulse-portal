@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MapLayout } from "./layout/MapLayout";
 import { LoadingOverlay } from "./LoadingOverlay";
@@ -197,6 +197,8 @@ const mockPlanningApplications: Application[] = [
 
 export const MapContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const postcode = location.state?.postcode;
   const initialTab = location.state?.tab || 'recent';
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
@@ -215,6 +217,22 @@ export const MapContent = () => {
     activeFilters,
     activeSort
   );
+
+  // Handle URL parameters on mount
+  useEffect(() => {
+    const applicationId = searchParams.get('application');
+    if (applicationId) {
+      const id = parseInt(applicationId, 10);
+      if (!isNaN(id) && filteredApplications.some(app => app.id === id)) {
+        setSelectedApplication(id);
+      }
+    }
+  }, [searchParams, filteredApplications]);
+
+  const handleMarkerClick = (id: number) => {
+    setSelectedApplication(id);
+    setSearchParams({ application: id.toString() });
+  };
 
   const saveSearch = async (postcode: string, status: string) => {
     try {
@@ -244,13 +262,6 @@ export const MapContent = () => {
     }
   };
 
-  // Save search when component mounts with postcode from location state
-  useEffect(() => {
-    if (postcode) {
-      saveSearch(postcode, initialTab);
-    }
-  }, [postcode, initialTab]);
-
   // Effect to select the closest application when coordinates change - only on mobile and map view
   useEffect(() => {
     if (coordinates && filteredApplications.length > 0 && isMobile && isMapView) {
@@ -264,7 +275,7 @@ export const MapContent = () => {
         coordinates,
         applicationCoordinates
       );
-      setSelectedApplication(closestId);
+      handleMarkerClick(closestId);
     }
   }, [coordinates, filteredApplications, isMobile, isMapView]);
 
@@ -272,12 +283,9 @@ export const MapContent = () => {
   useEffect(() => {
     if (!isMapView) {
       setSelectedApplication(null);
+      setSearchParams({});
     }
   }, [isMapView]);
-
-  const handleMarkerClick = (id: number) => {
-    setSelectedApplication(id);
-  };
 
   const handleFilterChange = (filterType: string, value: string) => {
     setActiveFilters(prev => ({

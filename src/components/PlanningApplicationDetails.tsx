@@ -8,7 +8,7 @@ import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
 import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
 import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Bell, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -77,10 +77,44 @@ export const PlanningApplicationDetails = ({
     });
   };
 
+  const handleShare = async () => {
+    if (!application) return;
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('application', application.id.toString());
+    
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      toast({
+        title: "Link copied!",
+        description: "Share this link to show this planning application to others.",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast({
+        title: "Couldn't copy link",
+        description: "Please try again or copy the URL from your browser.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div ref={containerRef} className="relative planning-details-container">
       <div className="p-6 space-y-4">
-        <ApplicationHeader application={application} />
+        <div className="flex items-center justify-between">
+          <ApplicationHeader application={application} />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShare}
+            className="flex items-center gap-2"
+          >
+            <Share2 className="w-4 h-4" />
+            Share
+          </Button>
+        </div>
+        
         <ApplicationImage application={application} />
         <ApplicationDetails application={application} />
         <ExpectedImpactAreas application={application} />
