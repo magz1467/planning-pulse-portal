@@ -3,20 +3,47 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import Image from "@/components/ui/image";
+import { supabase } from "@/integrations/supabase/client";
 
 export const NewsletterCard = () => {
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail) return;
     
-    toast({
-      title: "Newsletter subscription confirmed",
-      description: "You're now subscribed to our monthly planning trends newsletter.",
-    });
-    setNewsletterEmail("");
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('User data')
+        .insert([
+          { 
+            Email: newsletterEmail,
+            Marketing: true,
+            Type: 'newsletter'
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Newsletter subscription confirmed",
+        description: "You're now subscribed to our monthly planning trends newsletter.",
+      });
+      setNewsletterEmail("");
+    } catch (error) {
+      console.error('Error saving newsletter subscription:', error);
+      toast({
+        title: "Subscription failed",
+        description: "There was a problem subscribing to the newsletter. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,7 +69,9 @@ export const NewsletterCard = () => {
               required
             />
           </div>
-          <Button type="submit" className="w-full">Subscribe to Newsletter</Button>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Subscribing..." : "Subscribe to Newsletter"}
+          </Button>
         </form>
       </div>
     </div>

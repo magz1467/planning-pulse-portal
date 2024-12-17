@@ -14,18 +14,21 @@ export type Database = {
           created_at: string
           Email: string | null
           id: number
+          Marketing: boolean
           Type: string | null
         }
         Insert: {
           created_at?: string
           Email?: string | null
           id?: number
+          Marketing: boolean
           Type?: string | null
         }
         Update: {
           created_at?: string
           Email?: string | null
           id?: number
+          Marketing?: boolean
           Type?: string | null
         }
         Relationships: []
