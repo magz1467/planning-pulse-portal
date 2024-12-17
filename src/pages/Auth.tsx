@@ -13,12 +13,11 @@ const AuthPage = () => {
 
   useEffect(() => {
     // Check if user is already logged in
-    supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         toast({
-          title: "Successfully signed in",
-          description: `Welcome ${session.user.email}!`,
+          title: "Already signed in",
+          description: "You are already signed in",
         });
         navigate("/");
       }
@@ -39,6 +38,13 @@ const AuthPage = () => {
           title: "Password recovery",
           description: "Check your email for the recovery link",
         });
+      }
+      if (event === 'SIGNED_IN') {
+        toast({
+          title: "Signed in",
+          description: "You have been signed in successfully",
+        });
+        navigate("/");
       }
     });
 
@@ -65,6 +71,7 @@ const AuthPage = () => {
             appearance={{ theme: ThemeSupa }}
             theme="light"
             providers={[]}
+            redirectTo={`${window.location.origin}/reset-password`}
           />
         </div>
       </div>
