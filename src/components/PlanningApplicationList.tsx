@@ -14,7 +14,8 @@ export const PlanningApplicationList = ({
   onSelectApplication,
 }: PlanningApplicationListProps) => {
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
       case 'declined':
         return 'bg-[#ea384c]/10 text-[#ea384c]';
       case 'under review':
