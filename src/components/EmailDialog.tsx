@@ -10,21 +10,50 @@ import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
 
 interface EmailDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (email: string, radius: string) => void
+  applicationRef?: string
 }
 
-export const EmailDialog = ({ open, onOpenChange, onSubmit }: EmailDialogProps) => {
+export const EmailDialog = ({ 
+  open, 
+  onOpenChange, 
+  onSubmit,
+  applicationRef 
+}: EmailDialogProps) => {
   const [email, setEmail] = useState("")
   const [radius, setRadius] = useState("100")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(email, radius)
-    onOpenChange(false)
+    setIsSubmitting(true)
+
+    try {
+      if (applicationRef) {
+        // Save to User data table
+        await supabase
+          .from('User data')
+          .insert([
+            {
+              Email: email,
+              Marketing: true,
+              Radius_from_pc: parseInt(radius),
+            }
+          ])
+      }
+
+      onSubmit(email, radius)
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Error saving notification preferences:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -68,7 +97,9 @@ export const EmailDialog = ({ open, onOpenChange, onSubmit }: EmailDialogProps) 
             </RadioGroup>
           </div>
 
-          <Button type="submit" className="w-full">Subscribe</Button>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Subscribing..." : "Subscribe"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

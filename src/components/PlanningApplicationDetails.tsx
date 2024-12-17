@@ -146,6 +146,7 @@ export const PlanningApplicationDetails = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+        applicationRef={application?.reference}
       />
 
       <FeedbackEmailDialog
