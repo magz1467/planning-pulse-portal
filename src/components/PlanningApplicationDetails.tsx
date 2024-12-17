@@ -4,6 +4,7 @@ import { ApplicationImage } from "./planning-details/ApplicationImage";
 import { ApplicationDetails } from "./planning-details/ApplicationDetails";
 import { ApplicationDescription } from "./planning-details/ApplicationDescription";
 import { ApplicationComments } from "./planning-details/ApplicationComments";
+import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,15 +29,17 @@ export const PlanningApplicationDetails = ({
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Scroll to top when application changes
     if (containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
-  }, [application?.id]); // Now explicitly watching for application ID changes
+  }, [application?.id]);
 
   if (!application) return null;
 
-  // Mock data for feedback counts - in a real application, this would come from your backend
+  // Mock environmental impact score - in a real app this would come from the backend
+  const environmentalImpactScore = Math.floor((Math.random() * 100));
+
+  // Mock data for feedback counts
   const feedbackStats = {
     thumbsUp: feedback === 'up' ? 13 : 12,
     thumbsDown: feedback === 'down' ? 4 : 3
@@ -78,6 +81,7 @@ export const PlanningApplicationDetails = ({
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
         <ApplicationDetails application={application} />
+        <EnvironmentalImpactDial score={environmentalImpactScore} />
         <ApplicationDescription application={application} />
         
         <Card className="p-4 hover:border-primary transition-colors">
