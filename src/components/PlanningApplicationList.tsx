@@ -34,16 +34,20 @@ export const PlanningApplicationList = ({
           onClick={() => onSelectApplication(application.id)}
         >
           <div className="flex gap-4">
-            {application.image && (
-              <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+              {application.image ? (
                 <img
                   src={application.image}
                   alt={application.title}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-              </div>
-            )}
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <MapPin className="w-8 h-8 text-gray-400" />
+                </div>
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-primary truncate">{application.title}</h3>
               <div className="flex items-center gap-1 mt-1 text-gray-600">
