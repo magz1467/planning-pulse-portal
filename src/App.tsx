@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Careers from "./pages/Careers";
 import Help from "./pages/Help";
 import Press from "./pages/Press";
+import Accessibility from "./pages/Accessibility";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/careers" element={<Careers />} />
           <Route path="/help" element={<Help />} />
           <Route path="/press" element={<Press />} />
+          <Route path="/accessibility" element={<Accessibility />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
