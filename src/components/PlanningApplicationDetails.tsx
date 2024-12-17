@@ -82,11 +82,11 @@ export const PlanningApplicationDetails = ({
         
         <Card className="p-4 hover:border-primary transition-colors">
           <h3 className="font-semibold mb-4">Community Feedback</h3>
-          <div className="flex gap-8">
+          <div className="flex flex-col gap-2">
             <Button
               variant={feedback === 'up' ? "default" : "outline"}
               onClick={() => handleFeedback('up')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 justify-start"
             >
               <ThumbsUp className={`h-5 w-5 ${
                 feedback === 'up' ? 'text-white' : 'text-primary'
@@ -99,7 +99,7 @@ export const PlanningApplicationDetails = ({
             <Button
               variant={feedback === 'down' ? "outline" : "outline"}
               onClick={() => handleFeedback('down')}
-              className={`flex items-center gap-2 ${
+              className={`flex items-center gap-2 justify-start ${
                 feedback === 'down' ? 'bg-[#ea384c]/10' : ''
               }`}
             >
