@@ -2,13 +2,35 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Header = () => {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
+  useEffect(() => {
+    // Check initial auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleAuthAction = async () => {
+    if (isAuthenticated) {
+      await supabase.auth.signOut();
+      navigate("/");
+    } else {
+      navigate("/auth");
+    }
   };
 
   return (
@@ -43,10 +65,10 @@ const Header = () => {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              onClick={handleSignOut}
+              onClick={handleAuthAction}
               className="text-sm font-medium text-gray-500 hover:text-gray-900"
             >
-              Sign out
+              {isAuthenticated ? "Sign out" : "Sign in"}
             </Button>
           </div>
         </div>
