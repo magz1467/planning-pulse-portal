@@ -72,7 +72,7 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-6 space-y-4 pb-20">
       <ApplicationHeader application={application} />
       <ApplicationImage application={application} />
       
