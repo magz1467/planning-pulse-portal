@@ -6,6 +6,7 @@ import { LoadingOverlay } from "../LoadingOverlay";
 import { FilterBar } from "@/components/FilterBar";
 import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { getStatusColor } from "@/utils/statusColors";
+import { useEffect, useRef } from "react";
 
 interface MapLayoutProps {
   isLoading: boolean;
@@ -42,6 +43,14 @@ export const MapLayout = ({
   onToggleView,
 }: MapLayoutProps) => {
   const selectedApp = filteredApplications.find(app => app.id === selectedApplication);
+  const detailsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll position when selected application changes
+  useEffect(() => {
+    if (detailsContainerRef.current) {
+      detailsContainerRef.current.scrollTop = 0;
+    }
+  }, [selectedApplication]);
 
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
@@ -105,7 +114,7 @@ export const MapLayout = ({
                     ×
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div ref={detailsContainerRef} className="flex-1 overflow-y-auto">
                   <PlanningApplicationDetails
                     application={selectedApp}
                     onClose={() => onMarkerClick(null)}

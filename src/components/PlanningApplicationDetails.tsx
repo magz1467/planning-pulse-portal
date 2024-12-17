@@ -11,7 +11,7 @@ import { ApplicationSharing } from "./planning-details/ApplicationSharing";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
@@ -29,32 +29,6 @@ export const PlanningApplicationDetails = ({
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Reset scroll position when application changes
-  useEffect(() => {
-    if (containerRef.current && application?.id) {
-      const container = containerRef.current;
-      
-      // Reset scroll position synchronously
-      container.scrollTop = 0;
-      
-      // Disable any ongoing smooth scroll behavior
-      container.style.scrollBehavior = 'auto';
-      
-      // Force layout recalculation
-      container.getBoundingClientRect();
-      
-      // Clear any existing timeouts
-      const timeoutId = setTimeout(() => {
-        if (container) {
-          container.style.scrollBehavior = 'smooth';
-        }
-      }, 0);
-      
-      return () => clearTimeout(timeoutId);
-    }
-  }, [application?.id]);
 
   if (!application) return null;
 
@@ -98,90 +72,81 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className="h-full overflow-y-auto"
-      style={{ 
-        overscrollBehavior: 'contain',
-        WebkitOverflowScrolling: 'touch'
-      }}
-    >
-      <div className="p-6 space-y-4">
-        <ApplicationHeader application={application} />
-        <ApplicationImage application={application} />
-        
-        <ApplicationSharing 
-          applicationId={application.id} 
-          reference={application.reference}
-        />
+    <div className="p-6 space-y-4">
+      <ApplicationHeader application={application} />
+      <ApplicationImage application={application} />
+      
+      <ApplicationSharing 
+        applicationId={application.id} 
+        reference={application.reference}
+      />
 
-        <ApplicationDetails application={application} />
-        <ExpectedImpactAreas application={application} />
-        <EnvironmentalImpactDial score={environmentalImpactScore} />
-        <ApplicationDescription application={application} />
-        
-        <Card className="p-4 hover:border-primary transition-colors">
-          <h3 className="font-semibold mb-4">Community Feedback</h3>
-          <div className="flex flex-col gap-2">
-            <Button
-              variant={feedback === 'up' ? "default" : "outline"}
-              onClick={() => handleFeedback('up')}
-              className="flex items-center gap-2 justify-start"
-            >
-              <ThumbsUp className={`h-5 w-5 ${
-                feedback === 'up' ? 'text-white' : 'text-primary'
-              }`} />
-              <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
-              <span className={`text-sm ${
-                feedback === 'up' ? 'text-white' : 'text-gray-500'
-              }`}>people like this</span>
-            </Button>
-            <Button
-              variant={feedback === 'down' ? "outline" : "outline"}
-              onClick={() => handleFeedback('down')}
-              className={`flex items-center gap-2 justify-start ${
-                feedback === 'down' ? 'bg-[#ea384c]/10' : ''
-              }`}
-            >
-              <ThumbsDown className={`h-5 w-5 ${
-                feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
-              }`} />
-              <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-              <span className="text-xs text-gray-500">people dislike this</span>
-            </Button>
-          </div>
-        </Card>
+      <ApplicationDetails application={application} />
+      <ExpectedImpactAreas application={application} />
+      <EnvironmentalImpactDial score={environmentalImpactScore} />
+      <ApplicationDescription application={application} />
+      
+      <Card className="p-4 hover:border-primary transition-colors">
+        <h3 className="font-semibold mb-4">Community Feedback</h3>
+        <div className="flex flex-col gap-2">
+          <Button
+            variant={feedback === 'up' ? "default" : "outline"}
+            onClick={() => handleFeedback('up')}
+            className="flex items-center gap-2 justify-start"
+          >
+            <ThumbsUp className={`h-5 w-5 ${
+              feedback === 'up' ? 'text-white' : 'text-primary'
+            }`} />
+            <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
+            <span className={`text-sm ${
+              feedback === 'up' ? 'text-white' : 'text-gray-500'
+            }`}>people like this</span>
+          </Button>
+          <Button
+            variant={feedback === 'down' ? "outline" : "outline"}
+            onClick={() => handleFeedback('down')}
+            className={`flex items-center gap-2 justify-start ${
+              feedback === 'down' ? 'bg-[#ea384c]/10' : ''
+            }`}
+          >
+            <ThumbsDown className={`h-5 w-5 ${
+              feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
+            }`} />
+            <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
+            <span className="text-xs text-gray-500">people dislike this</span>
+          </Button>
+        </div>
+      </Card>
 
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-primary" />
-              <div>
-                <h3 className="font-semibold">Get Decision Updates</h3>
-                <p className="text-sm text-gray-600">We'll notify you when this application is decided</p>
-              </div>
-            </div>
-            <Button onClick={() => setShowEmailDialog(true)}>
-              Get notified
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bell className="h-5 w-5 text-primary" />
             <div>
-              <h3 className="font-semibold">Is this your development?</h3>
-              <p className="text-sm text-gray-600">Click here to verify and see full feedback</p>
+              <h3 className="font-semibold">Get Decision Updates</h3>
+              <p className="text-sm text-gray-600">We'll notify you when this application is decided</p>
             </div>
-            <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
-              Get feedback
-            </Button>
           </div>
-        </Card>
+          <Button onClick={() => setShowEmailDialog(true)}>
+            Get notified
+          </Button>
+        </div>
+      </Card>
 
-        <ApplicationComments />
-        <ApplicationDocuments />
-      </div>
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold">Is this your development?</h3>
+            <p className="text-sm text-gray-600">Click here to verify and see full feedback</p>
+          </div>
+          <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
+            Get feedback
+          </Button>
+        </div>
+      </Card>
+
+      <ApplicationComments />
+      <ApplicationDocuments />
 
       <EmailDialog 
         open={showEmailDialog}
