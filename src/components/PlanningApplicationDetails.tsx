@@ -4,6 +4,7 @@ import { ApplicationImage } from "./planning-details/ApplicationImage";
 import { ApplicationDetails } from "./planning-details/ApplicationDetails";
 import { ApplicationDescription } from "./planning-details/ApplicationDescription";
 import { ApplicationComments } from "./planning-details/ApplicationComments";
+import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
 import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
@@ -81,6 +82,7 @@ export const PlanningApplicationDetails = ({
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
         <ApplicationDetails application={application} />
+        <ExpectedImpactAreas application={application} />
         <EnvironmentalImpactDial score={environmentalImpactScore} />
         <ApplicationDescription application={application} />
         
