@@ -38,6 +38,28 @@ export const PlanningApplicationDetails = ({
 
   if (!application) return null;
 
+  const handleShare = async () => {
+    if (!application) return;
+    
+    const url = new URL(window.location.href);
+    url.searchParams.set('application', application.id.toString());
+    
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      toast({
+        title: "Link copied!",
+        description: "Share this link to show this planning application to others.",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast({
+        title: "Couldn't copy link",
+        description: "Please try again or copy the URL from your browser.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Mock environmental impact score - in a real app this would come from the backend
   const environmentalImpactScore = Math.floor((Math.random() * 100));
 
@@ -77,33 +99,13 @@ export const PlanningApplicationDetails = ({
     });
   };
 
-  const handleShare = async () => {
-    if (!application) return;
-    
-    const url = new URL(window.location.href);
-    url.searchParams.set('application', application.id.toString());
-    
-    try {
-      await navigator.clipboard.writeText(url.toString());
-      toast({
-        title: "Link copied!",
-        description: "Share this link to show this planning application to others.",
-        duration: 3000,
-      });
-    } catch (err) {
-      toast({
-        title: "Couldn't copy link",
-        description: "Please try again or copy the URL from your browser.",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div ref={containerRef} className="relative planning-details-container">
       <div className="p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <ApplicationHeader application={application} />
+        <ApplicationHeader application={application} />
+        <ApplicationImage application={application} />
+        
+        <div className="flex items-center justify-end">
           <Button
             variant="outline"
             size="sm"
@@ -111,11 +113,10 @@ export const PlanningApplicationDetails = ({
             className="flex items-center gap-2"
           >
             <Share2 className="w-4 h-4" />
-            Share
+            Share Application
           </Button>
         </div>
-        
-        <ApplicationImage application={application} />
+
         <ApplicationDetails application={application} />
         <ExpectedImpactAreas application={application} />
         <EnvironmentalImpactDial score={environmentalImpactScore} />
