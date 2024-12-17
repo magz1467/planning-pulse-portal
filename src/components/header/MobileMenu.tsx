@@ -20,7 +20,7 @@ export const MobileMenu = () => {
           <span className="sr-only">Open menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="overflow-y-auto max-h-screen">
+      <SheetContent className="overflow-y-auto max-h-screen pt-12">
         <div className="text-xl font-bold text-primary pb-4 mb-6 border-b sticky top-0 bg-background z-10">
           Menu
         </div>
