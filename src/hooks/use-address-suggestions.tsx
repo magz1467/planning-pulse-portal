@@ -25,28 +25,32 @@ export const useAddressSuggestions = (search: string) => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        // If search includes numbers (likely a postcode), try postcode lookup first
-        if (/\d/.test(debouncedSearch)) {
-          // First, try to get addresses for this postcode area
-          const addressResponse = await fetch(
+        // Using Find that Address API for actual street addresses
+        const response = await fetch(
+          `https://api.getAddress.io/find/${encodeURIComponent(debouncedSearch)}?api-key=YOUR_API_KEY&expand=true`
+        );
+        
+        // Fallback to postcodes.io if getAddress.io is not available
+        if (!response.ok) {
+          console.log('Falling back to postcodes.io');
+          const postcodeResponse = await fetch(
             `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
           );
-          const addressData = await addressResponse.json();
+          const postcodeData = await postcodeResponse.json();
           
-          if (addressData.result) {
-            // For each postcode, get its full details including addresses
-            const detailsPromises = addressData.result.map(async (postcode: string) => {
+          if (postcodeData.result) {
+            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
               const detailsResponse = await fetch(
                 `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
               );
               const details = await detailsResponse.json();
               
               if (details.result) {
-                // Include more detailed address information
                 return {
                   ...details.result,
                   postcode: details.result.postcode,
-                  address: `${details.result.admin_ward}, ${details.result.parish || details.result.admin_district}, ${details.result.postcode}`.trim()
+                  // Include full address information
+                  address: `${details.result.thoroughfare || ''} ${details.result.admin_ward}, ${details.result.parish || details.result.admin_district}, ${details.result.postcode}`.trim()
                 };
               }
               return null;
@@ -56,22 +60,16 @@ export const useAddressSuggestions = (search: string) => {
             return results.filter(Boolean);
           }
         }
-
-        // If no postcode results or search doesn't include numbers, try general address search
-        const generalResponse = await fetch(
-          `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
-        );
-        const generalData = await generalResponse.json();
         
-        if (generalData.result && generalData.result.length > 0) {
-          return generalData.result.map((result: any) => ({
-            ...result,
-            postcode: result.postcode,
-            address: `${result.admin_ward}, ${result.parish || result.admin_district}, ${result.postcode}`.trim()
-          }));
-        }
+        // Parse getAddress.io response
+        const data = await response.json();
+        return data.addresses.map((address: any) => ({
+          postcode: address.postcode,
+          address: `${address.line_1}${address.line_2 ? ', ' + address.line_2 : ''}, ${address.town}, ${address.postcode}`,
+          country: address.country,
+          admin_district: address.town
+        }));
         
-        return [];
       } catch (error) {
         console.error('Error fetching suggestions:', error);
         return [];
