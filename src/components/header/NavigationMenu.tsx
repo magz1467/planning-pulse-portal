@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 
 export const NavigationMenu = () => (
   <nav className="hidden md:flex items-center gap-6">
