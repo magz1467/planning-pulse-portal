@@ -218,13 +218,27 @@ export const MapContent = () => {
     activeSort
   );
 
-  // Handle URL parameters on mount
+  // Handle URL parameters on mount and when applications load
   useEffect(() => {
     const applicationId = searchParams.get('application');
     if (applicationId) {
       const id = parseInt(applicationId, 10);
-      if (!isNaN(id) && filteredApplications.some(app => app.id === id)) {
-        setSelectedApplication(id);
+      if (!isNaN(id)) {
+        // Check if the application exists in our data
+        const applicationExists = filteredApplications.some(app => app.id === id);
+        if (applicationExists) {
+          setSelectedApplication(id);
+        } else {
+          // If the application doesn't exist, show an error toast
+          toast({
+            title: "Application not found",
+            description: "The planning application you're looking for could not be found.",
+            variant: "destructive",
+          });
+          // Remove the application parameter from URL
+          searchParams.delete('application');
+          setSearchParams(searchParams);
+        }
       }
     }
   }, [searchParams, filteredApplications]);
