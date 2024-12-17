@@ -37,7 +37,7 @@ export const MobileMenu = () => (
         </Link>
         <div className="h-px bg-gray-200 my-4" />
         <Link to="/auth">
-          <Button variant="default" className="w-full mb-3">
+          <Button variant="outline" className="w-full mb-3">
             Sign In
           </Button>
         </Link>
@@ -45,9 +45,6 @@ export const MobileMenu = () => (
           <Button variant="default" className="w-full mb-4">
             Create Account
           </Button>
-        </Link>
-        <Link to="/privacy" className="text-sm text-gray-500 hover:text-primary">
-          Privacy
         </Link>
       </nav>
     </SheetContent>
