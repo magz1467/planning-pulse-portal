@@ -32,17 +32,26 @@ export const PlanningApplicationDetails = ({
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Force an immediate scroll to top when application changes
     if (containerRef.current && application?.id) {
-      // First set to 0 immediately to ensure we're at the top
+      // Immediately reset scroll position
       containerRef.current.scrollTop = 0;
       
-      // Then apply smooth scroll for visual polish
-      requestAnimationFrame(() => {
-        containerRef.current?.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
+      // Force a reflow to ensure the scroll position is reset
+      void containerRef.current.offsetHeight;
+      
+      // Schedule the smooth scroll for the next frame
+      window.requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.style.scrollBehavior = 'smooth';
+          containerRef.current.scrollTop = 0;
+          
+          // Reset scroll behavior after animation
+          setTimeout(() => {
+            if (containerRef.current) {
+              containerRef.current.style.scrollBehavior = 'auto';
+            }
+          }, 500);
+        }
       });
     }
   }, [application?.id]);
@@ -90,9 +99,12 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div 
-      ref={containerRef} 
-      className="relative h-full overflow-y-auto overscroll-contain scroll-smooth"
-      style={{ scrollBehavior: 'smooth' }}
+      ref={containerRef}
+      className="h-full overflow-y-auto overscroll-contain"
+      style={{ 
+        scrollBehavior: 'auto',
+        WebkitOverflowScrolling: 'touch'
+      }}
     >
       <div className="p-6 space-y-4">
         <ApplicationHeader application={application} />
@@ -135,7 +147,7 @@ export const PlanningApplicationDetails = ({
                 feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
               }`} />
               <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-              <span className="text-sm text-gray-500">people dislike this</span>
+              <span className="text-xs text-gray-500">people dislike this</span>
             </Button>
           </div>
         </Card>
