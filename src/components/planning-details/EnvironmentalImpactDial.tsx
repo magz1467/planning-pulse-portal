@@ -15,28 +15,41 @@ export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps)
   }, [score]);
 
   const getColor = (score: number) => {
-    // Convert score to a percentage for gradient calculation
-    const percent = score / 100;
-    
-    // RGB values for start and end colors
-    const start = {
-      r: parseInt("F2", 16), // From #F2FCE2
-      g: parseInt("FC", 16),
-      b: parseInt("E2", 16)
-    };
-    
-    const end = {
-      r: parseInt("ea", 16), // From #ea384c
-      g: parseInt("38", 16),
-      b: parseInt("4c", 16)
-    };
-    
-    // Interpolate between colors
-    const r = Math.round(start.r + (end.r - start.r) * percent);
-    const g = Math.round(start.g + (end.g - start.g) * percent);
-    const b = Math.round(start.b + (end.b - start.b) * percent);
-    
-    return `rgb(${r}, ${g}, ${b})`;
+    if (score < 30) {
+      return '#F2FCE2'; // Green for low impact
+    } else if (score >= 70) {
+      return '#ea384c'; // Red for high impact
+    } else {
+      // For scores between 30-70, calculate the orange intensity
+      const orangeIntensity = (score - 30) / 40; // 40 is the range (70-30)
+      
+      // Start color (lighter orange)
+      const start = {
+        r: parseInt("FE", 16), // From #FEC6A1
+        g: parseInt("C6", 16),
+        b: parseInt("A1", 16)
+      };
+      
+      // End color (darker orange)
+      const end = {
+        r: parseInt("F9", 16), // From #F97316
+        g: parseInt("73", 16),
+        b: parseInt("16", 16)
+      };
+      
+      // Interpolate between light and dark orange
+      const r = Math.round(start.r + (end.r - start.r) * orangeIntensity);
+      const g = Math.round(start.g + (end.g - start.g) * orangeIntensity);
+      const b = Math.round(start.b + (end.b - start.b) * orangeIntensity);
+      
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  };
+
+  const getImpactText = (score: number) => {
+    if (score < 30) return "Low Impact";
+    if (score >= 70) return "High Impact";
+    return "Medium Impact";
   };
 
   return (
@@ -44,12 +57,17 @@ export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps)
       <div className="space-y-2">
         <div className="flex justify-between items-center">
           <h3 className="font-semibold">Environmental Impact</h3>
-          <span 
-            className="text-sm font-medium"
-            style={{ color: getColor(score) }}
-          >
-            {score}/100
-          </span>
+          <div className="flex items-center gap-2">
+            <span 
+              className="text-sm font-medium"
+              style={{ color: getColor(score) }}
+            >
+              {score}/100
+            </span>
+            <span className="text-xs text-gray-500">
+              ({getImpactText(score)})
+            </span>
+          </div>
         </div>
         <Progress 
           value={progress} 
