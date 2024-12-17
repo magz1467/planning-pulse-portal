@@ -78,7 +78,7 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
           <div>
             <h3 className="font-semibold">Impacted Services</h3>
             <p className="text-sm text-gray-500">
-              {impactCounts.positive || 0} services may be supported,{' '}
+              {impactCounts.positive || 0} services may support local area,{' '}
               {impactCounts.negative || 0} may face pressure
             </p>
           </div>
