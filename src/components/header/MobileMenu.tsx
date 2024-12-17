@@ -20,6 +20,9 @@ export const MobileMenu = () => (
         Menu
       </div>
       <nav className="flex flex-col gap-4">
+        <Link to="/about" className="text-lg">
+          About
+        </Link>
         <Link to="/services/residents" className="text-lg">
           Resident Services
         </Link>
@@ -28,9 +31,6 @@ export const MobileMenu = () => (
         </Link>
         <Link to="/services/councils" className="text-lg">
           Council Services
-        </Link>
-        <Link to="/about" className="text-lg">
-          About
         </Link>
         <Link to="/contact" className="text-lg">
           Contact
