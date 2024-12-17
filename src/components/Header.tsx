@@ -60,10 +60,10 @@ const Header = () => {
                 </Button>
               </SheetTrigger>
               <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
+                <SheetHeader className="border-b pb-4 mb-4">
+                  <SheetTitle className="text-2xl font-bold text-primary">Menu</SheetTitle>
                 </SheetHeader>
-                <div className="flex flex-col gap-4 mt-6">
+                <div className="flex flex-col gap-4">
                   <Link
                     to="/about"
                     className="text-lg font-medium text-gray-900 hover:text-primary transition-colors"
