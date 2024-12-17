@@ -23,7 +23,7 @@ export const ApplicationComments = ({ initialComments = [] }: ApplicationComment
   return (
     <Card className="p-4 border-2 border-primary/20 shadow-lg animate-fade-in hover:border-primary/40 transition-colors duration-300">
       <div className="bg-primary/5 -m-4 mb-4 p-4 border-b">
-        <h3 className="font-semibold text-lg text-primary mb-2 animate-pulse">Have Your Say</h3>
+        <h3 className="font-semibold text-lg text-primary mb-2">Have Your Say</h3>
         <p className="text-sm text-gray-600">
           Your feedback submitted here will be shared directly with both the developer and the local council before the consultation deadline.
         </p>
