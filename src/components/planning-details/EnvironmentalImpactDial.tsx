@@ -55,19 +55,17 @@ export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps)
   return (
     <Card className="p-4">
       <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold">Environmental Impact</h3>
-          <div className="flex items-center gap-2">
-            <span 
-              className="text-sm font-medium"
-              style={{ color: getColor(score) }}
-            >
-              {score}/100
-            </span>
-            <span className="text-xs text-gray-500">
-              ({getImpactText(score)})
-            </span>
-          </div>
+        <h3 className="font-semibold">Environmental Impact</h3>
+        <div className="flex items-center gap-2">
+          <span 
+            className="text-sm font-medium"
+            style={{ color: getColor(score) }}
+          >
+            {score}/100
+          </span>
+          <span className="text-xs text-gray-500">
+            ({getImpactText(score)})
+          </span>
         </div>
         <Progress 
           value={progress} 
