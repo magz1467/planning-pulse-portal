@@ -14,11 +14,29 @@ const StayUpToDate = () => {
 
   const handleAreaSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!postcode || !areaEmail) return;
+    if (!postcode || !areaEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter both a postcode and email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(areaEmail)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     toast({
-      title: "Successfully subscribed!",
-      description: "You'll receive updates about new planning applications in your area.",
+      title: "Verification email sent",
+      description: "Please check your inbox to confirm your subscription.",
     });
     setPostcode("");
     setAreaEmail("");
@@ -52,6 +70,7 @@ const StayUpToDate = () => {
                 />
               </div>
               <h3 className="text-xl font-semibold mb-4">Local Updates</h3>
+              <p className="text-gray-600 mb-6">Get a notification when a new application goes live near you</p>
               <form onSubmit={handleAreaSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-2">Your postcode</label>
