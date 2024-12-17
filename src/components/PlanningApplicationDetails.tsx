@@ -7,7 +7,7 @@ import { ApplicationComments } from "./planning-details/ApplicationComments";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
@@ -25,14 +25,14 @@ export const PlanningApplicationDetails = ({
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
+  const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Scroll to top when component mounts or application changes
-    const detailsContainer = document.querySelector('.planning-details-container');
-    if (detailsContainer) {
-      detailsContainer.scrollTop = 0;
+    // Scroll to top when application changes
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
     }
-  }, [application]);
+  }, [application?.id]); // Now explicitly watching for application ID changes
 
   if (!application) return null;
 
@@ -73,7 +73,7 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div className="relative planning-details-container">
+    <div ref={containerRef} className="relative planning-details-container">
       <div className="p-6 space-y-4">
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
