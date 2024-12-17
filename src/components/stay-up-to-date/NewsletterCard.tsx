@@ -23,7 +23,7 @@ export const NewsletterCard = () => {
           { 
             Email: newsletterEmail,
             Marketing: true,
-            Type: 'newsletter'
+            Type: 'resident'
           }
         ]);
 
