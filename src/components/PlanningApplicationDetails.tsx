@@ -31,28 +31,28 @@ export const PlanningApplicationDetails = ({
   const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // Reset scroll position when application changes
   useEffect(() => {
     if (containerRef.current && application?.id) {
-      // Immediately reset scroll position
-      containerRef.current.scrollTop = 0;
+      const container = containerRef.current;
       
-      // Force a reflow to ensure the scroll position is reset
-      void containerRef.current.offsetHeight;
+      // Reset scroll position synchronously
+      container.scrollTop = 0;
       
-      // Schedule the smooth scroll for the next frame
-      window.requestAnimationFrame(() => {
-        if (containerRef.current) {
-          containerRef.current.style.scrollBehavior = 'smooth';
-          containerRef.current.scrollTop = 0;
-          
-          // Reset scroll behavior after animation
-          setTimeout(() => {
-            if (containerRef.current) {
-              containerRef.current.style.scrollBehavior = 'auto';
-            }
-          }, 500);
+      // Disable any ongoing smooth scroll behavior
+      container.style.scrollBehavior = 'auto';
+      
+      // Force layout recalculation
+      container.getBoundingClientRect();
+      
+      // Clear any existing timeouts
+      const timeoutId = setTimeout(() => {
+        if (container) {
+          container.style.scrollBehavior = 'smooth';
         }
-      });
+      }, 0);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [application?.id]);
 
@@ -100,9 +100,9 @@ export const PlanningApplicationDetails = ({
   return (
     <div 
       ref={containerRef}
-      className="h-full overflow-y-auto overscroll-contain"
+      className="h-full overflow-y-auto"
       style={{ 
-        scrollBehavior: 'auto',
+        overscrollBehavior: 'contain',
         WebkitOverflowScrolling: 'touch'
       }}
     >
