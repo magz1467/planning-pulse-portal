@@ -75,7 +75,7 @@ export const DesktopSidebar = ({
   };
 
   return (
-    <div className="w-full md:w-[400px] overflow-y-auto border-r border-gray-200 bg-white">
+    <div className="w-full md:w-[400px] h-full overflow-y-auto border-r border-gray-200 bg-white">
       <FilterBar 
         onFilterChange={onFilterChange} 
         onSortChange={onSortChange}
@@ -83,12 +83,14 @@ export const DesktopSidebar = ({
         activeSort={activeSort}
       />
       {selectedApplication === null ? (
-        <>
-          <PlanningApplicationList
-            applications={applications}
-            postcode={postcode}
-            onSelectApplication={onSelectApplication}
-          />
+        <div className="flex flex-col h-full">
+          <div className="flex-grow">
+            <PlanningApplicationList
+              applications={applications}
+              postcode={postcode}
+              onSelectApplication={onSelectApplication}
+            />
+          </div>
           <div className="p-4 border-t">
             <div className="bg-primary/5 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -112,7 +114,7 @@ export const DesktopSidebar = ({
               </form>
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <div className="relative">
           <div className="flex items-center justify-between border-b py-2 px-4">
