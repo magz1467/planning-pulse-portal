@@ -67,8 +67,8 @@ export const DesktopSidebar = ({
         activeSort={activeSort}
       />
       {selectedApplication === null ? (
-        <div className="flex flex-col h-full">
-          <div className="p-4 border-b">
+        <div className="flex flex-col h-[calc(100%-56px)]">
+          <div className="p-4 border-b sticky top-0 bg-white z-10">
             <div className="bg-primary/5 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Bell className="h-5 w-5 text-primary" />
@@ -85,7 +85,7 @@ export const DesktopSidebar = ({
               </Button>
             </div>
           </div>
-          <div className="flex-grow overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             <PlanningApplicationList
               applications={applications}
               postcode={postcode}
@@ -94,7 +94,7 @@ export const DesktopSidebar = ({
           </div>
         </div>
       ) : (
-        <div className="h-full flex flex-col">
+        <div className="h-[calc(100%-56px)] flex flex-col">
           <div className="flex items-center justify-between border-b py-2 px-4 flex-shrink-0">
             <h2 className="font-semibold">Planning Application Details</h2>
             <Button
