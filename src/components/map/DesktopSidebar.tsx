@@ -36,7 +36,7 @@ export const DesktopSidebar = ({
     : null;
 
   return (
-    <div className="w-full md:w-1/3 overflow-y-auto border-r border-gray-200 bg-white">
+    <div className="w-full md:w-[400px] overflow-y-auto border-r border-gray-200 bg-white">
       <FilterBar 
         onFilterChange={onFilterChange} 
         onSortChange={onSortChange}
