@@ -16,7 +16,7 @@ export const MobileMenu = () => (
       </Button>
     </SheetTrigger>
     <SheetContent>
-      <div className="text-xl font-bold text-primary mb-6">
+      <div className="text-xl font-bold text-primary pb-4 mb-6 border-b">
         Menu
       </div>
       <nav className="flex flex-col gap-4">
