@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
+import Image from "@/components/ui/image";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -34,20 +35,17 @@ export const PlanningApplicationList = ({
           onClick={() => onSelectApplication(application.id)}
         >
           <div className="flex gap-4">
-            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
               {application.image ? (
-                <img
+                <Image
                   src={application.image}
                   alt={application.title}
-                  className="w-full h-full object-cover bg-gray-100"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/lovable-uploads/ed8c75b6-7e73-4720-818d-f78fbcf2d94a.png";
-                  }}
+                  width={96}
+                  height={96}
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
                   <MapPin className="w-8 h-8 text-gray-400" />
                 </div>
               )}
