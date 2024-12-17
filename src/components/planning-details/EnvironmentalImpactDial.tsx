@@ -56,6 +56,7 @@ export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps)
     <Card className="p-4">
       <div className="space-y-2">
         <h3 className="font-semibold">Environmental Impact</h3>
+        <p className="text-xs text-gray-500">This is calculated using variables in the application</p>
         <div className="flex items-center gap-2">
           <span 
             className="text-sm font-medium"
