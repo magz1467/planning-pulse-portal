@@ -67,7 +67,7 @@ export const DesktopSidebar = ({
                 <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
               </div>
               <p className="text-sm text-gray-600 mb-4">
-                Stay informed about new planning applications in {postcode}
+                Stay informed about new planning applications near {postcode}
               </p>
               <Button 
                 className="w-full"
