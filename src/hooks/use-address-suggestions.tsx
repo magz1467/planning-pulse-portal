@@ -25,7 +25,21 @@ export const useAddressSuggestions = (search: string) => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        // Try postcode lookup first if the search includes numbers
+        // Try address lookup first
+        const addressResponse = await fetch(
+          `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
+        );
+        const addressData = await addressResponse.json();
+        
+        if (addressData.result && addressData.result.length > 0) {
+          return addressData.result.map((result: any) => ({
+            ...result,
+            postcode: result.postcode,
+            address: `${result.thoroughfare || result.admin_ward || ''}, ${result.admin_district}, ${result.postcode}`.trim()
+          }));
+        }
+
+        // If no address results, try postcode lookup
         if (/\d/.test(debouncedSearch)) {
           const postcodeResponse = await fetch(
             `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
@@ -52,18 +66,18 @@ export const useAddressSuggestions = (search: string) => {
             return results.filter(Boolean);
           }
         }
-
-        // Try address lookup
-        const addressResponse = await fetch(
-          `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
-        );
-        const addressData = await addressResponse.json();
         
-        if (addressData.result && addressData.result.length > 0) {
-          return addressData.result.map((result: any) => ({
+        // Try general address search as last resort
+        const generalAddressResponse = await fetch(
+          `https://api.postcodes.io/postcodes?street=${encodeURIComponent(debouncedSearch)}`
+        );
+        const generalAddressData = await generalAddressResponse.json();
+
+        if (generalAddressData.result && generalAddressData.result.length > 0) {
+          return generalAddressData.result.map((result: any) => ({
             ...result,
             postcode: result.postcode,
-            address: `${result.admin_ward || ''}, ${result.admin_district}, ${result.postcode}`.trim()
+            address: `${result.thoroughfare || ''}, ${result.admin_district}, ${result.postcode}`.trim()
           }));
         }
         
