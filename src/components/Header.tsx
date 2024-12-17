@@ -1,66 +1,56 @@
 import { Link } from "react-router-dom";
-import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const navItems = [
-    { to: "/services/residents", label: "For Residents" },
-    { to: "/services/developers", label: "For Developers" },
-    { to: "/services/councils", label: "For Councils" },
-    { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
-  ];
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   return (
-    <header className="border-b bg-white">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-primary">
-            PlanningPulse
-          </Link>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => (
+    <header className="bg-white shadow-sm">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <Link to="/" className="flex items-center">
+              <span className="text-xl font-bold text-primary">Planning Pulse</span>
+            </Link>
+            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
-                key={item.to}
-                to={item.to}
-                className="text-sm hover:text-primary"
+                to="/map"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900"
               >
-                {item.label}
+                Map
               </Link>
-            ))}
-          </nav>
-
-          {/* Mobile Navigation */}
-          <Sheet>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col gap-4 mt-8">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className="text-lg hover:text-primary px-2 py-1 rounded-md hover:bg-gray-100"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+              <Link
+                to="/about"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
+              >
+                About
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              onClick={handleSignOut}
+              className="text-sm font-medium text-gray-500 hover:text-gray-900"
+            >
+              Sign out
+            </Button>
+          </div>
         </div>
-      </div>
+      </nav>
     </header>
   );
 };
