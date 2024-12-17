@@ -35,7 +35,28 @@ export const MobileMenu = () => (
         <Link to="/contact" className="text-lg">
           Contact
         </Link>
+
         <div className="h-px bg-gray-200 my-4" />
+        
+        <div className="text-lg font-semibold mb-2">Planning Guides</div>
+        <Link to="/content/planning-basics" className="text-base pl-2">
+          Planning Basics
+        </Link>
+        <Link to="/content/local-plans" className="text-base pl-2">
+          Local Plans
+        </Link>
+        <Link to="/content/sustainable-development" className="text-base pl-2">
+          Sustainable Development
+        </Link>
+        <Link to="/content/planning-appeals" className="text-base pl-2">
+          Planning Appeals
+        </Link>
+        <Link to="/content/heritage-conservation" className="text-base pl-2">
+          Heritage & Conservation
+        </Link>
+
+        <div className="h-px bg-gray-200 my-4" />
+        
         <Link to="/auth">
           <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
             Sign In

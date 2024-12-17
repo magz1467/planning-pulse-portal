@@ -21,6 +21,13 @@ import Accessibility from "./pages/Accessibility";
 import Feedback from "./pages/Feedback";
 import Investors from "./pages/Investors";
 
+// Import new content pages
+import PlanningBasics from "./pages/content/PlanningBasics";
+import LocalPlans from "./pages/content/LocalPlans";
+import SustainableDevelopment from "./pages/content/SustainableDevelopment";
+import PlanningAppeals from "./pages/content/PlanningAppeals";
+import HeritageConservation from "./pages/content/HeritageConservation";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -47,6 +54,13 @@ const App = () => (
           <Route path="/accessibility" element={<Accessibility />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/investors" element={<Investors />} />
+          
+          {/* New content routes */}
+          <Route path="/content/planning-basics" element={<PlanningBasics />} />
+          <Route path="/content/local-plans" element={<LocalPlans />} />
+          <Route path="/content/sustainable-development" element={<SustainableDevelopment />} />
+          <Route path="/content/planning-appeals" element={<PlanningAppeals />} />
+          <Route path="/content/heritage-conservation" element={<HeritageConservation />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
