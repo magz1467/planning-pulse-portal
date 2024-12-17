@@ -22,12 +22,12 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
   
   if (!application) return null;
 
-  // In a real application, this would come from the backend
+  // Updated impact areas to match the requested distribution
   const impactAreas: ImpactArea[] = [
-    { name: "Schools", impact: "positive" },
-    { name: "Health", impact: "neutral" },
-    { name: "Roads", impact: "negative" },
-    { name: "Public Transport", impact: "positive" },
+    { name: "Schools", impact: "negative" },
+    { name: "Health", impact: "negative" },
+    { name: "Roads", impact: "neutral" },
+    { name: "Public Transport", impact: "neutral" },
     { name: "Utilities", impact: "neutral" },
     { name: "Community Services", impact: "positive" },
   ];
