@@ -82,12 +82,6 @@ const Header = () => {
                   >
                     For Councils
                   </Link>
-                  <Link
-                    to="/map"
-                    className="text-lg font-medium text-gray-900 hover:text-primary transition-colors"
-                  >
-                    Map
-                  </Link>
                   <Button
                     variant="ghost"
                     onClick={handleAuthAction}
