@@ -32,6 +32,12 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
     { name: "Community Services", impact: "positive" },
   ];
 
+  // Count impacts by type
+  const impactCounts = impactAreas.reduce((acc, area) => {
+    acc[area.impact] = (acc[area.impact] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   const getImpactIcon = (impact: string) => {
     switch (impact) {
       case 'positive':
@@ -65,12 +71,6 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
     }
   };
 
-  // Count impacts by type
-  const impactCounts = impactAreas.reduce((acc, area) => {
-    acc[area.impact] = (acc[area.impact] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
   return (
     <Card className="p-4">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -78,8 +78,7 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
           <div>
             <h3 className="font-semibold">Impacted Services</h3>
             <p className="text-sm text-gray-500">
-              {impactCounts.positive || 0} services may support local area,{' '}
-              {impactCounts.negative || 0} may face pressure
+              {impactCounts.positive || 0} services may improve, {impactCounts.negative || 0} services may face added pressure
             </p>
           </div>
           <CollapsibleTrigger className="hover:bg-gray-100 p-2 rounded-full transition-colors">
