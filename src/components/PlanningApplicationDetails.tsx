@@ -31,9 +31,13 @@ export const PlanningApplicationDetails = ({
   const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
   
+  // Update this useEffect to ensure smooth scrolling behavior
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
+    if (containerRef.current && application?.id) {
+      containerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     }
   }, [application?.id]);
 
@@ -79,7 +83,7 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div ref={containerRef} className="relative planning-details-container">
+    <div ref={containerRef} className="relative planning-details-container overflow-y-auto h-full">
       <div className="p-6 space-y-4">
         <ApplicationHeader application={application} />
         <ApplicationImage application={application} />
