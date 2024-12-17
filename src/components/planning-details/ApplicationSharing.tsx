@@ -10,12 +10,18 @@ interface ApplicationSharingProps {
 export const ApplicationSharing = ({ applicationId, reference }: ApplicationSharingProps) => {
   const { toast } = useToast();
 
+  const getShareUrl = () => {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('application', applicationId.toString());
+    return `${baseUrl}?${searchParams.toString()}`;
+  };
+
   const handleShare = async () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('application', applicationId.toString());
+    const url = getShareUrl();
     
     try {
-      await navigator.clipboard.writeText(url.toString());
+      await navigator.clipboard.writeText(url);
       toast({
         title: "Link copied!",
         description: "Share this link to show this planning application to others.",
@@ -31,10 +37,8 @@ export const ApplicationSharing = ({ applicationId, reference }: ApplicationShar
   };
 
   const handleWhatsAppShare = () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('application', applicationId.toString());
-    
-    const text = `Check out this planning application (ref: ${reference}): ${url.toString()}`;
+    const url = getShareUrl();
+    const text = `Check out this planning application (ref: ${reference}): ${url}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
