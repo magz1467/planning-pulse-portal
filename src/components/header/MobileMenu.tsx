@@ -9,9 +9,9 @@ export const MobileMenu = () => (
       <Button 
         variant="ghost" 
         size="icon"
-        className="relative hover:bg-primary/10 transition-colors"
+        className="relative p-2.5 hover:bg-primary/10 transition-colors rounded-lg bg-primary/5"
       >
-        <Menu className="h-7 w-7 text-primary" strokeWidth={2.5} />
+        <Menu className="h-8 w-8 text-primary" strokeWidth={2.5} />
         <span className="sr-only">Open menu</span>
       </Button>
     </SheetTrigger>
