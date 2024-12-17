@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { X, Bell } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
+import { EmailDialog } from "@/components/EmailDialog";
 
 interface DesktopSidebarProps {
   applications: Application[];
@@ -39,39 +38,16 @@ export const DesktopSidebar = ({
     ? applications.find((app) => app.id === selectedApplication)
     : null;
 
-  const [email, setEmail] = useState("");
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
 
-  const handleAreaUpdatesSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !postcode) return;
-
-    try {
-      const { error } = await supabase
-        .from('User data')
-        .insert([
-          {
-            Email: email,
-            "Post Code": postcode,
-            Marketing: true,
-            Type: 'resident'
-          }
-        ]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: "You've been subscribed to updates for this area.",
-      });
-      setEmail("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to subscribe to updates. Please try again.",
-        variant: "destructive"
-      });
-    }
+  const handleEmailSubmit = (email: string, radius: string) => {
+    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+    toast({
+      title: "Subscription pending",
+      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
+      duration: 5000,
+    });
   };
 
   return (
@@ -93,18 +69,12 @@ export const DesktopSidebar = ({
               <p className="text-sm text-gray-600 mb-4">
                 Stay informed about new planning applications in {postcode}
               </p>
-              <form onSubmit={handleAreaUpdatesSubmit} className="space-y-3">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <Button type="submit" className="w-full">
-                  Subscribe to Updates
-                </Button>
-              </form>
+              <Button 
+                className="w-full"
+                onClick={() => setShowEmailDialog(true)}
+              >
+                Get Alerts
+              </Button>
             </div>
           </div>
           <div className="flex-grow">
@@ -134,6 +104,12 @@ export const DesktopSidebar = ({
           />
         </div>
       )}
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+      />
     </div>
   );
 };
