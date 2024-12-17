@@ -15,6 +15,7 @@ export type Database = {
           Email: string | null
           id: number
           Marketing: boolean
+          "Post Code": string | null
           Type: string | null
         }
         Insert: {
@@ -22,6 +23,7 @@ export type Database = {
           Email?: string | null
           id?: number
           Marketing: boolean
+          "Post Code"?: string | null
           Type?: string | null
         }
         Update: {
@@ -29,6 +31,7 @@ export type Database = {
           Email?: string | null
           id?: number
           Marketing?: boolean
+          "Post Code"?: string | null
           Type?: string | null
         }
         Relationships: []

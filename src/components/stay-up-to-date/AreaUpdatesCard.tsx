@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { useToast } from "@/components/ui/use-toast";
 import Image from "@/components/ui/image";
+import { supabase } from "@/integrations/supabase/client";
 
 export const AreaUpdatesCard = () => {
   const [postcode, setPostcode] = useState("");
   const [areaEmail, setAreaEmail] = useState("");
   const { toast } = useToast();
 
-  const handleAreaSubmit = (e: React.FormEvent) => {
+  const handleAreaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!postcode || !areaEmail) {
       toast({
@@ -31,13 +32,34 @@ export const AreaUpdatesCard = () => {
       });
       return;
     }
-    
-    toast({
-      title: "Verification email sent",
-      description: "Please check your inbox to confirm your subscription.",
-    });
-    setPostcode("");
-    setAreaEmail("");
+
+    try {
+      const { error } = await supabase
+        .from('User data')
+        .insert([
+          {
+            Email: areaEmail,
+            "Post Code": postcode,
+            Marketing: true
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "You've been subscribed to local updates.",
+      });
+      setPostcode("");
+      setAreaEmail("");
+    } catch (error) {
+      console.error('Error saving subscription:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem subscribing to updates. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
