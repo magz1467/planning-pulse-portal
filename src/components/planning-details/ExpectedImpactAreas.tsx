@@ -46,11 +46,11 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
   const getImpactLabel = (impact: string) => {
     switch (impact) {
       case 'positive':
-        return 'This service may need additional capacity';
+        return 'May support these services';
       case 'negative':
-        return 'This development may increase pressure on this service';
+        return 'May increase pressure on services';
       default:
-        return 'No significant impact expected on this service';
+        return 'No significant impact expected';
     }
   };
 
@@ -78,7 +78,7 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
           <div>
             <h3 className="font-semibold">Impacted Services</h3>
             <p className="text-sm text-gray-500">
-              {impactCounts.positive || 0} services may need capacity,{' '}
+              {impactCounts.positive || 0} services may be supported,{' '}
               {impactCounts.negative || 0} may face pressure
             </p>
           </div>
@@ -109,11 +109,11 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
           <div className="border-t pt-3">
             <div className="flex items-center gap-2 text-xs text-gray-500">
               <AlertCircle className="w-3 h-3 text-primary" />
-              <span>Additional capacity may be needed</span>
+              <span>May support these services</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
               <AlertCircle className="w-3 h-3 text-[#ea384c]" />
-              <span>May increase service pressure</span>
+              <span>May increase pressure on services</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
               <MinusCircle className="w-3 h-3 text-gray-400" />
