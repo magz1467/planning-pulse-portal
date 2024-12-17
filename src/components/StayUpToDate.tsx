@@ -43,7 +43,7 @@ const StayUpToDate = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Area Updates Section */}
-            <div className="bg-[#F2FCE2] rounded-xl shadow-sm p-8">
+            <div className="rounded-xl p-8 border-2 border-[#F2FCE2]">
               <div className="mb-6 h-48 overflow-hidden rounded-lg">
                 <Image
                   src="/lovable-uploads/6492526a-800c-4702-a7f5-544d42447cc7.png"
@@ -75,7 +75,7 @@ const StayUpToDate = () => {
             </div>
 
             {/* Newsletter Section */}
-            <div className="bg-[#D3E4FD] rounded-xl shadow-sm p-8">
+            <div className="rounded-xl p-8 border-2 border-[#D3E4FD]">
               <div className="mb-6 h-48 overflow-hidden rounded-lg">
                 <Image
                   src="/lovable-uploads/128f63aa-cbd2-4d3a-89df-cd2651e10113.png"
@@ -101,7 +101,7 @@ const StayUpToDate = () => {
             </div>
 
             {/* Social Media Section */}
-            <div className="bg-[#FDE1D3] rounded-xl shadow-sm p-8">
+            <div className="rounded-xl p-8 border-2 border-[#FDE1D3]">
               <div className="mb-6 h-48 overflow-hidden rounded-lg">
                 <Image
                   src="/lovable-uploads/abb1ba01-758b-471b-a769-5607e42a106b.png"
