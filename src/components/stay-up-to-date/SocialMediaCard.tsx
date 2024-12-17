@@ -3,7 +3,7 @@ import Image from "@/components/ui/image";
 
 export const SocialMediaCard = () => {
   return (
-    <div className="flex flex-col rounded-xl p-8 border-2 border-[#FDE1D3] h-full">
+    <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
           src="/lovable-uploads/abb1ba01-758b-471b-a769-5607e42a106b.png"

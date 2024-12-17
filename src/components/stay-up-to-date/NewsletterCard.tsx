@@ -20,7 +20,7 @@ export const NewsletterCard = () => {
   };
 
   return (
-    <div className="flex flex-col rounded-xl p-8 border-2 border-[#D3E4FD] h-full">
+    <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
           src="/lovable-uploads/128f63aa-cbd2-4d3a-89df-cd2651e10113.png"

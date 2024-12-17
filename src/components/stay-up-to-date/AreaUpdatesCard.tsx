@@ -41,7 +41,7 @@ export const AreaUpdatesCard = () => {
   };
 
   return (
-    <div className="flex flex-col rounded-xl p-8 border-2 border-[#F2FCE2] h-full">
+    <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
           src="/lovable-uploads/6492526a-800c-4702-a7f5-544d42447cc7.png"
