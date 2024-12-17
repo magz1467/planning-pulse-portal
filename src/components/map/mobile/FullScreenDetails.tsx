@@ -14,7 +14,7 @@ export const FullScreenDetails = ({
   onClose,
 }: FullScreenDetailsProps) => {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full max-h-[100dvh] overflow-hidden">
       <div className="sticky top-0 z-10 bg-white border-b flex items-center justify-between p-4">
         <div className="h-4" />
         <Button
@@ -27,7 +27,7 @@ export const FullScreenDetails = ({
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overscroll-contain">
         <PlanningApplicationDetails
           application={application}
           onClose={onClose}
