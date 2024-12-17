@@ -229,9 +229,15 @@ export const MapContent = () => {
     }
   }, [searchParams, filteredApplications]);
 
-  const handleMarkerClick = (id: number) => {
+  const handleMarkerClick = (id: number | null) => {
     setSelectedApplication(id);
-    setSearchParams({ application: id.toString() });
+    if (id !== null) {
+      setSearchParams({ application: id.toString() });
+    } else {
+      // Remove the application parameter when deselecting
+      searchParams.delete('application');
+      setSearchParams(searchParams);
+    }
   };
 
   const saveSearch = async (postcode: string, status: string) => {
@@ -282,8 +288,7 @@ export const MapContent = () => {
   // Clear selected application when switching to list view
   useEffect(() => {
     if (!isMapView) {
-      setSelectedApplication(null);
-      setSearchParams({});
+      handleMarkerClick(null);
     }
   }, [isMapView]);
 
@@ -323,7 +328,7 @@ export const MapContent = () => {
       onToggleView={() => {
         setIsMapView(!isMapView);
         if (!isMapView) {
-          setSelectedApplication(null);
+          handleMarkerClick(null);
         }
       }}
     />
