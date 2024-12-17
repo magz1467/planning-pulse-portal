@@ -127,10 +127,9 @@ export const MapContent = () => {
     activeSort
   );
 
-  // Effect to select the closest application when coordinates change - only on mobile
+  // Effect to select the closest application when coordinates change - only on mobile and map view
   useEffect(() => {
-    if (coordinates && filteredApplications.length > 0 && isMobile) {
-      // Create an array of coordinates for each application (mocked for demo)
+    if (coordinates && filteredApplications.length > 0 && isMobile && isMapView) {
       const applicationCoordinates: [number, number][] = filteredApplications.map(() => [
         coordinates[0] + (Math.random() - 0.5) * 0.01,
         coordinates[1] + (Math.random() - 0.5) * 0.01
@@ -143,7 +142,14 @@ export const MapContent = () => {
       );
       setSelectedApplication(closestId);
     }
-  }, [coordinates, filteredApplications, isMobile]);
+  }, [coordinates, filteredApplications, isMobile, isMapView]);
+
+  // Clear selected application when switching to list view
+  useEffect(() => {
+    if (!isMapView) {
+      setSelectedApplication(null);
+    }
+  }, [isMapView]);
 
   const handleMarkerClick = (id: number) => {
     setSelectedApplication(id);
@@ -182,7 +188,12 @@ export const MapContent = () => {
       onMarkerClick={handleMarkerClick}
       onFilterChange={handleFilterChange}
       onSortChange={handleSortChange}
-      onToggleView={() => setIsMapView(!isMapView)}
+      onToggleView={() => {
+        setIsMapView(!isMapView);
+        if (!isMapView) {
+          setSelectedApplication(null);
+        }
+      }}
     />
   );
 };

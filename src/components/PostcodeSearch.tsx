@@ -28,6 +28,11 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
     setSearch(postcode);
     setOpen(false);
     onSelect(postcode);
+    // Trigger form submission by creating and dispatching a submit event
+    const form = document.querySelector('form');
+    if (form) {
+      form.requestSubmit();
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
