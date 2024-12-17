@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Careers from "./pages/Careers";
 import Help from "./pages/Help";
+import Press from "./pages/Press";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/help" element={<Help />} />
+          <Route path="/press" element={<Press />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
