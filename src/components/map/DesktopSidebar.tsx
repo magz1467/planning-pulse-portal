@@ -4,7 +4,7 @@ import { PlanningApplicationDetails } from "@/components/PlanningApplicationDeta
 import { FilterBar } from "@/components/FilterBar";
 import { Button } from "@/components/ui/button";
 import { X, Bell } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { EmailDialog } from "@/components/EmailDialog";
 
@@ -40,6 +40,14 @@ export const DesktopSidebar = ({
 
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll position when selected application changes
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [selectedApplication]);
 
   const handleEmailSubmit = (email: string, radius: string) => {
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
@@ -51,7 +59,7 @@ export const DesktopSidebar = ({
   };
 
   return (
-    <div className="w-full md:w-[400px] h-full overflow-y-auto border-r border-gray-200 bg-white">
+    <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
       <FilterBar 
         onFilterChange={onFilterChange} 
         onSortChange={onSortChange}
@@ -77,7 +85,7 @@ export const DesktopSidebar = ({
               </Button>
             </div>
           </div>
-          <div className="flex-grow">
+          <div className="flex-grow overflow-y-auto">
             <PlanningApplicationList
               applications={applications}
               postcode={postcode}
@@ -86,8 +94,8 @@ export const DesktopSidebar = ({
           </div>
         </div>
       ) : (
-        <div className="relative">
-          <div className="flex items-center justify-between border-b py-2 px-4">
+        <div className="h-full flex flex-col">
+          <div className="flex items-center justify-between border-b py-2 px-4 flex-shrink-0">
             <h2 className="font-semibold">Planning Application Details</h2>
             <Button
               variant="ghost"
@@ -98,10 +106,12 @@ export const DesktopSidebar = ({
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <PlanningApplicationDetails
-            application={selectedApplicationData!}
-            onClose={onClose}
-          />
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+            <PlanningApplicationDetails
+              application={selectedApplicationData!}
+              onClose={onClose}
+            />
+          </div>
         </div>
       )}
 
