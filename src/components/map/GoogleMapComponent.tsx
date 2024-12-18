@@ -33,6 +33,7 @@ export const GoogleMapComponent = ({
 
   const fetchRealMarkers = useCallback(async () => {
     try {
+      console.log('Fetching markers for postcode:', postcode);
       const { data, error } = await supabase.functions.invoke('fetch-map-markers', {
         body: { postcode, applications }
       });
@@ -42,6 +43,7 @@ export const GoogleMapComponent = ({
         return;
       }
 
+      console.log('Received marker data:', data);
       if (data && Array.isArray(data)) {
         setMarkers(data);
       }
@@ -57,10 +59,12 @@ export const GoogleMapComponent = ({
   }, [fetchRealMarkers, mapLoaded]);
 
   const onMapLoad = useCallback(() => {
+    console.log('Map loaded successfully');
     setMapLoaded(true);
   }, []);
 
   if (loadError) {
+    console.error('Error loading maps:', loadError);
     return <div>Error loading maps</div>;
   }
 
