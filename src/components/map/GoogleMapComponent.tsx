@@ -3,6 +3,7 @@ import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
 import { Application } from '@/types/planning';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingOverlay } from './LoadingOverlay';
+import { AlertCircle } from 'lucide-react';
 
 const mapContainerStyle = {
   width: '100%',
@@ -29,6 +30,7 @@ export const GoogleMapComponent = ({
 }: GoogleMapComponentProps) => {
   const [markers, setMarkers] = useState<Array<{ lat: number; lng: number; id: number }>>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
@@ -67,9 +69,26 @@ export const GoogleMapComponent = ({
     setMapLoaded(true);
   }, []);
 
-  if (loadError) {
-    console.error('Error loading maps:', loadError);
-    return <div>Error loading maps</div>;
+  // Handle map load error
+  useEffect(() => {
+    if (loadError) {
+      console.error('Error loading maps:', loadError);
+      setMapError('Failed to load Google Maps. Please check your API key configuration.');
+    }
+  }, [loadError]);
+
+  if (mapError || loadError) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-50">
+        <div className="text-center p-4">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Map Loading Error</h3>
+          <p className="text-gray-600 max-w-md">
+            {mapError || 'There was an error loading the map. Please try again later.'}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   if (!isLoaded) {
