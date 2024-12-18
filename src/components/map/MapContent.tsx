@@ -224,18 +224,15 @@ export const MapContent = () => {
     if (applicationId) {
       const id = parseInt(applicationId, 10);
       if (!isNaN(id)) {
-        // Check if the application exists in our data
         const applicationExists = filteredApplications.some(app => app.id === id);
         if (applicationExists) {
           setSelectedApplication(id);
         } else {
-          // If the application doesn't exist, show an error toast
           toast({
             title: "Application not found",
             description: "The planning application you're looking for could not be found.",
             variant: "destructive",
           });
-          // Remove the application parameter from URL
           searchParams.delete('application');
           setSearchParams(searchParams);
         }
@@ -248,7 +245,6 @@ export const MapContent = () => {
     if (id !== null) {
       setSearchParams({ application: id.toString() });
     } else {
-      // Remove the application parameter when deselecting
       searchParams.delete('application');
       setSearchParams(searchParams);
     }
@@ -282,7 +278,7 @@ export const MapContent = () => {
     }
   };
 
-  // Effect to select the closest application when coordinates change - only on mobile and map view
+  // Effect to select the closest application when coordinates change
   useEffect(() => {
     if (coordinates && filteredApplications.length > 0 && isMobile && isMapView) {
       const applicationCoordinates: [number, number][] = filteredApplications.map(() => [
