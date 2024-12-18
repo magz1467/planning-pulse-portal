@@ -9,6 +9,9 @@ const mapContainerStyle = {
   height: '100%'
 };
 
+// Define libraries array outside component to prevent unnecessary reloads
+const libraries: ("places")[] = ["places"];
+
 interface GoogleMapComponentProps {
   coordinates: [number, number];
   applications: Application[];
@@ -29,7 +32,7 @@ export const GoogleMapComponent = ({
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places'],
+    libraries,
   });
 
   const fetchRealMarkers = useCallback(async () => {
