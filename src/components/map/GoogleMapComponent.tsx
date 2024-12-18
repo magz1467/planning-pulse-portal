@@ -28,7 +28,7 @@ export const GoogleMapComponent = ({
   const [mapLoaded, setMapLoaded] = useState(false);
 
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
   });
 
   const fetchRealMarkers = useCallback(async () => {
