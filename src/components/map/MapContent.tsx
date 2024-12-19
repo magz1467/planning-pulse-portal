@@ -1,16 +1,14 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MapLayout } from "./layout/MapLayout";
-import { LoadingOverlay } from "./LoadingOverlay";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { MapContentLayout } from "./MapContentLayout";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
-import { Application } from "@/types/planning";
-import { findClosestApplication } from "@/utils/distance";
+import { useMapState } from "@/hooks/use-map-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+// Mock data moved to a separate constant
 const planningImages = [
   "/lovable-uploads/5138b4f3-8820-4457-9664-4a7f54b617a9.png",
   "/lovable-uploads/2a1a1b3d-4e95-4458-a340-d34de8863e11.png",
@@ -197,16 +195,7 @@ const mockPlanningApplications: Application[] = [
 
 export const MapContent = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const postcode = location.state?.postcode;
-  const initialTab = location.state?.tab || 'recent';
-  const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
-  const [activeFilters, setActiveFilters] = useState<{
-    status?: string;
-    type?: string;
-  }>({});
-  const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -218,37 +207,14 @@ export const MapContent = () => {
     activeSort
   );
 
-  // Handle URL parameters on mount and when applications load
-  useEffect(() => {
-    const applicationId = searchParams.get('application');
-    if (applicationId) {
-      const id = parseInt(applicationId, 10);
-      if (!isNaN(id)) {
-        const applicationExists = filteredApplications.some(app => app.id === id);
-        if (applicationExists) {
-          setSelectedApplication(id);
-        } else {
-          toast({
-            title: "Application not found",
-            description: "The planning application you're looking for could not be found.",
-            variant: "destructive",
-          });
-          searchParams.delete('application');
-          setSearchParams(searchParams);
-        }
-      }
-    }
-  }, [searchParams, filteredApplications]);
-
-  const handleMarkerClick = (id: number | null) => {
-    setSelectedApplication(id);
-    if (id !== null) {
-      setSearchParams({ application: id.toString() });
-    } else {
-      searchParams.delete('application');
-      setSearchParams(searchParams);
-    }
-  };
+  const {
+    selectedApplication,
+    activeFilters,
+    activeSort,
+    handleMarkerClick,
+    handleFilterChange,
+    handleSortChange
+  } = useMapState(coordinates, filteredApplications, isMobile, isMapView);
 
   const saveSearch = async (postcode: string, status: string) => {
     try {
@@ -278,51 +244,8 @@ export const MapContent = () => {
     }
   };
 
-  // Effect to select the closest application when coordinates change
-  useEffect(() => {
-    if (coordinates && filteredApplications.length > 0 && isMobile && isMapView) {
-      const applicationCoordinates: [number, number][] = filteredApplications.map(() => [
-        coordinates[0] + (Math.random() - 0.5) * 0.01,
-        coordinates[1] + (Math.random() - 0.5) * 0.01
-      ]);
-
-      const closestId = findClosestApplication(
-        filteredApplications,
-        coordinates,
-        applicationCoordinates
-      );
-      handleMarkerClick(closestId);
-    }
-  }, [coordinates, filteredApplications, isMobile, isMapView]);
-
-  // Clear selected application when switching to list view
-  useEffect(() => {
-    if (!isMapView) {
-      handleMarkerClick(null);
-    }
-  }, [isMapView]);
-
-  const handleFilterChange = (filterType: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
-  };
-
-  const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
-    setActiveSort(sortType);
-  };
-
-  if (!coordinates) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading map...</p>
-      </div>
-    );
-  }
-
   return (
-    <MapLayout
+    <MapContentLayout
       isLoading={isLoading}
       coordinates={coordinates}
       postcode={postcode}
