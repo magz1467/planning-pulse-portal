@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MapContentLayout } from "./layout/MapContentLayout";
+import { MapContentLayout } from "@/components/map/MapContentLayout";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { useMapState } from "@/hooks/use-map-state";
