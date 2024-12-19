@@ -12,6 +12,13 @@ const mapContainerStyle = {
 
 const libraries: ("places")[] = ["places"];
 
+const defaultOptions = {
+  zoomControl: true,
+  streetViewControl: false,
+  mapTypeControl: false,
+  fullscreenControl: false,
+};
+
 interface GoogleMapComponentProps {
   coordinates: [number, number];
   applications: Application[];
@@ -32,6 +39,7 @@ export const GoogleMapComponent = ({
   const [mapError, setMapError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [isKeyLoading, setIsKeyLoading] = useState(true);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
   // Fetch the Google Maps API key first
   useEffect(() => {
@@ -55,11 +63,6 @@ export const GoogleMapComponent = ({
           return;
         }
 
-        // Log success but not the actual key
-        console.log('Successfully retrieved Google Maps API key');
-        console.log('API Key length:', data.apiKey.length);
-        console.log('API Key prefix:', data.apiKey.substring(0, 5) + '...');
-        
         setApiKey(data.apiKey);
         setIsKeyLoading(false);
       } catch (error) {
@@ -72,14 +75,13 @@ export const GoogleMapComponent = ({
     fetchApiKey();
   }, []);
 
-  // Only load the map after we have the API key
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
     libraries,
   });
 
   const fetchRealMarkers = useCallback(async () => {
-    if (!mapLoaded) return;
+    if (!mapLoaded || !map) return;
     
     try {
       console.log('Fetching markers for postcode:', postcode);
@@ -100,14 +102,15 @@ export const GoogleMapComponent = ({
     } catch (error) {
       console.error('Error fetching markers:', error);
     }
-  }, [postcode, applications, mapLoaded]);
+  }, [postcode, applications, mapLoaded, map]);
 
   useEffect(() => {
     fetchRealMarkers();
   }, [fetchRealMarkers]);
 
-  const onMapLoad = useCallback(() => {
+  const onMapLoad = useCallback((map: google.maps.Map) => {
     console.log('Map loaded successfully');
+    setMap(map);
     setMapLoaded(true);
   }, []);
 
@@ -147,14 +150,9 @@ export const GoogleMapComponent = ({
         zoom={13}
         center={{ lat: coordinates[0], lng: coordinates[1] }}
         onLoad={onMapLoad}
-        options={{
-          zoomControl: true,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: false,
-        }}
+        options={defaultOptions}
       >
-        {markers.map((marker, index) => (
+        {map && markers.map((marker, index) => (
           <MarkerF
             key={`${marker.id}-${index}`}
             position={{ lat: marker.lat, lng: marker.lng }}
