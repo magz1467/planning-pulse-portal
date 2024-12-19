@@ -44,21 +44,23 @@ export const GoogleMapComponent = ({
         if (error) {
           console.error('Error from Edge Function:', error);
           setMapError('Failed to fetch Google Maps API key from server');
+          setIsKeyLoading(false);
           return;
         }
 
         if (!data?.apiKey) {
           console.error('No API key returned from server');
           setMapError('Google Maps API key not found in server configuration');
+          setIsKeyLoading(false);
           return;
         }
 
         console.log('Successfully retrieved Google Maps API key');
         setApiKey(data.apiKey);
+        setIsKeyLoading(false);
       } catch (error) {
         console.error('Error fetching API key:', error);
         setMapError('Failed to load Google Maps API key. Please check your configuration.');
-      } finally {
         setIsKeyLoading(false);
       }
     };
@@ -73,6 +75,8 @@ export const GoogleMapComponent = ({
   });
 
   const fetchRealMarkers = useCallback(async () => {
+    if (!mapLoaded) return;
+    
     try {
       console.log('Fetching markers for postcode:', postcode);
       
@@ -92,13 +96,11 @@ export const GoogleMapComponent = ({
     } catch (error) {
       console.error('Error fetching markers:', error);
     }
-  }, [postcode, applications]);
+  }, [postcode, applications, mapLoaded]);
 
   useEffect(() => {
-    if (mapLoaded) {
-      fetchRealMarkers();
-    }
-  }, [fetchRealMarkers, mapLoaded]);
+    fetchRealMarkers();
+  }, [fetchRealMarkers]);
 
   const onMapLoad = useCallback(() => {
     console.log('Map loaded successfully');
