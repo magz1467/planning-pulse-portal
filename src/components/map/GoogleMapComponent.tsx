@@ -30,24 +30,40 @@ export const GoogleMapComponent = ({
   const [markers, setMarkers] = useState<Array<{ lat: number; lng: number; id: number }>>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
-  // Load the Google Maps script with the API key from Supabase secrets
+  // Fetch the Google Maps API key first
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-google-maps-key');
+        
+        if (error || !data?.apiKey) {
+          console.error('Error fetching API key:', error);
+          setMapError('Failed to load Google Maps API key. Please check your configuration.');
+          return;
+        }
+
+        setApiKey(data.apiKey);
+      } catch (error) {
+        console.error('Error fetching API key:', error);
+        setMapError('Failed to load Google Maps API key. Please check your configuration.');
+      }
+    };
+
+    fetchApiKey();
+  }, []);
+
+  // Only load the map after we have the API key
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: apiKey || '',
     libraries,
   });
 
   const fetchRealMarkers = useCallback(async () => {
     try {
       console.log('Fetching markers for postcode:', postcode);
-      const { data: secretData } = await supabase.functions.invoke('get-google-maps-key');
       
-      if (!secretData) {
-        console.error('No API key found');
-        setMapError('Failed to load Google Maps API key. Please check your configuration.');
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke('fetch-map-markers', {
         body: { postcode, applications }
       });
@@ -84,7 +100,7 @@ export const GoogleMapComponent = ({
     }
   }, [loadError]);
 
-  if (mapError || loadError) {
+  if (!apiKey || mapError || loadError) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-50">
         <div className="text-center p-4">
