@@ -20,10 +20,17 @@ serve(async (req) => {
       throw new Error('API key not configured')
     }
 
+    // Validate API key format (basic check)
+    if (!apiKey.startsWith('AIza')) {
+      console.error('Invalid Google Maps API key format')
+      throw new Error('Invalid API key format')
+    }
+
     // Log success but not the actual key
     console.log('Successfully retrieved Google Maps API key')
     console.log('API Key length:', apiKey.length)
     console.log('API Key prefix:', apiKey.substring(0, 5) + '...')
+    console.log('API Key is valid format:', apiKey.startsWith('AIza'))
 
     return new Response(
       JSON.stringify({ 
