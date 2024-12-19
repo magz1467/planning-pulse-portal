@@ -20,17 +20,32 @@ serve(async (req) => {
       throw new Error('API key not configured')
     }
 
-    // Validate API key format (basic check)
-    if (!apiKey.startsWith('AIza')) {
-      console.error('Invalid Google Maps API key format')
-      throw new Error('Invalid API key format')
-    }
+    // Log key details for debugging (without exposing the full key)
+    console.log('Retrieved API key details:')
+    console.log('- Key length:', apiKey.length)
+    console.log('- First 4 chars:', apiKey.substring(0, 4))
+    console.log('- Expected prefix:', 'AIza')
+    console.log('- Has correct prefix:', apiKey.startsWith('AIza'))
 
-    // Log success but not the actual key
-    console.log('Successfully retrieved Google Maps API key')
-    console.log('API Key length:', apiKey.length)
-    console.log('API Key prefix:', apiKey.substring(0, 5) + '...')
-    console.log('API Key is valid format:', apiKey.startsWith('AIza'))
+    // Return detailed error if key format is incorrect
+    if (!apiKey.startsWith('AIza')) {
+      console.error('Invalid Google Maps API key format - key must start with AIza')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid API key format',
+          message: 'The Google Maps API key must start with AIza. Please check your Supabase secret configuration.',
+          details: {
+            keyLength: apiKey.length,
+            startsWithAIza: apiKey.startsWith('AIza'),
+            firstFourChars: apiKey.substring(0, 4)
+          }
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      )
+    }
 
     return new Response(
       JSON.stringify({ 
