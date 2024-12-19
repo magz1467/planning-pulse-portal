@@ -3,20 +3,18 @@ import { findClosestApplication } from "@/utils/distance";
 import { Application } from "@/types/planning";
 import { useToast } from "@/components/ui/use-toast";
 import { useSearchParams } from "react-router-dom";
+import { MapState, MapActions } from "@/types/map";
 
 export const useMapState = (
   coordinates: [number, number] | null,
-  filteredApplications: Application[],
+  applications: Application[],
   isMobile: boolean,
   isMapView: boolean
-) => {
+): MapState & MapActions => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
-  const [activeFilters, setActiveFilters] = useState<{
-    status?: string;
-    type?: string;
-  }>({});
-  const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
+  const [activeFilters, setActiveFilters] = useState<MapState["activeFilters"]>({});
+  const [activeSort, setActiveSort] = useState<MapState["activeSort"]>(null);
   const { toast } = useToast();
 
   // Handle URL parameters on mount and when applications load
@@ -25,7 +23,7 @@ export const useMapState = (
     if (applicationId) {
       const id = parseInt(applicationId, 10);
       if (!isNaN(id)) {
-        const applicationExists = filteredApplications.some(app => app.id === id);
+        const applicationExists = applications.some(app => app.id === id);
         if (applicationExists) {
           setSelectedApplication(id);
         } else {
@@ -39,24 +37,24 @@ export const useMapState = (
         }
       }
     }
-  }, [searchParams, filteredApplications]);
+  }, [searchParams, applications]);
 
   // Effect to select the closest application when coordinates change
   useEffect(() => {
-    if (coordinates && filteredApplications.length > 0 && isMobile && isMapView) {
-      const applicationCoordinates: [number, number][] = filteredApplications.map(() => [
+    if (coordinates && applications.length > 0 && isMobile && isMapView) {
+      const applicationCoordinates: [number, number][] = applications.map(() => [
         coordinates[0] + (Math.random() - 0.5) * 0.01,
         coordinates[1] + (Math.random() - 0.5) * 0.01
       ]);
 
       const closestId = findClosestApplication(
-        filteredApplications,
+        applications,
         coordinates,
         applicationCoordinates
       );
       handleMarkerClick(closestId);
     }
-  }, [coordinates, filteredApplications, isMobile, isMapView]);
+  }, [coordinates, applications, isMobile, isMapView]);
 
   const handleMarkerClick = (id: number | null) => {
     setSelectedApplication(id);
@@ -75,7 +73,7 @@ export const useMapState = (
     }));
   };
 
-  const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
+  const handleSortChange = (sortType: MapState["activeSort"]) => {
     setActiveSort(sortType);
   };
 

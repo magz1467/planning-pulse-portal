@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MapContentLayout } from "./MapContentLayout";
+import { MapContentLayout } from "./layout/MapContentLayout";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { useMapState } from "@/hooks/use-map-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Application } from "@/types/planning";
 
 // Mock data moved to a separate constant
 const planningImages = [
@@ -199,13 +200,7 @@ export const MapContent = () => {
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  
   const { coordinates, isLoading } = useCoordinates(postcode);
-  const filteredApplications = useFilteredApplications(
-    mockPlanningApplications,
-    activeFilters,
-    activeSort
-  );
 
   const {
     selectedApplication,
@@ -214,7 +209,13 @@ export const MapContent = () => {
     handleMarkerClick,
     handleFilterChange,
     handleSortChange
-  } = useMapState(coordinates, filteredApplications, isMobile, isMapView);
+  } = useMapState(coordinates, mockPlanningApplications, isMobile, isMapView);
+
+  const filteredApplications = useFilteredApplications(
+    mockPlanningApplications,
+    activeFilters,
+    activeSort
+  );
 
   const saveSearch = async (postcode: string, status: string) => {
     try {
