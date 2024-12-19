@@ -10,7 +10,6 @@ const mapContainerStyle = {
   height: '100%'
 };
 
-// Define libraries array outside component to prevent unnecessary reloads
 const libraries: ("places")[] = ["places"];
 
 interface GoogleMapComponentProps {
@@ -32,14 +31,23 @@ export const GoogleMapComponent = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
+  // Load the Google Maps script with the API key from Supabase secrets
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
   });
 
   const fetchRealMarkers = useCallback(async () => {
     try {
       console.log('Fetching markers for postcode:', postcode);
+      const { data: secretData } = await supabase.functions.invoke('get-google-maps-key');
+      
+      if (!secretData) {
+        console.error('No API key found');
+        setMapError('Failed to load Google Maps API key. Please check your configuration.');
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('fetch-map-markers', {
         body: { postcode, applications }
       });
@@ -69,7 +77,6 @@ export const GoogleMapComponent = ({
     setMapLoaded(true);
   }, []);
 
-  // Handle map load error
   useEffect(() => {
     if (loadError) {
       console.error('Error loading maps:', loadError);
