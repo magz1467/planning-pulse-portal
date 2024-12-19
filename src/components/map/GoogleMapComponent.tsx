@@ -55,7 +55,11 @@ export const GoogleMapComponent = ({
           return;
         }
 
+        // Log success but not the actual key
         console.log('Successfully retrieved Google Maps API key');
+        console.log('API Key length:', data.apiKey.length);
+        console.log('API Key prefix:', data.apiKey.substring(0, 5) + '...');
+        
         setApiKey(data.apiKey);
         setIsKeyLoading(false);
       } catch (error) {

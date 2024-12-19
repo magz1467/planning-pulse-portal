@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,10 +20,17 @@ serve(async (req) => {
       throw new Error('API key not configured')
     }
 
+    // Log success but not the actual key
     console.log('Successfully retrieved Google Maps API key')
+    console.log('API Key length:', apiKey.length)
+    console.log('API Key prefix:', apiKey.substring(0, 5) + '...')
 
     return new Response(
-      JSON.stringify({ apiKey }),
+      JSON.stringify({ 
+        apiKey,
+        status: 'success',
+        message: 'API key retrieved successfully'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
@@ -36,7 +42,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: 'Failed to retrieve Google Maps API key',
-        details: error.message 
+        details: error.message,
+        status: 'error'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
