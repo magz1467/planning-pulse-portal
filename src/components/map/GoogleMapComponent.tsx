@@ -31,23 +31,35 @@ export const GoogleMapComponent = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [isKeyLoading, setIsKeyLoading] = useState(true);
 
   // Fetch the Google Maps API key first
   useEffect(() => {
     const fetchApiKey = async () => {
+      setIsKeyLoading(true);
       try {
+        console.log('Fetching Google Maps API key...');
         const { data, error } = await supabase.functions.invoke('get-google-maps-key');
         
-        if (error || !data?.apiKey) {
-          console.error('Error fetching API key:', error);
-          setMapError('Failed to load Google Maps API key. Please check your configuration.');
+        if (error) {
+          console.error('Error from Edge Function:', error);
+          setMapError('Failed to fetch Google Maps API key from server');
           return;
         }
 
+        if (!data?.apiKey) {
+          console.error('No API key returned from server');
+          setMapError('Google Maps API key not found in server configuration');
+          return;
+        }
+
+        console.log('Successfully retrieved Google Maps API key');
         setApiKey(data.apiKey);
       } catch (error) {
         console.error('Error fetching API key:', error);
         setMapError('Failed to load Google Maps API key. Please check your configuration.');
+      } finally {
+        setIsKeyLoading(false);
       }
     };
 
@@ -99,6 +111,10 @@ export const GoogleMapComponent = ({
       setMapError('Failed to load Google Maps. Please check your API key configuration.');
     }
   }, [loadError]);
+
+  if (isKeyLoading) {
+    return <LoadingOverlay />;
+  }
 
   if (!apiKey || mapError || loadError) {
     return (
