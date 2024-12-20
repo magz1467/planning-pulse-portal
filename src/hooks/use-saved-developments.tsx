@@ -25,7 +25,7 @@ export const useSavedDevelopments = () => {
 
       if (error) throw error;
 
-      setSavedDevelopments(data.map(item => item.application_id));
+      setSavedDevelopments(data?.map(item => item.application_id) || []);
     } catch (error) {
       console.error('Error fetching saved developments:', error);
     } finally {
