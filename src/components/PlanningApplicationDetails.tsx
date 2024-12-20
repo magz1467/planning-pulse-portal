@@ -9,12 +9,13 @@ import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactD
 import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { ApplicationSharing } from "./planning-details/ApplicationSharing";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, Bell } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Bell, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
+import { useSavedDevelopments } from "@/hooks/use-saved-developments";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -29,10 +30,12 @@ export const PlanningApplicationDetails = ({
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
+  const { savedDevelopments, toggleSavedDevelopment } = useSavedDevelopments();
 
   if (!application) return null;
 
-  // Mock environmental impact score - in a real app this would come from the backend
+  const isSaved = savedDevelopments.includes(application.id);
+
   const environmentalImpactScore = Math.floor((Math.random() * 100));
 
   // Mock data for feedback counts
@@ -73,7 +76,18 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div className="p-6 space-y-4 pb-20">
-      <ApplicationHeader application={application} />
+      <div className="flex justify-between items-start">
+        <ApplicationHeader application={application} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => toggleSavedDevelopment(application.id)}
+          className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
+        >
+          <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+        </Button>
+      </div>
+      
       <ApplicationImage application={application} />
       
       <ApplicationSharing 
