@@ -9,13 +9,14 @@ import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactD
 import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { ApplicationSharing } from "./planning-details/ApplicationSharing";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, Bell, Heart } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Bell, Heart, BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
 import { useSavedDevelopments } from "@/hooks/use-saved-developments";
+import { Link } from "react-router-dom";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -35,6 +36,21 @@ export const PlanningApplicationDetails = ({
   if (!application) return null;
 
   const isSaved = savedDevelopments.includes(application.id);
+
+  const handleSave = () => {
+    toggleSavedDevelopment(application.id);
+    toast({
+      title: isSaved ? "Development removed" : "Development saved",
+      description: isSaved 
+        ? "The development has been removed from your saved list" 
+        : "The development has been added to your saved list. View all your saved developments.",
+      action: !isSaved ? (
+        <Link to="/saved" className="text-primary hover:underline">
+          View saved
+        </Link>
+      ) : undefined
+    });
+  };
 
   const environmentalImpactScore = Math.floor((Math.random() * 100));
 
@@ -78,14 +94,23 @@ export const PlanningApplicationDetails = ({
     <div className="p-6 space-y-4 pb-20">
       <div className="flex justify-between items-start">
         <ApplicationHeader application={application} />
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => toggleSavedDevelopment(application.id)}
-          className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
-        >
-          <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link 
+            to="/saved" 
+            className="text-sm text-gray-600 hover:text-primary flex items-center gap-1"
+          >
+            <BookmarkIcon className="h-4 w-4" />
+            Saved
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSave}
+            className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
+          >
+            <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+          </Button>
+        </div>
       </div>
       
       <ApplicationImage application={application} />

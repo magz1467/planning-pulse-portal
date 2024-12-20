@@ -13,7 +13,7 @@ interface SavedDevelopmentsProps {
 }
 
 export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDevelopmentsProps) => {
-  const { savedDevelopments, toggleSavedDevelopment } = useSavedDevelopments();
+  const { savedDevelopments, toggleSavedDevelopment, dummyApplications } = useSavedDevelopments();
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -37,7 +37,8 @@ export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDe
     );
   }
 
-  const savedApplications = applications.filter(app => 
+  // Use dummy data for demonstration
+  const savedApplications = dummyApplications.filter(app => 
     savedDevelopments.includes(app.id)
   );
 
@@ -80,6 +81,10 @@ export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDe
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleSavedDevelopment(application.id);
+                    toast({
+                      title: "Development removed",
+                      description: "The development has been removed from your saved list",
+                    });
                   }}
                   className="text-red-500 hover:text-red-600"
                 >
