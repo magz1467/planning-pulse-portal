@@ -6,6 +6,7 @@ import { Heart, MapPin } from 'lucide-react';
 import { useSavedDevelopments } from '@/hooks/use-saved-developments';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 
 interface SavedDevelopmentsProps {
   applications: Application[];
@@ -22,8 +23,12 @@ export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDe
   }, []);
 
   const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setIsAuthenticated(!!session);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+    }
   };
 
   if (!isAuthenticated) {

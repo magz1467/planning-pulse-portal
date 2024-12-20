@@ -12,7 +12,7 @@ const dummyApplications = [
 ];
 
 export const useSavedDevelopments = () => {
-  const [savedDevelopments, setSavedDevelopments] = useState<number[]>([1, 2, 3, 4, 5]); // Pre-populated with dummy data
+  const [savedDevelopments, setSavedDevelopments] = useState<number[]>([1, 2, 3, 4, 5]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -49,6 +49,6 @@ export const useSavedDevelopments = () => {
     savedDevelopments,
     isLoading,
     toggleSavedDevelopment,
-    dummyApplications, // Expose dummy data for demonstration
+    dummyApplications,
   };
 };
