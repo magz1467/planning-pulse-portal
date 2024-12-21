@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { GoogleMapComponent } from "./GoogleMapComponent";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { ApplicationMarkers } from "./ApplicationMarkers";
 
 interface MapContainerProps {
   coordinates: LatLngTuple;
@@ -19,13 +20,23 @@ export const MapContainerComponent = ({
 }: MapContainerProps) => {
   return (
     <div className="w-full h-full relative" style={{ zIndex: 0 }}>
-      <GoogleMapComponent
-        coordinates={coordinates}
-        applications={applications}
-        selectedApplication={selectedApplication}
-        onMarkerClick={onMarkerClick}
-        postcode={postcode}
-      />
+      <MapContainer
+        center={coordinates}
+        zoom={14}
+        scrollWheelZoom={true}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <ApplicationMarkers
+          applications={applications}
+          baseCoordinates={coordinates}
+          onMarkerClick={onMarkerClick}
+          selectedId={selectedApplication}
+        />
+      </MapContainer>
     </div>
   );
 };

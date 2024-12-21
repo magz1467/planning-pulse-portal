@@ -43,7 +43,6 @@ export const ApplicationMarkers = ({
           eventHandlers={{
             click: () => onMarkerClick(app.id),
           }}
-          // @ts-ignore - icon prop is valid but types are incorrect
           icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
         />
       ))}
