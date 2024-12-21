@@ -12,14 +12,15 @@ serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY')
+    // Try both possible secret names
+    let apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY') || Deno.env.get('GOOGLE_MAPS_API-KEY');
     
     if (!apiKey) {
-      console.error('Google Maps API key not found in environment variables')
+      console.error('Google Maps API key not found in environment variables');
       return new Response(
         JSON.stringify({ 
           error: 'API key not configured',
-          message: 'Please configure the Google Maps API key in Supabase secrets'
+          message: 'Please configure the Google Maps API key in Supabase secrets with the name GOOGLE_MAPS_API_KEY'
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
