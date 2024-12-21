@@ -17,6 +17,8 @@ import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
 import { useSavedDevelopments } from "@/hooks/use-saved-developments";
 import { Link } from "react-router-dom";
+import { AuthRequiredDialog } from "./AuthRequiredDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -29,6 +31,7 @@ export const PlanningApplicationDetails = ({
 }: PlanningApplicationDetailsProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
   const { savedDevelopments, toggleSavedDevelopment } = useSavedDevelopments();
@@ -37,7 +40,14 @@ export const PlanningApplicationDetails = ({
 
   const isSaved = savedDevelopments.includes(application.id);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     toggleSavedDevelopment(application.id);
     toast({
       title: isSaved ? "Development removed" : "Development saved",
@@ -198,6 +208,11 @@ export const PlanningApplicationDetails = ({
         open={showFeedbackDialog}
         onOpenChange={setShowFeedbackDialog}
         onSubmit={handleFeedbackEmailSubmit}
+      />
+
+      <AuthRequiredDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
       />
     </div>
   );
