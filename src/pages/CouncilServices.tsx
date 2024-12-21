@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesInsert } from "@/integrations/supabase/types";
 
 const CouncilServices = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -24,17 +25,17 @@ const CouncilServices = () => {
     e.preventDefault();
     
     try {
+      const contactData: TablesInsert<'council_contacts'> = {
+        council_name: formData.councilName,
+        contact_name: formData.contactName,
+        email: formData.email,
+        phone: formData.phone || null,
+        message: formData.message || null
+      };
+
       const { error } = await supabase
         .from('council_contacts')
-        .insert([
-          {
-            council_name: formData.councilName,
-            contact_name: formData.contactName,
-            email: formData.email,
-            phone: formData.phone,
-            message: formData.message
-          }
-        ]);
+        .insert(contactData);
 
       if (error) throw error;
 
