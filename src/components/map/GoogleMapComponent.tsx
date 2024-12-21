@@ -4,6 +4,7 @@ import { Application } from '@/types/planning';
 import { supabase } from '@/integrations/supabase/client';
 import { LoadingOverlay } from './LoadingOverlay';
 import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 const mapContainerStyle = {
   width: '100%',
@@ -40,6 +41,7 @@ export const GoogleMapComponent = ({
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [isKeyLoading, setIsKeyLoading] = useState(true);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const { toast } = useToast();
 
   // Fetch the Google Maps API key first
   useEffect(() => {
@@ -51,13 +53,23 @@ export const GoogleMapComponent = ({
         
         if (error) {
           console.error('Error from Edge Function:', error);
-          setMapError('Failed to fetch Google Maps API key from server');
+          toast({
+            variant: "destructive",
+            title: "Error fetching Google Maps API key",
+            description: "Please check your configuration and try again.",
+          });
+          setMapError('Failed to fetch Google Maps API key. Please check your configuration.');
           setIsKeyLoading(false);
           return;
         }
 
         if (!data?.apiKey) {
           console.error('No API key returned from server');
+          toast({
+            variant: "destructive",
+            title: "Configuration Error",
+            description: "Google Maps API key not found in server configuration.",
+          });
           setMapError('Google Maps API key not found in server configuration');
           setIsKeyLoading(false);
           return;
@@ -67,13 +79,18 @@ export const GoogleMapComponent = ({
         setIsKeyLoading(false);
       } catch (error) {
         console.error('Error fetching API key:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load Google Maps API key. Please check your configuration.",
+        });
         setMapError('Failed to load Google Maps API key. Please check your configuration.');
         setIsKeyLoading(false);
       }
     };
 
     fetchApiKey();
-  }, []);
+  }, [toast]);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey || '',
@@ -92,6 +109,11 @@ export const GoogleMapComponent = ({
 
       if (error) {
         console.error('Error fetching markers:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load map markers. Please try again.",
+        });
         return;
       }
 
@@ -101,8 +123,13 @@ export const GoogleMapComponent = ({
       }
     } catch (error) {
       console.error('Error fetching markers:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load map markers. Please try again.",
+      });
     }
-  }, [postcode, applications, mapLoaded, map]);
+  }, [postcode, applications, mapLoaded, map, toast]);
 
   useEffect(() => {
     fetchRealMarkers();
@@ -117,9 +144,14 @@ export const GoogleMapComponent = ({
   useEffect(() => {
     if (loadError) {
       console.error('Error loading maps:', loadError);
+      toast({
+        variant: "destructive",
+        title: "Map Loading Error",
+        description: "Failed to load Google Maps. Please check your API key configuration.",
+      });
       setMapError('Failed to load Google Maps. Please check your API key configuration.');
     }
-  }, [loadError]);
+  }, [loadError, toast]);
 
   if (isKeyLoading) {
     return <LoadingOverlay />;
