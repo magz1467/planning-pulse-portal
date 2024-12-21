@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MapContentLayout } from "@/components/map/MapContentLayout";
@@ -7,7 +6,7 @@ import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { useMapState } from "@/hooks/use-map-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Application } from "@/types/planning";
+import { useEffect, useState } from "react";
 
 // Mock data moved to a separate constant
 const planningImages = [
@@ -21,7 +20,7 @@ const getRandomImage = () => {
   return planningImages[randomIndex];
 };
 
-const mockPlanningApplications: Application[] = [
+const mockPlanningApplications = [
   {
     id: 1,
     title: "Two-Storey Residential Extension",
@@ -197,6 +196,7 @@ const mockPlanningApplications: Application[] = [
 export const MapContent = () => {
   const location = useLocation();
   const postcode = location.state?.postcode;
+  const initialFilter = location.state?.initialFilter;
   const [isMapView, setIsMapView] = useState(true);
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -208,42 +208,21 @@ export const MapContent = () => {
     activeSort,
     handleMarkerClick,
     handleFilterChange,
-    handleSortChange
+    handleSortChange,
   } = useMapState(coordinates, mockPlanningApplications, isMobile, isMapView);
+
+  // Apply initial filter if coming from completed tab
+  useEffect(() => {
+    if (initialFilter) {
+      handleFilterChange("status", initialFilter);
+    }
+  }, [initialFilter, handleFilterChange]);
 
   const filteredApplications = useFilteredApplications(
     mockPlanningApplications,
     activeFilters,
     activeSort
   );
-
-  const saveSearch = async (postcode: string, status: string) => {
-    try {
-      const { data: auth } = await supabase.auth.getSession();
-      const isLoggedIn = !!auth.session;
-
-      const { error } = await supabase
-        .from('Searches')
-        .insert([
-          {
-            "Post Code": postcode,
-            "Status": status,
-            "User_logged_in": isLoggedIn
-          }
-        ]);
-
-      if (error) {
-        console.error('Error saving search:', error);
-        toast({
-          title: "Error",
-          description: "There was a problem saving your search. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error saving search:', error);
-    }
-  };
 
   return (
     <MapContentLayout

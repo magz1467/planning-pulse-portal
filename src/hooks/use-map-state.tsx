@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
-import { findClosestApplication } from "@/utils/distance";
-import { Application } from "@/types/planning";
-import { useToast } from "@/components/ui/use-toast";
-import { useSearchParams } from "react-router-dom";
-import { MapState, MapActions } from "@/types/map";
+import { useState, useCallback } from 'react';
+import { Application } from '@/types/planning';
+import { MapState, MapActions } from '@/types/map';
 
 export const useMapState = (
   coordinates: [number, number] | null,
@@ -11,71 +8,27 @@ export const useMapState = (
   isMobile: boolean,
   isMapView: boolean
 ): MapState & MapActions => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedApplication, setSelectedApplication] = useState<number | null>(null);
-  const [activeFilters, setActiveFilters] = useState<MapState["activeFilters"]>({});
-  const [activeSort, setActiveSort] = useState<MapState["activeSort"]>(null);
-  const { toast } = useToast();
+  const [activeFilters, setActiveFilters] = useState<{
+    status?: string;
+    type?: string;
+  }>({});
+  const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
 
-  // Handle URL parameters on mount and when applications load
-  useEffect(() => {
-    const applicationId = searchParams.get('application');
-    if (applicationId) {
-      const id = parseInt(applicationId, 10);
-      if (!isNaN(id)) {
-        const applicationExists = applications.some(app => app.id === id);
-        if (applicationExists) {
-          setSelectedApplication(id);
-        } else {
-          toast({
-            title: "Application not found",
-            description: "The planning application you're looking for could not be found.",
-            variant: "destructive",
-          });
-          searchParams.delete('application');
-          setSearchParams(searchParams);
-        }
-      }
-    }
-  }, [searchParams, applications]);
-
-  // Effect to select the closest application when coordinates change
-  useEffect(() => {
-    if (coordinates && applications.length > 0 && isMobile && isMapView) {
-      const applicationCoordinates: [number, number][] = applications.map(() => [
-        coordinates[0] + (Math.random() - 0.5) * 0.01,
-        coordinates[1] + (Math.random() - 0.5) * 0.01
-      ]);
-
-      const closestId = findClosestApplication(
-        applications,
-        coordinates,
-        applicationCoordinates
-      );
-      handleMarkerClick(closestId);
-    }
-  }, [coordinates, applications, isMobile, isMapView]);
-
-  const handleMarkerClick = (id: number | null) => {
+  const handleMarkerClick = useCallback((id: number | null) => {
     setSelectedApplication(id);
-    if (id !== null) {
-      setSearchParams({ application: id.toString() });
-    } else {
-      searchParams.delete('application');
-      setSearchParams(searchParams);
-    }
-  };
+  }, []);
 
-  const handleFilterChange = (filterType: string, value: string) => {
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
     setActiveFilters(prev => ({
       ...prev,
-      [filterType]: value
+      [filterType]: value === prev[filterType] ? undefined : value
     }));
-  };
+  }, []);
 
-  const handleSortChange = (sortType: MapState["activeSort"]) => {
+  const handleSortChange = useCallback((sortType: 'closingSoon' | 'newest' | null) => {
     setActiveSort(sortType);
-  };
+  }, []);
 
   return {
     selectedApplication,
