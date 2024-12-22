@@ -1,8 +1,8 @@
 import { Icon, LatLngTuple } from 'leaflet';
-import { MapContainerProps as LeafletMapProps, TileLayerProps as LeafletTileLayerProps, MarkerProps as LeafletMarkerProps } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 
 declare module 'react-leaflet' {
-  export interface MapContainerProps extends LeafletMapProps {
+  export interface MapContainerProps extends React.ComponentProps<typeof MapContainer> {
     center: LatLngTuple;
     zoom: number;
     scrollWheelZoom: boolean;
@@ -10,12 +10,12 @@ declare module 'react-leaflet' {
     children?: React.ReactNode;
   }
 
-  export interface TileLayerProps extends LeafletTileLayerProps {
+  export interface TileLayerProps extends React.ComponentProps<typeof TileLayer> {
     attribution: string;
     url: string;
   }
 
-  export interface MarkerProps extends LeafletMarkerProps {
+  export interface MarkerProps extends React.ComponentProps<typeof Marker> {
     position: LatLngTuple;
     icon?: Icon;
     eventHandlers?: {
