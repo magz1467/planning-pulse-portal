@@ -7,6 +7,7 @@ declare module 'react-leaflet' {
     zoom: number;
     scrollWheelZoom: boolean;
     style?: React.CSSProperties;
+    children?: React.ReactNode;
   }
 
   export interface TileLayerProps extends LeafletTileLayerProps {
