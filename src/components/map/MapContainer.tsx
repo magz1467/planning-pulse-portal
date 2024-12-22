@@ -1,9 +1,9 @@
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, MapContainerProps } from "react-leaflet";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 
-interface MapContainerProps {
+interface MapContainerComponentProps {
   coordinates: LatLngTuple;
   postcode: string;
   applications: Application[];
@@ -17,7 +17,7 @@ export const MapContainerComponent = ({
   applications,
   selectedApplication,
   onMarkerClick,
-}: MapContainerProps) => {
+}: MapContainerComponentProps) => {
   return (
     <div className="w-full h-full relative" style={{ zIndex: 0 }}>
       <MapContainer

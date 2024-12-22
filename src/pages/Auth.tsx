@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { AuthChangeEvent, AuthError } from "@supabase/supabase-js";
+import { AuthError } from "@supabase/supabase-js";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ const AuthPage = () => {
   const mode = searchParams.get('mode');
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         toast({
@@ -25,10 +24,9 @@ const AuthPage = () => {
       }
     });
 
-    // Listen for auth events
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
@@ -62,7 +60,7 @@ const AuthPage = () => {
     };
   }, [navigate, toast]);
 
-  const handleAuthError = (error: AuthError) => {
+  const handleError = (error: AuthError) => {
     let errorMessage = "An error occurred during authentication";
     
     if (error.message.includes("Invalid login credentials")) {
@@ -105,7 +103,7 @@ const AuthPage = () => {
             theme="light"
             providers={[]}
             redirectTo={`${window.location.origin}/auth/callback`}
-            onError={handleAuthError}
+            onAuthError={handleError}
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Marker } from "react-leaflet";
+import { Marker, MarkerProps } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { applicationIcon, selectedApplicationIcon } from "./MapMarkers";
@@ -29,7 +29,6 @@ export const ApplicationMarkers = ({
     ];
   };
 
-  // Memoize the coordinates so they don't change on re-renders
   const applicationCoordinates = useMemo(() => {
     return applications.map((_, index) => generateRandomCoordinates(index));
   }, [applications.length, baseCoordinates[0], baseCoordinates[1]]);
