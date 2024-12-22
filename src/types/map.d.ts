@@ -16,6 +16,7 @@ declare module 'react-leaflet' {
     eventHandlers?: {
       click: () => void;
     };
+    children?: React.ReactNode;
   }
 
   export const MapContainer: React.FC<MapContainerProps>;
