@@ -2,6 +2,8 @@ import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { ApplicationMarkers } from "./ApplicationMarkers";
+import { useEffect, useRef } from "react";
+import { Map as LeafletMap } from "leaflet";
 
 interface MapContainerComponentProps {
   coordinates: LatLngTuple;
@@ -17,9 +19,18 @@ export const MapContainerComponent = ({
   selectedApplication,
   onMarkerClick,
 }: MapContainerComponentProps) => {
+  const mapRef = useRef<LeafletMap | null>(null);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.setView(coordinates, 14);
+    }
+  }, [coordinates]);
+
   return (
     <div className="w-full h-full relative">
       <MapContainer
+        ref={mapRef}
         center={coordinates}
         zoom={14}
         scrollWheelZoom={true}

@@ -31,7 +31,7 @@ export const ApplicationMarkers = ({
 
   const applicationCoordinates = useMemo(() => {
     return applications.map((_, index) => generateRandomCoordinates(index));
-  }, [applications.length, baseCoordinates[0], baseCoordinates[1]]);
+  }, [applications.length, baseCoordinates]);
 
   return (
     <>
