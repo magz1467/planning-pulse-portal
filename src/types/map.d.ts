@@ -8,11 +8,13 @@ declare module 'react-leaflet' {
     zoom: number;
     scrollWheelZoom: boolean;
     style?: React.CSSProperties;
+    className?: string;
   }
 
   export interface TileLayerProps {
     attribution: string;
     url: string;
+    className?: string;
   }
 
   export interface MarkerProps {
@@ -21,6 +23,7 @@ declare module 'react-leaflet' {
     eventHandlers?: {
       click: () => void;
     };
+    className?: string;
   }
 
   export const MapContainer: React.FC<MapContainerProps>;
