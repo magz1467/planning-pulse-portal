@@ -25,6 +25,8 @@ import PlanningAppeals from './pages/content/PlanningAppeals';
 import HeritageConservation from './pages/content/HeritageConservation';
 import PlanningAuthorities from './pages/content/PlanningAuthorities';
 
+import SavedPage from './pages/saved';
+
 const App = () => {
   return (
     <Router>
@@ -54,6 +56,7 @@ const App = () => {
         <Route path="/content/planning-appeals" element={<PlanningAppeals />} />
         <Route path="/content/heritage-conservation" element={<HeritageConservation />} />
         <Route path="/content/planning-authorities" element={<PlanningAuthorities />} />
+        <Route path="/saved" element={<SavedPage />} />
       </Routes>
     </Router>
   );
