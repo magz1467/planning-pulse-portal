@@ -23,7 +23,7 @@ declare module 'react-leaflet' {
     };
   }
 
-  export class MapContainer extends LeafletMapContainer {}
-  export class TileLayer extends LeafletTileLayer {}
-  export class Marker extends LeafletMarker {}
+  export const MapContainer: React.FC<MapContainerProps>;
+  export const TileLayer: React.FC<TileLayerProps>;
+  export const Marker: React.FC<MarkerProps>;
 }
