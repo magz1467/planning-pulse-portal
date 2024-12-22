@@ -8,8 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
 
-export const ContactForm = () => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+interface ContactFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const ContactForm = ({ open, onOpenChange }: ContactFormProps) => {
   const [formData, setFormData] = useState({
     councilName: "",
     contactName: "",
@@ -49,7 +53,7 @@ export const ContactForm = () => {
         phone: "",
         message: ""
       });
-      setIsDialogOpen(false);
+      onOpenChange(false);
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -69,7 +73,7 @@ export const ContactForm = () => {
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Get in Touch</DialogTitle>
