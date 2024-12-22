@@ -3,15 +3,11 @@ declare module 'react-leaflet' {
   import { ComponentProps } from 'react';
 
   export interface MapContainerProps extends ComponentProps<'div'> {
-    center?: [number, number];
-    zoom?: number;
+    center: [number, number];
+    zoom: number;
     scrollWheelZoom?: boolean;
     style?: React.CSSProperties;
     children?: React.ReactNode;
-  }
-
-  export interface TileLayerProps {
-    url: string;
   }
 
   export interface MarkerProps {
@@ -23,6 +19,6 @@ declare module 'react-leaflet' {
   }
 
   export const MapContainer: React.FC<MapContainerProps>;
-  export const TileLayer: React.FC<TileLayerProps>;
+  export const TileLayer: React.FC<{ url: string }>;
   export const Marker: React.FC<MarkerProps>;
 }

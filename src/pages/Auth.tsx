@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { AuthError } from "@supabase/supabase-js";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -60,22 +59,6 @@ const AuthPage = () => {
     };
   }, [navigate, toast]);
 
-  const handleError = (error: AuthError) => {
-    let errorMessage = "An error occurred during authentication";
-    
-    if (error.message.includes("Invalid login credentials")) {
-      errorMessage = "Incorrect email or password";
-    } else if (error.message.includes("Email not confirmed")) {
-      errorMessage = "Please verify your email address";
-    }
-
-    toast({
-      title: "Authentication Error",
-      description: errorMessage,
-      variant: "destructive",
-    });
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -103,7 +86,6 @@ const AuthPage = () => {
             theme="light"
             providers={[]}
             redirectTo={`${window.location.origin}/auth/callback`}
-            onError={handleError}
           />
         </div>
       </div>

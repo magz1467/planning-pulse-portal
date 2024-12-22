@@ -2,8 +2,11 @@ import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ContactForm } from "@/components/council/ContactForm";
+import { useState } from "react";
 
 const CouncilServices = () => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   return (
     <>
       <Header />
@@ -98,7 +101,7 @@ const CouncilServices = () => {
         </div>
       </div>
 
-      <ContactForm />
+      <ContactForm open={isDialogOpen} onOpenChange={setIsDialogOpen} />
 
       <Footer />
     </>
