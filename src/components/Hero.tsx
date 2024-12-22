@@ -24,8 +24,8 @@ export const Hero = () => {
           
           <div className="hidden md:flex items-center">
             <Image 
-              src="/lovable-uploads/bd79aa29-e80b-4e54-9b5f-7a1a4fe7ea48.png"
-              alt="Construction professional reviewing site plans" 
+              src="/lovable-uploads/c21e23a0-f1e5-43ef-b085-aff9c1f2fa76.png"
+              alt="Professional in construction safety gear reviewing plans on tablet" 
               className="rounded-lg shadow-xl w-full h-auto object-cover"
               loading="eager"
               width={800}
