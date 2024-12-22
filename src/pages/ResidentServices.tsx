@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Image from "@/components/ui/image";
+import { NewsletterCard } from "@/components/stay-up-to-date/NewsletterCard";
 
 const ResidentServices = () => {
   return (
@@ -51,7 +52,7 @@ const ResidentServices = () => {
               </div>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <div className="grid md:grid-cols-3 gap-8 mt-16 mb-16">
               <div className="bg-white p-8 rounded-xl shadow-sm">
                 <h3 className="text-xl font-semibold mb-4">Stay Informed</h3>
                 <p className="text-gray-600">
@@ -70,6 +71,15 @@ const ResidentServices = () => {
                   Access detailed analytics and historical data to make informed decisions about local developments.
                 </p>
               </div>
+            </div>
+
+            {/* Newsletter Section */}
+            <div className="bg-white rounded-xl p-8 shadow-sm max-w-xl mx-auto">
+              <h2 className="text-2xl font-bold text-center mb-6">Stay Updated with Planning Trends</h2>
+              <p className="text-gray-600 text-center mb-8">
+                Join our monthly newsletter to receive expert insights, local planning updates, and community engagement opportunities.
+              </p>
+              <NewsletterCard />
             </div>
           </div>
         </div>
