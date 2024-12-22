@@ -7,6 +7,7 @@ import { useMapState } from "@/hooks/use-map-state";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
+import type { LatLngTuple } from 'leaflet';
 
 // Mock data moved to a separate constant
 const planningImages = [
@@ -209,9 +210,8 @@ export const MapContent = () => {
     handleMarkerClick,
     handleFilterChange,
     handleSortChange,
-  } = useMapState(coordinates, mockPlanningApplications, isMobile, isMapView);
+  } = useMapState(coordinates as [number, number], mockPlanningApplications, isMobile, isMapView);
 
-  // Apply initial filter if coming from completed tab
   useEffect(() => {
     if (initialFilter) {
       handleFilterChange("status", initialFilter);
@@ -224,10 +224,13 @@ export const MapContent = () => {
     activeSort
   );
 
+  // Ensure coordinates are properly typed
+  const safeCoordinates: [number, number] = coordinates ? [coordinates[0], coordinates[1]] : [51.5074, -0.1278];
+
   return (
     <MapContentLayout
       isLoading={isLoading}
-      coordinates={coordinates}
+      coordinates={safeCoordinates}
       postcode={postcode}
       selectedApplication={selectedApplication}
       filteredApplications={filteredApplications}

@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { Map as LeafletMap } from "leaflet";
 
 interface MapContainerComponentProps {
-  coordinates: LatLngTuple;
+  coordinates: [number, number];
   postcode: string;
   applications: Application[];
   selectedApplication: number | null;
