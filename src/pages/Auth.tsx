@@ -2,7 +2,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/components/ui/use-toast";
 import { AuthChangeEvent } from "@supabase/supabase-js";
@@ -10,6 +10,8 @@ import { AuthChangeEvent } from "@supabase/supabase-js";
 const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode');
 
   useEffect(() => {
     // Check if user is already logged in
@@ -26,7 +28,7 @@ const AuthPage = () => {
     // Listen for auth events
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
+    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
       if (event === 'SIGNED_OUT') {
         toast({
           title: "Signed out",
@@ -60,18 +62,26 @@ const AuthPage = () => {
         <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Welcome to Planning Pulse
+              {mode === 'signup' ? 'Create your account' : 'Welcome back'}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Sign in or create an account to continue
+              {mode === 'signup' 
+                ? 'Sign up to start tracking planning applications'
+                : 'Sign in to your account'}
             </p>
           </div>
           <Auth
             supabaseClient={supabase}
-            appearance={{ theme: ThemeSupa }}
+            appearance={{ 
+              theme: ThemeSupa,
+              style: {
+                button: { background: 'rgb(var(--primary))', color: 'white' },
+                anchor: { color: 'rgb(var(--primary))' },
+              }
+            }}
             theme="light"
             providers={[]}
-            redirectTo={`${window.location.origin}/reset-password`}
+            redirectTo={`${window.location.origin}/auth/callback`}
           />
         </div>
       </div>
