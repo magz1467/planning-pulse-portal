@@ -28,13 +28,13 @@ export const MobileMenu = () => {
           <Link to="/about" className="text-lg">
             About
           </Link>
-          <Link to="/services/residents" className="text-lg">
+          <Link to="/resident-services" className="text-lg">
             Resident Services
           </Link>
-          <Link to="/services/developers" className="text-lg">
+          <Link to="/developer-services" className="text-lg">
             Developer Services
           </Link>
-          <Link to="/services/councils" className="text-lg">
+          <Link to="/council-services" className="text-lg">
             Council Services
           </Link>
           <Link to="/contact" className="text-lg">
