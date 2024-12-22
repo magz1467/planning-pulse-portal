@@ -8,11 +8,13 @@ declare module 'react-leaflet' {
     scrollWheelZoom: boolean;
     style?: React.CSSProperties;
     children?: React.ReactNode;
+    className?: string;
   }
 
   export interface TileLayerProps {
     attribution: string;
     url: string;
+    className?: string;
   }
 
   export interface MarkerProps {
@@ -21,5 +23,6 @@ declare module 'react-leaflet' {
     eventHandlers?: {
       click: () => void;
     };
+    className?: string;
   }
 }
