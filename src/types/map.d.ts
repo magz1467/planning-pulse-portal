@@ -1,9 +1,9 @@
 declare module 'react-leaflet' {
-  import { Map as LeafletMap, Marker as LeafletMarker, TileLayer as LeafletTileLayer } from 'leaflet';
+  import { Map as LeafletMap, Marker as LeafletMarker, TileLayer as LeafletTileLayer, Icon, LatLngTuple } from 'leaflet';
   import { ComponentProps } from 'react';
 
   export interface MapContainerProps extends ComponentProps<'div'> {
-    center: [number, number];
+    center: LatLngTuple;
     zoom: number;
     scrollWheelZoom?: boolean;
     style?: React.CSSProperties;
@@ -11,8 +11,8 @@ declare module 'react-leaflet' {
   }
 
   export interface MarkerProps {
-    position: [number, number];
-    icon?: any;
+    position: LatLngTuple;
+    icon?: Icon;
     eventHandlers?: {
       click: () => void;
     };
