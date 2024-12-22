@@ -103,7 +103,7 @@ const AuthPage = () => {
             theme="light"
             providers={[]}
             redirectTo={`${window.location.origin}/auth/callback`}
-            onAuthError={handleError}
+            onError={handleError}
           />
         </div>
       </div>

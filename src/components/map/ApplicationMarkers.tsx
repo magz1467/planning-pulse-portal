@@ -1,4 +1,4 @@
-import { Marker, MarkerProps } from "react-leaflet";
+import { Marker } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { applicationIcon, selectedApplicationIcon } from "./MapMarkers";
