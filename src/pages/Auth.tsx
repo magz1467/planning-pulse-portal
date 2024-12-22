@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { useToast } from "@/components/ui/use-toast";
-import { AuthChangeEvent } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
+import { AuthChangeEvent, AuthError } from "@supabase/supabase-js";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -43,10 +43,17 @@ const AuthPage = () => {
       }
       if (event === 'SIGNED_IN') {
         toast({
-          title: "Signed in",
+          title: "Success",
           description: "You have been signed in successfully",
+          variant: "default",
         });
         navigate("/");
+      }
+      if (event === 'USER_UPDATED') {
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been updated successfully",
+        });
       }
     });
 
@@ -54,6 +61,22 @@ const AuthPage = () => {
       subscription.unsubscribe();
     };
   }, [navigate, toast]);
+
+  const handleAuthError = (error: AuthError) => {
+    let errorMessage = "An error occurred during authentication";
+    
+    if (error.message.includes("Invalid login credentials")) {
+      errorMessage = "Incorrect email or password";
+    } else if (error.message.includes("Email not confirmed")) {
+      errorMessage = "Please verify your email address";
+    }
+
+    toast({
+      title: "Authentication Error",
+      description: errorMessage,
+      variant: "destructive",
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -82,6 +105,7 @@ const AuthPage = () => {
             theme="light"
             providers={[]}
             redirectTo={`${window.location.origin}/auth/callback`}
+            onError={handleAuthError}
           />
         </div>
       </div>
