@@ -14,6 +14,8 @@ import Investors from './pages/Investors';
 import ResidentServices from './pages/ResidentServices';
 import DeveloperServices from './pages/DeveloperServices';
 import CouncilServices from './pages/CouncilServices';
+import Auth from './pages/Auth';
+import ResetPassword from './pages/ResetPassword';
 
 // Content pages
 import PlanningBasics from './pages/content/PlanningBasics';
@@ -41,6 +43,9 @@ const App = () => {
         <Route path="/resident-services" element={<ResidentServices />} />
         <Route path="/developer-services" element={<DeveloperServices />} />
         <Route path="/council-services" element={<CouncilServices />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/auth/callback" element={<Auth />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         
         {/* Content pages */}
         <Route path="/content/planning-basics" element={<PlanningBasics />} />

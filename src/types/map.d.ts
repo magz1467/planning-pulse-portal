@@ -1,7 +1,8 @@
-import { Icon, LatLngTuple } from 'leaflet';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-
 declare module 'react-leaflet' {
+  import { LatLngTuple } from 'leaflet';
+  import { LeafletEventHandlerFnMap } from 'leaflet';
+  import { Icon } from 'leaflet';
+
   export interface MapContainerProps {
     center: LatLngTuple;
     zoom: number;
