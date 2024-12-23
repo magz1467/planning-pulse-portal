@@ -19,61 +19,76 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // For testing purposes, create a mock development entry
-    const mockDevelopment = {
-      external_id: 'MAP_' + Date.now(),
-      title: 'Test Development from MapCloud',
-      address: '123 Test Street, London',
-      status: 'Under Review',
-      description: 'Test development entry from scheduled job',
-      applicant: 'Test Developer',
-      submission_date: new Date().toISOString(),
-      decision_due: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-      type: 'Residential',
-      ward: 'Test Ward',
-      officer: 'Test Officer',
-      consultation_end: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days from now
-      lat: 51.5074,
-      lng: -0.1278,
-      raw_data: { source: 'MapCloud API Mock' }
+    // Fetch planning data from the API
+    const response = await fetch('https://www.planning.data.gov.uk/api/v1/applications', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Planning API responded with status: ${response.status}`);
     }
 
-    // Insert the mock development
-    const { data, error } = await supabase
-      .from('developments')
-      .upsert(mockDevelopment, {
-        onConflict: 'external_id',
-        returning: true
-      })
+    const data = await response.json();
+    console.log('Fetched planning data:', data);
 
-    if (error) {
-      console.error('Error inserting development:', error)
-      throw error
+    // Process each application and upsert to database
+    for (const application of data.applications || []) {
+      const development = {
+        external_id: application.reference,
+        title: application.proposal || 'No title provided',
+        address: application.site?.address || 'No address provided',
+        status: application.status || 'Unknown',
+        description: application.proposal || '',
+        applicant: application.applicant?.name || 'Unknown',
+        submission_date: application.created_at ? new Date(application.created_at) : null,
+        decision_due: application.decision?.decision_date ? new Date(application.decision.decision_date) : null,
+        type: application.type || 'Unknown',
+        ward: application.site?.ward || '',
+        officer: application.officer?.name || '',
+        consultation_end: application.consultation?.end_date ? new Date(application.consultation.end_date) : null,
+        lat: application.site?.location?.latitude || null,
+        lng: application.site?.location?.longitude || null,
+        raw_data: application
+      };
+
+      const { data: upsertResult, error: upsertError } = await supabase
+        .from('developments')
+        .upsert(development, {
+          onConflict: 'external_id',
+          returning: true
+        });
+
+      if (upsertError) {
+        console.error('Error upserting development:', upsertError);
+        throw upsertError;
+      }
+
+      console.log('Successfully upserted development:', upsertResult);
     }
-
-    console.log('Successfully inserted/updated development:', data)
 
     return new Response(
       JSON.stringify({
-        message: 'Development data updated successfully',
-        data
+        message: 'Planning data updated successfully',
+        processed: data.applications?.length || 0
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
       }
-    )
+    );
   } catch (error) {
-    console.error('Error in update-developments function:', error)
+    console.error('Error in update-developments function:', error);
     return new Response(
       JSON.stringify({
-        error: 'Failed to update development data',
+        error: 'Failed to update planning data',
         details: error.message
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
       }
-    )
+    );
   }
 })

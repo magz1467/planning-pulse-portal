@@ -42,6 +42,69 @@ export type Database = {
         }
         Relationships: []
       }
+      developments: {
+        Row: {
+          address: string | null
+          applicant: string | null
+          consultation_end: string | null
+          created_at: string
+          decision_due: string | null
+          description: string | null
+          external_id: string | null
+          id: number
+          lat: number | null
+          lng: number | null
+          officer: string | null
+          raw_data: Json | null
+          status: string | null
+          submission_date: string | null
+          title: string
+          type: string | null
+          updated_at: string
+          ward: string | null
+        }
+        Insert: {
+          address?: string | null
+          applicant?: string | null
+          consultation_end?: string | null
+          created_at?: string
+          decision_due?: string | null
+          description?: string | null
+          external_id?: string | null
+          id?: number
+          lat?: number | null
+          lng?: number | null
+          officer?: string | null
+          raw_data?: Json | null
+          status?: string | null
+          submission_date?: string | null
+          title: string
+          type?: string | null
+          updated_at?: string
+          ward?: string | null
+        }
+        Update: {
+          address?: string | null
+          applicant?: string | null
+          consultation_end?: string | null
+          created_at?: string
+          decision_due?: string | null
+          description?: string | null
+          external_id?: string | null
+          id?: number
+          lat?: number | null
+          lng?: number | null
+          officer?: string | null
+          raw_data?: Json | null
+          status?: string | null
+          submission_date?: string | null
+          title?: string
+          type?: string | null
+          updated_at?: string
+          ward?: string | null
+        }
+        Relationships: []
+      }
       saved_developments: {
         Row: {
           application_id: number
