@@ -39,6 +39,8 @@ async function processApplications(applications: any[], supabase: any) {
       consultation_end: application.consultation?.end_date ? new Date(application.consultation.end_date) : null,
       lat: application.site?.location?.latitude || null,
       lng: application.site?.location?.longitude || null,
+      location: application.site?.location?.latitude && application.site?.location?.longitude ? 
+        `SRID=4326;POINT(${application.site.location.longitude} ${application.site.location.latitude})` : null,
       raw_data: application
     };
 
