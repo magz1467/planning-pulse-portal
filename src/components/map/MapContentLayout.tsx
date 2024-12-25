@@ -98,6 +98,44 @@ export const MapContentLayout = ({
             />
           )}
         </div>
+        
+        {isMobile && !isMapView && (
+          <div className="absolute inset-0 flex flex-col bg-gray-50">
+            <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
+              <div className="p-4 space-y-4">
+                {filteredApplications.map((app) => (
+                  <div
+                    key={app.id}
+                    className="bg-white p-4 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => onMarkerClick(app.id)}
+                  >
+                    <div className="flex gap-4">
+                      {app.image && (
+                        <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+                          <img
+                            src={app.image}
+                            alt={app.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-primary truncate">{app.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{app.address}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className={`text-xs px-2 py-1 rounded ${app.status === 'approved' ? 'bg-green-100 text-green-800' : app.status === 'declined' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}`}>
+                            {app.status}
+                          </span>
+                          <span className="text-xs text-gray-500">{app.distance}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
