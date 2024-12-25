@@ -42,19 +42,11 @@ export const NewsletterCard = () => {
         .from('User_data')
         .insert({
           Email: newsletterEmail,
-          Marketing: true,
-          Type: 'newsletter'
+          Type: 'newsletter',
+          Marketing: true
         });
 
-      if (error) {
-        console.error('Error saving newsletter subscription:', error);
-        toast({
-          title: "Subscription failed",
-          description: "There was a problem subscribing to the newsletter. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
+      if (error) throw error;
 
       toast({
         title: "Success!",

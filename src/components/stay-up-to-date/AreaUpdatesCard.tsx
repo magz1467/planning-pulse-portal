@@ -45,19 +45,11 @@ export const AreaUpdatesCard = () => {
         .insert({
           Email: areaEmail,
           Post_Code: postcode,
-          Marketing: true,
-          Type: 'area_updates'
+          Type: 'area_updates',
+          Marketing: true
         });
 
-      if (error) {
-        console.error('Error saving subscription:', error);
-        toast({
-          title: "Subscription failed",
-          description: "There was a problem subscribing to updates. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
+      if (error) throw error;
       
       toast({
         title: "Success!",
