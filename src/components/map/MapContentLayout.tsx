@@ -113,20 +113,22 @@ export const MapContentLayout = ({
           )}
         </div>
         
-        {isMobile && !isMapView && !selectedApplication && (
-          <MobileListView
-            postcode={postcode}
-            applications={filteredApplications}
-            onSelectApplication={onMarkerClick}
-            onShowEmailDialog={() => setShowEmailDialog(true)}
-          />
-        )}
-
-        {isMobile && selectedApplication !== null && !isMapView && selectedApp && (
-          <MobileDetailsView
-            application={selectedApp}
-            onClose={() => onMarkerClick(null)}
-          />
+        {isMobile && !isMapView && (
+          <div className="flex-1 overflow-hidden">
+            {selectedApplication !== null && selectedApp ? (
+              <MobileDetailsView
+                application={selectedApp}
+                onClose={() => onMarkerClick(null)}
+              />
+            ) : (
+              <MobileListView
+                postcode={postcode}
+                applications={filteredApplications}
+                onSelectApplication={onMarkerClick}
+                onShowEmailDialog={() => setShowEmailDialog(true)}
+              />
+            )}
+          </div>
         )}
       </div>
 
