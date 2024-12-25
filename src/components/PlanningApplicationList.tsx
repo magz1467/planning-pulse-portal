@@ -7,7 +7,7 @@ import { getStatusColor } from "@/utils/statusColors";
 interface PlanningApplicationListProps {
   applications: Application[];
   postcode: string;
-  onSelectApplication: (id: number) => void;
+  onSelectApplication: (id: number | null) => void;
 }
 
 export const PlanningApplicationList = ({
