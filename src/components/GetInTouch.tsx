@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +18,7 @@ const GetInTouch = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [type, setType] = useState<string>("");
+  const [comments, setComments] = useState("");
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +27,7 @@ const GetInTouch = () => {
     if (!email || !type) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
@@ -38,7 +40,8 @@ const GetInTouch = () => {
           {
             Email: email,
             Type: type,
-            Marketing: true
+            Marketing: true,
+            Message: comments
           }
         ]);
 
@@ -51,6 +54,7 @@ const GetInTouch = () => {
 
       setEmail("");
       setType("");
+      setComments("");
       setIsDialogOpen(false);
     } catch (error) {
       console.error('Error saving contact:', error);
@@ -121,6 +125,17 @@ const GetInTouch = () => {
                   <Label htmlFor="press">Press</Label>
                 </div>
               </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="comments">Comments</Label>
+              <Textarea
+                id="comments"
+                placeholder="Tell us more about your inquiry..."
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                className="min-h-[100px]"
+              />
             </div>
 
             <Button type="submit" className="w-full">Submit</Button>
