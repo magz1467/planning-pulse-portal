@@ -173,7 +173,7 @@ export const MapContentLayout = ({
         )}
 
         {selectedApplication !== null && selectedApp && !isMapView && (
-          <div className="fixed inset-0 z-50 bg-white animate-in slide-in-from-bottom duration-300">
+          <div className="fixed inset-0 z-[2000] bg-white animate-in slide-in-from-bottom duration-300">
             <div className="h-full flex flex-col bg-white">
               <div className="sticky top-0 z-50 border-b py-2 px-4 bg-white flex justify-between items-center shadow-sm">
                 <h2 className="font-semibold">Planning Application Details</h2>
