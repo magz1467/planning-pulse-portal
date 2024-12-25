@@ -38,7 +38,7 @@ export const AreaUpdatesCard = () => {
     
     try {
       const { error } = await supabase
-        .from('"User data"')
+        .from('User data')
         .insert([
           {
             Email: areaEmail,

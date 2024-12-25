@@ -40,7 +40,7 @@ export const NewsletterCard = () => {
     
     try {
       const { error } = await supabase
-        .from('"User data"')
+        .from('User data')
         .insert([
           { 
             Email: newsletterEmail,
