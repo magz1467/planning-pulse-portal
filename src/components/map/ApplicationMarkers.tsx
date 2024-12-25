@@ -18,8 +18,10 @@ export const ApplicationMarkers = ({
   selectedId,
 }: ApplicationMarkersProps) => {
   const generateRandomCoordinates = (index: number): LatLngTuple => {
-    const angle = Math.random() * 2 * Math.PI;
-    const distance = Math.random() * 0.01;
+    // Use a seeded random-like approach based on the index
+    const angle = (index * Math.PI * 0.08) % (2 * Math.PI); // Distribute evenly in a circle
+    const distance = (0.005 + (index % 5) * 0.002); // Vary the distance from center in concentric rings
+    
     const latOffset = distance * Math.cos(angle);
     const lngOffset = distance * Math.sin(angle);
 
