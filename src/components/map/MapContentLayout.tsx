@@ -108,7 +108,7 @@ export const MapContentLayout = ({
             onMarkerClick={onMarkerClick}
           />
 
-          {isMobile && selectedApplication !== null && (
+          {isMobile && selectedApplication !== null && isMapView && (
             <MobileApplicationCards
               applications={filteredApplications}
               selectedId={selectedApplication}
@@ -117,7 +117,7 @@ export const MapContentLayout = ({
           )}
         </div>
         
-        {isMobile && !isMapView && (
+        {isMobile && !isMapView && !selectedApplication && (
           <div className="absolute inset-0 flex flex-col h-full max-h-[100dvh] overflow-hidden bg-gray-50">
             <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
               <div className="p-4 bg-white border-b">
