@@ -5,7 +5,7 @@ export const Stats = () => {
     <div className="flex gap-6 items-center justify-center mb-2">
       <div className="flex items-center gap-2 text-center">
         <CheckCircle className="text-primary" size={20} />
-        <span className="text-sm">Verified data source</span>
+        <span className="text-sm">Official data source</span>
       </div>
       <div className="flex items-center gap-2 text-center">
         <Users className="text-primary" size={20} />
