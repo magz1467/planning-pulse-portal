@@ -35,9 +35,9 @@ export const EmailDialog = ({
 
     try {
       if (applicationRef) {
-        // Save to User data table
+        // Save to User_data table
         await supabase
-          .from('User data')
+          .from('User_data')
           .insert([
             {
               Email: email,

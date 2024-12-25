@@ -10,11 +10,6 @@ export const NewsletterCard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -27,7 +22,8 @@ export const NewsletterCard = () => {
       return;
     }
 
-    if (!validateEmail(newsletterEmail)) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newsletterEmail)) {
       toast({
         title: "Error",
         description: "Please enter a valid email address",
@@ -35,7 +31,7 @@ export const NewsletterCard = () => {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
     
     try {

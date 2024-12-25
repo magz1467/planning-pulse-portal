@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const GetInTouch = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,7 +33,7 @@ const GetInTouch = () => {
 
     try {
       const { error } = await supabase
-        .from('User data')
+        .from('User_data')
         .insert([
           {
             Email: email,
@@ -53,6 +53,7 @@ const GetInTouch = () => {
       setType("");
       setIsDialogOpen(false);
     } catch (error) {
+      console.error('Error saving contact:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
