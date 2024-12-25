@@ -21,7 +21,7 @@ interface MapContentLayoutProps {
   activeSort: 'closingSoon' | 'newest' | null;
   isMapView: boolean;
   isMobile: boolean;
-  onMarkerClick: (id: number) => void;
+  onMarkerClick: (id: number | null) => void;
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onToggleView: () => void;
@@ -54,6 +54,10 @@ export const MapContentLayout = ({
     });
   };
 
+  const handleClose = () => {
+    onMarkerClick(null);
+  };
+
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
       {isLoading && <LoadingOverlay />}
@@ -78,6 +82,7 @@ export const MapContentLayout = ({
           onFilterChange={onFilterChange}
           onSortChange={onSortChange}
           onSelectApplication={onMarkerClick}
+          onClose={handleClose}
         />
         
         <MapSection 

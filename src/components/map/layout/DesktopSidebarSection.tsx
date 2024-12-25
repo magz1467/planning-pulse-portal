@@ -14,6 +14,7 @@ interface DesktopSidebarSectionProps {
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number | null) => void;
+  onClose: () => void;
 }
 
 export const DesktopSidebarSection = ({
@@ -26,6 +27,7 @@ export const DesktopSidebarSection = ({
   onFilterChange,
   onSortChange,
   onSelectApplication,
+  onClose,
 }: DesktopSidebarSectionProps) => {
   if (isMobile) return null;
 
@@ -39,7 +41,7 @@ export const DesktopSidebarSection = ({
       onFilterChange={onFilterChange}
       onSortChange={onSortChange}
       onSelectApplication={onSelectApplication}
-      onClose={() => onSelectApplication(null)}
+      onClose={onClose}
     />
   );
 };
