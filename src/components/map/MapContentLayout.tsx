@@ -6,9 +6,8 @@ import { MobileApplicationCards } from "./MobileApplicationCards";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { EmailDialog } from "@/components/EmailDialog";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect, useRef, useState } from "react";
-import { MobileListView } from "./mobile/MobileListView";
-import { MobileDetailsView } from "./mobile/MobileDetailsView";
+import { useState } from "react";
+import { MobileListContainer } from "./mobile/MobileListContainer";
 
 interface MapContentLayoutProps {
   isLoading: boolean;
@@ -44,16 +43,8 @@ export const MapContentLayout = ({
   onSortChange,
   onToggleView,
 }: MapContentLayoutProps) => {
-  const selectedApp = filteredApplications.find(app => app.id === selectedApplication);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
-
-  // Select first application by default when applications load
-  useEffect(() => {
-    if (filteredApplications.length > 0 && !selectedApplication && isMapView) {
-      onMarkerClick(filteredApplications[0].id);
-    }
-  }, [filteredApplications, selectedApplication, isMapView, onMarkerClick]);
 
   const handleEmailSubmit = (email: string, radius: string) => {
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
@@ -114,21 +105,13 @@ export const MapContentLayout = ({
         </div>
         
         {isMobile && !isMapView && (
-          <div className="flex-1 overflow-hidden">
-            {selectedApplication !== null && selectedApp ? (
-              <MobileDetailsView
-                application={selectedApp}
-                onClose={() => onMarkerClick(null)}
-              />
-            ) : (
-              <MobileListView
-                postcode={postcode}
-                applications={filteredApplications}
-                onSelectApplication={onMarkerClick}
-                onShowEmailDialog={() => setShowEmailDialog(true)}
-              />
-            )}
-          </div>
+          <MobileListContainer
+            applications={filteredApplications}
+            selectedApplication={selectedApplication}
+            postcode={postcode}
+            onSelectApplication={onMarkerClick}
+            onShowEmailDialog={() => setShowEmailDialog(true)}
+          />
         )}
       </div>
 

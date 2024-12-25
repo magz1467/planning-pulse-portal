@@ -44,6 +44,14 @@ export const MapContent = () => {
   // Ensure coordinates are properly typed
   const safeCoordinates: [number, number] = coordinates ? [coordinates[0], coordinates[1]] : [52.0406, -0.7594]; // Milton Keynes coordinates
 
+  const handleViewToggle = () => {
+    setIsMapView(!isMapView);
+    // Clear selection when switching to list view
+    if (isMapView && selectedApplication !== null) {
+      handleMarkerClick(null);
+    }
+  };
+
   return (
     <MapContentLayout
       isLoading={isLoading}
@@ -58,9 +66,7 @@ export const MapContent = () => {
       onMarkerClick={handleMarkerClick}
       onFilterChange={handleFilterChange}
       onSortChange={handleSortChange}
-      onToggleView={() => {
-        setIsMapView(!isMapView);
-      }}
+      onToggleView={handleViewToggle}
     />
   );
 };
