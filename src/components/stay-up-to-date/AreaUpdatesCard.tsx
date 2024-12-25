@@ -12,6 +12,10 @@ export const AreaUpdatesCard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const validateEmail = (email: string) => {
+    return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+  };
+
   const handleAreaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -24,8 +28,7 @@ export const AreaUpdatesCard = () => {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(areaEmail)) {
+    if (!validateEmail(areaEmail)) {
       toast({
         title: "Error",
         description: "Please enter a valid email address.",
