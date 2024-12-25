@@ -57,11 +57,6 @@ export const DesktopSidebar = ({
     });
   };
 
-  const handleClose = () => {
-    onSelectApplication(null);
-    onClose();
-  };
-
   return (
     <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
       <FilterBar 
@@ -86,11 +81,11 @@ export const DesktopSidebar = ({
         </div>
       ) : (
         <div className="h-[calc(100%-56px)] flex flex-col">
-          <DetailHeader onClose={handleClose} />
+          <DetailHeader onClose={onClose} />
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
             <PlanningApplicationDetails
               application={selectedApplicationData!}
-              onClose={handleClose}
+              onClose={onClose}
             />
           </div>
         </div>
