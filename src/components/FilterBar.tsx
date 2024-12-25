@@ -55,7 +55,7 @@ export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeS
             <Filter className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="start">
           {hasActiveFilters && (
             <>
               <DropdownMenuItem
@@ -109,7 +109,7 @@ export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeS
               <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="start">
             <DropdownMenuItem
               onClick={() => onSortChange(null)}
               className="cursor-pointer"
