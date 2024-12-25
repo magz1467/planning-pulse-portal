@@ -5,13 +5,6 @@ import { AlertSection } from "./AlertSection";
 interface ApplicationListViewProps {
   applications: Application[];
   postcode: string;
-  activeFilters: {
-    status?: string;
-    type?: string;
-  };
-  activeSort: 'closingSoon' | 'newest' | null;
-  onFilterChange: (filterType: string, value: string) => void;
-  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number | null) => void;
   onShowEmailDialog: () => void;
 }

@@ -66,10 +66,6 @@ export const DesktopSidebar = ({
         <ApplicationListView
           applications={applications}
           postcode={postcode}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          onFilterChange={onFilterChange}
-          onSortChange={onSortChange}
           onSelectApplication={onSelectApplication}
           onShowEmailDialog={() => setShowEmailDialog(true)}
         />
