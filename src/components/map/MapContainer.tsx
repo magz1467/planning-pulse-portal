@@ -4,6 +4,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef } from "react";
 import { Map as LeafletMap } from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 interface MapContainerComponentProps {
   coordinates: [number, number];
@@ -24,6 +25,9 @@ export const MapContainerComponent = ({
   useEffect(() => {
     if (mapRef.current) {
       mapRef.current.setView(coordinates, 14);
+      setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 100);
     }
   }, [coordinates]);
 

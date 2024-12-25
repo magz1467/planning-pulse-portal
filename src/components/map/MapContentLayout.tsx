@@ -77,7 +77,10 @@ export const MapContentLayout = ({
         
         <div 
           className={`flex-1 relative ${isMobile ? (isMapView ? 'block' : 'hidden') : 'block'}`}
-          style={{ height: isMobile ? 'calc(100dvh - 120px)' : '100%' }}
+          style={{ 
+            height: isMobile ? 'calc(100vh - 120px)' : '100%',
+            width: '100%'
+          }}
         >
           <MapContainerComponent
             coordinates={coordinates}
