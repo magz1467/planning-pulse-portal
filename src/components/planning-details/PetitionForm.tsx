@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Share2, MessageCircle } from "lucide-react";
 
 interface PetitionFormProps {
   open: boolean;
@@ -16,7 +17,40 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+
+  const getShareUrl = () => {
+    const baseUrl = window.location.origin + window.location.pathname;
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('application', applicationId.toString());
+    return `${baseUrl}?${searchParams.toString()}`;
+  };
+
+  const handleShare = async () => {
+    const url = getShareUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "Link copied!",
+        description: "Share this link to show others your petition.",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast({
+        title: "Couldn't copy link",
+        description: "Please try again or copy the URL from your browser.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    const url = getShareUrl();
+    const text = `I just created a petition about a planning application. Join me in making our voice heard: ${url}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,12 +69,13 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
 
       if (error) throw error;
 
+      setIsSuccess(true);
       toast({
-        title: "Petition created",
-        description: "Your petition has been submitted successfully.",
+        title: "🎉 Petition created successfully!",
+        description: "Your voice matters. Share your petition to increase its impact!",
+        duration: 5000,
       });
 
-      onOpenChange(false);
     } catch (error) {
       console.error('Error creating petition:', error);
       toast({
@@ -53,35 +88,74 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
     }
   };
 
+  const handleClose = () => {
+    setIsSuccess(false);
+    setEmail("");
+    setAddress("");
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Petition</DialogTitle>
+          <DialogTitle>
+            {isSuccess ? "Petition Created Successfully! 🎉" : "Create Petition"}
+          </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              type="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+        
+        {!isSuccess ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Input
+                type="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Input
+                type="text"
+                placeholder="Your address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Petition"}
+            </Button>
+          </form>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Thank you for creating this petition! Share it with others to increase its impact.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                onClick={handleShare}
+                className="w-full flex items-center gap-2"
+              >
+                <Share2 className="w-4 h-4" />
+                Copy Share Link
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleWhatsAppShare}
+                className="w-full flex items-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Share on WhatsApp
+              </Button>
+            </div>
+            <Button onClick={handleClose} className="w-full mt-4">
+              Close
+            </Button>
           </div>
-          <div>
-            <Input
-              type="text"
-              placeholder="Your address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create Petition"}
-          </Button>
-        </form>
+        )}
       </DialogContent>
     </Dialog>
   );
