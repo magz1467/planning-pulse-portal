@@ -60,103 +60,101 @@ export const FilterBar = ({
   };
 
   return (
-    <div className={`${isMobile ? "px-3 py-2" : "flex gap-4 p-4 bg-white border-b border-gray-200"}`}>
-      <div className="flex gap-2 w-full">
+    <div className={`flex items-center gap-2 ${isMobile ? "px-3 py-2" : "p-4 bg-white border-b border-gray-200"}`}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="outline" 
+            size={isMobile ? "sm" : "default"}
+            className={`flex-1 justify-between ${isMobile ? 'px-3' : 'w-full'}`}
+          >
+            <span className="truncate">{activeFilterText}</span>
+            <Filter className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent 
+          align="start"
+          className="w-[200px] bg-white z-[100]"
+        >
+          {hasActiveFilters && (
+            <>
+              <DropdownMenuItem
+                onClick={handleClearFilters}
+                className="cursor-pointer text-blue-600 font-medium"
+              >
+                Clear filters
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          
+          <DropdownMenuItem disabled className="text-sm font-semibold">
+            Status
+          </DropdownMenuItem>
+          {statusOptions.map((status) => (
+            <DropdownMenuItem
+              key={status}
+              onClick={() => onFilterChange("status", status)}
+              className="cursor-pointer"
+            >
+              {status}
+            </DropdownMenuItem>
+          ))}
+          
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem disabled className="text-sm font-semibold">
+            Type
+          </DropdownMenuItem>
+          {typeOptions.map((type) => (
+            <DropdownMenuItem
+              key={type}
+              onClick={() => onFilterChange("type", type)}
+              className="cursor-pointer"
+            >
+              {type}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {onSortChange && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="outline" 
               size={isMobile ? "sm" : "default"}
-              className={`${isMobile ? 'px-3 flex-1' : 'w-[180px]'} justify-between bg-white`}
+              className={`flex-1 justify-between ${isMobile ? 'px-3' : 'w-full'}`}
             >
-              <span className="truncate">{activeFilterText}</span>
-              <Filter className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
+              <span className="truncate">{getSortButtonText()}</span>
+              <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start"
             className="w-[200px] bg-white z-[100]"
           >
-            {hasActiveFilters && (
-              <>
-                <DropdownMenuItem
-                  onClick={handleClearFilters}
-                  className="cursor-pointer text-blue-600 font-medium"
-                >
-                  Clear filters
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            
-            <DropdownMenuItem disabled className="text-sm font-semibold">
-              Status
+            <DropdownMenuItem
+              onClick={() => onSortChange(null)}
+              className="cursor-pointer"
+            >
+              Default
             </DropdownMenuItem>
-            {statusOptions.map((status) => (
-              <DropdownMenuItem
-                key={status}
-                onClick={() => onFilterChange("status", status)}
-                className="cursor-pointer"
-              >
-                {status}
-              </DropdownMenuItem>
-            ))}
-            
-            <DropdownMenuSeparator />
-            
-            <DropdownMenuItem disabled className="text-sm font-semibold">
-              Type
+            <DropdownMenuItem
+              onClick={() => onSortChange('closingSoon')}
+              className="cursor-pointer"
+            >
+              Closing Soon
             </DropdownMenuItem>
-            {typeOptions.map((type) => (
-              <DropdownMenuItem
-                key={type}
-                onClick={() => onFilterChange("type", type)}
-                className="cursor-pointer"
-              >
-                {type}
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuItem
+              onClick={() => onSortChange('newest')}
+              className="cursor-pointer"
+            >
+              Newest
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        {onSortChange && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline" 
-                size={isMobile ? "sm" : "default"}
-                className={`${isMobile ? 'px-3 flex-1' : 'w-[180px]'} justify-between bg-white`}
-              >
-                <span className="truncate">{getSortButtonText()}</span>
-                <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="start"
-              className="w-[200px] bg-white z-[100]"
-            >
-              <DropdownMenuItem
-                onClick={() => onSortChange(null)}
-                className="cursor-pointer"
-              >
-                Default
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onSortChange('closingSoon')}
-                className="cursor-pointer"
-              >
-                Closing Soon
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onSortChange('newest')}
-                className="cursor-pointer"
-              >
-                Newest
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
+      )}
     </div>
   );
 };
