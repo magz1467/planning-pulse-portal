@@ -17,7 +17,9 @@ export const SearchForm = () => {
       const { data: auth } = await supabase.auth.getSession();
       const isLoggedIn = !!auth.session;
 
-      const { error } = await supabase
+      console.log('Saving search to Supabase:', { postcode, status, isLoggedIn });
+
+      const { data, error } = await supabase
         .from('Searches')
         .insert([
           {
@@ -28,10 +30,14 @@ export const SearchForm = () => {
         ]);
 
       if (error) {
-        console.error('Error saving search:', error);
+        console.error('Supabase error saving search:', error);
+        throw error;
       }
+
+      console.log('Search saved successfully:', data);
     } catch (error) {
-      console.error('Error saving search:', error);
+      console.error('Error in saveSearch function:', error);
+      throw error;
     }
   };
 
@@ -52,8 +58,8 @@ export const SearchForm = () => {
     } catch (error) {
       console.error('Error during search:', error);
       toast({
-        title: "Error",
-        description: "There was a problem saving your search. Please try again.",
+        title: "Error saving search",
+        description: "There was a problem saving your search data. The error has been logged.",
         variant: "destructive",
       });
     } finally {
