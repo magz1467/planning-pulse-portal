@@ -46,10 +46,8 @@ export const MapContent = () => {
 
   const handleViewToggle = () => {
     setIsMapView(!isMapView);
-    // Clear selection when switching to list view
-    if (isMapView && selectedApplication !== null) {
-      handleMarkerClick(null);
-    }
+    // Clear selection when switching views
+    handleMarkerClick(null);
   };
 
   return (
