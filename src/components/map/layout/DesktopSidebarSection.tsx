@@ -13,7 +13,7 @@ interface DesktopSidebarSectionProps {
   activeSort: 'closingSoon' | 'newest' | null;
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
-  onSelectApplication: (id: number) => void;
+  onSelectApplication: (id: number | null) => void;
 }
 
 export const DesktopSidebarSection = ({
