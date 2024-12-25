@@ -43,7 +43,15 @@ export const NewsletterCard = () => {
           Type: 'newsletter'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving newsletter subscription:', error);
+        toast({
+          title: "Subscription failed",
+          description: "There was a problem subscribing to the newsletter. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       toast({
         title: "Success!",
