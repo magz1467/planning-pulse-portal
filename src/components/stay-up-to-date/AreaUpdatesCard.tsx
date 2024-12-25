@@ -38,6 +38,13 @@ export const AreaUpdatesCard = () => {
     setIsSubmitting(true);
     
     try {
+      console.log('Attempting to insert area subscription:', {
+        email: areaEmail,
+        postCode: postcode,
+        type: 'area_updates',
+        marketing: true
+      });
+
       const { error } = await supabase
         .from('User data')
         .insert([
@@ -49,7 +56,10 @@ export const AreaUpdatesCard = () => {
           }
         ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Area subscription error:', error);
+        throw error;
+      }
       
       toast({
         title: "Success!",

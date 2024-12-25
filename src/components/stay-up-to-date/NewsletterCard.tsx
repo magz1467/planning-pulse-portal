@@ -39,6 +39,12 @@ export const NewsletterCard = () => {
     setIsSubmitting(true);
     
     try {
+      console.log('Attempting to insert newsletter subscription:', {
+        email: newsletterEmail,
+        type: 'newsletter',
+        marketing: true
+      });
+
       const { error } = await supabase
         .from('User data')
         .insert([
@@ -49,7 +55,10 @@ export const NewsletterCard = () => {
           }
         ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Newsletter subscription error:', error);
+        throw error;
+      }
 
       toast({
         title: "Success!",
