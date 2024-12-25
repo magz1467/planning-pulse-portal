@@ -38,17 +38,20 @@ export const AreaUpdatesCard = () => {
     
     try {
       const { error } = await supabase
-        .from('User data')
+        .from('User_data')
         .insert([
           {
             Email: areaEmail,
-            "Post Code": postcode,
+            Post_Code: postcode,
             Marketing: true,
             Type: 'area_updates'
           }
         ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving subscription:', error);
+        throw error;
+      }
       
       toast({
         title: "Success!",

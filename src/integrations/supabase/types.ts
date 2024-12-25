@@ -177,7 +177,7 @@ export type Database = {
         }
         Relationships: []
       }
-      "User data": {
+      User_data: {
         Row: {
           created_at: string
           Email: string | null

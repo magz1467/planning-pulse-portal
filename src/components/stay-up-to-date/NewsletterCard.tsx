@@ -40,7 +40,7 @@ export const NewsletterCard = () => {
     
     try {
       const { error } = await supabase
-        .from('User data')
+        .from('User_data')
         .insert([
           { 
             Email: newsletterEmail,
@@ -49,7 +49,10 @@ export const NewsletterCard = () => {
           }
         ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving newsletter subscription:', error);
+        throw error;
+      }
 
       toast({
         title: "Success!",
