@@ -45,7 +45,7 @@ export const AreaUpdatesCard = () => {
             Email: areaEmail,
             "Post Code": postcode,
             Marketing: true,
-            Type: 'resident'
+            Type: 'area_updates'
           }
         ]);
 

@@ -45,7 +45,7 @@ export const NewsletterCard = () => {
           { 
             Email: newsletterEmail,
             Marketing: true,
-            Type: 'resident'
+            Type: 'newsletter'
           }
         ]);
 
@@ -53,7 +53,7 @@ export const NewsletterCard = () => {
 
       toast({
         title: "Success!",
-        description: "Please check your email to confirm your subscription.",
+        description: "Thank you for subscribing to our newsletter.",
       });
       setNewsletterEmail("");
     } catch (error) {
