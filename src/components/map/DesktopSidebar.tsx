@@ -1,12 +1,10 @@
 import { Application } from "@/types/planning";
-import { PlanningApplicationList } from "@/components/PlanningApplicationList";
-import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { FilterBar } from "@/components/FilterBar";
-import { useEffect, useRef, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
 import { EmailDialog } from "@/components/EmailDialog";
-import { AlertSection } from "./sidebar/AlertSection";
-import { DetailHeader } from "./sidebar/DetailHeader";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { ApplicationListView } from "./sidebar/ApplicationListView";
+import { ApplicationDetailView } from "./sidebar/ApplicationDetailView";
 
 interface DesktopSidebarProps {
   applications: Application[];
@@ -34,19 +32,12 @@ export const DesktopSidebar = ({
   onSelectApplication,
   onClose,
 }: DesktopSidebarProps) => {
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const { toast } = useToast();
+
   const selectedApplicationData = selectedApplication
     ? applications.find((app) => app.id === selectedApplication)
     : null;
-
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const { toast } = useToast();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0;
-    }
-  }, [selectedApplication]);
 
   const handleEmailSubmit = (email: string, radius: string) => {
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
@@ -57,6 +48,11 @@ export const DesktopSidebar = ({
     });
   };
 
+  const handleClose = () => {
+    onSelectApplication(null);
+    onClose();
+  };
+
   return (
     <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
       <FilterBar 
@@ -65,30 +61,23 @@ export const DesktopSidebar = ({
         activeFilters={activeFilters}
         activeSort={activeSort}
       />
+      
       {selectedApplication === null ? (
-        <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
-            <AlertSection 
-              postcode={postcode}
-              onShowEmailDialog={() => setShowEmailDialog(true)}
-            />
-            <PlanningApplicationList
-              applications={applications}
-              postcode={postcode}
-              onSelectApplication={onSelectApplication}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="h-[calc(100%-56px)] flex flex-col">
-          <DetailHeader onClose={onClose} />
-          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
-            <PlanningApplicationDetails
-              application={selectedApplicationData!}
-              onClose={onClose}
-            />
-          </div>
-        </div>
+        <ApplicationListView
+          applications={applications}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={onFilterChange}
+          onSortChange={onSortChange}
+          onSelectApplication={onSelectApplication}
+          onShowEmailDialog={() => setShowEmailDialog(true)}
+        />
+      ) : selectedApplicationData && (
+        <ApplicationDetailView
+          application={selectedApplicationData}
+          onClose={handleClose}
+        />
       )}
 
       <EmailDialog 
