@@ -19,7 +19,7 @@ interface DesktopSidebarProps {
   activeSort: 'closingSoon' | 'newest' | null;
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
-  onSelectApplication: (id: number) => void;
+  onSelectApplication: (id: number | null) => void;
   onClose: () => void;
 }
 
@@ -57,6 +57,11 @@ export const DesktopSidebar = ({
     });
   };
 
+  const handleClose = () => {
+    onSelectApplication(null);
+    onClose();
+  };
+
   return (
     <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
       <FilterBar 
@@ -81,11 +86,11 @@ export const DesktopSidebar = ({
         </div>
       ) : (
         <div className="h-[calc(100%-56px)] flex flex-col">
-          <DetailHeader onClose={onClose} />
+          <DetailHeader onClose={handleClose} />
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
             <PlanningApplicationDetails
               application={selectedApplicationData!}
-              onClose={onClose}
+              onClose={handleClose}
             />
           </div>
         </div>
