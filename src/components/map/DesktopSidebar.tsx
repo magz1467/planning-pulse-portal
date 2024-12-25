@@ -2,11 +2,11 @@ import { Application } from "@/types/planning";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { FilterBar } from "@/components/FilterBar";
-import { Button } from "@/components/ui/button";
-import { X, Bell } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { EmailDialog } from "@/components/EmailDialog";
+import { AlertSection } from "./sidebar/AlertSection";
+import { DetailHeader } from "./sidebar/DetailHeader";
 
 interface DesktopSidebarProps {
   applications: Application[];
@@ -68,23 +68,10 @@ export const DesktopSidebar = ({
       {selectedApplication === null ? (
         <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
           <div className="flex-1 overflow-y-auto">
-            <div className="p-4 border-b bg-white">
-              <div className="bg-primary/5 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Bell className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  Stay informed about new planning applications near {postcode}
-                </p>
-                <Button 
-                  className="w-full"
-                  onClick={() => setShowEmailDialog(true)}
-                >
-                  Get Alerts
-                </Button>
-              </div>
-            </div>
+            <AlertSection 
+              postcode={postcode}
+              onShowEmailDialog={() => setShowEmailDialog(true)}
+            />
             <PlanningApplicationList
               applications={applications}
               postcode={postcode}
@@ -94,17 +81,7 @@ export const DesktopSidebar = ({
         </div>
       ) : (
         <div className="h-[calc(100%-56px)] flex flex-col">
-          <div className="flex items-center justify-between border-b py-2 px-4 flex-shrink-0">
-            <h2 className="font-semibold">Planning Application Details</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="ml-2"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DetailHeader onClose={onClose} />
           <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
             <PlanningApplicationDetails
               application={selectedApplicationData!}
