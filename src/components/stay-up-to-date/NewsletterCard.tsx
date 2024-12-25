@@ -12,7 +12,14 @@ export const NewsletterCard = () => {
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newsletterEmail) return;
+    if (!newsletterEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter an email address",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -38,8 +45,8 @@ export const NewsletterCard = () => {
       if (response.error) throw new Error(response.error.message);
 
       toast({
-        title: "Check your email",
-        description: "We've sent you a verification link. Please check your inbox to complete your subscription.",
+        title: "Success!",
+        description: "Please check your email to confirm your subscription.",
       });
       setNewsletterEmail("");
     } catch (error) {
