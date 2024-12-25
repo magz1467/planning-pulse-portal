@@ -24,7 +24,6 @@ export const AreaUpdatesCard = () => {
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(areaEmail)) {
       toast({
@@ -38,15 +37,8 @@ export const AreaUpdatesCard = () => {
     setIsSubmitting(true);
     
     try {
-      console.log('Attempting to insert area subscription:', {
-        email: areaEmail,
-        postCode: postcode,
-        type: 'area_updates',
-        marketing: true
-      });
-
       const { error } = await supabase
-        .from('User data')
+        .from('"User data"')
         .insert([
           {
             Email: areaEmail,
@@ -56,10 +48,7 @@ export const AreaUpdatesCard = () => {
           }
         ]);
 
-      if (error) {
-        console.error('Area subscription error:', error);
-        throw error;
-      }
+      if (error) throw error;
       
       toast({
         title: "Success!",
