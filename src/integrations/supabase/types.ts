@@ -181,29 +181,38 @@ export type Database = {
         Row: {
           created_at: string
           Email: string | null
+          email_verified: boolean | null
           id: number
           Marketing: boolean
           "Post Code": string | null
           Radius_from_pc: number | null
           Type: string | null
+          verification_token: string | null
+          verification_token_expires: string | null
         }
         Insert: {
           created_at?: string
           Email?: string | null
+          email_verified?: boolean | null
           id?: number
           Marketing: boolean
           "Post Code"?: string | null
           Radius_from_pc?: number | null
           Type?: string | null
+          verification_token?: string | null
+          verification_token_expires?: string | null
         }
         Update: {
           created_at?: string
           Email?: string | null
+          email_verified?: boolean | null
           id?: number
           Marketing?: boolean
           "Post Code"?: string | null
           Radius_from_pc?: number | null
           Type?: string | null
+          verification_token?: string | null
+          verification_token_expires?: string | null
         }
         Relationships: []
       }

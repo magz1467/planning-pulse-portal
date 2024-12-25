@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import Image from "@/components/ui/image";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -17,6 +17,7 @@ export const NewsletterCard = () => {
     setIsSubmitting(true);
     
     try {
+      // First save to database
       const { error } = await supabase
         .from('User data')
         .insert([
@@ -29,9 +30,16 @@ export const NewsletterCard = () => {
 
       if (error) throw error;
 
+      // Send verification email
+      const response = await supabase.functions.invoke('send-verification', {
+        body: { email: newsletterEmail }
+      });
+
+      if (response.error) throw new Error(response.error.message);
+
       toast({
-        title: "Newsletter subscription confirmed",
-        description: "You're now subscribed to our monthly planning trends newsletter.",
+        title: "Check your email",
+        description: "We've sent you a verification link. Please check your inbox to complete your subscription.",
       });
       setNewsletterEmail("");
     } catch (error) {
