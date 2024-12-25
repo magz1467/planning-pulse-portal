@@ -20,14 +20,23 @@ export const useMapState = (
   }, []);
 
   const handleFilterChange = useCallback((filterType: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value === prev[filterType] ? undefined : value
-    }));
+    setActiveFilters(prev => {
+      // If the value is the same as current, remove the filter
+      if (value === prev[filterType]) {
+        const newFilters = { ...prev };
+        delete newFilters[filterType];
+        return newFilters;
+      }
+      // Otherwise, set the new filter value
+      return {
+        ...prev,
+        [filterType]: value
+      };
+    });
   }, []);
 
   const handleSortChange = useCallback((sortType: 'closingSoon' | 'newest' | null) => {
-    setActiveSort(sortType);
+    setActiveSort(prev => sortType === prev ? null : sortType);
   }, []);
 
   return {

@@ -12,7 +12,7 @@ export const useFilteredApplications = (
   const [filteredApplications, setFilteredApplications] = useState(applications);
 
   useEffect(() => {
-    let filtered = applications;
+    let filtered = [...applications];
     
     // Apply filters
     if (activeFilters.status) {
