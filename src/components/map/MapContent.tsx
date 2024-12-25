@@ -35,13 +35,6 @@ export const MapContent = () => {
     }
   }, [initialFilter, handleFilterChange]);
 
-  // Clear selected application when switching to list view
-  useEffect(() => {
-    if (!isMapView && selectedApplication !== null) {
-      handleMarkerClick(null);
-    }
-  }, [isMapView, selectedApplication, handleMarkerClick]);
-
   const filteredApplications = useFilteredApplications(
     mockPlanningApplications,
     activeFilters,
