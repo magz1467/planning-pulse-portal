@@ -1,80 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { useToast } from "@/hooks/use-toast";
 import Image from "@/components/ui/image";
-import { supabase } from "@/integrations/supabase/client";
+import { EmailDialog } from "@/components/EmailDialog";
 
 export const AreaUpdatesCard = () => {
-  const [postcode, setPostcode] = useState("");
-  const [areaEmail, setAreaEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
 
-  const validateEmail = (email: string) => {
-    return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-  };
-
-  const handleAreaSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!postcode || !areaEmail) {
-      toast({
-        title: "Error",
-        description: "Please enter both a postcode and email address.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!validateEmail(areaEmail)) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    
-    try {
-      const { error } = await supabase
-        .from('User_data')
-        .insert({
-          Email: areaEmail,
-          Post_Code: postcode,
-          Type: 'area_updates',
-          Marketing: true
-        });
-
-      if (error) {
-        console.error('Error saving subscription:', error);
-        toast({
-          title: "Subscription failed",
-          description: "There was a problem subscribing to updates. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      toast({
-        title: "Success!",
-        description: "You've been subscribed to local updates.",
-      });
-      setPostcode("");
-      setAreaEmail("");
-    } catch (error) {
-      console.error('Error saving subscription:', error);
-      toast({
-        title: "Subscription failed",
-        description: "There was a problem subscribing to updates. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleEmailSubmit = (email: string, radius: string) => {
+    toast({
+      title: "Success!",
+      description: "You've been subscribed to local updates.",
+    });
   };
 
   return (
@@ -89,29 +27,19 @@ export const AreaUpdatesCard = () => {
       <div className="flex-grow">
         <h3 className="text-xl font-semibold mb-4">Local Updates</h3>
         <p className="text-gray-600 mb-6">Get a notification when a new application goes live near you</p>
-        <form onSubmit={handleAreaSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm text-gray-600 mb-2">Your postcode</label>
-            <PostcodeSearch
-              onSelect={setPostcode}
-              placeholder="Enter postcode"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-600 mb-2">Email address</label>
-            <Input
-              type="email"
-              value={areaEmail}
-              onChange={(e) => setAreaEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-            />
-          </div>
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Subscribing..." : "Get Area Updates"}
-          </Button>
-        </form>
+        <Button 
+          onClick={() => setShowEmailDialog(true)} 
+          className="w-full"
+        >
+          Get Area Updates
+        </Button>
       </div>
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+      />
     </div>
   );
 };
