@@ -20,17 +20,13 @@ export const ApplicationDetailView = ({
     }
   }, [application.id]);
 
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
     <div className="h-[calc(100%-56px)] flex flex-col">
-      <DetailHeader onClose={handleClose} />
+      <DetailHeader onClose={onClose} />
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
         <PlanningApplicationDetails
           application={application}
-          onClose={handleClose}
+          onClose={onClose}
         />
       </div>
     </div>

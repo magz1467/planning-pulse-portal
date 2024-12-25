@@ -1,7 +1,6 @@
 import { Application } from "@/types/planning";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 import { AlertSection } from "./AlertSection";
-import { FilterBar } from "@/components/FilterBar";
 
 interface ApplicationListViewProps {
   applications: Application[];
@@ -20,10 +19,6 @@ interface ApplicationListViewProps {
 export const ApplicationListView = ({
   applications,
   postcode,
-  activeFilters,
-  activeSort,
-  onFilterChange,
-  onSortChange,
   onSelectApplication,
   onShowEmailDialog,
 }: ApplicationListViewProps) => {
