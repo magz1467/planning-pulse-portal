@@ -60,13 +60,13 @@ export const FilterBar = ({
   };
 
   return (
-    <div className={`flex items-center gap-2 ${isMobile ? "px-3 py-2" : "p-4 bg-white border-b border-gray-200"}`}>
+    <div className={`flex items-center gap-2 ${isMobile ? "px-2 py-2" : "p-4 bg-white border-b border-gray-200"}`}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 
             variant="outline" 
             size={isMobile ? "sm" : "default"}
-            className={`flex-1 justify-between ${isMobile ? 'px-3' : 'w-full'}`}
+            className="flex-1 justify-between"
           >
             <span className="truncate">{activeFilterText}</span>
             <Filter className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
@@ -124,7 +124,7 @@ export const FilterBar = ({
             <Button 
               variant="outline" 
               size={isMobile ? "sm" : "default"}
-              className={`flex-1 justify-between ${isMobile ? 'px-3' : 'w-full'}`}
+              className="flex-1 justify-between"
             >
               <span className="truncate">{getSortButtonText()}</span>
               <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
