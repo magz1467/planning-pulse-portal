@@ -4,6 +4,14 @@ import { DesktopSidebar } from "./DesktopSidebar";
 import { MapContainerComponent } from "./MapContainer";
 import { MobileApplicationCards } from "./MobileApplicationCards";
 import { LoadingOverlay } from "./LoadingOverlay";
+import { FilterBar } from "@/components/FilterBar";
+import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
+import { getStatusColor } from "@/utils/statusColors";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Bell } from "lucide-react";
+import { EmailDialog } from "@/components/EmailDialog";
+import { useToast } from "@/components/ui/use-toast";
 
 interface MapContentLayoutProps {
   isLoading: boolean;
@@ -39,13 +47,26 @@ export const MapContentLayout = ({
   onSortChange,
   onToggleView,
 }: MapContentLayoutProps) => {
-  if (!coordinates) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading map...</p>
-      </div>
-    );
-  }
+  const selectedApp = filteredApplications.find(app => app.id === selectedApplication);
+  const detailsContainerRef = useRef<HTMLDivElement>(null);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const { toast } = useToast();
+
+  // Select first application by default when applications load
+  useEffect(() => {
+    if (filteredApplications.length > 0 && !selectedApplication && isMapView) {
+      onMarkerClick(filteredApplications[0].id);
+    }
+  }, [filteredApplications, selectedApplication, isMapView, onMarkerClick]);
+
+  const handleEmailSubmit = (email: string, radius: string) => {
+    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+    toast({
+      title: "Subscription pending",
+      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
+      duration: 5000,
+    });
+  };
 
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
@@ -77,10 +98,7 @@ export const MapContentLayout = ({
         
         <div 
           className={`flex-1 relative ${isMobile ? (isMapView ? 'block' : 'hidden') : 'block'}`}
-          style={{ 
-            height: isMobile ? 'calc(100vh - 120px)' : '100%',
-            width: '100%'
-          }}
+          style={{ height: isMobile ? 'calc(100dvh - 120px)' : '100%' }}
         >
           <MapContainerComponent
             coordinates={coordinates}
@@ -100,8 +118,25 @@ export const MapContentLayout = ({
         </div>
         
         {isMobile && !isMapView && (
-          <div className="absolute inset-0 flex flex-col bg-gray-50">
+          <div className="absolute inset-0 flex flex-col h-full max-h-[100dvh] overflow-hidden bg-gray-50">
             <div className="flex-1 overflow-y-auto overscroll-contain pb-safe">
+              <div className="p-4 bg-white border-b">
+                <div className="bg-primary/5 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Bell className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Stay informed about new planning applications near {postcode}
+                  </p>
+                  <Button 
+                    className="w-full"
+                    onClick={() => setShowEmailDialog(true)}
+                  >
+                    Get Alerts
+                  </Button>
+                </div>
+              </div>
               <div className="p-4 space-y-4">
                 {filteredApplications.map((app) => (
                   <div
@@ -123,7 +158,7 @@ export const MapContentLayout = ({
                         <h3 className="font-semibold text-primary truncate">{app.title}</h3>
                         <p className="text-sm text-gray-600 mt-1 line-clamp-2">{app.address}</p>
                         <div className="flex justify-between items-center mt-2">
-                          <span className={`text-xs px-2 py-1 rounded ${app.status === 'approved' ? 'bg-green-100 text-green-800' : app.status === 'declined' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}`}>
+                          <span className={`text-xs px-2 py-1 rounded ${getStatusColor(app.status)}`}>
                             {app.status}
                           </span>
                           <span className="text-xs text-gray-500">{app.distance}</span>
@@ -137,6 +172,12 @@ export const MapContentLayout = ({
           </div>
         )}
       </div>
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+      />
     </div>
   );
 };

@@ -46,7 +46,7 @@ export const MobileApplicationCards = ({
 
   if (selectedApp) {
     return (
-      <div className="fixed inset-0 bg-white z-[1100] overflow-auto">
+      <div className="fixed inset-0 bg-white z-[1100] animate-in slide-in-from-bottom duration-300">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {
@@ -70,16 +70,7 @@ export const MobileApplicationCards = ({
         </SheetTrigger>
         <SheetContent 
           side="bottom" 
-          className="p-0 h-[45vh] rounded-t-xl bg-white shadow-lg"
-          style={{ 
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 1100,
-            transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
-            transition: 'transform 0.3s ease-out'
-          }}
+          className="p-0 h-[45vh] rounded-t-xl bg-white shadow-lg animate-in slide-in-from-bottom duration-300"
         >
           <div className="flex flex-col h-full bg-white">
             <div className="p-0.5 border-b bg-white sticky top-0">
