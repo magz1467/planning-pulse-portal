@@ -22,7 +22,7 @@ export const AuthRequiredDialog = ({
 }: AuthRequiredDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="sm:max-w-[425px]">
+      <AlertDialogContent className="sm:max-w-[425px] z-[3000]">
         <AlertDialogHeader>
           <AlertDialogTitle>Sign in required</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
