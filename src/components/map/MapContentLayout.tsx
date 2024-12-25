@@ -171,6 +171,28 @@ export const MapContentLayout = ({
             </div>
           </div>
         )}
+
+        {selectedApplication !== null && selectedApp && !isMapView && (
+          <div className="fixed inset-0 z-50 bg-white animate-in slide-in-from-bottom duration-300">
+            <div className="h-full flex flex-col bg-white">
+              <div className="sticky top-0 z-50 border-b py-2 px-4 bg-white flex justify-between items-center shadow-sm">
+                <h2 className="font-semibold">Planning Application Details</h2>
+                <button 
+                  onClick={() => onMarkerClick(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ×
+                </button>
+              </div>
+              <div ref={detailsContainerRef} className="flex-1 overflow-y-auto">
+                <PlanningApplicationDetails
+                  application={selectedApp}
+                  onClose={() => onMarkerClick(null)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <EmailDialog 
