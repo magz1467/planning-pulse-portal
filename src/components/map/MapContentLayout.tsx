@@ -93,7 +93,7 @@ export const MapContentLayout = ({
         )}
         
         <div 
-          className={`flex-1 relative ${isMobile ? (isMapView ? 'block' : 'hidden') : 'block'}`}
+          className={`flex-1 relative ${isMobile && !isMapView ? 'hidden' : 'block'}`}
           style={{ height: isMobile ? 'calc(100dvh - 120px)' : '100%' }}
         >
           <MapContainerComponent
@@ -104,7 +104,7 @@ export const MapContentLayout = ({
             onMarkerClick={onMarkerClick}
           />
 
-          {isMobile && selectedApplication !== null && isMapView && (
+          {isMobile && isMapView && selectedApplication !== null && (
             <MobileApplicationCards
               applications={filteredApplications}
               selectedId={selectedApplication}
