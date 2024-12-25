@@ -7,7 +7,6 @@ import { useMapState } from "@/hooks/use-map-state";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { generateMockApplications } from "@/utils/mockDataGenerator";
-import type { LatLngTuple } from 'leaflet';
 
 // Generate 200 mock applications
 const mockPlanningApplications = generateMockApplications(200);
@@ -36,6 +35,13 @@ export const MapContent = () => {
     }
   }, [initialFilter, handleFilterChange]);
 
+  // Clear selected application when switching to list view
+  useEffect(() => {
+    if (!isMapView && selectedApplication !== null) {
+      handleMarkerClick(null);
+    }
+  }, [isMapView, selectedApplication, handleMarkerClick]);
+
   const filteredApplications = useFilteredApplications(
     mockPlanningApplications,
     activeFilters,
@@ -61,9 +67,6 @@ export const MapContent = () => {
       onSortChange={handleSortChange}
       onToggleView={() => {
         setIsMapView(!isMapView);
-        if (!isMapView) {
-          handleMarkerClick(null);
-        }
       }}
     />
   );
