@@ -2,17 +2,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import Image from "@/components/ui/image";
 import { supabase } from "@/integrations/supabase/client";
 
 export const AreaUpdatesCard = () => {
   const [postcode, setPostcode] = useState("");
   const [areaEmail, setAreaEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleAreaSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!postcode || !areaEmail) {
       toast({
         title: "Error",
@@ -33,6 +35,8 @@ export const AreaUpdatesCard = () => {
       return;
     }
 
+    setIsSubmitting(true);
+    
     try {
       const { error } = await supabase
         .from('User data')
@@ -41,14 +45,14 @@ export const AreaUpdatesCard = () => {
             Email: areaEmail,
             "Post Code": postcode,
             Marketing: true,
-            Type: 'resident'  // Added 'resident' type
+            Type: 'resident'
           }
         ]);
 
       if (error) throw error;
       
       toast({
-        title: "Success",
+        title: "Success!",
         description: "You've been subscribed to local updates.",
       });
       setPostcode("");
@@ -60,6 +64,8 @@ export const AreaUpdatesCard = () => {
         description: "There was a problem subscribing to updates. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -93,7 +99,9 @@ export const AreaUpdatesCard = () => {
               required
             />
           </div>
-          <Button type="submit" className="w-full">Get Area Updates</Button>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Subscribing..." : "Get Area Updates"}
+          </Button>
         </form>
       </div>
     </div>
