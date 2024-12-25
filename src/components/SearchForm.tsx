@@ -43,7 +43,15 @@ export const SearchForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!postcode.trim()) return;
+    
+    if (!postcode.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a postcode",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSearching(true);
     try {
@@ -108,7 +116,7 @@ export const SearchForm = () => {
         <Button 
           type="submit" 
           className="w-full bg-primary hover:bg-primary-dark text-white py-6"
-          disabled={isSearching}
+          disabled={isSearching || !postcode.trim()}
         >
           {isSearching ? 'Searching...' : 'Show planning applications'}
         </Button>
