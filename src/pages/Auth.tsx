@@ -13,6 +13,7 @@ const AuthPage = () => {
   const mode = searchParams.get('mode');
 
   useEffect(() => {
+    // Check if user is already signed in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         toast({
@@ -23,6 +24,7 @@ const AuthPage = () => {
       }
     });
 
+    // Handle auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -54,6 +56,7 @@ const AuthPage = () => {
       }
     });
 
+    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
