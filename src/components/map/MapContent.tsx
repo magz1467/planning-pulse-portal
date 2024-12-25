@@ -42,7 +42,7 @@ export const MapContent = () => {
   );
 
   // Ensure coordinates are properly typed
-  const safeCoordinates: [number, number] = coordinates ? [coordinates[0], coordinates[1]] : [52.0406, -0.7594]; // Milton Keynes coordinates
+  const safeCoordinates: [number, number] = coordinates ? [coordinates[0], coordinates[1]] : [52.0406, -0.7594];
 
   const handleViewToggle = () => {
     setIsMapView(!isMapView);
