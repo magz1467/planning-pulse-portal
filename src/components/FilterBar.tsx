@@ -74,7 +74,7 @@ export const FilterBar = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="start"
-          className="w-[200px] bg-white z-[100]"
+          className="w-[200px] bg-white z-[9999]"
         >
           {hasActiveFilters && (
             <>
@@ -132,7 +132,7 @@ export const FilterBar = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent 
             align="start"
-            className="w-[200px] bg-white z-[100]"
+            className="w-[200px] bg-white z-[9999]"
           >
             <DropdownMenuItem
               onClick={() => onSortChange(null)}
