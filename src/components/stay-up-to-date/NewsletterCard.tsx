@@ -39,7 +39,6 @@ export const NewsletterCard = () => {
     setIsSubmitting(true);
     
     try {
-      // First save to database
       const { error } = await supabase
         .from('User data')
         .insert([
@@ -51,13 +50,6 @@ export const NewsletterCard = () => {
         ]);
 
       if (error) throw error;
-
-      // Send verification email
-      const response = await supabase.functions.invoke('send-verification', {
-        body: { email: newsletterEmail }
-      });
-
-      if (response.error) throw new Error(response.error.message);
 
       toast({
         title: "Success!",
