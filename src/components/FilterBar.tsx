@@ -49,13 +49,13 @@ export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeS
           <Button 
             variant="outline" 
             size={isMobile ? "sm" : "default"}
-            className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between`}
+            className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between bg-white`}
           >
             <span className="truncate">{activeFilterText}</span>
             <Filter className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent align="start" className="w-[200px] bg-white">
           {hasActiveFilters && (
             <>
               <DropdownMenuItem
@@ -103,13 +103,13 @@ export const FilterBar = ({ onFilterChange, onSortChange, activeFilters, activeS
             <Button 
               variant="outline" 
               size={isMobile ? "sm" : "default"}
-              className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between`}
+              className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between bg-white`}
             >
               <span className="truncate">{getSortButtonText()}</span>
               <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
+          <DropdownMenuContent align="start" className="w-[200px] bg-white">
             <DropdownMenuItem
               onClick={() => onSortChange(null)}
               className="cursor-pointer"
