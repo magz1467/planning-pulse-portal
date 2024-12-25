@@ -1,13 +1,12 @@
 import { Application } from "@/types/planning";
 import { MapHeader } from "./MapHeader";
-import { DesktopSidebar } from "./DesktopSidebar";
-import { MapContainerComponent } from "./MapContainer";
-import { MobileApplicationCards } from "./MobileApplicationCards";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { EmailDialog } from "@/components/EmailDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { MobileListContainer } from "./mobile/MobileListContainer";
+import { MapSection } from "./layout/MapSection";
+import { DesktopSidebarSection } from "./layout/DesktopSidebarSection";
 
 interface MapContentLayoutProps {
   isLoading: boolean;
@@ -69,40 +68,27 @@ export const MapContentLayout = ({
       />
       
       <div className="flex flex-1 min-h-0 relative">
-        {!isMobile && (
-          <DesktopSidebar
-            applications={filteredApplications}
-            selectedApplication={selectedApplication}
-            postcode={postcode}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            onFilterChange={onFilterChange}
-            onSortChange={onSortChange}
-            onSelectApplication={onMarkerClick}
-            onClose={() => onMarkerClick(null)}
-          />
-        )}
+        <DesktopSidebarSection 
+          isMobile={isMobile}
+          applications={filteredApplications}
+          selectedApplication={selectedApplication}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={onFilterChange}
+          onSortChange={onSortChange}
+          onSelectApplication={onMarkerClick}
+        />
         
-        <div 
-          className={`flex-1 relative ${isMobile && !isMapView ? 'hidden' : 'block'}`}
-          style={{ height: isMobile ? 'calc(100dvh - 120px)' : '100%' }}
-        >
-          <MapContainerComponent
-            coordinates={coordinates}
-            postcode={postcode}
-            applications={filteredApplications}
-            selectedApplication={selectedApplication}
-            onMarkerClick={onMarkerClick}
-          />
-
-          {isMobile && isMapView && selectedApplication !== null && (
-            <MobileApplicationCards
-              applications={filteredApplications}
-              selectedId={selectedApplication}
-              onSelectApplication={onMarkerClick}
-            />
-          )}
-        </div>
+        <MapSection 
+          isMobile={isMobile}
+          isMapView={isMapView}
+          coordinates={coordinates}
+          postcode={postcode}
+          applications={filteredApplications}
+          selectedApplication={selectedApplication}
+          onMarkerClick={onMarkerClick}
+        />
         
         {isMobile && !isMapView && (
           <MobileListContainer
