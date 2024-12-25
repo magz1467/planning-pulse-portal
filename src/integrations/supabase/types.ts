@@ -108,6 +108,44 @@ export type Database = {
         }
         Relationships: []
       }
+      petitions: {
+        Row: {
+          address: string
+          application_id: number
+          created_at: string
+          id: number
+          reasons: string[]
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          address: string
+          application_id: number
+          created_at?: string
+          id?: never
+          reasons: string[]
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string
+          application_id?: number
+          created_at?: string
+          id?: never
+          reasons?: string[]
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "petitions_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "developments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_developments: {
         Row: {
           application_id: number

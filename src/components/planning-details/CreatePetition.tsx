@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileText } from "lucide-react";
+import { PetitionForm } from "./PetitionForm";
 
 const PETITION_REASONS = [
   { id: "privacy", label: "Loss of privacy" },
@@ -18,9 +19,14 @@ const PETITION_REASONS = [
   { id: "other", label: "Other" },
 ];
 
-export const CreatePetition = () => {
+interface CreatePetitionProps {
+  applicationId: number;
+}
+
+export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showPetitionForm, setShowPetitionForm] = useState(false);
 
   const handleReasonToggle = (reasonId: string) => {
     setSelectedReasons(current =>
@@ -71,11 +77,19 @@ export const CreatePetition = () => {
           <Button 
             className="w-full mt-4"
             disabled={selectedReasons.length === 0}
+            onClick={() => setShowPetitionForm(true)}
           >
             Create Petition
           </Button>
         </div>
       )}
+
+      <PetitionForm
+        open={showPetitionForm}
+        onOpenChange={setShowPetitionForm}
+        applicationId={applicationId}
+        selectedReasons={selectedReasons}
+      />
     </Card>
   );
 };

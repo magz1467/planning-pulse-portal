@@ -170,7 +170,7 @@ export const PlanningApplicationDetails = ({
 
       <ApplicationComments />
       
-      <CreatePetition />
+      <CreatePetition applicationId={application.id} />
 
       <ApplicationDocuments />
 
