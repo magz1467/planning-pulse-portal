@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PostcodeSearch } from "./PostcodeSearch";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./ui/use-toast";
 
 export const SearchForm = () => {
@@ -11,36 +10,6 @@ export const SearchForm = () => {
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const saveSearch = async (postcode: string, status: string) => {
-    try {
-      const { data: auth } = await supabase.auth.getSession();
-      const isLoggedIn = !!auth.session;
-
-      console.log('Saving search to Supabase:', { postcode, status, isLoggedIn });
-
-      const { error } = await supabase
-        .from('Searches')
-        .insert([
-          {
-            "Post Code": postcode,
-            "Status": status,
-            "User_logged_in": isLoggedIn
-          }
-        ]);
-
-      if (error) {
-        console.error('Supabase error saving search:', error);
-        throw error;
-      }
-
-      console.log('Search saved successfully');
-      return true;
-    } catch (error) {
-      console.error('Error in saveSearch function:', error);
-      throw error;
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +25,6 @@ export const SearchForm = () => {
 
     setIsSearching(true);
     try {
-      await saveSearch(postcode.trim(), activeTab);
       navigate('/map', { 
         state: { 
           postcode: postcode.trim(),
@@ -67,8 +35,8 @@ export const SearchForm = () => {
     } catch (error) {
       console.error('Error during search:', error);
       toast({
-        title: "Error saving search",
-        description: "There was a problem saving your search data. The error has been logged.",
+        title: "Error",
+        description: "There was a problem with the search. Please try again.",
         variant: "destructive",
       });
     } finally {
