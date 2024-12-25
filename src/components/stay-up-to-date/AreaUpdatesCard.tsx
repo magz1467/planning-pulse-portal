@@ -52,7 +52,7 @@ export const AreaUpdatesCard = () => {
       if (error) {
         console.error('Error saving subscription:', error);
         toast({
-          title: "Error",
+          title: "Subscription failed",
           description: "There was a problem subscribing to updates. Please try again.",
           variant: "destructive"
         });
@@ -68,7 +68,7 @@ export const AreaUpdatesCard = () => {
     } catch (error) {
       console.error('Error saving subscription:', error);
       toast({
-        title: "Error",
+        title: "Subscription failed",
         description: "There was a problem subscribing to updates. Please try again.",
         variant: "destructive"
       });

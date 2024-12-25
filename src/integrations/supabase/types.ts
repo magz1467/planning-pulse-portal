@@ -183,7 +183,7 @@ export type Database = {
           Email: string | null
           email_verified: boolean | null
           id: number
-          Marketing: boolean
+          Marketing: boolean | null
           "Post Code": string | null
           Radius_from_pc: number | null
           Type: string | null
@@ -195,7 +195,7 @@ export type Database = {
           Email?: string | null
           email_verified?: boolean | null
           id?: number
-          Marketing: boolean
+          Marketing?: boolean | null
           "Post Code"?: string | null
           Radius_from_pc?: number | null
           Type?: string | null
@@ -207,7 +207,7 @@ export type Database = {
           Email?: string | null
           email_verified?: boolean | null
           id?: number
-          Marketing?: boolean
+          Marketing?: boolean | null
           "Post Code"?: string | null
           Radius_from_pc?: number | null
           Type?: string | null
