@@ -8,6 +8,7 @@ import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
 import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
 import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { ApplicationSharing } from "./planning-details/ApplicationSharing";
+import { CreatePetition } from "./planning-details/CreatePetition";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, Bell, Heart, BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -167,6 +168,12 @@ export const PlanningApplicationDetails = ({
         </div>
       </Card>
 
+      <ApplicationComments />
+      
+      <CreatePetition />
+
+      <ApplicationDocuments />
+
       <Card className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -193,9 +200,6 @@ export const PlanningApplicationDetails = ({
           </Button>
         </div>
       </Card>
-
-      <ApplicationComments />
-      <ApplicationDocuments />
 
       <EmailDialog 
         open={showEmailDialog}
