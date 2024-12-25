@@ -19,7 +19,7 @@ export const SearchForm = () => {
 
       console.log('Saving search to Supabase:', { postcode, status, isLoggedIn });
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('Searches')
         .insert([
           {
@@ -34,7 +34,8 @@ export const SearchForm = () => {
         throw error;
       }
 
-      console.log('Search saved successfully:', data);
+      console.log('Search saved successfully');
+      return true;
     } catch (error) {
       console.error('Error in saveSearch function:', error);
       throw error;
