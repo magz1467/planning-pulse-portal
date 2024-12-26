@@ -35,7 +35,6 @@ export const EmailDialog = ({
 
     try {
       if (applicationRef) {
-        // Save to User_data table
         await supabase
           .from('User_data')
           .insert([
@@ -58,10 +57,15 @@ export const EmailDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[2000]">
+      <DialogContent 
+        className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[2000]"
+        role="dialog"
+        aria-labelledby="email-dialog-title"
+        aria-describedby="email-dialog-description"
+      >
         <DialogHeader>
-          <DialogTitle>Set up planning alerts</DialogTitle>
-          <DialogDescription>
+          <DialogTitle id="email-dialog-title">Set up planning alerts</DialogTitle>
+          <DialogDescription id="email-dialog-description">
             Enter your email address to receive notifications about new planning applications
           </DialogDescription>
         </DialogHeader>
@@ -72,6 +76,7 @@ export const EmailDialog = ({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            aria-label="Email address"
           />
           
           <div className="space-y-3">
@@ -81,6 +86,7 @@ export const EmailDialog = ({
               value={radius}
               onValueChange={setRadius}
               className="flex flex-col space-y-2"
+              aria-label="Select notification radius"
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="100" id="r100" />

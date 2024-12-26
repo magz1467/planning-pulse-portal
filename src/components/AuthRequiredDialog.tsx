@@ -22,10 +22,15 @@ export const AuthRequiredDialog = ({
 }: AuthRequiredDialogProps) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="sm:max-w-[425px] z-[3000]">
+      <AlertDialogContent 
+        className="sm:max-w-[425px] z-[3000]"
+        role="dialog"
+        aria-labelledby="auth-dialog-title"
+        aria-describedby="auth-dialog-description"
+      >
         <AlertDialogHeader>
-          <AlertDialogTitle>Sign in required</AlertDialogTitle>
-          <AlertDialogDescription className="space-y-2">
+          <AlertDialogTitle id="auth-dialog-title">Sign in required</AlertDialogTitle>
+          <AlertDialogDescription id="auth-dialog-description" className="space-y-2">
             <p>
               To save developments and get notified about updates, you'll need to create
               a free account or sign in.
