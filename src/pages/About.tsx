@@ -9,8 +9,8 @@ const About = () => {
       <div className="min-h-screen bg-gradient-to-br from-[#F1F0FB] to-white">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6 animate-[slide-up_0.5s_ease-out] order-2 lg:order-1">
+            <div className="flex flex-col lg:flex-row gap-12 items-start">
+              <div className="flex-1 space-y-6 animate-[slide-up_0.5s_ease-out]">
                 <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-[#9b87f5] bg-clip-text text-transparent">
                   About PlanningPulse
                 </h1>
@@ -34,7 +34,7 @@ const About = () => {
                 </div>
               </div>
 
-              <div className="lg:pl-8 animate-[slide-up_0.7s_ease-out] order-1 lg:order-2">
+              <div className="w-full lg:w-1/2 animate-[slide-up_0.7s_ease-out]">
                 <div className="relative rounded-2xl overflow-hidden shadow-xl">
                   <Image
                     src="/lovable-uploads/334551c0-9c95-45dc-ac93-6a0c71f0d7c6.png"
