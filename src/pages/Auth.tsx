@@ -67,6 +67,13 @@ const AuthPage = () => {
             description: "Your profile has been updated successfully",
           });
         }
+        if (event === 'SIGNED_UP') {
+          toast({
+            title: "Account created",
+            description: "Your account has been created successfully",
+            variant: "default",
+          });
+        }
       } catch (error: any) {
         console.error('Auth state change error:', error);
         toast({
@@ -109,14 +116,6 @@ const AuthPage = () => {
             theme="light"
             providers={[]}
             redirectTo={window.location.origin + '/auth/callback'}
-            onError={(error) => {
-              console.error('Auth error:', error);
-              toast({
-                title: "Authentication Error",
-                description: error.message,
-                variant: "destructive"
-              });
-            }}
           />
         </div>
       </div>
