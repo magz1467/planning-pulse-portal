@@ -1,12 +1,34 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu, ChevronDown, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+    }
+  };
 
   return (
     <Sheet>
@@ -72,16 +94,36 @@ export const MobileMenu = () => {
 
           <div className="h-px bg-gray-200 my-4" />
           
-          <Link to="/auth">
-            <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/auth?mode=signup">
-            <Button variant="default" className="w-full">
-              Create Account
-            </Button>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link to="/profile" className="flex items-center gap-2 text-lg">
+                <User className="h-5 w-5" />
+                My Profile
+              </Link>
+              <Button 
+                variant="outline" 
+                className="w-full border-primary text-primary hover:bg-primary/10"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                }}
+              >
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/auth">
+                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/auth?mode=signup">
+                <Button variant="default" className="w-full">
+                  Create Account
+                </Button>
+              </Link>
+            </>
+          )}
         </nav>
       </SheetContent>
     </Sheet>

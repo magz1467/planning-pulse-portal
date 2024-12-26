@@ -17,6 +17,7 @@ import CouncilServices from './pages/CouncilServices';
 import Auth from './pages/Auth';
 import AuthSuccess from './pages/AuthSuccess';
 import ResetPassword from './pages/ResetPassword';
+import Profile from './pages/Profile';
 
 // Content pages
 import PlanningBasics from './pages/content/PlanningBasics';
@@ -50,6 +51,7 @@ const App = () => {
         <Route path="/auth/callback" element={<Auth />} />
         <Route path="/auth/success" element={<AuthSuccess />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/profile" element={<Profile />} />
         
         {/* Content pages */}
         <Route path="/content/planning-basics" element={<PlanningBasics />} />
