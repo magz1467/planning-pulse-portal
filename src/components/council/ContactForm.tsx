@@ -21,12 +21,17 @@ export const ContactForm = ({ open, onOpenChange }: ContactFormProps) => {
     phone: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (isSubmitting) return;
+    
     try {
+      setIsSubmitting(true);
+      
       const contactData: TablesInsert<'council_contacts'> = {
         council_name: formData.councilName,
         contact_name: formData.contactName,
@@ -53,6 +58,7 @@ export const ContactForm = ({ open, onOpenChange }: ContactFormProps) => {
         phone: "",
         message: ""
       });
+      
       onOpenChange(false);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -61,6 +67,8 @@ export const ContactForm = ({ open, onOpenChange }: ContactFormProps) => {
         description: "There was a problem submitting your request. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -139,7 +147,13 @@ export const ContactForm = ({ open, onOpenChange }: ContactFormProps) => {
             />
           </div>
 
-          <Button type="submit" className="w-full">Submit</Button>
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
