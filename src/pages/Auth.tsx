@@ -31,9 +31,9 @@ const AuthPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-grow flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow">
+        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow" role="dialog" aria-labelledby="auth-title">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 id="auth-title" className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               {mode === 'signup' ? 'Create your account' : 'Welcome back'}
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
