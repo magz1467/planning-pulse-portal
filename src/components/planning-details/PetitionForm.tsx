@@ -61,13 +61,15 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      const { error } = await supabase.from('petitions').insert([{
-        user_email: email,
-        user_id: session?.user?.id || null,
-        application_id: applicationId,
-        reasons: selectedReasons,
-        address: `${addressLine1}, ${postcode}`
-      }]);
+      const { error } = await supabase
+        .from('petitions')
+        .insert([{
+          user_email: email,
+          user_id: session?.user?.id || null,
+          application_id: applicationId,
+          reasons: selectedReasons,
+          address: `${addressLine1}, ${postcode}`
+        }]);
 
       if (error) throw error;
 
