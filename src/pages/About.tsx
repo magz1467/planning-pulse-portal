@@ -12,7 +12,7 @@ const About = () => {
           <div className="max-w-6xl mx-auto">
             {/* Hero section with title and intro */}
             <div className="mb-16">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-[#9b87f5] bg-clip-text text-transparent mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">
                 About PlanningPulse
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed">
@@ -51,7 +51,7 @@ const About = () => {
                 />
               </div>
               <div className="bg-white rounded-xl shadow-sm p-8 space-y-4 hover:shadow-md transition-shadow">
-                <h2 className="text-2xl font-semibold text-[#7E69AB]">Our Impact</h2>
+                <h2 className="text-2xl font-semibold text-primary">Our Impact</h2>
                 <p className="text-lg text-gray-600">
                   Since our launch, we've helped thousands of residents have their say on local developments, while helping developers better understand community needs and concerns.
                 </p>
