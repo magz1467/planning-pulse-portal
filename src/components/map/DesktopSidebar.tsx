@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { FilterBar } from "@/components/FilterBar";
 import { EmailDialog } from "@/components/EmailDialog";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ApplicationListView } from "./sidebar/ApplicationListView";
 import { ApplicationDetailView } from "./sidebar/ApplicationDetailView";
@@ -48,10 +48,10 @@ export const DesktopSidebar = ({
     });
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onSelectApplication(null);
     onClose();
-  };
+  }, [onSelectApplication, onClose]);
 
   return (
     <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
