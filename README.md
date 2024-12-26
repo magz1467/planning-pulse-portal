@@ -6,8 +6,6 @@
 
 ## How can I edit this code?
 
-There are several ways of editing your application.
-
 **Use Lovable**
 
 Simply visit the [Lovable Project](https://lovable.dev/projects/106f7ed5-6c9b-4088-ba7e-3d7443df8f58) and start prompting.
@@ -30,29 +28,28 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
-npm i
+yarn install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+# Step 4: Set up environment variables for local testing
+# Replace with your actual Supabase service role key and URL
+export SUPABASE_SERVICE_ROLE_KEY='your_service_role_key_here'
+export SUPABASE_URL='your_supabase_project_url_here'
+
+# Step 5: Run tests
+yarn test
 ```
 
-**Edit a file directly in GitHub**
+## Running Tests
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+To run tests locally, you must set the following environment variables:
+- `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase project's service role key
+- `SUPABASE_URL`: Your Supabase project's URL
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+These can be found in your Supabase project settings.
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
