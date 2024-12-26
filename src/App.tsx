@@ -15,6 +15,7 @@ import ResidentServices from './pages/ResidentServices';
 import DeveloperServices from './pages/DeveloperServices';
 import CouncilServices from './pages/CouncilServices';
 import Auth from './pages/Auth';
+import AuthSuccess from './pages/AuthSuccess';
 import ResetPassword from './pages/ResetPassword';
 
 // Content pages
@@ -47,6 +48,7 @@ const App = () => {
         <Route path="/council-services" element={<CouncilServices />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/callback" element={<Auth />} />
+        <Route path="/auth/success" element={<AuthSuccess />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         
         {/* Content pages */}

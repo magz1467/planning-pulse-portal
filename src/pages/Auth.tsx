@@ -62,11 +62,7 @@ const AuthPage = () => {
             navigate("/");
             break;
           case 'SIGNED_UP':
-            toast({
-              title: "Account created",
-              description: "Your account has been created successfully",
-              variant: "default",
-            });
+            navigate("/auth/success");
             break;
           case 'USER_UPDATED':
             toast({
