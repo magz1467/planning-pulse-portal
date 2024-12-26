@@ -42,7 +42,7 @@ export const FilterBar = ({
 
   return (
     <div className="flex items-center gap-2 px-2 py-3 border-b bg-white">
-      <div className="flex-1 flex items-center gap-2">
+      <div className="flex-1 flex items-center gap-2 overflow-hidden">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
@@ -111,25 +111,27 @@ export const FilterBar = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap py-1 flex-nowrap min-w-0">
-          {activeFilters.status && (
-            <Badge 
-              variant="secondary" 
-              className="px-4 py-1.5 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 border-0 font-medium cursor-pointer shrink-0"
-              onClick={() => onFilterChange("status", "")}
-            >
-              {activeFilters.status} ×
-            </Badge>
-          )}
-          {activeFilters.type && (
-            <Badge 
-              variant="secondary" 
-              className="px-4 py-1.5 rounded-full bg-gray-50 text-gray-900 hover:bg-gray-100 border-0 font-medium cursor-pointer shrink-0"
-              onClick={() => onFilterChange("type", "")}
-            >
-              {activeFilters.type} ×
-            </Badge>
-          )}
+        <div className="flex-1 overflow-hidden">
+          <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+            {activeFilters.status && (
+              <Badge 
+                variant="secondary" 
+                className="px-4 py-1.5 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 border-0 font-medium cursor-pointer whitespace-nowrap"
+                onClick={() => onFilterChange("status", "")}
+              >
+                {activeFilters.status} ×
+              </Badge>
+            )}
+            {activeFilters.type && (
+              <Badge 
+                variant="secondary" 
+                className="px-4 py-1.5 rounded-full bg-gray-50 text-gray-900 hover:bg-gray-100 border-0 font-medium cursor-pointer whitespace-nowrap"
+                onClick={() => onFilterChange("type", "")}
+              >
+                {activeFilters.type} ×
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
