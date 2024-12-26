@@ -108,7 +108,15 @@ const AuthPage = () => {
             }}
             theme="light"
             providers={[]}
-            redirectTo={`${window.location.origin}/auth/callback`}
+            redirectTo={window.location.origin + '/auth/callback'}
+            onError={(error) => {
+              console.error('Auth error:', error);
+              toast({
+                title: "Authentication Error",
+                description: error.message,
+                variant: "destructive"
+              });
+            }}
           />
         </div>
       </div>
