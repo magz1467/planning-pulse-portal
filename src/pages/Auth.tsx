@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
+import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -37,42 +38,42 @@ const AuthPage = () => {
 
     checkSession();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
       try {
-        if (event === 'SIGNED_OUT') {
-          toast({
-            title: "Signed out",
-            description: "You have been signed out successfully",
-          });
-        }
-        if (event === 'PASSWORD_RECOVERY') {
-          toast({
-            title: "Password recovery",
-            description: "Check your email for the recovery link",
-          });
-        }
-        if (event === 'SIGNED_IN') {
-          toast({
-            title: "Success",
-            description: "You have been signed in successfully",
-            variant: "default",
-          });
-          navigate("/");
-        }
-        if (event === 'USER_UPDATED') {
-          toast({
-            title: "Profile updated",
-            description: "Your profile has been updated successfully",
-          });
-        }
-        if (event === 'SIGNED_UP') {
-          toast({
-            title: "Account created",
-            description: "Your account has been created successfully",
-            variant: "default",
-          });
+        switch (event) {
+          case 'SIGNED_OUT':
+            toast({
+              title: "Signed out",
+              description: "You have been signed out successfully",
+            });
+            break;
+          case 'PASSWORD_RECOVERY':
+            toast({
+              title: "Password recovery",
+              description: "Check your email for the recovery link",
+            });
+            break;
+          case 'SIGNED_IN':
+            toast({
+              title: "Success",
+              description: "You have been signed in successfully",
+              variant: "default",
+            });
+            navigate("/");
+            break;
+          case 'USER_UPDATED':
+            toast({
+              title: "Profile updated",
+              description: "Your profile has been updated successfully",
+            });
+            break;
+          case 'SIGNED_UP':
+            toast({
+              title: "Account created",
+              description: "Your account has been created successfully",
+              variant: "default",
+            });
+            break;
         }
       } catch (error: any) {
         console.error('Auth state change error:', error);
@@ -82,7 +83,11 @@ const AuthPage = () => {
           variant: "destructive"
         });
       }
-    });
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
     return () => {
       subscription.unsubscribe();
