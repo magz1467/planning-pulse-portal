@@ -8,6 +8,8 @@ export const handleAuthStateChange = (
   navigate: (path: string) => void,
   toast: ReturnType<typeof useToast>['toast']
 ) => {
+  console.log('Auth state changed:', event, 'Session:', session);
+  
   switch (event) {
     case 'SIGNED_IN':
       toast({
@@ -37,6 +39,7 @@ export const handleAuthStateChange = (
       break;
     case 'INITIAL_SESSION':
       // User has an active session
+      console.log('Initial session detected, redirecting to success page');
       navigate("/auth/success");
       break;
   }
@@ -48,6 +51,8 @@ export const checkSession = async (
 ) => {
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
+    console.log('Checking session:', session, 'Error:', error);
+    
     if (error) throw error;
     
     if (session) {
