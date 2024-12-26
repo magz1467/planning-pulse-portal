@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Share2, MessageCircle } from "lucide-react";
+import { PostcodeSearch } from "@/components/PostcodeSearch";
 
 interface PetitionFormProps {
   open: boolean;
@@ -15,7 +16,8 @@ interface PetitionFormProps {
 
 export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReasons }: PetitionFormProps) => {
   const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
@@ -64,7 +66,7 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
         user_id: session?.user?.id || null,
         application_id: applicationId,
         reasons: selectedReasons,
-        address: address
+        address: `${addressLine1}, ${postcode}`
       }]);
 
       if (error) throw error;
@@ -91,7 +93,8 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
   const handleClose = () => {
     setIsSuccess(false);
     setEmail("");
-    setAddress("");
+    setPostcode("");
+    setAddressLine1("");
     onOpenChange(false);
   };
 
@@ -115,12 +118,19 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
                 required
               />
             </div>
+            <div className="space-y-2">
+              <PostcodeSearch
+                onSelect={setPostcode}
+                placeholder="Enter your postcode"
+                className="w-full"
+              />
+            </div>
             <div>
               <Input
                 type="text"
-                placeholder="Your address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Address line 1"
+                value={addressLine1}
+                onChange={(e) => setAddressLine1(e.target.value)}
                 required
               />
             </div>
