@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { handleAuthChange, checkSession } from "@/utils/auth";
+import { handleAuthChange } from "@/utils/auth";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -14,18 +14,40 @@ const AuthPage = () => {
   const mode = searchParams.get('mode');
 
   useEffect(() => {
-    // Check if user is already logged in
-    checkSession(navigate);
-
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       handleAuthChange(event, session, navigate);
     });
 
+    // Check if user is already logged in
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      console.log('Checking session:', session, 'Error:', error);
+      
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      if (session?.user) {
+        toast({
+          title: "Already signed in",
+          description: "You are already signed in",
+        });
+        navigate("/");
+      }
+    };
+
+    checkSession();
+
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   return (
     <div className="flex flex-col min-h-screen">
