@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { AuthError, AuthResponse, User, Session } from '@supabase/supabase-js';
+import { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const AuthPage = () => {
 
     checkSession();
 
-    const handleAuthStateChange = (event: 'INITIAL_SESSION' | 'SIGNED_IN' | 'SIGNED_OUT' | 'USER_UPDATED' | 'USER_DELETED' | 'PASSWORD_RECOVERY' | 'TOKEN_REFRESHED', session: Session | null) => {
+    const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
       try {
         switch (event) {
           case 'SIGNED_OUT':
@@ -60,6 +60,13 @@ const AuthPage = () => {
               variant: "default",
             });
             navigate("/");
+            break;
+          case 'SIGNED_UP':
+            toast({
+              title: "Account created",
+              description: "Your account has been created successfully",
+              variant: "default",
+            });
             break;
           case 'USER_UPDATED':
             toast({
