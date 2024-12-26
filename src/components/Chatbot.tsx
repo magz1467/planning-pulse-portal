@@ -24,6 +24,7 @@ export const Chatbot = () => {
     }
 
     try {
+      // Save to database
       const { error } = await supabase
         .from('contact_requests')
         .insert([
@@ -35,6 +36,15 @@ export const Chatbot = () => {
         ]);
 
       if (error) throw error;
+
+      // Notify admin via email
+      const { error: notifyError } = await supabase.functions.invoke('notify-contact', {
+        body: { email, phone, message }
+      });
+
+      if (notifyError) {
+        console.error('Error notifying admin:', notifyError);
+      }
 
       toast({
         title: "Message sent",
