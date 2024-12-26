@@ -1,18 +1,20 @@
-import { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { toast } from "@/components/ui/use-toast";
+import { NavigateFunction } from "react-router-dom";
 
-export const handleAuthStateChange = (
-  event: AuthChangeEvent, 
+export const handleAuthChange = (
+  event: AuthChangeEvent,
   session: Session | null,
-  navigate: (path: string) => void,
-  toast: ReturnType<typeof useToast>['toast']
+  navigate: NavigateFunction
 ) => {
-  console.log('Auth state changed:', event, 'Session:', session);
-  
+  console.log("Auth event:", event);
+  console.log("Session:", session);
+
+  const hasValidSession = session && session.user;
+
   switch (event) {
     case 'SIGNED_IN':
-      if (session) {
+      if (hasValidSession) {
         toast({
           title: "Success",
           description: "You have been signed in successfully",
@@ -28,7 +30,7 @@ export const handleAuthStateChange = (
       navigate("/auth");
       break;
     case 'USER_UPDATED':
-      if (session) {
+      if (hasValidSession) {
         toast({
           title: "Profile updated",
           description: "Your profile has been updated successfully",
@@ -38,41 +40,16 @@ export const handleAuthStateChange = (
     case 'PASSWORD_RECOVERY':
       toast({
         title: "Password recovery",
-        description: "Check your email for the recovery link",
+        description: "Check your email for the password recovery link",
       });
       break;
     case 'INITIAL_SESSION':
-      if (session) {
-        console.log('Initial session detected, redirecting to success page');
+      if (hasValidSession) {
+        console.log('Initial session detected with valid user');
         navigate("/auth/success");
+      } else {
+        console.log('No valid session detected');
       }
       break;
-  }
-};
-
-export const checkSession = async (
-  navigate: (path: string) => void,
-  toast: ReturnType<typeof useToast>['toast']
-) => {
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    console.log('Checking session:', session, 'Error:', error);
-    
-    if (error) throw error;
-    
-    if (session) {
-      toast({
-        title: "Already signed in",
-        description: "You are already signed in",
-      });
-      navigate("/");
-    }
-  } catch (error: any) {
-    console.error('Session check error:', error);
-    toast({
-      title: "Error",
-      description: error.message,
-      variant: "destructive"
-    });
   }
 };
