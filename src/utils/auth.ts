@@ -12,11 +12,13 @@ export const handleAuthStateChange = (
   
   switch (event) {
     case 'SIGNED_IN':
-      toast({
-        title: "Success",
-        description: "You have been signed in successfully",
-      });
-      navigate("/");
+      if (session) {
+        toast({
+          title: "Success",
+          description: "You have been signed in successfully",
+        });
+        navigate("/");
+      }
       break;
     case 'SIGNED_OUT':
       toast({
@@ -26,10 +28,12 @@ export const handleAuthStateChange = (
       navigate("/auth");
       break;
     case 'USER_UPDATED':
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
-      });
+      if (session) {
+        toast({
+          title: "Profile updated",
+          description: "Your profile has been updated successfully",
+        });
+      }
       break;
     case 'PASSWORD_RECOVERY':
       toast({
@@ -38,9 +42,10 @@ export const handleAuthStateChange = (
       });
       break;
     case 'INITIAL_SESSION':
-      // User has an active session
-      console.log('Initial session detected, redirecting to success page');
-      navigate("/auth/success");
+      if (session) {
+        console.log('Initial session detected, redirecting to success page');
+        navigate("/auth/success");
+      }
       break;
   }
 };
