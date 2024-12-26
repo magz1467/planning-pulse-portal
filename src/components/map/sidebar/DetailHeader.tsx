@@ -7,7 +7,7 @@ interface DetailHeaderProps {
 
 export const DetailHeader = ({ onClose }: DetailHeaderProps) => {
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-between border-b py-2 px-4 bg-white">
+    <div className="sticky top-0 z-50 flex items-center justify-between border-b py-2 px-4 bg-white shadow-sm">
       <h2 className="font-semibold">Planning Application Details</h2>
       <Button
         variant="ghost"

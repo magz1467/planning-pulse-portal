@@ -50,8 +50,7 @@ export const DesktopSidebar = ({
 
   const handleClose = useCallback(() => {
     onSelectApplication(null);
-    onClose();
-  }, [onSelectApplication, onClose]);
+  }, [onSelectApplication]);
 
   return (
     <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
