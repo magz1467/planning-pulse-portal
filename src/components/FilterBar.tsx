@@ -111,11 +111,11 @@ export const FilterBar = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap py-1">
+        <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap py-1 flex-nowrap min-w-0">
           {activeFilters.status && (
             <Badge 
               variant="secondary" 
-              className="px-4 py-1.5 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 border-0 font-medium cursor-pointer"
+              className="px-4 py-1.5 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 border-0 font-medium cursor-pointer shrink-0"
               onClick={() => onFilterChange("status", "")}
             >
               {activeFilters.status} ×
@@ -124,7 +124,7 @@ export const FilterBar = ({
           {activeFilters.type && (
             <Badge 
               variant="secondary" 
-              className="px-4 py-1.5 rounded-full bg-gray-50 text-gray-900 hover:bg-gray-100 border-0 font-medium cursor-pointer"
+              className="px-4 py-1.5 rounded-full bg-gray-50 text-gray-900 hover:bg-gray-100 border-0 font-medium cursor-pointer shrink-0"
               onClick={() => onFilterChange("type", "")}
             >
               {activeFilters.type} ×
