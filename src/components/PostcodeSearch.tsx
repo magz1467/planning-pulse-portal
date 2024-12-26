@@ -68,7 +68,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
       </div>
 
       {open && search.length >= 2 && (
-        <div className="absolute z-50 w-full mt-1">
+        <div className="absolute z-[9999] w-full mt-1">
           <Command className="rounded-lg border shadow-md">
             <CommandList>
               {isLoading ? (
