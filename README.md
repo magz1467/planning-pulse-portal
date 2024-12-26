@@ -28,20 +28,21 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
-yarn install
+npm install
 
 # Step 4: Set up environment variables for local testing
+# Create a .env file with the following content:
 # Replace with your actual Supabase service role key and URL
-export SUPABASE_SERVICE_ROLE_KEY='your_service_role_key_here'
-export SUPABASE_URL='your_supabase_project_url_here'
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+SUPABASE_URL=your_supabase_project_url_here
 
 # Step 5: Run tests
-yarn test
+npm test
 ```
 
 ## Running Tests
 
-To run tests locally, you must set the following environment variables:
+To run tests locally, you must create a `.env` file with the following environment variables:
 - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase project's service role key
 - `SUPABASE_URL`: Your Supabase project's URL
 
