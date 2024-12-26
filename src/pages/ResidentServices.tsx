@@ -45,7 +45,7 @@ const ResidentServices = () => {
                 <Image
                   src="/lovable-uploads/c21e23a0-f1e5-43ef-b085-aff9c1f2fa76.png"
                   alt="Local resident using planning application platform"
-                  className="rounded-2xl shadow-lg relative z-10"
+                  className="rounded-2xl shadow-lg relative z-10 object-center"
                   width={800}
                   height={600}
                 />
