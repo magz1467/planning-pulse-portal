@@ -148,24 +148,32 @@ export type Database = {
       }
       saved_developments: {
         Row: {
-          application_id: number
           created_at: string
+          development_id: number
           id: number
           user_id: string | null
         }
         Insert: {
-          application_id: number
           created_at?: string
+          development_id: number
           id?: number
           user_id?: string | null
         }
         Update: {
-          application_id?: number
           created_at?: string
+          development_id?: number
           id?: number
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "saved_developments_development_id_fkey"
+            columns: ["development_id"]
+            isOneToOne: false
+            referencedRelation: "developments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       Searches: {
         Row: {

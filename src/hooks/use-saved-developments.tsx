@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { SavedDevelopment } from '@/types/saved';
 
 // Dummy data for development
 const dummyApplications = [
@@ -37,14 +38,14 @@ export const useSavedDevelopments = () => {
 
       const { data, error } = await supabase
         .from('saved_developments')
-        .select('application_id')
+        .select('development_id')
         .eq('user_id', session.session.user.id);
 
       if (error) {
         throw error;
       }
 
-      setSavedDevelopments(data.map(item => item.application_id));
+      setSavedDevelopments(data.map(item => item.development_id));
     } catch (error: any) {
       console.error('Error fetching saved developments:', error);
       toast({
@@ -55,7 +56,7 @@ export const useSavedDevelopments = () => {
     }
   };
 
-  const toggleSavedDevelopment = async (applicationId: number) => {
+  const toggleSavedDevelopment = async (developmentId: number) => {
     try {
       const { data: session } = await supabase.auth.getSession();
       
@@ -63,7 +64,7 @@ export const useSavedDevelopments = () => {
         return;
       }
 
-      const isSaved = savedDevelopments.includes(applicationId);
+      const isSaved = savedDevelopments.includes(developmentId);
 
       if (isSaved) {
         // Remove from saved
@@ -71,23 +72,23 @@ export const useSavedDevelopments = () => {
           .from('saved_developments')
           .delete()
           .eq('user_id', session.session.user.id)
-          .eq('application_id', applicationId);
+          .eq('development_id', developmentId);
 
         if (error) throw error;
 
-        setSavedDevelopments(prev => prev.filter(id => id !== applicationId));
+        setSavedDevelopments(prev => prev.filter(id => id !== developmentId));
       } else {
         // Add to saved
         const { error } = await supabase
           .from('saved_developments')
           .insert({
             user_id: session.session.user.id,
-            application_id: applicationId
+            development_id: developmentId
           });
 
         if (error) throw error;
 
-        setSavedDevelopments(prev => [...prev, applicationId]);
+        setSavedDevelopments(prev => [...prev, developmentId]);
       }
     } catch (error: any) {
       console.error('Error toggling saved development:', error);
