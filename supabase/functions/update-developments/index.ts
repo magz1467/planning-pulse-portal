@@ -20,49 +20,23 @@ async function fetchPageOfApplications(pageUrl: string) {
   return await response.json();
 }
 
-async function processApplications(applications: any[], supabase: any) {
-  let processedCount = 0;
-  
-  for (const application of applications) {
-    const development = {
-      external_id: application.reference,
-      title: application.proposal || 'No title provided',
-      address: application.site?.address || 'No address provided',
-      status: application.status || 'Unknown',
-      description: application.proposal || '',
-      applicant: application.applicant?.name || 'Unknown',
-      submission_date: application.created_at ? new Date(application.created_at) : null,
-      decision_due: application.decision?.decision_date ? new Date(application.decision.decision_date) : null,
-      type: application.type || 'Unknown',
-      ward: application.site?.ward || '',
-      officer: application.officer?.name || '',
-      consultation_end: application.consultation?.end_date ? new Date(application.consultation.end_date) : null,
-      lat: application.site?.location?.latitude || null,
-      lng: application.site?.location?.longitude || null,
-      location: application.site?.location?.latitude && application.site?.location?.longitude ? 
-        `SRID=4326;POINT(${application.site.location.longitude} ${application.site.location.latitude})` : null,
-      raw_data: application
-    };
-
-    const { error: upsertError } = await supabase
-      .from('developments')
-      .upsert(development, {
-        onConflict: 'external_id',
-        returning: true
-      });
-
-    if (upsertError) {
-      console.error('Error upserting development:', upsertError);
-      continue; // Continue with next application instead of throwing
-    }
-
-    processedCount++;
-    if (processedCount % 100 === 0) {
-      console.log(`Processed ${processedCount} applications`);
-    }
-  }
-
-  return processedCount;
+interface DevelopmentUpdate {
+  external_id: string;
+  title: string;
+  address: string | null;
+  status: string | null;
+  description: string | null;
+  applicant: string | null;
+  submission_date: Date | null;
+  decision_due: Date | null;
+  type: string | null;
+  ward: string | null;
+  officer: string | null;
+  consultation_end: Date | null;
+  lat: number | null;
+  lng: number | null;
+  location: string | null;
+  raw_data: any;
 }
 
 serve(async (req) => {
@@ -72,7 +46,7 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Starting planning data update process');
+    console.log('Starting planning data sync process');
     
     // Initialize Supabase client
     const supabase = createClient(
@@ -81,12 +55,15 @@ serve(async (req) => {
     )
 
     let nextPage = 'https://www.planning.data.gov.uk/api/v1/applications';
-    let totalProcessed = 0;
     let pageCount = 0;
+    let updatesCount = 0;
+    let insertsCount = 0;
+    const batchSize = 100; // Process in batches of 100
+    let updateBatch: DevelopmentUpdate[] = [];
 
     while (nextPage) {
       pageCount++;
-      console.log(`Fetching page ${pageCount}: ${nextPage}`);
+      console.log(`Processing page ${pageCount}: ${nextPage}`);
       
       const data = await fetchPageOfApplications(nextPage);
       
@@ -95,29 +72,67 @@ serve(async (req) => {
         break;
       }
 
-      const processedCount = await processApplications(data.applications, supabase);
-      totalProcessed += processedCount;
+      // Prepare batch of applications to check/update
+      for (const application of data.applications) {
+        const development: DevelopmentUpdate = {
+          external_id: application.reference,
+          title: application.proposal || 'No title provided',
+          address: application.site?.address || null,
+          status: application.status || null,
+          description: application.proposal || null,
+          applicant: application.applicant?.name || null,
+          submission_date: application.created_at ? new Date(application.created_at) : null,
+          decision_due: application.decision?.decision_date ? new Date(application.decision.decision_date) : null,
+          type: application.type || null,
+          ward: application.site?.ward || null,
+          officer: application.officer?.name || null,
+          consultation_end: application.consultation?.end_date ? new Date(application.consultation.end_date) : null,
+          lat: application.site?.location?.latitude || null,
+          lng: application.site?.location?.longitude || null,
+          location: application.site?.location?.latitude && application.site?.location?.longitude ? 
+            `SRID=4326;POINT(${application.site.location.longitude} ${application.site.location.latitude})` : null,
+          raw_data: application
+        };
+
+        updateBatch.push(development);
+
+        // Process batch when it reaches the batch size
+        if (updateBatch.length >= batchSize) {
+          const { inserts, updates } = await processBatch(updateBatch, supabase);
+          insertsCount += inserts;
+          updatesCount += updates;
+          updateBatch = []; // Clear batch after processing
+        }
+      }
+
+      // Process any remaining items in the batch
+      if (updateBatch.length > 0) {
+        const { inserts, updates } = await processBatch(updateBatch, supabase);
+        insertsCount += inserts;
+        updatesCount += updates;
+        updateBatch = [];
+      }
 
       // Check for next page in the HAL links
       nextPage = data._links?.next?.href || null;
       
       // Log progress
-      console.log(`Completed page ${pageCount}. Processed ${processedCount} applications on this page.`);
-      console.log(`Total processed so far: ${totalProcessed}`);
+      console.log(`Completed page ${pageCount}. Total inserts: ${insertsCount}, updates: ${updatesCount}`);
       
-      // Optional: Add a small delay to avoid rate limiting
+      // Add a small delay to avoid rate limiting
       if (nextPage) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
-    console.log('Planning data update process completed');
+    console.log('Planning data sync completed');
     
     return new Response(
       JSON.stringify({
-        message: 'Planning data update completed successfully',
-        totalProcessed,
-        pagesProcessed: pageCount
+        message: 'Planning data sync completed successfully',
+        pagesProcessed: pageCount,
+        totalInserts: insertsCount,
+        totalUpdates: updatesCount
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -128,7 +143,7 @@ serve(async (req) => {
     console.error('Error in update-developments function:', error);
     return new Response(
       JSON.stringify({
-        error: 'Failed to update planning data',
+        error: 'Failed to sync planning data',
         details: error.message
       }),
       { 
@@ -138,3 +153,71 @@ serve(async (req) => {
     );
   }
 })
+
+async function processBatch(batch: DevelopmentUpdate[], supabase: any) {
+  let inserts = 0;
+  let updates = 0;
+
+  try {
+    // First check which records exist
+    const externalIds = batch.map(dev => dev.external_id);
+    const { data: existingRecords } = await supabase
+      .from('developments')
+      .select('external_id, status, decision_due, consultation_end')
+      .in('external_id', externalIds);
+
+    const existingMap = new Map(existingRecords?.map(record => [record.external_id, record]));
+
+    // Split batch into inserts and updates
+    const toInsert = [];
+    const toUpdate = [];
+
+    for (const development of batch) {
+      const existing = existingMap.get(development.external_id);
+      
+      if (!existing) {
+        toInsert.push(development);
+      } else if (
+        existing.status !== development.status ||
+        existing.decision_due !== development.decision_due?.toISOString() ||
+        existing.consultation_end !== development.consultation_end?.toISOString()
+      ) {
+        toUpdate.push(development);
+      }
+    }
+
+    // Process inserts
+    if (toInsert.length > 0) {
+      const { error: insertError } = await supabase
+        .from('developments')
+        .insert(toInsert);
+
+      if (insertError) {
+        console.error('Error inserting developments:', insertError);
+      } else {
+        inserts = toInsert.length;
+      }
+    }
+
+    // Process updates
+    if (toUpdate.length > 0) {
+      const { error: updateError } = await supabase
+        .from('developments')
+        .upsert(toUpdate, {
+          onConflict: 'external_id',
+          ignoreDuplicates: false
+        });
+
+      if (updateError) {
+        console.error('Error updating developments:', updateError);
+      } else {
+        updates = toUpdate.length;
+      }
+    }
+
+  } catch (error) {
+    console.error('Error processing batch:', error);
+  }
+
+  return { inserts, updates };
+}
