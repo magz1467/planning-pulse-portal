@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { AuthChangeEvent, Session } from '@supabase/supabase-js';
+import { handleAuthStateChange, checkSession } from "@/utils/auth";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -14,76 +14,13 @@ const AuthPage = () => {
   const mode = searchParams.get('mode');
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        
-        if (session) {
-          toast({
-            title: "Already signed in",
-            description: "You are already signed in",
-          });
-          navigate("/");
-        }
-      } catch (error: any) {
-        console.error('Session check error:', error);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
-    };
+    // Check if user is already logged in
+    checkSession(navigate, toast);
 
-    checkSession();
-
-    const handleAuthStateChange = (event: AuthChangeEvent, session: Session | null) => {
-      try {
-        switch (event) {
-          case 'SIGNED_OUT':
-            toast({
-              title: "Signed out",
-              description: "You have been signed out successfully",
-            });
-            break;
-          case 'PASSWORD_RECOVERY':
-            toast({
-              title: "Password recovery",
-              description: "Check your email for the recovery link",
-            });
-            break;
-          case 'SIGNED_IN':
-            toast({
-              title: "Success",
-              description: "You have been signed in successfully",
-              variant: "default",
-            });
-            navigate("/");
-            break;
-          case 'SIGNED_UP':
-            navigate("/auth/success");
-            break;
-          case 'USER_UPDATED':
-            toast({
-              title: "Profile updated",
-              description: "Your profile has been updated successfully",
-            });
-            break;
-        }
-      } catch (error: any) {
-        console.error('Auth state change error:', error);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      }
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      handleAuthStateChange(event, session, navigate, toast);
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -116,7 +53,7 @@ const AuthPage = () => {
             }}
             theme="light"
             providers={[]}
-            redirectTo={window.location.origin + '/auth/callback'}
+            redirectTo={`${window.location.origin}/auth/callback`}
           />
         </div>
       </div>
