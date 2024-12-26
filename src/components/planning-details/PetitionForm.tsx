@@ -61,17 +61,32 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
+      // First verify the API connection
+      const { error: testError } = await supabase
+        .from('petitions')
+        .select('id')
+        .limit(1);
+
+      if (testError) {
+        console.error('API Connection test failed:', testError);
+        throw new Error('Failed to connect to the database. Please try again later.');
+      }
+
+      // Proceed with insertion
       const { error } = await supabase
         .from('petitions')
-        .insert([{
+        .insert({
           user_email: email,
           user_id: session?.user?.id || null,
           application_id: applicationId,
           reasons: selectedReasons,
           address: `${addressLine1}, ${postcode}`
-        }]);
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error details:', error);
+        throw error;
+      }
 
       setIsSuccess(true);
       toast({
@@ -80,11 +95,11 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
         duration: 5000,
       });
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating petition:', error);
       toast({
         title: "Error",
-        description: "Failed to create petition. Please try again.",
+        description: error.message || "Failed to create petition. Please try again.",
         variant: "destructive",
       });
     } finally {
