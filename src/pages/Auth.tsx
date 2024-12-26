@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { handleAuthStateChange, checkSession } from "@/utils/auth";
+import { handleAuthChange, checkSession } from "@/utils/auth";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -15,17 +15,17 @@ const AuthPage = () => {
 
   useEffect(() => {
     // Check if user is already logged in
-    checkSession(navigate, toast);
+    checkSession(navigate);
 
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      handleAuthStateChange(event, session, navigate, toast);
+      handleAuthChange(event, session, navigate);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate]);
 
   return (
     <div className="flex flex-col min-h-screen">

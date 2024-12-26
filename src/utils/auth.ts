@@ -1,6 +1,7 @@
 import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { toast } from "@/components/ui/use-toast";
 import { NavigateFunction } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export const handleAuthChange = (
   event: AuthChangeEvent,
@@ -51,5 +52,37 @@ export const handleAuthChange = (
         console.log('No valid session detected');
       }
       break;
+  }
+};
+
+export const checkSession = async (
+  navigate: NavigateFunction,
+  showToast = true
+) => {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    console.log('Checking session:', session, 'Error:', error);
+    
+    if (error) throw error;
+    
+    if (session?.user) {
+      if (showToast) {
+        toast({
+          title: "Already signed in",
+          description: "You are already signed in",
+        });
+      }
+      navigate("/");
+      return true;
+    }
+    return false;
+  } catch (error: any) {
+    console.error('Session check error:', error);
+    toast({
+      title: "Error",
+      description: error.message,
+      variant: "destructive"
+    });
+    return false;
   }
 };
