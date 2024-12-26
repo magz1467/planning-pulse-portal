@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import Image from "@/components/ui/image";
+import GetInTouch from "@/components/GetInTouch";
 
 const About = () => {
   return (
@@ -58,6 +59,9 @@ const About = () => {
             </div>
           </div>
         </div>
+
+        {/* Get In Touch section */}
+        <GetInTouch />
       </div>
       <Footer />
     </>
