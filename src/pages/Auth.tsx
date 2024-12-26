@@ -13,50 +13,70 @@ const AuthPage = () => {
   const mode = searchParams.get('mode');
 
   useEffect(() => {
-    // Check if user is already signed in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        
+        if (session) {
+          toast({
+            title: "Already signed in",
+            description: "You are already signed in",
+          });
+          navigate("/");
+        }
+      } catch (error: any) {
+        console.error('Session check error:', error);
         toast({
-          title: "Already signed in",
-          description: "You are already signed in",
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
         });
-        navigate("/");
       }
-    });
+    };
 
-    // Handle auth state changes
+    checkSession();
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      try {
+        if (event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You have been signed out successfully",
+          });
+        }
+        if (event === 'PASSWORD_RECOVERY') {
+          toast({
+            title: "Password recovery",
+            description: "Check your email for the recovery link",
+          });
+        }
+        if (event === 'SIGNED_IN') {
+          toast({
+            title: "Success",
+            description: "You have been signed in successfully",
+            variant: "default",
+          });
+          navigate("/");
+        }
+        if (event === 'USER_UPDATED') {
+          toast({
+            title: "Profile updated",
+            description: "Your profile has been updated successfully",
+          });
+        }
+      } catch (error: any) {
+        console.error('Auth state change error:', error);
         toast({
-          title: "Signed out",
-          description: "You have been signed out successfully",
-        });
-      }
-      if (event === 'PASSWORD_RECOVERY') {
-        toast({
-          title: "Password recovery",
-          description: "Check your email for the recovery link",
-        });
-      }
-      if (event === 'SIGNED_IN') {
-        toast({
-          title: "Success",
-          description: "You have been signed in successfully",
-          variant: "default",
-        });
-        navigate("/");
-      }
-      if (event === 'USER_UPDATED') {
-        toast({
-          title: "Profile updated",
-          description: "Your profile has been updated successfully",
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
         });
       }
     });
 
-    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
