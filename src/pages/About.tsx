@@ -35,11 +35,13 @@ const About = () => {
               </div>
 
               <div className="w-full lg:w-1/2 animate-[slide-up_0.7s_ease-out]">
-                <div className="relative rounded-2xl overflow-hidden shadow-xl">
+                <div className="relative rounded-2xl overflow-hidden shadow-xl max-w-full">
                   <Image
                     src="/lovable-uploads/334551c0-9c95-45dc-ac93-6a0c71f0d7c6.png"
                     alt="Community planning meeting with diverse group of people discussing and collaborating"
-                    className="w-full h-auto rounded-2xl hover:scale-105 transition-transform duration-500"
+                    className="w-full h-auto rounded-2xl hover:scale-105 transition-transform duration-500 object-cover"
+                    width={800}
+                    height={600}
                   />
                 </div>
               </div>
