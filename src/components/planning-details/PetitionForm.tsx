@@ -97,7 +97,7 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] z-[2000] bg-white">
         <DialogHeader>
           <DialogTitle>
             {isSuccess ? "Petition Created Successfully! 🎉" : "Create Petition"}
