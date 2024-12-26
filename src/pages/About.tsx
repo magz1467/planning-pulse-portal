@@ -34,7 +34,7 @@ const About = () => {
                 </div>
               </div>
 
-              <div className="w-full lg:w-[35%] flex-shrink-0 animate-[slide-up_0.7s_ease-out]">
+              <div className="w-full lg:w-[35%] flex-shrink-0 animate-[slide-up_0.7s_ease-out] self-start sticky top-24">
                 <div className="relative rounded-2xl overflow-hidden shadow-xl">
                   <Image
                     src="/lovable-uploads/334551c0-9c95-45dc-ac93-6a0c71f0d7c6.png"
