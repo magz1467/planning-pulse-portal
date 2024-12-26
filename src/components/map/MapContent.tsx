@@ -41,12 +41,12 @@ export const MapContent = () => {
     activeSort
   );
 
-  // Select the first application when postcode changes, but only in map view
+  // Only auto-select first application on mobile and in map view
   useEffect(() => {
-    if (isMapView && filteredApplications.length > 0 && !selectedApplication) {
+    if (isMobile && isMapView && filteredApplications.length > 0 && !selectedApplication) {
       handleMarkerClick(filteredApplications[0].id);
     }
-  }, [postcode, filteredApplications, selectedApplication, handleMarkerClick, isMapView]);
+  }, [postcode, filteredApplications, selectedApplication, handleMarkerClick, isMapView, isMobile]);
 
   // Ensure coordinates are properly typed
   const safeCoordinates: [number, number] = coordinates ? [coordinates[0], coordinates[1]] : [52.0406, -0.7594];
