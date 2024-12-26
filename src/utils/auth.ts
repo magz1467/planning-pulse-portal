@@ -35,7 +35,8 @@ export const handleAuthStateChange = (
         description: "Check your email for the recovery link",
       });
       break;
-    case 'SIGNED_UP':
+    case 'INITIAL_SESSION':
+      // User has an active session
       navigate("/auth/success");
       break;
   }
