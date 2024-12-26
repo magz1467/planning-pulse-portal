@@ -18,11 +18,11 @@ const Mission = () => {
                   Our platform revolutionizes this outdated system by creating a seamless digital bridge between residents, developers, and local authorities. Through data-driven insights and transparent processes, we're building a future where planning decisions are made faster, smarter, and with genuine community input.
                 </p>
               </div>
-              <div className="relative h-[400px]">
+              <div className="flex items-center justify-center h-full">
                 <Image 
                   src="/lovable-uploads/ecdf4ccf-de30-4de8-a738-6470bdc2d41c.png"
                   alt="Modern sustainable home design" 
-                  className="rounded-lg shadow-xl w-full h-full object-cover"
+                  className="rounded-lg shadow-xl w-full h-[400px] object-cover"
                   loading="lazy"
                   width={800}
                   height={600}
