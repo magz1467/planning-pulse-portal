@@ -7,7 +7,7 @@ const About = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gradient-to-br from-[#F1F0FB] to-white">
+      <div className="min-h-screen bg-white">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
             {/* Hero section with title and intro */}
