@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileText } from "lucide-react";
 import { PetitionForm } from "./PetitionForm";
+import { useToast } from "@/hooks/use-toast";
 
 const PETITION_REASONS = [
   { id: "privacy", label: "Loss of privacy" },
@@ -27,6 +28,7 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showPetitionForm, setShowPetitionForm] = useState(false);
+  const { toast } = useToast();
 
   const handleReasonToggle = (reasonId: string) => {
     setSelectedReasons(current =>
