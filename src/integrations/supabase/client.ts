@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const supabaseUrl = 'https://jposqxdboetyioymfswd.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impwb3NxeGRib2V0eWlveW1mc3dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk4MjEwNzgsImV4cCI6MjAyNTM5NzA3OH0.N3UGpylo0CtZvGxHFG8O_vI6HVPJHPDqEjbCyHXNPKc';
+// Replace these two lines with your copied values:
+const supabaseUrl = 'YOUR_PROJECT_URL_HERE';
+const supabaseAnonKey = 'YOUR_ANON_PUBLIC_KEY_HERE';
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
