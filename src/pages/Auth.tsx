@@ -118,27 +118,6 @@ const AuthPage = () => {
             theme="light"
             providers={[]}
             redirectTo={`${window.location.origin}/auth/callback`}
-            onError={(error) => {
-              console.error('Auth error:', error);
-              let errorMessage = error.message;
-              
-              // Map specific error messages to user-friendly ones
-              if (error.message?.includes('Invalid API key')) {
-                errorMessage = 'Authentication service configuration error. Please try again later.';
-              } else if (error.message?.includes('Email not confirmed')) {
-                errorMessage = 'Please confirm your email address before signing in';
-              } else if (error.message?.includes('Invalid login credentials')) {
-                errorMessage = 'Invalid email or password';
-              } else if (error.message?.includes('Email already registered')) {
-                errorMessage = 'This email is already registered. Please sign in instead';
-              }
-
-              toast({
-                title: "Authentication Error",
-                description: errorMessage,
-                variant: "destructive"
-              });
-            }}
           />
         </div>
       </div>
