@@ -138,7 +138,7 @@ export type Database = {
       petitions: {
         Row: {
           address: string
-          application_id: number
+          application_id: number | null
           created_at: string
           id: number
           reasons: string[]
@@ -147,7 +147,7 @@ export type Database = {
         }
         Insert: {
           address: string
-          application_id: number
+          application_id?: number | null
           created_at?: string
           id?: never
           reasons: string[]
@@ -156,22 +156,14 @@ export type Database = {
         }
         Update: {
           address?: string
-          application_id?: number
+          application_id?: number | null
           created_at?: string
           id?: never
           reasons?: string[]
           user_email?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "petitions_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: false
-            referencedRelation: "developments"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       saved_developments: {
         Row: {

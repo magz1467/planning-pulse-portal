@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { PetitionSharing } from "./petition/PetitionSharing";
 
 interface PetitionFormProps {
@@ -16,13 +15,11 @@ interface PetitionFormProps {
 
 export const PetitionForm = ({ 
   open, 
-  onOpenChange, 
-  applicationId, 
+  onOpenChange,
+  applicationId,
   selectedReasons 
 }: PetitionFormProps) => {
   const [email, setEmail] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [addressLine1, setAddressLine1] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
@@ -32,32 +29,14 @@ export const PetitionForm = ({
     setIsSubmitting(true);
 
     try {
-      // First verify the application exists
-      const { data: application, error: applicationError } = await supabase
-        .from('developments')
-        .select('id')
-        .eq('id', applicationId)
-        .single();
-
-      if (applicationError || !application) {
-        throw new Error('Invalid application ID. The development may have been removed.');
-      }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // Then create the petition
       const { error } = await supabase
         .from('petitions')
         .insert({
           user_email: email,
-          user_id: session?.user?.id || null,
-          application_id: applicationId,
-          reasons: selectedReasons,
-          address: `${addressLine1}, ${postcode}`
+          reasons: selectedReasons
         });
 
       if (error) {
-        console.error('Error details:', error);
         throw error;
       }
 
@@ -83,8 +62,6 @@ export const PetitionForm = ({
   const handleClose = () => {
     setIsSuccess(false);
     setEmail("");
-    setPostcode("");
-    setAddressLine1("");
     onOpenChange(false);
   };
 
@@ -105,22 +82,6 @@ export const PetitionForm = ({
                 placeholder="Your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <PostcodeSearch
-                onSelect={setPostcode}
-                placeholder="Enter your postcode"
-                className="w-full"
-              />
-            </div>
-            <div>
-              <Input
-                type="text"
-                placeholder="Address line 1"
-                value={addressLine1}
-                onChange={(e) => setAddressLine1(e.target.value)}
                 required
               />
             </div>
