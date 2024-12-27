@@ -32,20 +32,20 @@ export const PetitionForm = ({
     setIsSubmitting(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // First verify the API connection
-      const { error: testError } = await supabase
-        .from('petitions')
+      // First verify the application exists
+      const { data: application, error: applicationError } = await supabase
+        .from('developments')
         .select('id')
-        .limit(1);
+        .eq('id', applicationId)
+        .single();
 
-      if (testError) {
-        console.error('API Connection test failed:', testError);
-        throw new Error('Failed to connect to the database. Please try again later.');
+      if (applicationError || !application) {
+        throw new Error('Invalid application ID. The development may have been removed.');
       }
 
-      // Proceed with insertion
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Then create the petition
       const { error } = await supabase
         .from('petitions')
         .insert({
