@@ -137,7 +137,7 @@ export type Database = {
       }
       petitions: {
         Row: {
-          address: string
+          address: string | null
           application_id: number | null
           created_at: string
           id: number
@@ -146,7 +146,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          address: string
+          address?: string | null
           application_id?: number | null
           created_at?: string
           id?: never
@@ -155,7 +155,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
-          address?: string
+          address?: string | null
           application_id?: number | null
           created_at?: string
           id?: never
