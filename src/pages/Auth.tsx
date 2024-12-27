@@ -30,11 +30,6 @@ const AuthPage = () => {
           title: "Signed out",
           description: "You have been signed out",
         });
-      } else if (event === 'USER_DELETED') {
-        toast({
-          title: "Account deleted",
-          description: "Your account has been deleted",
-        });
       } else if (event === 'PASSWORD_RECOVERY') {
         toast({
           title: "Password recovery email sent",
