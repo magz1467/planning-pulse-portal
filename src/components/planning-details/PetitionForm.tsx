@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Share2, MessageCircle, Link2 } from "lucide-react";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
+import { PetitionSharing } from "./petition/PetitionSharing";
 
 interface PetitionFormProps {
   open: boolean;
@@ -14,45 +14,18 @@ interface PetitionFormProps {
   selectedReasons: string[];
 }
 
-export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReasons }: PetitionFormProps) => {
+export const PetitionForm = ({ 
+  open, 
+  onOpenChange, 
+  applicationId, 
+  selectedReasons 
+}: PetitionFormProps) => {
   const [email, setEmail] = useState("");
   const [postcode, setPostcode] = useState("");
   const [addressLine1, setAddressLine1] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
-
-  const getShareUrl = () => {
-    const baseUrl = window.location.origin + window.location.pathname;
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set('application', applicationId.toString());
-    return `${baseUrl}?${searchParams.toString()}`;
-  };
-
-  const handleShare = async () => {
-    const url = getShareUrl();
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({
-        title: "Link copied!",
-        description: "Share this link to show others your petition.",
-        duration: 3000,
-      });
-    } catch (err) {
-      toast({
-        title: "Couldn't copy link",
-        description: "Please try again or copy the URL from your browser.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleWhatsAppShare = () => {
-    const url = getShareUrl();
-    const text = `I just created a petition about a planning application. Join me in making our voice heard: ${url}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, '_blank');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,24 +133,7 @@ export const PetitionForm = ({ open, onOpenChange, applicationId, selectedReason
             <p className="text-sm text-gray-600">
               Thank you for creating this petition! Share it with others to increase its impact.
             </p>
-            <div className="flex flex-col gap-2">
-              <Button
-                variant="outline"
-                onClick={handleShare}
-                className="w-full flex items-center gap-2"
-              >
-                <Share2 className="w-4 h-4" />
-                Copy Share Link
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleWhatsAppShare}
-                className="w-full flex items-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Share on WhatsApp
-              </Button>
-            </div>
+            <PetitionSharing applicationId={applicationId} />
             <Button onClick={handleClose} className="w-full mt-4">
               Close
             </Button>
