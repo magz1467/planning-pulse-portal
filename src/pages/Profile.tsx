@@ -2,14 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from "@/components/Header";
 import { User } from '@supabase/supabase-js';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileOverview } from '@/components/profile/ProfileOverview';
-import { SavedDevelopmentsTab } from '@/components/profile/SavedDevelopmentsTab';
-import { PetitionsTab } from '@/components/profile/PetitionsTab';
-import { SettingsTab } from '@/components/profile/SettingsTab';
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { ProfileTabs } from '@/components/profile/ProfileTabs';
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -43,7 +40,7 @@ const Profile = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Modified query to handle multiple results
+      // Get most recent user profile
       const { data: profileData, error: profileError } = await supabase
         .from('User_data')
         .select('*')
@@ -52,10 +49,9 @@ const Profile = () => {
         .limit(1);
 
       if (profileError) throw profileError;
-      
-      // Use the most recent profile if exists
       setUserProfile(profileData?.[0] || null);
 
+      // Get petitions with development data
       const { data: petitionsData, error: petitionsError } = await supabase
         .from('petitions')
         .select(`
@@ -69,7 +65,7 @@ const Profile = () => {
         .eq('user_id', session.user.id);
 
       if (petitionsError) throw petitionsError;
-      setPetitions(petitionsData);
+      setPetitions(petitionsData || []);
 
       setLoading(false);
     } catch (error: any) {
@@ -184,43 +180,16 @@ const Profile = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">My Profile</h1>
-        
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="saved">Saved Developments</TabsTrigger>
-            <TabsTrigger value="petitions">My Petitions</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview">
-            <ProfileOverview 
-              user={user}
-              userProfile={userProfile}
-              onPostcodeUpdate={handlePostcodeUpdate}
-              onEmailSubmit={handleEmailSubmit}
-            />
-          </TabsContent>
-
-          <TabsContent value="saved">
-            <SavedDevelopmentsTab 
-              onSelectApplication={(id) => navigate(`/map?development=${id}`)}
-            />
-          </TabsContent>
-
-          <TabsContent value="petitions">
-            <PetitionsTab petitions={petitions} />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <SettingsTab 
-              userProfile={userProfile}
-              onMarketingUpdate={handleMarketingUpdate}
-              onSignOut={handleSignOut}
-            />
-          </TabsContent>
-        </Tabs>
+        <ProfileHeader user={user} />
+        <ProfileTabs 
+          user={user}
+          userProfile={userProfile}
+          petitions={petitions}
+          onPostcodeUpdate={handlePostcodeUpdate}
+          onEmailSubmit={handleEmailSubmit}
+          onMarketingUpdate={handleMarketingUpdate}
+          onSignOut={handleSignOut}
+        />
       </main>
     </div>
   );
