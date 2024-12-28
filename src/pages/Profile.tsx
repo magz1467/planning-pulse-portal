@@ -8,13 +8,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from '@supabase/supabase-js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
+import { EmailDialog } from '@/components/EmailDialog';
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [petitions, setPetitions] = useState<any[]>([]);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -80,6 +82,41 @@ const Profile = () => {
     }
   };
 
+  const handleEmailSubmit = async (email: string, radius: string) => {
+    try {
+      const { error } = await supabase
+        .from('User_data')
+        .update({
+          'Post Code': userProfile?.Post_Code,
+          'Radius_from_pc': parseInt(radius),
+        })
+        .eq('Email', email);
+
+      if (error) throw error;
+
+      setShowEmailDialog(false);
+      setUserProfile(prev => ({
+        ...prev,
+        Radius_from_pc: parseInt(radius)
+      }));
+
+      toast({
+        title: "Success",
+        description: "Your notification preferences have been updated",
+      });
+
+      // Refresh user data
+      fetchUserData();
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update notification preferences",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleMarketingUpdate = async (value: boolean) => {
     try {
       const { error } = await supabase
@@ -99,6 +136,27 @@ const Profile = () => {
       toast({
         title: "Error",
         description: "Failed to update marketing preferences",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePostcodeUpdate = async (postcode: string) => {
+    try {
+      const { error } = await supabase
+        .from('User_data')
+        .update({ 'Post Code': postcode })
+        .eq('Email', user?.email);
+
+      if (error) throw error;
+
+      setUserProfile(prev => ({ ...prev, 'Post Code': postcode }));
+      setShowEmailDialog(true);
+    } catch (error) {
+      console.error('Error updating postcode:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update postcode",
         variant: "destructive",
       });
     }
@@ -139,11 +197,38 @@ const Profile = () => {
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Post Code</label>
-                  <p>{userProfile?.Post_Code || 'Not set'}</p>
+                  <div className="flex items-center gap-2">
+                    <p>{userProfile?.Post_Code || 'Not set'}</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const postcode = prompt('Enter your postcode:');
+                        if (postcode) {
+                          handlePostcodeUpdate(postcode);
+                        }
+                      }}
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      {userProfile?.Post_Code ? 'Update' : 'Add'}
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm text-gray-500">Notification Radius</label>
-                  <p>{userProfile?.Radius_from_pc ? `${userProfile.Radius_from_pc}m` : 'Not set'}</p>
+                  <div className="flex items-center gap-2">
+                    <p>{userProfile?.Radius_from_pc ? `${userProfile.Radius_from_pc}m` : 'Not set'}</p>
+                    {userProfile?.Post_Code && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowEmailDialog(true)}
+                      >
+                        <Bell className="h-4 w-4 mr-2" />
+                        {userProfile?.Radius_from_pc ? 'Update' : 'Set up'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -227,8 +312,16 @@ const Profile = () => {
               </div>
             </Card>
           </TabsContent>
+
         </Tabs>
       </main>
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+        applicationRef={userProfile?.Post_Code}
+      />
     </div>
   );
 };
