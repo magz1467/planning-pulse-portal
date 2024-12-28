@@ -1,9 +1,6 @@
 import { User } from '@supabase/supabase-js';
 import { Card } from "@/components/ui/card";
-import { EmailDialog } from '@/components/EmailDialog';
-import { useState } from 'react';
 import { PostcodeSection } from './PostcodeSection';
-import { NotificationSettings } from './NotificationSettings';
 
 interface ProfileOverviewProps {
   user: User | null;
@@ -18,8 +15,6 @@ export const ProfileOverview = ({
   onPostcodeUpdate,
   onEmailSubmit 
 }: ProfileOverviewProps) => {
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">Account Information</h2>
@@ -33,19 +28,7 @@ export const ProfileOverview = ({
           initialPostcode={userProfile?.Post_Code}
           onPostcodeUpdate={onPostcodeUpdate}
         />
-
-        <NotificationSettings 
-          radiusFromPc={userProfile?.Radius_from_pc}
-          onOpenEmailDialog={() => setShowEmailDialog(true)}
-        />
       </div>
-
-      <EmailDialog 
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        onSubmit={onEmailSubmit}
-        applicationRef={userProfile?.Post_Code}
-      />
     </Card>
   );
 };

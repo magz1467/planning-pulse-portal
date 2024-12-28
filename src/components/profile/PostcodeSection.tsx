@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { PostcodeSearch } from '@/components/PostcodeSearch';
-import { Trash, PlusCircle } from 'lucide-react';
+import { Trash, Bell } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import { EmailDialog } from '@/components/EmailDialog';
 
 interface PostcodeSectionProps {
   initialPostcode?: string;
@@ -13,8 +14,10 @@ interface PostcodeSectionProps {
 export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: PostcodeSectionProps) => {
   const [postcode, setPostcode] = useState(initialPostcode);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [postcodes, setPostcodes] = useState<Array<{ id: number; postcode: string }>>([]);
+  const [postcodes, setPostcodes] = useState<Array<{ id: number; postcode: string; radius?: string }>>([]);
   const [showAddNew, setShowAddNew] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [selectedPostcode, setSelectedPostcode] = useState<string>('');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -25,7 +28,7 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
     try {
       const { data, error } = await supabase
         .from('user_postcodes')
-        .select('id, postcode')
+        .select('id, postcode, radius')
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -112,6 +115,38 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
     }
   };
 
+  const handleEmailSubmit = async (email: string, radius: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
+      const { error } = await supabase
+        .from('user_postcodes')
+        .update({ radius })
+        .eq('postcode', selectedPostcode)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await fetchPostcodes();
+      setShowEmailDialog(false);
+      toast({
+        title: "Success",
+        description: `Alert radius updated for ${selectedPostcode}`,
+      });
+    } catch (error) {
+      console.error('Error updating alert radius:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update alert radius",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handlePostcodeSelect = (selectedPostcode: string) => {
     setPostcode(selectedPostcode);
   };
@@ -122,7 +157,27 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
       <div className="space-y-2">
         {postcodes.map((item) => (
           <div key={item.id} className="flex items-center gap-2">
-            <div className="flex-1 p-2 bg-gray-50 rounded-md">{item.postcode}</div>
+            <div className="flex-1 p-2 bg-gray-50 rounded-md">
+              <div className="flex items-center justify-between">
+                <span>{item.postcode}</span>
+                {item.radius && (
+                  <span className="text-sm text-gray-500">
+                    Alerts: {item.radius === "1000" ? "1km" : `${item.radius}m`}
+                  </span>
+                )}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setSelectedPostcode(item.postcode);
+                setShowEmailDialog(true);
+              }}
+              className="h-9 w-9"
+            >
+              <Bell className="h-4 w-4" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -156,11 +211,17 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
             className="w-full"
             onClick={() => setShowAddNew(true)}
           >
-            <PlusCircle className="h-4 w-4 mr-2" />
             Add Postcode
           </Button>
         )}
       </div>
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+        applicationRef={selectedPostcode}
+      />
     </div>
   );
 };
