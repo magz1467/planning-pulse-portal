@@ -12,7 +12,7 @@ serve(async (req) => {
   try {
     console.log('Starting planning data sync process');
     
-    let nextPage = 'https://www.planning.data.gov.uk/api/v1/applications';
+    let nextPage = 'https://www.planning.data.gov.uk/entity.json?limit=10';
     let pageCount = 0;
     let updatesCount = 0;
     let insertsCount = 0;
@@ -62,6 +62,7 @@ serve(async (req) => {
           updateBatch = []; // Clear batch after processing
         }
       }
+      throw new Error("fjksdg;jkdf;klbfjk;")
 
       // Process any remaining items in the batch
       if (updateBatch.length > 0) {
@@ -73,6 +74,7 @@ serve(async (req) => {
 
       // Check for next page in the HAL links
       nextPage = data._links?.next?.href || null;
+      console.log(nextPage)
       
       // Log progress
       console.log(`Completed page ${pageCount}. Total inserts: ${insertsCount}, updates: ${updatesCount}`);
@@ -98,7 +100,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error in update-developments function:', error);
+    console.error('Error in update-applications function:', error);
     return new Response(
       JSON.stringify({
         error: 'Failed to sync planning data',

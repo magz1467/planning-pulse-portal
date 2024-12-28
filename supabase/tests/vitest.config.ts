@@ -6,6 +6,6 @@ dotenv.config();
 export default defineConfig({
   test: {
     environment: 'node',
-    setupFiles: ['dotenv/config'],
+    setupFiles: ['dotenv/config', './supabase/.env'],
   },
 });

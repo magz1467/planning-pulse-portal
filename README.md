@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Planning Pulse Portal
 
 ## Project info
 
@@ -20,33 +20,28 @@ The only requirement is having Node.js & npm installed - [install with nvm](http
 
 Follow these steps:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm install
-
-# Step 4: Set up environment variables for local testing
-# Create a .env file with the following content:
-# Replace with your actual Supabase service role key and URL
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-SUPABASE_URL=your_supabase_project_url_here
-
-# Step 5: Run tests
-npm test
-```
-
 ## Running Tests
 
 To run tests locally, you must create a `.env` file with the following environment variables:
 - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase project's service role key
 - `SUPABASE_URL`: Your Supabase project's URL
 
-These can be found in your Supabase project settings.
+Collect these by going to the project in supabase -> project settings (in the bottom left corner) -> API settings
+
+```sh
+git clone git@github.com:magz1467/planning-pulse-portal.git
+cd planning-pulse-portal
+npm i
+
+echo "SUPABASE_SERVICE_ROLE_KEY=___________" >> ./supabase/.env
+echo "SUPABASE_URL=https://jposqxdboetyioymfswd.supabase.com" >> ./supabase/.env
+```
+
+## Running Tests
+
+```
+npx vitest .
+```
 
 ## What technologies are used for this project?
 

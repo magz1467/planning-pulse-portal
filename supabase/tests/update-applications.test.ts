@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { expect, test } from 'vitest';
+import { config } from 'dotenv';
+config({ path: './supabase/.env' });
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -10,11 +12,12 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-test('update-developments function should populate developments table', async () => {
+test('update-applications function should populate developments table', async () => {
   // Invoke the function
-  const { data, error } = await supabase.functions.invoke('update-developments', {
+  const { data, error } = await supabase.functions.invoke('update-applications', {
     method: 'POST'
   });
+  console.log('Function response:', { data, error });
 
   // Check for successful response
   expect(error).toBeNull();
