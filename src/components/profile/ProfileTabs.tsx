@@ -14,6 +14,7 @@ interface ProfileTabsProps {
   onEmailSubmit: (email: string, radius: string) => Promise<void>;
   onMarketingUpdate: (value: boolean) => Promise<void>;
   onSignOut: () => Promise<void>;
+  onInterestTypeUpdate: (type: string) => Promise<void>;
 }
 
 export const ProfileTabs = ({ 
@@ -23,7 +24,8 @@ export const ProfileTabs = ({
   onPostcodeUpdate,
   onEmailSubmit,
   onMarketingUpdate,
-  onSignOut
+  onSignOut,
+  onInterestTypeUpdate
 }: ProfileTabsProps) => {
   const navigate = useNavigate();
 
@@ -41,6 +43,7 @@ export const ProfileTabs = ({
           user={user}
           userProfile={userProfile}
           onPostcodeUpdate={onPostcodeUpdate}
+          onInterestTypeUpdate={onInterestTypeUpdate}
         />
       </TabsContent>
 

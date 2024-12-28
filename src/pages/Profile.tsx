@@ -7,7 +7,6 @@ import { Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
-import { SavedApplicationsTab } from '@/components/profile/SavedApplicationsTab';
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -77,6 +76,30 @@ const Profile = () => {
         variant: "destructive",
       });
       setLoading(false);
+    }
+  };
+
+  const handleInterestTypeUpdate = async (type: string) => {
+    try {
+      const { error } = await supabase
+        .from('User_data')
+        .update({ Type: type })
+        .eq('Email', user?.email);
+
+      if (error) throw error;
+
+      setUserProfile(prev => ({ ...prev, Type: type }));
+      toast({
+        title: "Success",
+        description: "Interest type updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating interest type:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update interest type",
+        variant: "destructive",
+      });
     }
   };
 
@@ -190,6 +213,7 @@ const Profile = () => {
           onEmailSubmit={handleEmailSubmit}
           onMarketingUpdate={handleMarketingUpdate}
           onSignOut={handleSignOut}
+          onInterestTypeUpdate={handleInterestTypeUpdate}
         />
       </main>
     </div>
