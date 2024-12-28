@@ -18,6 +18,7 @@ import Auth from './pages/Auth';
 import AuthSuccess from './pages/AuthSuccess';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
+import Cookies from './pages/Cookies';
 
 // Content pages
 import PlanningBasics from './pages/content/PlanningBasics';
@@ -41,6 +42,7 @@ const App = () => {
         <Route path="/press" element={<Press />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/cookies" element={<Cookies />} />
         <Route path="/accessibility" element={<Accessibility />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/investors" element={<Investors />} />
