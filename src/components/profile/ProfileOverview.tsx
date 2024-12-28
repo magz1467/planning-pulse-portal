@@ -6,14 +6,12 @@ interface ProfileOverviewProps {
   user: User | null;
   userProfile: any;
   onPostcodeUpdate: (postcode: string) => Promise<void>;
-  onEmailSubmit: (email: string, radius: string) => Promise<void>;
 }
 
 export const ProfileOverview = ({ 
   user, 
   userProfile, 
   onPostcodeUpdate,
-  onEmailSubmit 
 }: ProfileOverviewProps) => {
   return (
     <Card className="p-6">

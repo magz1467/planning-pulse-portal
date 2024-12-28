@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { PostcodeSearch } from '@/components/PostcodeSearch';
-import { Trash, Bell } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { EmailDialog } from '@/components/EmailDialog';
+import { PostcodeItem } from './PostcodeItem';
+import { AddPostcode } from './AddPostcode';
 
 interface PostcodeSectionProps {
   initialPostcode?: string;
   onPostcodeUpdate: (postcode: string) => Promise<void>;
 }
 
-export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: PostcodeSectionProps) => {
+export const PostcodeSection = ({ 
+  initialPostcode = '', 
+  onPostcodeUpdate 
+}: PostcodeSectionProps) => {
   const [postcode, setPostcode] = useState(initialPostcode);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [postcodes, setPostcodes] = useState<Array<{ id: number; postcode: string; radius?: string }>>([]);
@@ -56,7 +59,6 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
 
     setIsSubmitting(true);
     try {
-      // Get the current user
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -147,64 +149,31 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
     }
   };
 
-  const handlePostcodeSelect = (selectedPostcode: string) => {
-    setPostcode(selectedPostcode);
-  };
-
   return (
     <div>
       <label className="text-sm text-gray-500">Post Codes</label>
       <div className="space-y-2">
         {postcodes.map((item) => (
-          <div key={item.id} className="flex items-center gap-2">
-            <div className="flex-1 p-2 bg-gray-50 rounded-md">
-              <div className="flex items-center justify-between">
-                <span>{item.postcode}</span>
-                {item.radius && (
-                  <span className="text-sm text-gray-500">
-                    Alerts: {item.radius === "1000" ? "1km" : `${item.radius}m`}
-                  </span>
-                )}
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setSelectedPostcode(item.postcode);
-                setShowEmailDialog(true);
-              }}
-              className="h-9 w-9"
-            >
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDelete(item.id)}
-              className="h-9 w-9"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          </div>
+          <PostcodeItem
+            key={item.id}
+            id={item.id}
+            postcode={item.postcode}
+            radius={item.radius}
+            onDelete={handleDelete}
+            onAlertClick={(postcode) => {
+              setSelectedPostcode(postcode);
+              setShowEmailDialog(true);
+            }}
+          />
         ))}
 
         {showAddNew ? (
-          <div className="flex gap-2">
-            <PostcodeSearch
-              onSelect={handlePostcodeSelect}
-              placeholder="Enter your postcode"
-              className="flex-1"
-            />
-            <Button 
-              variant="outline" 
-              size="default"
-              onClick={handlePostcodeSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Adding...' : 'Add'}
-            </Button>
-          </div>
+          <AddPostcode
+            postcode={postcode}
+            isSubmitting={isSubmitting}
+            onPostcodeSelect={setPostcode}
+            onSubmit={handlePostcodeSubmit}
+          />
         ) : (
           <Button
             variant="outline"
