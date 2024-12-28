@@ -2,7 +2,7 @@ import { User } from '@supabase/supabase-js';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; 
-import { MapPin, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { EmailDialog } from '@/components/EmailDialog';
 import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +28,10 @@ export const ProfileOverview = ({
   const handlePostcodeSubmit = async () => {
     if (postcode.trim()) {
       await onPostcodeUpdate(postcode.trim());
+      toast({
+        title: "Success",
+        description: "Your postcode has been updated",
+      });
     }
   };
 
@@ -55,7 +59,6 @@ export const ProfileOverview = ({
               size="default"
               onClick={handlePostcodeSubmit}
             >
-              <MapPin className="h-4 w-4 mr-2" />
               {userProfile?.Post_Code ? 'Update' : 'Save'}
             </Button>
           </div>
