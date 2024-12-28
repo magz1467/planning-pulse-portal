@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PostcodeSearch } from "./PostcodeSearch";
 import { useToast } from "./ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useSearchLogger } from "@/hooks/use-search-logger";
+import { SearchTabs } from "./search/SearchTabs";
 
 export const SearchForm = () => {
   const [activeTab, setActiveTab] = useState<'recent' | 'completed'>('recent');
@@ -11,26 +12,7 @@ export const SearchForm = () => {
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const logSearch = async (postcode: string) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const { error } = await supabase
-        .from('Searches')
-        .insert({
-          'Post Code': postcode,
-          'Status': activeTab,
-          'User_logged_in': !!session?.user
-        });
-
-      if (error) {
-        console.error('Error logging search:', error);
-      }
-    } catch (err) {
-      console.error('Error logging search:', err);
-    }
-  };
+  const { logSearch } = useSearchLogger();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,8 +28,7 @@ export const SearchForm = () => {
 
     setIsSearching(true);
     try {
-      // Log the search to Supabase
-      await logSearch(postcode.trim());
+      await logSearch(postcode.trim(), activeTab);
 
       navigate('/map', { 
         state: { 
@@ -70,32 +51,11 @@ export const SearchForm = () => {
 
   return (
     <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
-      <div className="flex gap-4 mb-6">
-        <Button 
-          variant="outline" 
-          className={`flex-1 transition-colors ${
-            activeTab === 'recent' 
-              ? 'bg-primary-light text-primary hover:bg-primary hover:text-white' 
-              : 'hover:bg-primary-light hover:text-primary'
-          }`}
-          onClick={() => setActiveTab('recent')}
-          disabled={isSearching}
-        >
-          Recent
-        </Button>
-        <Button 
-          variant="outline" 
-          className={`flex-1 transition-colors ${
-            activeTab === 'completed' 
-              ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' 
-              : 'hover:bg-gray-100 hover:text-gray-600'
-          }`}
-          onClick={() => setActiveTab('completed')}
-          disabled={isSearching}
-        >
-          Completed
-        </Button>
-      </div>
+      <SearchTabs 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        disabled={isSearching}
+      />
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
