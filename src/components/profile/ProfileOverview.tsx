@@ -21,15 +21,17 @@ export const ProfileOverview = ({
   onEmailSubmit 
 }: ProfileOverviewProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const { toast } = useToast();
 
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">Account Information</h2>
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
           <label className="text-sm text-gray-500">Email</label>
           <p>{user?.email}</p>
         </div>
+        
         <div>
           <label className="text-sm text-gray-500">Post Code</label>
           <div className="flex items-center gap-2">
@@ -49,23 +51,27 @@ export const ProfileOverview = ({
             </Button>
           </div>
         </div>
+
         <div>
-          <label className="text-sm text-gray-500">Notification Radius</label>
-          <div className="flex items-center gap-2">
-            <p>{userProfile?.Radius_from_pc ? `${userProfile.Radius_from_pc}m` : 'Not set'}</p>
-            {userProfile?.Post_Code && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowEmailDialog(true)}
-              >
-                <Bell className="h-4 w-4 mr-2" />
-                {userProfile?.Radius_from_pc ? 'Update' : 'Set up'}
-              </Button>
+          <label className="text-sm text-gray-500">Notification Settings</label>
+          <div className="mt-2">
+            <Button 
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={() => setShowEmailDialog(true)}
+            >
+              <Bell className="h-4 w-4" />
+              {userProfile?.Radius_from_pc ? 'Update Alert Settings' : 'Set Up Alerts'}
+            </Button>
+            {userProfile?.Radius_from_pc && (
+              <p className="text-sm text-gray-500 mt-2">
+                Currently receiving alerts within {userProfile.Radius_from_pc}m of your postcode
+              </p>
             )}
           </div>
         </div>
       </div>
+
       <EmailDialog 
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
