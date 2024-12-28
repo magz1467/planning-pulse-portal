@@ -1,7 +1,7 @@
 import { User } from '@supabase/supabase-js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileOverview } from './ProfileOverview';
-import { SavedDevelopmentsTab } from './SavedDevelopmentsTab';
+import { SavedApplicationsTab } from './SavedApplicationsTab';
 import { PetitionsTab } from './PetitionsTab';
 import { SettingsTab } from './SettingsTab';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ export const ProfileTabs = ({
     <Tabs defaultValue="overview" className="space-y-6">
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="saved">Saved Developments</TabsTrigger>
+        <TabsTrigger value="saved">Saved Applications</TabsTrigger>
         <TabsTrigger value="petitions">My Petitions</TabsTrigger>
         <TabsTrigger value="settings">Settings</TabsTrigger>
       </TabsList>
@@ -45,8 +45,8 @@ export const ProfileTabs = ({
       </TabsContent>
 
       <TabsContent value="saved">
-        <SavedDevelopmentsTab 
-          onSelectApplication={(id) => navigate(`/map?development=${id}`)}
+        <SavedApplicationsTab 
+          onSelectApplication={(id) => navigate(`/map?application=${id}`)}
         />
       </TabsContent>
 

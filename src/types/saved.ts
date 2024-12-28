@@ -1,6 +1,6 @@
-export interface SavedDevelopment {
+export interface SavedApplication {
   id: number;
   created_at: string;
-  development_id: number;
+  application_id: number;
   user_id: string | null;
 }
