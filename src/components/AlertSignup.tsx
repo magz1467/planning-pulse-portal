@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Bell } from "lucide-react"
+import { Bell, Check } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { EmailDialog } from "./EmailDialog"
 
@@ -19,12 +19,26 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
 
   const handleEmailSubmit = (email: string, radius: string) => {
     setIsSubscribed(true)
+    setShowEmailDialog(false)
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+    
+    // Show pending toast
     toast({
       title: "Subscription pending",
       description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
       duration: 5000,
     })
+  }
+
+  if (isSubscribed) {
+    return (
+      <div className="p-3 bg-primary-light/50 rounded-lg mb-4">
+        <div className="flex items-center gap-2 text-sm text-primary">
+          <Check size={16} className="text-primary" />
+          <span>Alerts set up for this area</span>
+        </div>
+      </div>
+    )
   }
 
   return (
