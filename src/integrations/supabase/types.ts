@@ -15,63 +15,111 @@ export type Database = {
           applicant: string | null
           consultation_end: string | null
           created_at: string
+          dataset: string | null
           decision_due: string | null
           description: string | null
+          end_date: string | null
+          entity: number | null
+          entry_date: string | null
           external_id: string | null
           id: number
           lat: number | null
           lng: number | null
+          local_planning_authority: string | null
           location: unknown | null
           officer: string | null
+          opendatacommunities_uri: string | null
+          organisation_entity: string | null
+          parliament_thesaurus: string | null
+          prefix: string | null
           raw_data: Json | null
+          start_date: string | null
+          statistical_geography: string | null
           status: string | null
           submission_date: string | null
           title: string
+          twitter: string | null
           type: string | null
+          typology: string | null
           updated_at: string
           ward: string | null
+          website: string | null
+          wikidata: string | null
+          wikipedia: string | null
         }
         Insert: {
           address?: string | null
           applicant?: string | null
           consultation_end?: string | null
           created_at?: string
+          dataset?: string | null
           decision_due?: string | null
           description?: string | null
+          end_date?: string | null
+          entity?: number | null
+          entry_date?: string | null
           external_id?: string | null
           id?: number
           lat?: number | null
           lng?: number | null
+          local_planning_authority?: string | null
           location?: unknown | null
           officer?: string | null
+          opendatacommunities_uri?: string | null
+          organisation_entity?: string | null
+          parliament_thesaurus?: string | null
+          prefix?: string | null
           raw_data?: Json | null
+          start_date?: string | null
+          statistical_geography?: string | null
           status?: string | null
           submission_date?: string | null
           title: string
+          twitter?: string | null
           type?: string | null
+          typology?: string | null
           updated_at?: string
           ward?: string | null
+          website?: string | null
+          wikidata?: string | null
+          wikipedia?: string | null
         }
         Update: {
           address?: string | null
           applicant?: string | null
           consultation_end?: string | null
           created_at?: string
+          dataset?: string | null
           decision_due?: string | null
           description?: string | null
+          end_date?: string | null
+          entity?: number | null
+          entry_date?: string | null
           external_id?: string | null
           id?: number
           lat?: number | null
           lng?: number | null
+          local_planning_authority?: string | null
           location?: unknown | null
           officer?: string | null
+          opendatacommunities_uri?: string | null
+          organisation_entity?: string | null
+          parliament_thesaurus?: string | null
+          prefix?: string | null
           raw_data?: Json | null
+          start_date?: string | null
+          statistical_geography?: string | null
           status?: string | null
           submission_date?: string | null
           title?: string
+          twitter?: string | null
           type?: string | null
+          typology?: string | null
           updated_at?: string
           ward?: string | null
+          website?: string | null
+          wikidata?: string | null
+          wikipedia?: string | null
         }
         Relationships: []
       }

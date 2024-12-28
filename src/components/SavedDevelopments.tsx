@@ -3,7 +3,7 @@ import { Application } from '@/types/planning';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, MapPin } from 'lucide-react';
-import { useSavedDevelopments } from '@/hooks/use-saved-developments';
+import { useSavedApplications } from '@/hooks/use-saved-applications';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,7 @@ interface SavedDevelopmentsProps {
 }
 
 export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDevelopmentsProps) => {
-  const { savedDevelopments, toggleSavedDevelopment, dummyApplications } = useSavedDevelopments();
+  const { savedApplications, toggleSavedApplication, dummyApplications } = useSavedApplications();
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -34,7 +34,7 @@ export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDe
   if (!isAuthenticated) {
     return (
       <Card className="p-6 text-center">
-        <p className="text-gray-600 mb-4">Sign in to save and view your favorite developments</p>
+        <p className="text-gray-600 mb-4">Sign in to save and view your favorite applications</p>
         <Button onClick={() => {/* Add your sign in logic here */}}>
           Sign In
         </Button>
@@ -43,21 +43,21 @@ export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDe
   }
 
   // Use dummy data for demonstration
-  const savedApplications = dummyApplications.filter(app => 
-    savedDevelopments.includes(app.id)
+  const savedApplicationsList = dummyApplications.filter(app => 
+    savedApplications.includes(app.id)
   );
 
-  if (savedApplications.length === 0) {
+  if (savedApplicationsList.length === 0) {
     return (
       <Card className="p-6 text-center">
-        <p className="text-gray-600">You haven't saved any developments yet</p>
+        <p className="text-gray-600">You haven't saved any applications yet</p>
       </Card>
     );
   }
 
   return (
     <div className="space-y-4">
-      {savedApplications.map((application) => (
+      {savedApplicationsList.map((application) => (
         <Card 
           key={application.id}
           className="p-4 hover:border-primary cursor-pointer transition-colors"
@@ -85,10 +85,10 @@ export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDe
                   size="icon"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleSavedDevelopment(application.id);
+                    toggleSavedApplication(application.id);
                     toast({
-                      title: "Development removed",
-                      description: "The development has been removed from your saved list",
+                      title: "Application removed",
+                      description: "The application has been removed from your saved list",
                     });
                   }}
                   className="text-red-500 hover:text-red-600"
