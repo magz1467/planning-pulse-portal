@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Bell } from 'lucide-react';
 import { EmailDialog } from '@/components/EmailDialog';
 import { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 
 interface ProfileOverviewProps {
@@ -27,11 +26,19 @@ export const ProfileOverview = ({
 
   const handlePostcodeSubmit = async () => {
     if (postcode.trim()) {
-      await onPostcodeUpdate(postcode.trim());
-      toast({
-        title: "Success",
-        description: "Your postcode has been updated",
-      });
+      try {
+        await onPostcodeUpdate(postcode.trim());
+        toast({
+          title: "Success",
+          description: "Your postcode has been updated",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update postcode",
+          variant: "destructive",
+        });
+      }
     }
   };
 
