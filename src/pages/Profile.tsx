@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { User } from '@supabase/supabase-js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, MapPin, Bell } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileOverview } from '@/components/profile/ProfileOverview';
 import { SavedDevelopmentsTab } from '@/components/profile/SavedDevelopmentsTab';
@@ -43,14 +43,18 @@ const Profile = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
+      // Modified query to handle multiple results
       const { data: profileData, error: profileError } = await supabase
         .from('User_data')
         .select('*')
         .eq('Email', session.user.email)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
       if (profileError) throw profileError;
-      setUserProfile(profileData);
+      
+      // Use the most recent profile if exists
+      setUserProfile(profileData?.[0] || null);
 
       const { data: petitionsData, error: petitionsError } = await supabase
         .from('petitions')
