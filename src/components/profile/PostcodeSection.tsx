@@ -180,8 +180,11 @@ export const PostcodeSection = ({
 
   return (
     <div>
-      <label className="text-sm text-gray-500">Post Codes</label>
-      <div className="space-y-2">
+      <div className="space-y-1">
+        <label className="text-sm text-gray-500">Post Codes</label>
+        <p className="text-sm text-gray-500">These are the postcodes you want to be kept aware of for planning applications</p>
+      </div>
+      <div className="space-y-2 mt-2">
         {postcodes.map((item) => (
           <PostcodeItem
             key={item.id}
