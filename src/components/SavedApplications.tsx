@@ -8,12 +8,12 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 
-interface SavedApplicationsProps {
+interface SavedDevelopmentsProps {
   applications: Application[];
   onSelectApplication: (id: number) => void;
 }
 
-export const SavedApplications = ({ applications, onSelectApplication }: SavedApplicationsProps) => {
+export const SavedDevelopments = ({ applications, onSelectApplication }: SavedDevelopmentsProps) => {
   const { savedApplications, toggleSavedApplication, dummyApplications } = useSavedApplications();
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);

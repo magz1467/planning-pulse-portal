@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
+import { SavedApplicationsTab } from '@/components/profile/SavedApplicationsTab';
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);

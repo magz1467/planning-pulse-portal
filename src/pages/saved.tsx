@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Header } from '@/components/Header';
-import { SavedDevelopments } from '@/components/SavedDevelopments';
+import { SavedApplications } from '@/components/SavedApplications';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Application } from '@/types/planning';
@@ -35,8 +35,8 @@ const SavedPage = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Saved Developments</h1>
-          <SavedDevelopments 
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">Saved Applications</h1>
+          <SavedApplications 
             applications={[]} 
             onSelectApplication={handleSelectApplication}
           />
