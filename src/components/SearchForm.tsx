@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { PostcodeSearch } from "./PostcodeSearch";
 import { useToast } from "./ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@supabase/auth-helpers-react";
 
 export const SearchForm = () => {
   const [activeTab, setActiveTab] = useState<'recent' | 'completed'>('recent');
@@ -12,16 +11,17 @@ export const SearchForm = () => {
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const auth = useAuth();
 
   const logSearch = async (postcode: string) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { error } = await supabase
         .from('Searches')
         .insert({
           'Post Code': postcode,
           'Status': activeTab,
-          'User_logged_in': auth?.user() ? true : false
+          'User_logged_in': !!session?.user
         });
 
       if (error) {
