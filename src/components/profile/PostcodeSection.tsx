@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
+import { PostcodeSearch } from '@/components/PostcodeSearch';
 
 interface PostcodeSectionProps {
   initialPostcode?: string;
@@ -10,12 +11,21 @@ interface PostcodeSectionProps {
 
 export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: PostcodeSectionProps) => {
   const [postcode, setPostcode] = useState(initialPostcode);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handlePostcodeSubmit = async () => {
     const trimmedPostcode = postcode.trim();
-    if (!trimmedPostcode) return;
+    if (!trimmedPostcode) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid postcode",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    setIsSubmitting(true);
     try {
       await onPostcodeUpdate(trimmedPostcode);
       toast({
@@ -26,29 +36,34 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
       console.error('Error updating postcode:', error);
       toast({
         title: "Error",
-        description: "Failed to update postcode",
+        description: "Failed to update postcode. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handlePostcodeSelect = (selectedPostcode: string) => {
+    setPostcode(selectedPostcode);
   };
 
   return (
     <div>
       <label className="text-sm text-gray-500">Post Code</label>
       <div className="flex gap-2">
-        <Input
-          type="text"
+        <PostcodeSearch
+          onSelect={handlePostcodeSelect}
           placeholder="Enter your postcode"
-          value={postcode}
-          onChange={(e) => setPostcode(e.target.value)}
           className="max-w-[200px]"
         />
         <Button 
           variant="outline" 
           size="default"
           onClick={handlePostcodeSubmit}
+          disabled={isSubmitting}
         >
-          {initialPostcode ? 'Update' : 'Save'}
+          {isSubmitting ? 'Updating...' : (initialPostcode ? 'Update' : 'Save')}
         </Button>
       </div>
     </div>
