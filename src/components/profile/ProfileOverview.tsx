@@ -1,6 +1,7 @@
 import { User } from '@supabase/supabase-js';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; 
 import { MapPin, Bell } from 'lucide-react';
 import { EmailDialog } from '@/components/EmailDialog';
 import { useState } from 'react';
@@ -21,7 +22,14 @@ export const ProfileOverview = ({
   onEmailSubmit 
 }: ProfileOverviewProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [postcode, setPostcode] = useState(userProfile?.Post_Code || '');
   const { toast } = useToast();
+
+  const handlePostcodeSubmit = async () => {
+    if (postcode.trim()) {
+      await onPostcodeUpdate(postcode.trim());
+    }
+  };
 
   return (
     <Card className="p-6">
@@ -34,20 +42,21 @@ export const ProfileOverview = ({
         
         <div>
           <label className="text-sm text-gray-500">Post Code</label>
-          <div className="flex items-center gap-2">
-            <p>{userProfile?.Post_Code || 'Not set'}</p>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Enter your postcode"
+              value={postcode}
+              onChange={(e) => setPostcode(e.target.value)}
+              className="max-w-[200px]"
+            />
             <Button 
               variant="outline" 
-              size="sm"
-              onClick={() => {
-                const postcode = prompt('Enter your postcode:');
-                if (postcode) {
-                  onPostcodeUpdate(postcode);
-                }
-              }}
+              size="default"
+              onClick={handlePostcodeSubmit}
             >
               <MapPin className="h-4 w-4 mr-2" />
-              {userProfile?.Post_Code ? 'Update' : 'Add'}
+              {userProfile?.Post_Code ? 'Update' : 'Save'}
             </Button>
           </div>
         </div>
