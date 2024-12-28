@@ -8,12 +8,12 @@ interface MapListToggleProps {
 
 export const MapListToggle = ({ isMapView, onToggle }: MapListToggleProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center">
       <Button
         variant="ghost"
         size="sm"
         onClick={onToggle}
-        className={isMapView ? "text-primary" : "text-gray-500"}
+        className={`px-2 ${isMapView ? "text-primary" : "text-gray-500"}`}
       >
         <Map className="h-5 w-5 mr-1" />
         Map
@@ -22,7 +22,7 @@ export const MapListToggle = ({ isMapView, onToggle }: MapListToggleProps) => {
         variant="ghost"
         size="sm"
         onClick={onToggle}
-        className={!isMapView ? "text-primary" : "text-gray-500"}
+        className={`px-2 ${!isMapView ? "text-primary" : "text-gray-500"}`}
       >
         <List className="h-5 w-5 mr-1" />
         List

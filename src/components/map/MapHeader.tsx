@@ -69,16 +69,18 @@ export const MapHeader = ({
 
         {isMobile && onFilterChange && onToggleView && (
           <div className="flex items-center justify-between mt-3 border-t pt-2">
-            <FilterBar
-              onFilterChange={onFilterChange}
-              onSortChange={onSortChange}
-              activeFilters={activeFilters}
-              activeSort={activeSort}
-            />
-            <MapListToggle
-              isMapView={isMapView}
-              onToggle={onToggleView}
-            />
+            <div className="flex items-center gap-1">
+              <FilterBar
+                onFilterChange={onFilterChange}
+                onSortChange={onSortChange}
+                activeFilters={activeFilters}
+                activeSort={activeSort}
+              />
+              <MapListToggle
+                isMapView={isMapView}
+                onToggle={onToggleView}
+              />
+            </div>
           </div>
         )}
       </div>
