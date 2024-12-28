@@ -16,7 +16,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
-import { useSavedDevelopments } from "@/hooks/use-saved-developments";
+import { useSavedApplications } from "@/hooks/use-saved-applications";
 import { Link } from "react-router-dom";
 import { AuthRequiredDialog } from "./AuthRequiredDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,11 +35,11 @@ export const PlanningApplicationDetails = ({
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
-  const { savedDevelopments, toggleSavedDevelopment } = useSavedDevelopments();
+  const { savedApplications, toggleSavedApplication } = useSavedApplications();
 
   if (!application) return null;
 
-  const isSaved = savedDevelopments.includes(application.id);
+  const isSaved = savedApplications.includes(application.id);
 
   const handleSave = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -49,12 +49,12 @@ export const PlanningApplicationDetails = ({
       return;
     }
 
-    toggleSavedDevelopment(application.id);
+    toggleSavedApplication(application.id);
     toast({
-      title: isSaved ? "Development removed" : "Development saved",
+      title: isSaved ? "Application removed" : "Application saved",
       description: isSaved 
-        ? "The development has been removed from your saved list" 
-        : "The development has been added to your saved list. View all your saved developments.",
+        ? "The application has been removed from your saved list" 
+        : "The application has been added to your saved list. View all your saved applications.",
       action: !isSaved ? (
         <Link to="/saved" className="text-primary hover:underline">
           View saved

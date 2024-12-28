@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { SavedDevelopment } from '@/types/saved';
+import { SavedApplication } from '@/types/saved';
 
 // Dummy data for development
 const dummyApplications = [
   {
     id: 1,
-    title: "Development 1",
+    title: "Application 1",
     address: "123 Main St",
     status: "Pending",
     distance: "1.2 miles",
@@ -15,20 +15,19 @@ const dummyApplications = [
   },
   {
     id: 2,
-    title: "Development 2",
+    title: "Application 2",
     address: "456 Elm St",
     status: "Approved",
     distance: "0.5 miles",
     image: "https://via.placeholder.com/150"
   },
-  // Add more dummy applications as needed
 ];
 
-export const useSavedDevelopments = () => {
-  const [savedDevelopments, setSavedDevelopments] = useState<number[]>([]);
+export const useSavedApplications = () => {
+  const [savedApplications, setSavedApplications] = useState<number[]>([]);
   const { toast } = useToast();
 
-  const fetchSavedDevelopments = async () => {
+  const fetchSavedApplications = async () => {
     try {
       const { data: session } = await supabase.auth.getSession();
       
@@ -37,26 +36,26 @@ export const useSavedDevelopments = () => {
       }
 
       const { data, error } = await supabase
-        .from('saved_developments')
-        .select('development_id')
+        .from('saved_applications')
+        .select('application_id')
         .eq('user_id', session.session.user.id);
 
       if (error) {
         throw error;
       }
 
-      setSavedDevelopments(data.map(item => item.development_id));
+      setSavedApplications(data.map(item => item.application_id));
     } catch (error: any) {
-      console.error('Error fetching saved developments:', error);
+      console.error('Error fetching saved applications:', error);
       toast({
         title: "Error",
-        description: "Failed to load saved developments",
+        description: "Failed to load saved applications",
         variant: "destructive",
       });
     }
   };
 
-  const toggleSavedDevelopment = async (developmentId: number) => {
+  const toggleSavedApplication = async (applicationId: number) => {
     try {
       const { data: session } = await supabase.auth.getSession();
       
@@ -64,49 +63,49 @@ export const useSavedDevelopments = () => {
         return;
       }
 
-      const isSaved = savedDevelopments.includes(developmentId);
+      const isSaved = savedApplications.includes(applicationId);
 
       if (isSaved) {
         // Remove from saved
         const { error } = await supabase
-          .from('saved_developments')
+          .from('saved_applications')
           .delete()
           .eq('user_id', session.session.user.id)
-          .eq('development_id', developmentId);
+          .eq('application_id', applicationId);
 
         if (error) throw error;
 
-        setSavedDevelopments(prev => prev.filter(id => id !== developmentId));
+        setSavedApplications(prev => prev.filter(id => id !== applicationId));
       } else {
         // Add to saved
         const { error } = await supabase
-          .from('saved_developments')
+          .from('saved_applications')
           .insert({
             user_id: session.session.user.id,
-            development_id: developmentId
+            application_id: applicationId
           });
 
         if (error) throw error;
 
-        setSavedDevelopments(prev => [...prev, developmentId]);
+        setSavedApplications(prev => [...prev, applicationId]);
       }
     } catch (error: any) {
-      console.error('Error toggling saved development:', error);
+      console.error('Error toggling saved application:', error);
       toast({
         title: "Error",
-        description: "Failed to update saved developments",
+        description: "Failed to update saved applications",
         variant: "destructive",
       });
     }
   };
 
   useEffect(() => {
-    fetchSavedDevelopments();
+    fetchSavedApplications();
   }, []);
 
   return {
-    savedDevelopments,
-    toggleSavedDevelopment,
+    savedApplications,
+    toggleSavedApplication,
     dummyApplications
   };
 };
