@@ -1,7 +1,8 @@
 import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
+import { Bell, X } from "lucide-react";
 import { getStatusColor } from "@/utils/statusColors";
+import { useState } from "react";
 
 interface MobileListViewProps {
   postcode: string;
@@ -16,25 +17,37 @@ export const MobileListView = ({
   onSelectApplication,
   onShowEmailDialog,
 }: MobileListViewProps) => {
+  const [showAlerts, setShowAlerts] = useState(true);
+
   return (
     <div className="absolute inset-0 flex flex-col h-full max-h-[100dvh] overflow-hidden bg-gray-50">
-      <div className="p-4 bg-white border-b">
-        <div className="bg-primary/5 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Bell className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Stay informed about new planning applications near {postcode}
-          </p>
+      {showAlerts && (
+        <div className="p-4 bg-white border-b relative">
           <Button 
-            className="w-full"
-            onClick={onShowEmailDialog}
+            variant="ghost" 
+            size="icon" 
+            className="absolute right-2 top-2 h-8 w-8"
+            onClick={() => setShowAlerts(false)}
           >
-            Get Alerts
+            <X className="h-4 w-4" />
           </Button>
+          <div className="bg-primary/5 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Bell className="h-5 w-5 text-primary" />
+              <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Stay informed about new planning applications near {postcode}
+            </p>
+            <Button 
+              className="w-full"
+              onClick={onShowEmailDialog}
+            >
+              Get Alerts
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
       <div className="p-4 space-y-4 overflow-y-auto">
         {applications.map((app) => (
           <div
