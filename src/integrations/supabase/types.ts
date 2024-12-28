@@ -9,67 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      contact_requests: {
-        Row: {
-          created_at: string
-          email: string | null
-          id: number
-          message: string
-          phone: string | null
-          status: string | null
-        }
-        Insert: {
-          created_at?: string
-          email?: string | null
-          id?: number
-          message: string
-          phone?: string | null
-          status?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string | null
-          id?: number
-          message?: string
-          phone?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      council_contacts: {
-        Row: {
-          contact_name: string
-          council_name: string
-          created_at: string
-          email: string
-          id: number
-          message: string | null
-          phone: string | null
-          status: string | null
-        }
-        Insert: {
-          contact_name: string
-          council_name: string
-          created_at?: string
-          email: string
-          id?: number
-          message?: string | null
-          phone?: string | null
-          status?: string | null
-        }
-        Update: {
-          contact_name?: string
-          council_name?: string
-          created_at?: string
-          email?: string
-          id?: number
-          message?: string | null
-          phone?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      developments: {
+      applications: {
         Row: {
           address: string | null
           applicant: string | null
@@ -135,6 +75,66 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_requests: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: number
+          message: string
+          phone: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: number
+          message: string
+          phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: number
+          message?: string
+          phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      council_contacts: {
+        Row: {
+          contact_name: string
+          council_name: string
+          created_at: string
+          email: string
+          id: number
+          message: string | null
+          phone: string | null
+          status: string | null
+        }
+        Insert: {
+          contact_name: string
+          council_name: string
+          created_at?: string
+          email: string
+          id?: number
+          message?: string | null
+          phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          contact_name?: string
+          council_name?: string
+          created_at?: string
+          email?: string
+          id?: number
+          message?: string | null
+          phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       petitions: {
         Row: {
           address: string | null
@@ -168,36 +168,36 @@ export type Database = {
             foreignKeyName: "petitions_application_id_fkey"
             columns: ["application_id"]
             isOneToOne: false
-            referencedRelation: "developments"
+            referencedRelation: "applications"
             referencedColumns: ["id"]
           },
         ]
       }
-      saved_developments: {
+      saved_applications: {
         Row: {
+          application_id: number
           created_at: string
-          development_id: number
           id: number
           user_id: string | null
         }
         Insert: {
+          application_id: number
           created_at?: string
-          development_id: number
           id?: number
           user_id?: string | null
         }
         Update: {
+          application_id?: number
           created_at?: string
-          development_id?: number
           id?: number
           user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "saved_developments_development_id_fkey"
-            columns: ["development_id"]
+            foreignKeyName: "saved_applications_application_id_fkey"
+            columns: ["application_id"]
             isOneToOne: false
-            referencedRelation: "developments"
+            referencedRelation: "applications"
             referencedColumns: ["id"]
           },
         ]
