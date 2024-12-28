@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { EmailDialog } from '@/components/EmailDialog';
 import { PostcodeItem } from './PostcodeItem';
 import { AddPostcode } from './AddPostcode';
+import { RadiusDialog } from './RadiusDialog';
 
 interface PostcodeSectionProps {
   initialPostcode?: string;
@@ -20,7 +21,9 @@ export const PostcodeSection = ({
   const [postcodes, setPostcodes] = useState<Array<{ id: number; postcode: string; radius?: string }>>([]);
   const [showAddNew, setShowAddNew] = useState(false);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [showRadiusDialog, setShowRadiusDialog] = useState(false);
   const [selectedPostcode, setSelectedPostcode] = useState<string>('');
+  const [selectedPostcodeId, setSelectedPostcodeId] = useState<number | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -149,6 +152,32 @@ export const PostcodeSection = ({
     }
   };
 
+  const handleRadiusSubmit = async (radius: string) => {
+    if (!selectedPostcodeId) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_postcodes')
+        .update({ radius })
+        .eq('id', selectedPostcodeId);
+
+      if (error) throw error;
+
+      await fetchPostcodes();
+      toast({
+        title: "Success",
+        description: `Alert radius updated for ${selectedPostcode}`,
+      });
+    } catch (error) {
+      console.error('Error updating alert radius:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update alert radius",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div>
       <label className="text-sm text-gray-500">Post Codes</label>
@@ -162,7 +191,8 @@ export const PostcodeSection = ({
             onDelete={handleDelete}
             onAlertClick={(postcode) => {
               setSelectedPostcode(postcode);
-              setShowEmailDialog(true);
+              setSelectedPostcodeId(item.id);
+              setShowRadiusDialog(true);
             }}
           />
         ))}
@@ -190,6 +220,13 @@ export const PostcodeSection = ({
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
         applicationRef={selectedPostcode}
+      />
+
+      <RadiusDialog
+        open={showRadiusDialog}
+        onOpenChange={setShowRadiusDialog}
+        onSubmit={handleRadiusSubmit}
+        postcode={selectedPostcode}
       />
     </div>
   );

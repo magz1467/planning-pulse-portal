@@ -41,7 +41,6 @@ export const ProfileTabs = ({
           user={user}
           userProfile={userProfile}
           onPostcodeUpdate={onPostcodeUpdate}
-          onEmailSubmit={onEmailSubmit}
         />
       </TabsContent>
 
