@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { corsHeaders } from '../_shared/cors.ts'
-import { DevelopmentUpdate } from './types.ts'
+import { Application } from './types.ts'
 import { processBatch } from './batch-processor.ts'
 import { fetchPageOfApplications } from './api-client.ts'
 
@@ -11,48 +11,51 @@ serve(async (req) => {
 
   try {
     console.log('Starting planning data sync process');
-    
+
     let nextPage = 'https://www.planning.data.gov.uk/entity.json?limit=10';
     let pageCount = 0;
     let updatesCount = 0;
     let insertsCount = 0;
-    const batchSize = 100;
-    let updateBatch: DevelopmentUpdate[] = [];
+    const batchSize = 1;
+    let updateBatch: Application[] = [];
+
 
     while (nextPage) {
       pageCount++;
       console.log(`Processing page ${pageCount}: ${nextPage}`);
-      
+
       const data = await fetchPageOfApplications(nextPage);
-      
-      if (!data.applications || !Array.isArray(data.applications)) {
+
+      if (!data.entities || !Array.isArray(data.entities)) {
         console.error('Invalid data format received:', data);
         break;
       }
 
-      // Prepare batch of applications to check/update
-      for (const application of data.applications) {
-        const development: DevelopmentUpdate = {
-          external_id: application.reference,
-          title: application.proposal || 'No title provided',
-          address: application.site?.address || null,
-          status: application.status || null,
-          description: application.proposal || null,
-          applicant: application.applicant?.name || null,
-          submission_date: application.created_at ? new Date(application.created_at) : null,
-          decision_due: application.decision?.decision_date ? new Date(application.decision.decision_date) : null,
-          type: application.type || null,
-          ward: application.site?.ward || null,
-          officer: application.officer?.name || null,
-          consultation_end: application.consultation?.end_date ? new Date(application.consultation.end_date) : null,
-          lat: application.site?.location?.latitude || null,
-          lng: application.site?.location?.longitude || null,
-          location: application.site?.location?.latitude && application.site?.location?.longitude ? 
-            `SRID=4326;POINT(${application.site.location.longitude} ${application.site.location.latitude})` : null,
-          raw_data: application
+      // Prepare batch of entity. to check/update
+      for (const entity of data.entities) {
+        const application: Application = {
+          external_id: entity.reference,
+          title: entity.proposal || 'No title provided',
+          address: entity.site?.address || null,
+          status: entity.status || null,
+          description: entity.proposal || null,
+          applicant: entity.applicant?.name || null,
+          submission_date: entity.created_at ? new Date(entity.created_at) : null,
+          decision_due: entity.decision?.decision_date ? new Date(entity.decision.decision_date) : null,
+          type: entity.type || null,
+          ward: entity.site?.ward || null,
+          officer: entity.officer?.name || null,
+          consultation_end: entity.consultation?.end_date ? new Date(entity.consultation.end_date) : null,
+          lat: entity.site?.location?.latitude || null,
+          lng: entity.site?.location?.longitude || null,
+          location: entity.site?.location?.latitude && entity.site?.location?.longitude ?
+            `SRID=4326;POINT(${entity.site.location.longitude} ${entity.site.location.latitude})` : null,
+          raw_data: entity,
         };
 
-        updateBatch.push(development);
+        updateBatch.push(application);
+
+        console.log(`UpdateBatch sise ${updateBatch.length}`)
 
         // Process batch when it reaches the batch size
         if (updateBatch.length >= batchSize) {
@@ -62,7 +65,6 @@ serve(async (req) => {
           updateBatch = []; // Clear batch after processing
         }
       }
-      throw new Error("fjksdg;jkdf;klbfjk;")
 
       // Process any remaining items in the batch
       if (updateBatch.length > 0) {
@@ -75,10 +77,11 @@ serve(async (req) => {
       // Check for next page in the HAL links
       nextPage = data._links?.next?.href || null;
       console.log(nextPage)
-      
+
       // Log progress
       console.log(`Completed page ${pageCount}. Total inserts: ${insertsCount}, updates: ${updatesCount}`);
-      
+
+      throw new Error("done a round")
       // Add a small delay to avoid rate limiting
       if (nextPage) {
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -86,7 +89,7 @@ serve(async (req) => {
     }
 
     console.log('Planning data sync completed');
-    
+
     return new Response(
       JSON.stringify({
         message: 'Planning data sync completed successfully',
@@ -94,20 +97,20 @@ serve(async (req) => {
         totalInserts: insertsCount,
         totalUpdates: updatesCount
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'entity.json' },
+        status: 200
       }
     );
   } catch (error) {
-    console.error('Error in update-applications function:', error);
+    console.error('Error in update-entity. function:', error);
     return new Response(
       JSON.stringify({
         error: 'Failed to sync planning data',
         details: error.message
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'entity.json' },
         status: 500
       }
     );

@@ -1,4 +1,4 @@
-export interface DevelopmentUpdate {
+export interface Application {
   external_id: string;
   title: string;
   address: string | null;
@@ -21,3 +21,4 @@ export interface BatchProcessResult {
   inserts: number;
   updates: number;
 }
+
