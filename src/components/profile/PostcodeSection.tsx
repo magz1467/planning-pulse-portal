@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { PostcodeSearch } from '@/components/PostcodeSearch';
@@ -28,17 +27,20 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
     setIsSubmitting(true);
     try {
       await onPostcodeUpdate(trimmedPostcode);
+      // Only show success toast if the promise resolves successfully
       toast({
         title: "Success",
         description: "Your postcode has been updated",
       });
     } catch (error) {
       console.error('Error updating postcode:', error);
+      // Show error toast if the promise rejects
       toast({
         title: "Error",
         description: "Failed to update postcode. Please try again.",
         variant: "destructive",
       });
+      return; // Exit early on error to prevent state updates
     } finally {
       setIsSubmitting(false);
     }
