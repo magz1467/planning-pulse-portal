@@ -53,9 +53,19 @@ export const PostcodeSection = ({ initialPostcode = '', onPostcodeUpdate }: Post
 
     setIsSubmitting(true);
     try {
+      // Get the current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
       const { error } = await supabase
         .from('user_postcodes')
-        .insert({ postcode: trimmedPostcode });
+        .insert({ 
+          postcode: trimmedPostcode,
+          user_id: user.id 
+        });
 
       if (error) throw error;
 
