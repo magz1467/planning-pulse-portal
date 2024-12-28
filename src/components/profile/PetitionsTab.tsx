@@ -12,11 +12,11 @@ export const PetitionsTab = ({ petitions }: PetitionsTabProps) => {
         <div className="space-y-4">
           {petitions.map((petition) => (
             <Card key={petition.id} className="p-4">
-              <h3 className="font-semibold">{petition.developments.title}</h3>
-              <p className="text-sm text-gray-500">{petition.developments.address}</p>
+              <h3 className="font-semibold">{petition.applications.title}</h3>
+              <p className="text-sm text-gray-500">{petition.applications.address}</p>
               <div className="mt-2">
                 <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
-                  {petition.developments.status}
+                  {petition.applications.status}
                 </span>
               </div>
               <div className="mt-4">

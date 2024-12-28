@@ -51,12 +51,12 @@ const Profile = () => {
       if (profileError) throw profileError;
       setUserProfile(profileData?.[0] || null);
 
-      // Get petitions with development data
+      // Get petitions with application data - Fixed the table name from 'developments' to 'applications'
       const { data: petitionsData, error: petitionsError } = await supabase
         .from('petitions')
         .select(`
           *,
-          developments (
+          applications (
             title,
             address,
             status
