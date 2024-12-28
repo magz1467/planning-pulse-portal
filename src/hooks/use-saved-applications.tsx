@@ -3,26 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SavedApplication } from '@/types/saved';
 
-// Dummy data for development
-const dummyApplications = [
-  {
-    id: 1,
-    title: "Application 1",
-    address: "123 Main St",
-    status: "Pending",
-    distance: "1.2 miles",
-    image: "https://via.placeholder.com/150"
-  },
-  {
-    id: 2,
-    title: "Application 2",
-    address: "456 Elm St",
-    status: "Approved",
-    distance: "0.5 miles",
-    image: "https://via.placeholder.com/150"
-  },
-];
-
 export const useSavedApplications = () => {
   const [savedApplications, setSavedApplications] = useState<number[]>([]);
   const { toast } = useToast();
@@ -77,6 +57,22 @@ export const useSavedApplications = () => {
 
         setSavedApplications(prev => prev.filter(id => id !== applicationId));
       } else {
+        // First verify the application exists
+        const { data: applicationExists, error: checkError } = await supabase
+          .from('applications')
+          .select('id')
+          .eq('id', applicationId)
+          .single();
+
+        if (checkError || !applicationExists) {
+          toast({
+            title: "Error",
+            description: "This application no longer exists",
+            variant: "destructive",
+          });
+          return;
+        }
+
         // Add to saved
         const { error } = await supabase
           .from('saved_applications')
@@ -106,6 +102,5 @@ export const useSavedApplications = () => {
   return {
     savedApplications,
     toggleSavedApplication,
-    dummyApplications
   };
 };

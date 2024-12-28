@@ -14,13 +14,18 @@ interface SavedApplicationsProps {
 }
 
 export const SavedApplications = ({ applications, onSelectApplication }: SavedApplicationsProps) => {
-  const { savedApplications, toggleSavedApplication, dummyApplications } = useSavedApplications();
+  const { savedApplications, toggleSavedApplication } = useSavedApplications();
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [savedApplicationsList, setSavedApplicationsList] = useState<Application[]>([]);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    fetchSavedApplications();
+  }, [savedApplications]);
 
   const checkAuth = async () => {
     try {
@@ -28,6 +33,23 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
       setIsAuthenticated(!!session);
     } catch (error) {
       console.error('Error checking auth status:', error);
+    }
+  };
+
+  const fetchSavedApplications = async () => {
+    if (!isAuthenticated || savedApplications.length === 0) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .select('*')
+        .in('id', savedApplications);
+
+      if (error) throw error;
+
+      setSavedApplicationsList(data || []);
+    } catch (error) {
+      console.error('Error fetching saved applications:', error);
     }
   };
 
@@ -41,11 +63,6 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
       </Card>
     );
   }
-
-  // Use dummy data for demonstration
-  const savedApplicationsList = dummyApplications.filter(app => 
-    savedApplications.includes(app.id)
-  );
 
   if (savedApplicationsList.length === 0) {
     return (
