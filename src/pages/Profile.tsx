@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from "@/components/Header";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { SavedDevelopments } from "@/components/SavedDevelopments";
-import { supabase } from "@/integrations/supabase/client";
 import { User } from '@supabase/supabase-js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, MapPin, Bell } from 'lucide-react';
-import { EmailDialog } from '@/components/EmailDialog';
+import { supabase } from "@/integrations/supabase/client";
+import { ProfileOverview } from '@/components/profile/ProfileOverview';
+import { SavedDevelopmentsTab } from '@/components/profile/SavedDevelopmentsTab';
+import { PetitionsTab } from '@/components/profile/PetitionsTab';
+import { SettingsTab } from '@/components/profile/SettingsTab';
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [petitions, setPetitions] = useState<any[]>([]);
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -44,7 +43,6 @@ const Profile = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Fetch user profile data
       const { data: profileData, error: profileError } = await supabase
         .from('User_data')
         .select('*')
@@ -54,7 +52,6 @@ const Profile = () => {
       if (profileError) throw profileError;
       setUserProfile(profileData);
 
-      // Fetch user petitions
       const { data: petitionsData, error: petitionsError } = await supabase
         .from('petitions')
         .select(`
@@ -94,7 +91,6 @@ const Profile = () => {
 
       if (error) throw error;
 
-      setShowEmailDialog(false);
       setUserProfile(prev => ({
         ...prev,
         Radius_from_pc: parseInt(radius)
@@ -105,7 +101,6 @@ const Profile = () => {
         description: "Your notification preferences have been updated",
       });
 
-      // Refresh user data
       fetchUserData();
     } catch (error) {
       console.error('Error updating notification preferences:', error);
@@ -151,7 +146,10 @@ const Profile = () => {
       if (error) throw error;
 
       setUserProfile(prev => ({ ...prev, 'Post Code': postcode }));
-      setShowEmailDialog(true);
+      toast({
+        title: "Success",
+        description: "Postcode updated successfully",
+      });
     } catch (error) {
       console.error('Error updating postcode:', error);
       toast({
@@ -160,6 +158,11 @@ const Profile = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
   };
 
   if (loading) {
@@ -188,140 +191,33 @@ const Profile = () => {
           </TabsList>
 
           <TabsContent value="overview">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Account Information</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-500">Email</label>
-                  <p>{user?.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-500">Post Code</label>
-                  <div className="flex items-center gap-2">
-                    <p>{userProfile?.Post_Code || 'Not set'}</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => {
-                        const postcode = prompt('Enter your postcode:');
-                        if (postcode) {
-                          handlePostcodeUpdate(postcode);
-                        }
-                      }}
-                    >
-                      <MapPin className="h-4 w-4 mr-2" />
-                      {userProfile?.Post_Code ? 'Update' : 'Add'}
-                    </Button>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-500">Notification Radius</label>
-                  <div className="flex items-center gap-2">
-                    <p>{userProfile?.Radius_from_pc ? `${userProfile.Radius_from_pc}m` : 'Not set'}</p>
-                    {userProfile?.Post_Code && (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setShowEmailDialog(true)}
-                      >
-                        <Bell className="h-4 w-4 mr-2" />
-                        {userProfile?.Radius_from_pc ? 'Update' : 'Set up'}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <ProfileOverview 
+              user={user}
+              userProfile={userProfile}
+              onPostcodeUpdate={handlePostcodeUpdate}
+              onEmailSubmit={handleEmailSubmit}
+            />
           </TabsContent>
 
           <TabsContent value="saved">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Saved Developments</h2>
-              <SavedDevelopments 
-                applications={[]} 
-                onSelectApplication={(id) => navigate(`/map?development=${id}`)} 
-              />
-            </Card>
+            <SavedDevelopmentsTab 
+              onSelectApplication={(id) => navigate(`/map?development=${id}`)}
+            />
           </TabsContent>
 
           <TabsContent value="petitions">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">My Petitions</h2>
-              {petitions.length > 0 ? (
-                <div className="space-y-4">
-                  {petitions.map((petition) => (
-                    <Card key={petition.id} className="p-4">
-                      <h3 className="font-semibold">{petition.developments.title}</h3>
-                      <p className="text-sm text-gray-500">{petition.developments.address}</p>
-                      <div className="mt-2">
-                        <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
-                          {petition.developments.status}
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <h4 className="text-sm font-medium mb-2">Reasons:</h4>
-                        <ul className="list-disc list-inside text-sm text-gray-600">
-                          {petition.reasons.map((reason: string, index: number) => (
-                            <li key={index}>{reason}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">You haven't created any petitions yet.</p>
-              )}
-            </Card>
+            <PetitionsTab petitions={petitions} />
           </TabsContent>
 
           <TabsContent value="settings">
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Settings</h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Marketing Preferences</h3>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant={userProfile?.Marketing ? "default" : "outline"}
-                      onClick={() => handleMarketingUpdate(true)}
-                    >
-                      Opt In
-                    </Button>
-                    <Button
-                      variant={!userProfile?.Marketing ? "default" : "outline"}
-                      onClick={() => handleMarketingUpdate(false)}
-                    >
-                      Opt Out
-                    </Button>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Account Actions</h3>
-                  <Button
-                    variant="destructive"
-                    onClick={async () => {
-                      await supabase.auth.signOut();
-                      navigate('/');
-                    }}
-                  >
-                    Sign Out
-                  </Button>
-                </div>
-              </div>
-            </Card>
+            <SettingsTab 
+              userProfile={userProfile}
+              onMarketingUpdate={handleMarketingUpdate}
+              onSignOut={handleSignOut}
+            />
           </TabsContent>
-
         </Tabs>
       </main>
-
-      <EmailDialog 
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        onSubmit={handleEmailSubmit}
-        applicationRef={userProfile?.Post_Code}
-      />
     </div>
   );
 };
