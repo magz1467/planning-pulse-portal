@@ -61,7 +61,7 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
         ward: app.ward || '',
         officer: app.officer || '',
         consultationEnd: app.consultation_end || '',
-        image: app.image || ''
+        image: '/placeholder.svg' // Default placeholder image
       }));
 
       setSavedApplicationsList(transformedData || []);
