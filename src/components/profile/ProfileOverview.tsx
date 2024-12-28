@@ -4,6 +4,7 @@ import { PostcodeSection } from './PostcodeSection';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useState } from 'react';
+import { format } from 'date-fns';
 
 interface ProfileOverviewProps {
   user: User | null;
@@ -27,10 +28,19 @@ export const ProfileOverview = ({
     }
   };
 
+  const memberSince = userProfile?.created_at 
+    ? format(new Date(userProfile.created_at), 'MMMM d, yyyy')
+    : 'Unknown';
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">Account Information</h2>
       <div className="space-y-6">
+        <div>
+          <label className="text-sm text-gray-500">Member since</label>
+          <p>{memberSince}</p>
+        </div>
+        
         <div>
           <label className="text-sm text-gray-500">Email</label>
           <p>{user?.email}</p>
