@@ -163,7 +163,15 @@ export type Database = {
           user_email?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "petitions_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "developments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_developments: {
         Row: {
