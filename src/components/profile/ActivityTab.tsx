@@ -16,30 +16,69 @@ interface ActivityTabProps {
   userId: string;
 }
 
+const defaultStats: ActivityStats = {
+  total_points: 0,
+  total_comments: 0,
+  total_petitions: 0,
+  total_reactions: 0,
+  login_streak: 0
+};
+
 export const ActivityTab = ({ userId }: ActivityTabProps) => {
-  const [stats, setStats] = useState<ActivityStats | null>(null);
+  const [stats, setStats] = useState<ActivityStats>(defaultStats);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const maxPoints = 1000; // Example threshold for progress bar
 
   useEffect(() => {
     const fetchActivityStats = async () => {
-      const { data, error } = await supabase
-        .from('user_activity')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      if (error) {
-        console.error('Error fetching activity stats:', error);
-        return;
+        const { data, error } = await supabase
+          .from('user_activity')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        setStats(data || defaultStats);
+      } catch (err) {
+        console.error('Error fetching activity stats:', err);
+        setError('Failed to load activity stats. Please try again later.');
+      } finally {
+        setIsLoading(false);
       }
-
-      setStats(data);
     };
 
-    fetchActivityStats();
+    if (userId) {
+      fetchActivityStats();
+    }
   }, [userId]);
 
-  if (!stats) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center justify-center h-40">
+          <div className="text-muted-foreground">Loading activity data...</div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-6">
+        <div className="flex items-center justify-center h-40">
+          <div className="text-destructive">{error}</div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6">
