@@ -1,0 +1,14 @@
+https://www.planning.data.gov.uk/dataset.json
+collect here
+
+
+central-activities-zone
+"The [Greater London Authority](https://www.london.gov.uk/) (GLA) designates a central area of London with [implications for planning](https://www.london.gov.uk/what-we-do/planning/implementing-london-plan/london-plan-guidance-and-spgs/central-activities-zone)\nThis dataset combines data provided by the GLA with the boundary from the individual London boroughs."
+
+infrastructure-project
+The boundaries shown are used to inform the [Environmental Impact Assessment](https://www.gov.uk/guidance/environmental-impact-assessment) (EIA). This information is used by the [Planning Inspectorate](https://www.gov.uk/government/organisations/planning-inspectorate) (PINS) to identify the consultation bodies. These site boundaries may change.
+
+infrastructure-project-decision
+
+
+https://planningdata.london.gov.uk/dashboard/app/dashboards#/view/26232d10-87d7-11eb-9557-b96feee58904?_g=(filters:!())

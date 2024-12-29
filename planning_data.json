@@ -1,0 +1,902 @@
+[
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "03/01/2002",
+    "last_updated": "2023-09-22T19:00:07.243Z",
+    "valid_date": "02/11/2001",
+    "lpa_app_no": "01/00632/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-01_00632_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "24/07/2003",
+    "last_updated": "2022-04-14T19:00:12.507Z",
+    "valid_date": "14/02/2003",
+    "lpa_app_no": "03/00131/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00131_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "01/11/2004",
+    "last_updated": "2022-04-14T19:00:12.569Z",
+    "valid_date": "05/03/2003",
+    "lpa_app_no": "03/00191/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00191_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "30/06/2003",
+    "last_updated": "2022-04-14T19:00:12.546Z",
+    "valid_date": "17/04/2003",
+    "lpa_app_no": "03/00309/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00309_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "08/04/2004",
+    "last_updated": "2022-04-14T19:00:12.511Z",
+    "valid_date": "08/05/2003",
+    "lpa_app_no": "03/00332/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00332_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "13/08/2003",
+    "last_updated": "2022-04-14T19:00:12.510Z",
+    "valid_date": "09/05/2003",
+    "lpa_app_no": "03/00381/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00381_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "21/11/2003",
+    "last_updated": "2022-04-14T19:00:12.547Z",
+    "valid_date": "29/05/2003",
+    "lpa_app_no": "03/00434/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00434_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/09/2003",
+    "last_updated": "2023-02-01T20:00:08.392Z",
+    "valid_date": "27/06/2003",
+    "lpa_app_no": "03/00514/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00514_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/09/2003",
+    "last_updated": "2023-02-01T20:00:08.391Z",
+    "valid_date": "30/06/2003",
+    "lpa_app_no": "03/00515/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00515_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "24/08/2004",
+    "last_updated": "2022-04-14T19:00:12.579Z",
+    "valid_date": "04/07/2003",
+    "lpa_app_no": "03/00551/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00551_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "22/06/2004",
+    "last_updated": "2022-04-14T19:00:12.522Z",
+    "valid_date": "10/11/2003",
+    "lpa_app_no": "03/00893/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00893_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "26/11/2004",
+    "last_updated": "2022-04-14T19:00:12.571Z",
+    "valid_date": "17/11/2003",
+    "lpa_app_no": "03/00919/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-03_00919_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "07/10/2004",
+    "last_updated": "2022-04-14T19:00:12.573Z",
+    "valid_date": "09/01/2004",
+    "lpa_app_no": "04/00024/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00024_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "21/03/2005",
+    "last_updated": "2022-04-14T19:00:12.520Z",
+    "valid_date": "29/03/2004",
+    "lpa_app_no": "04/00163/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00163_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "04/07/2005",
+    "last_updated": "2022-04-14T19:00:12.512Z",
+    "valid_date": "07/06/2004",
+    "lpa_app_no": "04/00472/REM",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00472_REM"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "30/03/2005",
+    "last_updated": "2022-04-14T19:00:12.508Z",
+    "valid_date": "21/06/2004",
+    "lpa_app_no": "04/00524/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00524_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "11/03/2005",
+    "last_updated": "2023-07-17T19:00:08.974Z",
+    "valid_date": "19/07/2004",
+    "lpa_app_no": "04/00608/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00608_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/08/2005",
+    "last_updated": "2022-04-14T19:00:12.574Z",
+    "valid_date": "30/07/2004",
+    "lpa_app_no": "04/00672/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00672_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "17/02/2005",
+    "last_updated": "2024-04-26T09:54:19.582Z",
+    "valid_date": "20/09/2004",
+    "lpa_app_no": "04/00770/REM",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00770_REM"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "17/11/2004",
+    "last_updated": "2021-12-17T16:03:21.969Z",
+    "valid_date": "24/09/2004",
+    "lpa_app_no": "04/00897/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-04_00897_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "06/02/2006",
+    "last_updated": "2022-04-14T19:00:12.569Z",
+    "valid_date": "14/01/2005",
+    "lpa_app_no": "05/00030/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00030_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/03/2005",
+    "last_updated": "2022-04-14T19:00:12.555Z",
+    "valid_date": "28/01/2005",
+    "lpa_app_no": "05/00078/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00078_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "14/06/2005",
+    "last_updated": "2021-12-17T16:03:21.968Z",
+    "valid_date": "20/04/2005",
+    "lpa_app_no": "05/00273/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00273_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "27/02/2006",
+    "last_updated": "2022-04-14T19:00:12.578Z",
+    "valid_date": "02/06/2005",
+    "lpa_app_no": "05/00492/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00492_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "22/11/2005",
+    "last_updated": "2022-04-14T19:00:12.557Z",
+    "valid_date": "26/08/2005",
+    "lpa_app_no": "05/00564/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00564_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "14/12/2005",
+    "last_updated": "2022-04-14T19:00:12.520Z",
+    "valid_date": "14/09/2005",
+    "lpa_app_no": "05/00568/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00568_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/11/2005",
+    "last_updated": "2024-04-26T09:54:19.595Z",
+    "valid_date": "04/08/2005",
+    "lpa_app_no": "05/00661/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00661_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "27/02/2006",
+    "last_updated": "2022-04-14T19:00:12.558Z",
+    "valid_date": "18/08/2005",
+    "lpa_app_no": "05/00746/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00746_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "20/12/2005",
+    "last_updated": "2022-04-14T19:00:12.571Z",
+    "valid_date": "20/09/2005",
+    "lpa_app_no": "05/00933/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_00933_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "20/01/2006",
+    "last_updated": "2022-04-14T19:00:12.579Z",
+    "valid_date": "26/10/2005",
+    "lpa_app_no": "05/01079/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_01079_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/02/2006",
+    "last_updated": "2021-12-17T16:03:21.969Z",
+    "valid_date": "12/12/2005",
+    "lpa_app_no": "05/01207/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_01207_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "12/03/2009",
+    "last_updated": "2022-04-14T19:00:12.567Z",
+    "valid_date": "30/06/2006",
+    "lpa_app_no": "05/01272/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-05_01272_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "26/03/2007",
+    "last_updated": "2022-04-14T19:00:12.572Z",
+    "valid_date": "20/02/2006",
+    "lpa_app_no": "06/00164/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00164_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "05/06/2006",
+    "last_updated": "2022-04-14T19:00:12.561Z",
+    "valid_date": "08/03/2006",
+    "lpa_app_no": "06/00231/REM",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00231_REM"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "05/09/2006",
+    "last_updated": "2022-04-14T19:00:12.568Z",
+    "valid_date": "06/06/2006",
+    "lpa_app_no": "06/00268/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00268_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "05/04/2007",
+    "last_updated": "2022-04-14T19:00:12.556Z",
+    "valid_date": "06/07/2006",
+    "lpa_app_no": "06/00637/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00637_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "19/03/2008",
+    "last_updated": "2024-04-26T09:54:19.613Z",
+    "valid_date": "13/07/2006",
+    "lpa_app_no": "06/00675/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00675_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/02/2007",
+    "last_updated": "2022-04-14T19:00:12.553Z",
+    "valid_date": "09/08/2006",
+    "lpa_app_no": "06/00766/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00766_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/03/2007",
+    "last_updated": "2022-04-14T19:00:12.553Z",
+    "valid_date": "15/08/2006",
+    "lpa_app_no": "06/00790/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00790_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "14/12/2006",
+    "last_updated": "2023-07-18T19:00:09.409Z",
+    "valid_date": "11/10/2006",
+    "lpa_app_no": "06/00917/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_00917_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "16/11/2009",
+    "last_updated": "2022-04-14T19:00:12.519Z",
+    "valid_date": "01/12/2006",
+    "lpa_app_no": "06/01136/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_01136_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "21/06/2007",
+    "last_updated": "2022-04-14T19:00:12.571Z",
+    "valid_date": "13/12/2006",
+    "lpa_app_no": "06/01249/REM",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_01249_REM"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "17/02/2009",
+    "last_updated": "2023-12-24T20:00:06.390Z",
+    "valid_date": "05/02/2007",
+    "lpa_app_no": "06/01284/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-06_01284_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "04/07/2007",
+    "last_updated": "2024-04-26T09:54:19.627Z",
+    "valid_date": "13/04/2007",
+    "lpa_app_no": "07/00136/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-07_00136_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "21/08/2007",
+    "last_updated": "2021-12-29T12:33:17.170Z",
+    "valid_date": "27/06/2007",
+    "lpa_app_no": "07/00463/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-07_00463_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "16/11/2007",
+    "last_updated": "2022-04-14T19:00:12.574Z",
+    "valid_date": "17/08/2007",
+    "lpa_app_no": "07/00939/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-07_00939_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "19/12/2007",
+    "last_updated": "2022-04-14T19:00:12.576Z",
+    "valid_date": "05/09/2007",
+    "lpa_app_no": "07/01014/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-07_01014_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "04/03/2009",
+    "last_updated": "2024-04-26T09:54:19.730Z",
+    "valid_date": "03/12/2007",
+    "lpa_app_no": "07/01289/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-07_01289_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "24/04/2009",
+    "last_updated": "2022-04-14T19:00:12.559Z",
+    "valid_date": "28/01/2008",
+    "lpa_app_no": "08/00106/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_00106_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "01/04/2009",
+    "last_updated": "2022-04-14T19:00:12.571Z",
+    "valid_date": "25/04/2008",
+    "lpa_app_no": "08/00469/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_00469_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "24/03/2010",
+    "last_updated": "2022-04-14T19:00:12.517Z",
+    "valid_date": "25/04/2008",
+    "lpa_app_no": "08/00470/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_00470_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "15/09/2009",
+    "last_updated": "2022-04-14T19:00:12.578Z",
+    "valid_date": "20/11/2008",
+    "lpa_app_no": "08/00727/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_00727_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "29/03/2011",
+    "last_updated": "2024-04-26T09:54:19.917Z",
+    "valid_date": "29/10/2008",
+    "lpa_app_no": "08/01325/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_01325_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/02/2009",
+    "last_updated": "2022-04-14T19:00:12.557Z",
+    "valid_date": "24/11/2008",
+    "lpa_app_no": "08/01422/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_01422_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/06/2009",
+    "last_updated": "2022-04-14T19:00:12.555Z",
+    "valid_date": "16/03/2009",
+    "lpa_app_no": "08/01426/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-08_01426_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "06/10/2010",
+    "last_updated": "2022-04-14T19:00:12.566Z",
+    "valid_date": "29/05/2009",
+    "lpa_app_no": "09/00388/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-09_00388_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "29/03/2011",
+    "last_updated": "2024-04-26T09:54:19.968Z",
+    "valid_date": "26/06/2009",
+    "lpa_app_no": "09/00476/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-09_00476_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "24/12/2009",
+    "last_updated": "2022-04-14T19:00:12.559Z",
+    "valid_date": "20/07/2009",
+    "lpa_app_no": "09/00522/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-09_00522_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "31/03/2011",
+    "last_updated": "2022-04-14T19:00:12.557Z",
+    "valid_date": "26/03/2010",
+    "lpa_app_no": "10/00287/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-10_00287_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "31/03/2011",
+    "last_updated": "2022-04-14T19:00:12.568Z",
+    "valid_date": "30/11/2010",
+    "lpa_app_no": "10/01038/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-10_01038_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "01/03/2011",
+    "last_updated": "2021-12-17T16:03:24.423Z",
+    "valid_date": "03/12/2010",
+    "lpa_app_no": "10/01043/REM",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-10_01043_REM"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "29/03/2012",
+    "last_updated": "2022-04-14T19:00:12.518Z",
+    "valid_date": "11/03/2011",
+    "lpa_app_no": "11/00173/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00173_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "26/03/2012",
+    "last_updated": "2022-04-14T19:00:12.570Z",
+    "valid_date": "09/06/2011",
+    "lpa_app_no": "11/00399/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00399_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/02/2012",
+    "last_updated": "2024-04-26T09:54:20.001Z",
+    "valid_date": "19/05/2011",
+    "lpa_app_no": "11/00407/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00407_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "16/03/2012",
+    "last_updated": "2022-04-14T19:00:12.514Z",
+    "valid_date": "08/06/2011",
+    "lpa_app_no": "11/00460/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00460_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "01/05/2012",
+    "last_updated": "2022-04-14T19:00:12.557Z",
+    "valid_date": "09/06/2011",
+    "lpa_app_no": "11/00476/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00476_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "28/03/2012",
+    "last_updated": "2022-04-14T19:00:12.572Z",
+    "valid_date": "11/07/2011",
+    "lpa_app_no": "11/00564/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00564_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "27/03/2012",
+    "last_updated": "2022-04-14T19:00:12.557Z",
+    "valid_date": "26/07/2011",
+    "lpa_app_no": "11/00669/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00669_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "15/03/2012",
+    "last_updated": "2022-04-14T19:00:12.560Z",
+    "valid_date": "09/08/2011",
+    "lpa_app_no": "11/00707/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00707_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "17/02/2012",
+    "last_updated": "2022-04-14T19:00:12.513Z",
+    "valid_date": "11/08/2011",
+    "lpa_app_no": "11/00727/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00727_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/03/2012",
+    "last_updated": "2022-04-14T19:00:12.550Z",
+    "valid_date": "21/10/2011",
+    "lpa_app_no": "11/00901/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00901_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/03/2012",
+    "last_updated": "2022-04-14T19:00:12.518Z",
+    "valid_date": "01/12/2011",
+    "lpa_app_no": "11/00954/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00954_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "27/03/2012",
+    "last_updated": "2022-04-14T19:00:12.558Z",
+    "valid_date": "07/12/2011",
+    "lpa_app_no": "11/00992/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_00992_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "03/05/2013",
+    "last_updated": "2024-04-26T09:54:20.072Z",
+    "valid_date": "01/12/2011",
+    "lpa_app_no": "11/01015/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_01015_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "29/03/2012",
+    "last_updated": "2022-04-14T19:00:12.521Z",
+    "valid_date": "23/12/2011",
+    "lpa_app_no": "11/01044/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-11_01044_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "22/01/2013",
+    "last_updated": "2022-04-14T19:00:12.514Z",
+    "valid_date": "20/02/2012",
+    "lpa_app_no": "12/00121/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00121_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "29/05/2013",
+    "last_updated": "2022-04-14T19:00:12.515Z",
+    "valid_date": "01/03/2012",
+    "lpa_app_no": "12/00159/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00159_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "05/11/2012",
+    "last_updated": "2024-04-26T09:54:20.090Z",
+    "valid_date": "08/03/2012",
+    "lpa_app_no": "12/00178/OUT",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00178_OUT"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "27/11/2012",
+    "last_updated": "2022-08-09T19:00:09.741Z",
+    "valid_date": "09/03/2012",
+    "lpa_app_no": "12/00187/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00187_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "03/12/2012",
+    "last_updated": "2022-04-14T19:00:12.508Z",
+    "valid_date": "10/07/2012",
+    "lpa_app_no": "12/00498/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00498_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "28/11/2012",
+    "last_updated": "2022-08-09T19:00:09.743Z",
+    "valid_date": "31/05/2012",
+    "lpa_app_no": "12/00501/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00501_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "03/12/2012",
+    "last_updated": "2022-04-14T19:00:12.508Z",
+    "valid_date": "10/07/2012",
+    "lpa_app_no": "12/00626/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00626_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "15/04/2013",
+    "last_updated": "2022-08-09T19:00:09.750Z",
+    "valid_date": "22/02/2013",
+    "lpa_app_no": "12/00762/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00762_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "03/12/2012",
+    "last_updated": "2022-09-02T19:00:06.140Z",
+    "valid_date": "17/09/2012",
+    "lpa_app_no": "12/00793/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00793_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "10/12/2012",
+    "last_updated": "2022-09-02T19:00:06.140Z",
+    "valid_date": "17/09/2012",
+    "lpa_app_no": "12/00794/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00794_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "07/12/2012",
+    "last_updated": "2021-12-17T16:03:29.327Z",
+    "valid_date": "19/10/2012",
+    "lpa_app_no": "12/00817/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00817_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "11/12/2012",
+    "last_updated": "2022-08-09T19:00:09.749Z",
+    "valid_date": "25/09/2012",
+    "lpa_app_no": "12/00837/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00837_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "20/12/2012",
+    "last_updated": "2022-08-09T19:00:09.738Z",
+    "valid_date": "08/11/2012",
+    "lpa_app_no": "12/00887/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00887_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "01/02/2013",
+    "last_updated": "2024-05-17T16:34:28.486Z",
+    "valid_date": "14/11/2012",
+    "lpa_app_no": "12/00983/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-12_00983_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "04/04/2013",
+    "last_updated": "2022-08-09T19:00:09.749Z",
+    "valid_date": "07/01/2013",
+    "lpa_app_no": "13/00001/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00001_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "13/06/2013",
+    "last_updated": "2024-04-26T09:54:20.170Z",
+    "valid_date": "20/03/2013",
+    "lpa_app_no": "13/00229/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00229_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "04/06/2013",
+    "last_updated": "2024-05-17T16:34:28.494Z",
+    "valid_date": "09/04/2013",
+    "lpa_app_no": "13/00252/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00252_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "23/07/2013",
+    "last_updated": "2022-09-02T19:00:06.137Z",
+    "valid_date": "30/04/2013",
+    "lpa_app_no": "13/00363/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00363_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "03/12/2013",
+    "last_updated": "2022-08-09T19:00:09.748Z",
+    "valid_date": "14/05/2013",
+    "lpa_app_no": "13/00378/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00378_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "24/07/2013",
+    "last_updated": "2022-04-14T19:00:12.561Z",
+    "valid_date": "29/05/2013",
+    "lpa_app_no": "13/00385/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00385_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "15/10/2013",
+    "last_updated": "2022-08-09T19:00:09.743Z",
+    "valid_date": "21/06/2013",
+    "lpa_app_no": "13/00510/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00510_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "22/11/2013",
+    "last_updated": "2022-04-14T19:00:12.569Z",
+    "valid_date": "27/06/2013",
+    "lpa_app_no": "13/00524/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00524_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "26/11/2013",
+    "last_updated": "2022-04-14T19:00:12.557Z",
+    "valid_date": "06/08/2013",
+    "lpa_app_no": "13/00628/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00628_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "02/12/2015",
+    "last_updated": "2022-08-09T19:00:09.753Z",
+    "valid_date": "01/08/2013",
+    "lpa_app_no": "13/00649/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00649_FUL"
+  },
+  {
+    "lpa_name": "Barking & Dagenham",
+    "decision_date": "05/12/2013",
+    "last_updated": "2022-09-02T19:00:06.131Z",
+    "valid_date": "09/08/2013",
+    "lpa_app_no": "13/00675/FUL",
+    "application_type": "All Other",
+    "id": "Barking_&_Dagenham-13_00675_FUL"
+  }
+]
