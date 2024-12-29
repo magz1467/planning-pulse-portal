@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          activity_type: string
+          application_id: number | null
+          created_at: string
+          id: number
+          points: number
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          application_id?: number | null
+          created_at?: string
+          id?: number
+          points: number
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          application_id?: number | null
+          created_at?: string
+          id?: number
+          points?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_log_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications: {
         Row: {
           address: string | null
@@ -295,6 +330,42 @@ export type Database = {
           proj4text?: string | null
           srid?: number
           srtext?: string | null
+        }
+        Relationships: []
+      }
+      user_activity: {
+        Row: {
+          created_at: string
+          id: number
+          last_login: string | null
+          login_streak: number | null
+          total_comments: number | null
+          total_petitions: number | null
+          total_points: number | null
+          total_reactions: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          last_login?: string | null
+          login_streak?: number | null
+          total_comments?: number | null
+          total_petitions?: number | null
+          total_points?: number | null
+          total_reactions?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          last_login?: string | null
+          login_streak?: number | null
+          total_comments?: number | null
+          total_petitions?: number | null
+          total_points?: number | null
+          total_reactions?: number | null
+          user_id?: string
         }
         Relationships: []
       }

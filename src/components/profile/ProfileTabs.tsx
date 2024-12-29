@@ -4,6 +4,7 @@ import { ProfileOverview } from './ProfileOverview';
 import { SavedApplicationsTab } from './SavedApplicationsTab';
 import { PetitionsTab } from './PetitionsTab';
 import { SettingsTab } from './SettingsTab';
+import { ActivityTab } from './ActivityTab';
 import { useNavigate } from 'react-router-dom';
 
 interface ProfileTabsProps {
@@ -33,6 +34,7 @@ export const ProfileTabs = ({
     <Tabs defaultValue="overview" className="space-y-6">
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
         <TabsTrigger value="saved">Saved Applications</TabsTrigger>
         <TabsTrigger value="petitions">My Petitions</TabsTrigger>
         <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -45,6 +47,10 @@ export const ProfileTabs = ({
           onPostcodeUpdate={onPostcodeUpdate}
           onInterestTypeUpdate={onInterestTypeUpdate}
         />
+      </TabsContent>
+
+      <TabsContent value="activity">
+        <ActivityTab userId={user?.id || ''} />
       </TabsContent>
 
       <TabsContent value="saved">
