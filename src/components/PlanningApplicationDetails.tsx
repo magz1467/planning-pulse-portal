@@ -9,8 +9,9 @@ import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactD
 import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { ApplicationSharing } from "./planning-details/ApplicationSharing";
 import { CreatePetition } from "./planning-details/CreatePetition";
+import { ApplicationFeedback } from "./planning-details/ApplicationFeedback";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, Bell, Heart, BookmarkIcon } from "lucide-react";
+import { Bell, Heart, BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -40,6 +41,11 @@ export const PlanningApplicationDetails = ({
   if (!application) return null;
 
   const isSaved = savedApplications.includes(application.id);
+  const environmentalImpactScore = Math.floor((Math.random() * 100));
+  const feedbackStats = {
+    thumbsUp: feedback === 'up' ? 13 : 12,
+    thumbsDown: feedback === 'down' ? 4 : 3
+  };
 
   const handleSave = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -61,14 +67,6 @@ export const PlanningApplicationDetails = ({
         </Link>
       ) : undefined
     });
-  };
-
-  const environmentalImpactScore = Math.floor((Math.random() * 100));
-
-  // Mock data for feedback counts
-  const feedbackStats = {
-    thumbsUp: feedback === 'up' ? 13 : 12,
-    thumbsDown: feedback === 'down' ? 4 : 3
   };
 
   const handleEmailSubmit = (email: string, radius: string) => {
@@ -125,53 +123,23 @@ export const PlanningApplicationDetails = ({
       </div>
       
       <ApplicationImage application={application} />
-      
       <ApplicationSharing 
         applicationId={application.id} 
         reference={application.reference}
       />
-
       <ApplicationDetails application={application} />
       <ExpectedImpactAreas application={application} />
       <EnvironmentalImpactDial score={environmentalImpactScore} />
       <ApplicationDescription application={application} />
       
-      <Card className="p-4 hover:border-primary transition-colors">
-        <h3 className="font-semibold mb-4">Community Feedback</h3>
-        <div className="flex flex-col gap-2">
-          <Button
-            variant={feedback === 'up' ? "default" : "outline"}
-            onClick={() => handleFeedback('up')}
-            className="flex items-center gap-2 justify-start"
-          >
-            <ThumbsUp className={`h-5 w-5 ${
-              feedback === 'up' ? 'text-white' : 'text-primary'
-            }`} />
-            <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
-            <span className={`text-sm ${
-              feedback === 'up' ? 'text-white' : 'text-gray-500'
-            }`}>people like this</span>
-          </Button>
-          <Button
-            variant={feedback === 'down' ? "outline" : "outline"}
-            onClick={() => handleFeedback('down')}
-            className={`flex items-center gap-2 justify-start ${
-              feedback === 'down' ? 'bg-[#ea384c]/10' : ''
-            }`}
-          >
-            <ThumbsDown className={`h-5 w-5 ${
-              feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
-            }`} />
-            <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-            <span className="text-xs text-gray-500">people dislike this</span>
-          </Button>
-        </div>
-      </Card>
+      <ApplicationFeedback 
+        feedback={feedback}
+        onFeedback={handleFeedback}
+        feedbackStats={feedbackStats}
+      />
 
       <ApplicationComments />
-      
       <CreatePetition applicationId={application.id} />
-
       <ApplicationDocuments />
 
       <Card className="p-4">

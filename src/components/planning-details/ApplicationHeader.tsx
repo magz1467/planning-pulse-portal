@@ -1,5 +1,6 @@
 import { Application } from "@/types/planning";
 import { cn } from "@/lib/utils";
+import { ApplicationTitle } from "./ApplicationTitle";
 
 interface ApplicationHeaderProps {
   application?: Application;
@@ -23,7 +24,7 @@ export const ApplicationHeader = ({ application }: ApplicationHeaderProps) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-2">{application.title}</h2>
+      <ApplicationTitle title={application.title || application.description || ''} />
       <p className="text-gray-600 mb-2">{application.address}</p>
       <div className="flex gap-2">
         <span className={cn(
