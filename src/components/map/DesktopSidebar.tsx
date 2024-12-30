@@ -59,6 +59,10 @@ export const DesktopSidebar = ({
           postcode={postcode}
           onSelectApplication={onSelectApplication}
           onShowEmailDialog={() => setShowEmailDialog(true)}
+          onFilterChange={onFilterChange}
+          onSortChange={onSortChange}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
         />
       ) : selectedApplicationData && (
         <ApplicationDetailView

@@ -1,12 +1,20 @@
 import { Application } from "@/types/planning";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 import { AlertSection } from "./AlertSection";
+import { FilterBar } from "@/components/FilterBar";
 
 interface ApplicationListViewProps {
   applications: Application[];
   postcode: string;
   onSelectApplication: (id: number | null) => void;
   onShowEmailDialog: () => void;
+  onFilterChange?: (filterType: string, value: string) => void;
+  onSortChange?: (sortType: 'closingSoon' | 'newest' | null) => void;
+  activeFilters?: {
+    status?: string;
+    type?: string;
+  };
+  activeSort?: 'closingSoon' | 'newest' | null;
 }
 
 export const ApplicationListView = ({
@@ -14,10 +22,22 @@ export const ApplicationListView = ({
   postcode,
   onSelectApplication,
   onShowEmailDialog,
+  onFilterChange,
+  onSortChange,
+  activeFilters = {},
+  activeSort = null,
 }: ApplicationListViewProps) => {
   return (
     <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
       <div className="flex-1 overflow-y-auto">
+        <div className="sticky top-0 z-10 bg-white">
+          <FilterBar 
+            onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+          />
+        </div>
         <AlertSection 
           postcode={postcode}
           onShowEmailDialog={onShowEmailDialog}

@@ -5,7 +5,6 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useApplicationsData } from "./hooks/useApplicationsData";
 import { MapView } from "./components/MapView";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
-import { FilterBar } from "@/components/FilterBar";
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
 
@@ -65,21 +64,13 @@ export const ApplicationsDashboardMap = () => {
           onClose={() => setSelectedId(null)}
         />
 
-        <div className="flex-1 flex flex-col">
-          <FilterBar 
-            onFilterChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
+        <div className="flex-1 relative">
+          <MapView
+            applications={applications}
+            selectedId={selectedId}
+            onMarkerClick={handleMarkerClick}
+            onBoundsChange={fetchApplicationsInBounds}
           />
-          <div className="flex-1 relative">
-            <MapView
-              applications={applications}
-              selectedId={selectedId}
-              onMarkerClick={handleMarkerClick}
-              onBoundsChange={fetchApplicationsInBounds}
-            />
-          </div>
         </div>
       </div>
     </div>
