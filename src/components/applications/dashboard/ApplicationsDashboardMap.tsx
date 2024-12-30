@@ -137,30 +137,39 @@ export const ApplicationsDashboardMap = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {applications.map((app) => (
-            <Marker
-              key={app.id}
-              position={app.coordinates}
-              icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
-              eventHandlers={{
-                click: () => handleMarkerClick(app.id),
-              }}
-            >
-              <Popup>
-                <Card className="p-4">
-                  <h3 className="font-semibold mb-2">{app.title}</h3>
-                  <p className="text-sm text-gray-600">{app.address}</p>
-                  <p className="text-sm text-gray-600 mt-1">Status: {app.status}</p>
-                  <Button 
-                    className="mt-2 w-full"
-                    onClick={() => handleMarkerClick(app.id)}
-                  >
-                    View Details
-                  </Button>
-                </Card>
-              </Popup>
-            </Marker>
-          ))}
+          <MarkerClusterGroup
+            chunkedLoading
+            maxClusterRadius={50}
+            spiderfyOnMaxZoom={true}
+            showCoverageOnHover={false}
+            zoomToBoundsOnClick={true}
+            disableClusteringAtZoom={16}
+          >
+            {applications.map((app) => (
+              <Marker
+                key={app.id}
+                position={app.coordinates}
+                icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
+                eventHandlers={{
+                  click: () => handleMarkerClick(app.id),
+                }}
+              >
+                <Popup>
+                  <Card className="p-4">
+                    <h3 className="font-semibold mb-2">{app.title}</h3>
+                    <p className="text-sm text-gray-600">{app.address}</p>
+                    <p className="text-sm text-gray-600 mt-1">Status: {app.status}</p>
+                    <Button 
+                      className="mt-2 w-full"
+                      onClick={() => handleMarkerClick(app.id)}
+                    >
+                      View Details
+                    </Button>
+                  </Card>
+                </Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
         </MapContainer>
       </div>
 
