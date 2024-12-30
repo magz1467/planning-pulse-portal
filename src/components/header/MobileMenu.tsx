@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ChevronDown, User } from "lucide-react";
+import { Menu, ChevronDown, User, Map } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
@@ -32,16 +32,25 @@ export const MobileMenu = () => {
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon"
+      <div className="flex items-center gap-2">
+        <Link 
+          to="/applications/dashboard/map"
           className="relative p-2.5 hover:bg-primary/10 transition-colors rounded-lg bg-primary/5"
         >
-          <Menu className="h-8 w-8 text-primary" strokeWidth={2.5} />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </SheetTrigger>
+          <Map className="h-6 w-6 text-primary" strokeWidth={2} />
+          <span className="sr-only">Applications Map</span>
+        </Link>
+        <SheetTrigger asChild>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="relative p-2.5 hover:bg-primary/10 transition-colors rounded-lg bg-primary/5"
+          >
+            <Menu className="h-8 w-8 text-primary" strokeWidth={2.5} />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </SheetTrigger>
+      </div>
       <SheetContent className="overflow-y-auto max-h-screen pt-12">
         <div className="text-xl font-bold text-primary pb-4 mb-6 border-b sticky top-0 bg-background z-10">
           Menu
