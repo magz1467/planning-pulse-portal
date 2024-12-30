@@ -1,9 +1,23 @@
 import requests
-import json
-from typing import List, Dict, Any
+from typing import Any
+from typing import Generator
+
+SOURCES = [
+    "lpa_name",
+    "lpa_app_no",
+    "last_updated",
+    "valid_date",
+    "decision_date",
+    "id",
+    "application_type",
+]
+
+URL = "https://planningdata.london.gov.uk/api-guest/applications/_search"
+
+HEADERS = {"X-API-AllowRequest": "be2rmRnt&", "Content-Type": "application/json"}
 
 
-def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
+def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
     """
     Fetch all planning data using pagination.
     Args:
@@ -11,12 +25,7 @@ def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
     Returns:
         List of all planning records
     """
-    url = "https://planningdata.london.gov.uk/api-guest/applications/_search"
 
-    headers = {"X-API-AllowRequest": "be2rmRnt&", "Content-Type": "application/json"}
-
-    # Initialize variables
-    all_records = []
     search_after = None
     total_fetched = 0
 
@@ -25,25 +34,19 @@ def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
         payload = {
             "size": size,
             "sort": [
-                {"_id": "asc"}  # Sort by ID to ensure consistent pagination
+                # Sort by ID to ensure consistent pagination
+                {"_id": "asc"}
             ],
             "query": {
                 "bool": {
                     "must": [
+                        # must have centroid new schema location value
                         {"exists": {"field": "centroid"}},
+                        # set valid_date for a little filter
                         {"range": {"valid_date": {"gte": "01/01/2024"}}},
                     ]
                 }
             },
-            # "_
-            #     "lpa_name",
-            #     "lpa_app_no",
-            #     "last_updated",
-            #     "valid_date",
-            #     "decision_date",
-            #     "id",
-            #     "application_type",
-            # ],
         }
 
         # Add search_after for pagination if we're not on the first page
@@ -51,7 +54,7 @@ def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
             payload["search_after"] = search_after
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(URL, headers=HEADERS, json=payload)
             response.raise_for_status()
             data = response.json()
 
@@ -62,25 +65,21 @@ def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
             if not hits:
                 break
 
-            # Add the records to our collection
-            all_records.extend([hit["_source"] for hit in hits])
+            # yield records
+            yield from (hit["_source"] for hit in hits)
 
             # Update total fetched
             total_fetched += len(hits)
             print(f"Fetched {total_fetched} records...")
 
             # Get the sort values of the last record for the next iteration
-            print(hits[-1])
             search_after = hits[-1]["sort"]
-            if total_fetched > 10:
-                print("Fetched 10")
-                return all_records
 
+            if total_fetched > 10:
+                print("Breaking after 10")
+                break
         except requests.exceptions.RequestException as e:
             print(f"Error making request: {e}")
             break
 
-    print(f"Completed fetching {len(all_records)} total records")
-    return all_records
-
-
+    print(f"Completed fetching {total_fetched} total records")

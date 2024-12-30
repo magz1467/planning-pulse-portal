@@ -1,7 +1,7 @@
 # Installation
 
 ```
-pip install tqdm sqlalchemy rpc psycopg2 click
+poetry install
 ```
 
 ## Running
