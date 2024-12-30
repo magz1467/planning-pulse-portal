@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -14,12 +16,40 @@ export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
 }: PlanningApplicationListProps) => {
+  const [aiHeaders, setAiHeaders] = useState<{ [key: number]: string }>({});
+
   const getImageUrl = (path: string) => {
     if (path.startsWith('http')) {
       return path;
     }
     return path.startsWith('/') ? path : `/${path}`;
   };
+
+  useEffect(() => {
+    const generateHeaders = async () => {
+      const headers: { [key: number]: string } = {};
+      
+      for (const app of applications) {
+        if (!aiHeaders[app.id] && app.description) {
+          try {
+            const { data, error } = await supabase.functions.invoke('generate-listing-header', {
+              body: { description: app.description }
+            });
+            
+            if (!error && data?.header) {
+              headers[app.id] = data.header;
+            }
+          } catch (error) {
+            console.error('Error generating header:', error);
+          }
+        }
+      }
+      
+      setAiHeaders(prev => ({ ...prev, ...headers }));
+    };
+
+    generateHeaders();
+  }, [applications]);
 
   return (
     <div className="divide-y">
@@ -46,8 +76,8 @@ export const PlanningApplicationList = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-primary line-clamp-3">
-                {application.description || ''}
+              <h3 className="font-semibold text-primary line-clamp-2">
+                {aiHeaders[application.id] || application.description || ''}
               </h3>
               <div className="flex items-center gap-1 mt-1 text-gray-600">
                 <MapPin className="w-3 h-3" />
