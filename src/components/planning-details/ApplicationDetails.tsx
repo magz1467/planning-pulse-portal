@@ -14,6 +14,8 @@ export const ApplicationDetails = ({ application }: ApplicationDetailsProps) => 
       <dl className="grid grid-cols-2 gap-2 text-sm">
         <dt className="text-gray-600">Reference:</dt>
         <dd>{application.reference}</dd>
+        <dt className="text-gray-600">Type:</dt>
+        <dd>{application.type}</dd>
         <dt className="text-gray-600">Applicant:</dt>
         <dd>{application.applicant}</dd>
         <dt className="text-gray-600">Submission Date:</dt>
