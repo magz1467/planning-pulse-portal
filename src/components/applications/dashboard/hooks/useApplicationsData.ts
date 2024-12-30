@@ -33,7 +33,7 @@ export const useApplicationsData = () => {
 
       // Then get the paginated data
       const { data, error } = await supabase
-        .rpc('get_applications_in_bounds', {
+        .rpc('get_applications_in_bounds_paginated', {
           sw_lng: sw.lng,
           sw_lat: sw.lat,
           ne_lng: ne.lng,
