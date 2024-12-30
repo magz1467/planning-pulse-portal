@@ -18,11 +18,18 @@ const MapEventHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: LatLngBo
       onBoundsChange(map.getBounds());
     },
     zoomend: () => {
-      if (map.getZoom() < 12) {
-        map.setZoom(12);
-      }
+      onBoundsChange(map.getBounds());
+    },
+    load: () => {
+      onBoundsChange(map.getBounds());
     }
   });
+
+  // Initial bounds fetch
+  useEffect(() => {
+    onBoundsChange(map.getBounds());
+  }, []);
+
   return null;
 };
 
@@ -33,7 +40,7 @@ export const MapView = ({ applications, selectedId, onMarkerClick, onBoundsChang
     <MapContainer
       center={LONDON_COORDINATES}
       zoom={12}
-      minZoom={12}
+      minZoom={10}
       style={{ height: "100%", width: "100%" }}
     >
       <MapEventHandler onBoundsChange={onBoundsChange} />

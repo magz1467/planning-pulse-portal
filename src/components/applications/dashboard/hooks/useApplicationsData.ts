@@ -34,29 +34,37 @@ export const useApplicationsData = () => {
     
     try {
       // First get the total count with retry logic
-      const { data: countData, error: countError } = await fetchWithRetry(() => 
-        supabase.rpc('get_applications_count_in_bounds', {
-          sw_lng: sw.lng,
-          sw_lat: sw.lat,
-          ne_lng: ne.lng,
-          ne_lat: ne.lat
-        }).then(response => response)
+      const countPromise = Promise.resolve(
+        fetchWithRetry(() => 
+          supabase.rpc('get_applications_count_in_bounds', {
+            sw_lng: sw.lng,
+            sw_lat: sw.lat,
+            ne_lng: ne.lng,
+            ne_lat: ne.lat
+          })
+        )
       );
+
+      const { data: countData, error: countError } = await countPromise;
 
       if (countError) throw countError;
       setTotalCount(countData || 0);
 
       // Then get the paginated data with retry logic
-      const { data, error } = await fetchWithRetry(() =>
-        supabase.rpc('get_applications_in_bounds_paginated', {
-          sw_lng: sw.lng,
-          sw_lat: sw.lat,
-          ne_lng: ne.lng,
-          ne_lat: ne.lat,
-          page_size: PAGE_SIZE,
-          page_number: currentPage
-        }).then(response => response)
+      const dataPromise = Promise.resolve(
+        fetchWithRetry(() =>
+          supabase.rpc('get_applications_in_bounds_paginated', {
+            sw_lng: sw.lng,
+            sw_lat: sw.lat,
+            ne_lng: ne.lng,
+            ne_lat: ne.lat,
+            page_size: PAGE_SIZE,
+            page_number: currentPage
+          })
+        )
       );
+
+      const { data, error } = await dataPromise;
 
       if (error) throw error;
 
