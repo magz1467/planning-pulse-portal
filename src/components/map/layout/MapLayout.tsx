@@ -68,8 +68,6 @@ export const MapLayout = ({
 
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
-      {isLoading && <LoadingOverlay />}
-      
       <MapHeader 
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}

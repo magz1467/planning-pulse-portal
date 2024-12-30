@@ -5,7 +5,6 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useApplicationsData } from "./hooks/useApplicationsData";
 import { MapView } from "./components/MapView";
 import { ApplicationDetails } from "./components/ApplicationDetails";
-import { LoadingOverlay } from "@/components/map/LoadingOverlay";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -24,7 +23,6 @@ export const ApplicationsDashboardMap = () => {
   return (
     <div className="h-screen w-full flex">
       <div className="w-full h-full relative">
-        {isLoading && <LoadingOverlay />}
         <MapView
           applications={applications}
           selectedId={selectedId}

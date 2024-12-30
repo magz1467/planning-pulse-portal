@@ -1,6 +1,5 @@
 import { Application } from "@/types/planning";
 import { MapHeader } from "./MapHeader";
-import { LoadingOverlay } from "./LoadingOverlay";
 import { EmailDialog } from "@/components/EmailDialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
@@ -60,8 +59,6 @@ export const MapContentLayout = ({
 
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
-      {isLoading && <LoadingOverlay />}
-      
       <MapHeader 
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}
