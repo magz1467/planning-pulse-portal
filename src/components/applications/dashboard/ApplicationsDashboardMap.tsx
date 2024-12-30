@@ -20,15 +20,12 @@ export const ApplicationsDashboardMap = () => {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      console.log('Fetching applications...');
-      
       const { data, error } = await supabase
         .from('applications')
         .select('*, geom')
         .not('geom', 'is', null);
 
       if (error) {
-        console.error('Error fetching applications:', error);
         toast({
           title: "Error fetching applications",
           description: error.message,
@@ -37,10 +34,7 @@ export const ApplicationsDashboardMap = () => {
         return;
       }
 
-      console.log('Raw data from database:', data);
-
       if (!data || data.length === 0) {
-        console.log('No applications found in the database');
         return;
       }
 
@@ -48,8 +42,6 @@ export const ApplicationsDashboardMap = () => {
       const transformedData = data?.map(app => {
         // Extract coordinates from PostGIS geometry
         const geomObj = app.geom;
-        console.log('Processing geometry for app:', app.application_id, 'Geometry:', JSON.stringify(geomObj, null, 2));
-        
         let coordinates: [number, number] | null = null;
 
         // Handle PostGIS geometry object
@@ -61,10 +53,7 @@ export const ApplicationsDashboardMap = () => {
           ];
         }
 
-        console.log('Extracted coordinates:', coordinates);
-
         if (!coordinates) {
-          console.warn('Invalid geometry for application:', app.application_id);
           return null;
         }
 
@@ -91,9 +80,6 @@ export const ApplicationsDashboardMap = () => {
       }).filter((app): app is Application & { coordinates: [number, number] } => 
         app !== null && app.coordinates !== null
       );
-
-      console.log('Final transformed applications:', transformedData);
-      console.log('Number of valid applications:', transformedData.length);
       
       setApplications(transformedData || []);
     };
@@ -102,7 +88,6 @@ export const ApplicationsDashboardMap = () => {
   }, [toast]);
 
   const handleMarkerClick = (id: number) => {
-    console.log('Marker clicked:', id);
     setSelectedId(id === selectedId ? null : id);
   };
 
@@ -120,33 +105,30 @@ export const ApplicationsDashboardMap = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {applications.map((app) => {
-            console.log('Rendering marker for app:', app.id, 'at coordinates:', app.coordinates);
-            return (
-              <Marker
-                key={app.id}
-                position={app.coordinates}
-                icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
-                eventHandlers={{
-                  click: () => handleMarkerClick(app.id),
-                }}
-              >
-                <Popup>
-                  <Card className="p-4">
-                    <h3 className="font-semibold mb-2">{app.title}</h3>
-                    <p className="text-sm text-gray-600">{app.address}</p>
-                    <p className="text-sm text-gray-600 mt-1">Status: {app.status}</p>
-                    <Button 
-                      className="mt-2 w-full"
-                      onClick={() => handleMarkerClick(app.id)}
-                    >
-                      View Details
-                    </Button>
-                  </Card>
-                </Popup>
-              </Marker>
-            );
-          })}
+          {applications.map((app) => (
+            <Marker
+              key={app.id}
+              position={app.coordinates}
+              icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
+              eventHandlers={{
+                click: () => handleMarkerClick(app.id),
+              }}
+            >
+              <Popup>
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">{app.title}</h3>
+                  <p className="text-sm text-gray-600">{app.address}</p>
+                  <p className="text-sm text-gray-600 mt-1">Status: {app.status}</p>
+                  <Button 
+                    className="mt-2 w-full"
+                    onClick={() => handleMarkerClick(app.id)}
+                  >
+                    View Details
+                  </Button>
+                </Card>
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
       </div>
 
