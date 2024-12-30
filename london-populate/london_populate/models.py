@@ -123,38 +123,6 @@ class PlanningApplication(Base):
     # PostGIS geometry column
     geom = Column(Geometry(geometry_type="POINT", srid=4326))
 
-    @hybrid_property
-    def centroid_as_geom(self):
-        """
-        Returns the centroid as a PostGIS POINT geometry object.
-        """
-        if self.centroid:
-            try:
-                centroid = json.loads(self.centroid)
-                lat = centroid.get("lat")
-                lng = centroid.get("lng")
-                if lat is not None and lng is not None:
-                    return f"SRID=4326;POINT({lng} {lat})"
-            except (json.JSONDecodeError, TypeError, KeyError):
-                pass
-        return None
-
-    @validates("centroid")
-    def validate_centroid(self, key, value):
-        """
-        Validates the centroid JSON field and updates the geom column.
-        """
-        if value:
-            try:
-                centroid = json.loads(value)
-                lat = centroid.get("lat")
-                lng = centroid.get("lng")
-                if lat is not None and lng is not None:
-                    self.geom = f"SRID=4326;POINT({lng} {lat})"
-            except (json.JSONDecodeError, TypeError, KeyError):
-                self.geom = None
-        return value
-
     def __repr__(self):
         return f"<PlanningApplication(id={self.id}, lpa_app_no={self.lpa_app_no})>"
 
@@ -164,9 +132,21 @@ class PlanningApplication(Base):
         Create a PlanningApplication instance from API response data
         """
         # Convert any nested dictionaries to JSON strings
-        for key, value in data.items():
-            if isinstance(value, (dict, list)):
-                data[key] = json.dumps(value)
+        # for key, value in data.items():
+        #     if isinstance(value, (dict, list)):
+        #         data[key] = json.dumps(value)
+        #
+        # Handle geom explicitly from centroid if available
+        if "centroid" in data:
+            try:
+                centroid = data["centroid"]
+                lat = centroid.get("lat")
+                lon = centroid.get("lon")
+                if lat is not None and lon is not None:
+                    data["geom"] = f"SRID=4326;POINT({lon} {lat})"
+            except (json.JSONDecodeError, TypeError, KeyError) as e:
+                data["geom"] = None
+                raise e
 
         return cls(**data)
 

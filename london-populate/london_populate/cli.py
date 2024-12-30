@@ -35,19 +35,20 @@ def bulk_insert_from_application_resp(api_data, batch_size=1000):
             if not batch:  # If the batch is empty, stop processing
                 break
 
-            # Prepare the bulk insert statement
-            stmt = insert(PlanningApplication.__table__).values(batch)
-
-            # Execute the batch and commit
-            result = session.execute(stmt)
+            # Convert the batch using from_api_response
+            prepared_batch = [
+                PlanningApplication.from_api_response(record) for record in batch
+            ]
+            session.bulk_save_objects(prepared_batch)
             session.commit()
 
             # Update counters (assumes result.rowcount reflects total processed)
-            inserted_count += result.rowcount
+            inserted_count += len(prepared_batch)
 
     except Exception as e:
         session.rollback()
         print(f"Error inserting: {str(e)}")
+        raise e
 
     print(f"Processed {inserted_count} records to database")
 
