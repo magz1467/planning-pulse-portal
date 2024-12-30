@@ -7,6 +7,9 @@ import { MapView } from "./components/MapView";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MapListToggle } from "@/components/map/mobile/MapListToggle";
+import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -15,6 +18,8 @@ export const ApplicationsDashboardMap = () => {
     type?: string;
   }>({});
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
+  const [isMapView, setIsMapView] = useState(true);
+  const isMobile = useIsMobile();
   
   const { 
     applications, 
@@ -48,30 +53,50 @@ export const ApplicationsDashboardMap = () => {
               <Home className="h-6 w-6" />
               PlanningPulse
             </Link>
+            {isMobile && (
+              <MapListToggle 
+                isMapView={isMapView} 
+                onToggle={() => setIsMapView(!isMapView)} 
+              />
+            )}
           </div>
         </div>
       </header>
       <div className="flex flex-1 min-h-0 relative">
-        <DesktopSidebar
-          applications={applications}
-          selectedApplication={selectedId}
-          postcode=""
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          onSelectApplication={handleMarkerClick}
-          onClose={() => setSelectedId(null)}
-        />
-
-        <div className="flex-1 relative">
-          <MapView
+        {(!isMobile || !isMapView) && (
+          <DesktopSidebar
             applications={applications}
-            selectedId={selectedId}
-            onMarkerClick={handleMarkerClick}
-            onBoundsChange={fetchApplicationsInBounds}
+            selectedApplication={selectedId}
+            postcode=""
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            onSelectApplication={handleMarkerClick}
+            onClose={() => setSelectedId(null)}
           />
-        </div>
+        )}
+
+        {(!isMobile || isMapView) && (
+          <div className="flex-1 relative">
+            <MapView
+              applications={applications}
+              selectedId={selectedId}
+              onMarkerClick={handleMarkerClick}
+              onBoundsChange={fetchApplicationsInBounds}
+            />
+          </div>
+        )}
+
+        {isMobile && !isMapView && (
+          <MobileListContainer
+            applications={applications}
+            selectedApplication={selectedId}
+            postcode=""
+            onSelectApplication={handleMarkerClick}
+            onShowEmailDialog={() => {}}
+          />
+        )}
       </div>
     </div>
   );
