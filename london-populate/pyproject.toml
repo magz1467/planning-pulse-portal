@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "london-populate"
+version = "0.1.0"
+description = "Populate london applicatons"
+authors = ["Ollivanders <ollivander64@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.12"
+requests = "^2.32.3"
+click = "^8.1.8"
+sqlalchemy = "^2.0.36"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

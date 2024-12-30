@@ -8,16 +8,23 @@ def fetch_planning_data():
     headers = {"X-API-AllowRequest": "be2rmRnt&", "Content-Type": "application/json"}
 
     payload = {
-        # "query": {"bool": {"must": [{"range": {"valid_date": {"gte": "01/01/2001"}}}]}},
-        "_source": [
-            "lpa_name",
-            # "lpa_app_no",
-            # "last_updated",
-            # "valid_date",
-            # "decision_date",
-            # "id",
-            # "application_type",
-        ],
+        "query": {
+            "bool": {
+                "must": [
+                    {"exists": {"field": "centroid"}},
+                    {"range": {"valid_date": {"gte": "01/01/2001"}}},
+                ]
+            }
+        },
+        # "_source": [
+        # "lpa_name",
+        # "lpa_app_no",
+        # "last_updated",
+        # "valid_date",
+        # "decision_date",
+        # "id",
+        # "application_type",
+        # ],
     }
 
     try:

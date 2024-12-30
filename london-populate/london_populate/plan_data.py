@@ -28,17 +28,22 @@ def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
                 {"_id": "asc"}  # Sort by ID to ensure consistent pagination
             ],
             "query": {
-                "bool": {"must": [{"range": {"valid_date": {"gte": "01/01/2001"}}}]}
+                "bool": {
+                    "must": [
+                        {"exists": {"field": "centroid"}},
+                        {"range": {"valid_date": {"gte": "01/01/2024"}}},
+                    ]
+                }
             },
-            "_source": [
-                "lpa_name",
-                "lpa_app_no",
-                "last_updated",
-                "valid_date",
-                "decision_date",
-                "id",
-                "application_type",
-            ],
+            # "_
+            #     "lpa_name",
+            #     "lpa_app_no",
+            #     "last_updated",
+            #     "valid_date",
+            #     "decision_date",
+            #     "id",
+            #     "application_type",
+            # ],
         }
 
         # Add search_after for pagination if we're not on the first page
@@ -97,6 +102,13 @@ if __name__ == "__main__":
     # Fetch all records
     all_records = fetch_planning_data_paginated()
 
+    record_keys = set()
+    for record in all_records:
+        for k, v in record.items():
+            record_keys.add((k, type(v)))
+
     # Save to file
     if all_records:
         save_to_file(all_records)
+
+    print(list(record_keys))
