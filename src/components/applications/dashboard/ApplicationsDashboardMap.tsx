@@ -39,12 +39,14 @@ export const ApplicationsDashboardMap = () => {
     const sw = bounds.getSouthWest();
     const ne = bounds.getNorthEast();
     
+    const envelope = `ST_MakeEnvelope(${sw.lng}, ${sw.lat}, ${ne.lng}, ${ne.lat}, 4326)`;
+    
     const { data, error } = await supabase
       .from('applications')
       .select('*, geom')
       .not('geom', 'is', null)
       .filter('geom', 'not.is', null)
-      .filter(`st_within(geom, st_makeenvelope(${sw.lng}, ${sw.lat}, ${ne.lng}, ${ne.lat}, 4326))`);
+      .filter(`st_within(geom, ${envelope})`, 'is', true);
 
     if (error) {
       toast({
