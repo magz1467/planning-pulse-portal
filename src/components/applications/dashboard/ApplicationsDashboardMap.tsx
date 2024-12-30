@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect, useState, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -12,80 +12,109 @@ import { Application } from "@/types/planning";
 import L from 'leaflet';
 import 'leaflet.markercluster';
 
+// Component to handle map events and bounds
+const MapEventHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: L.LatLngBounds) => void }) => {
+  const map = useMapEvents({
+    moveend: () => {
+      onBoundsChange(map.getBounds());
+    },
+    zoomend: () => {
+      // Prevent zooming out past initial zoom level
+      if (map.getZoom() < 12) {
+        map.setZoom(12);
+      }
+    }
+  });
+  return null;
+};
+
 export const ApplicationsDashboardMap = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const { toast } = useToast();
   const LONDON_COORDINATES: [number, number] = [51.5074, -0.1278];
+  const mapRef = useRef<L.Map | null>(null);
+
+  const fetchApplicationsInBounds = async (bounds: L.LatLngBounds) => {
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+    
+    const { data, error } = await supabase
+      .from('applications')
+      .select('*, geom')
+      .not('geom', 'is', null)
+      .filter('geom', 'not.is', null)
+      // PostGIS query to check if point is within bounds
+      .filter(`geom && ST_MakeEnvelope(${sw.lng}, ${sw.lat}, ${ne.lng}, ${ne.lat}, 4326)`);
+
+    if (error) {
+      toast({
+        title: "Error fetching applications",
+        description: error.message,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      return;
+    }
+
+    // Transform the data to match the Application type
+    const transformedData = data?.map(app => {
+      // Extract coordinates from PostGIS geometry
+      const geomObj = app.geom;
+      let coordinates: [number, number] | null = null;
+
+      // Handle PostGIS geometry object
+      if (geomObj && typeof geomObj === 'object' && 'coordinates' in geomObj) {
+        coordinates = [
+          geomObj.coordinates[1] as number, // Latitude
+          geomObj.coordinates[0] as number  // Longitude
+        ];
+      }
+
+      if (!coordinates) {
+        return null;
+      }
+
+      return {
+        id: app.application_id,
+        title: app.description || '',
+        address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
+        status: app.status || '',
+        distance: 'N/A',
+        reference: app.lpa_app_no || '',
+        description: app.description || '',
+        applicant: typeof app.application_details === 'object' ? 
+          (app.application_details as any)?.applicant || '' : '',
+        submissionDate: app.valid_date || '',
+        decisionDue: app.decision_target_date || '',
+        type: app.application_type || '',
+        ward: app.ward || '',
+        officer: typeof app.application_details === 'object' ? 
+          (app.application_details as any)?.officer || '' : '',
+        consultationEnd: app.last_date_consultation_comments || '',
+        image: '/placeholder.svg',
+        coordinates
+      };
+    }).filter((app): app is Application & { coordinates: [number, number] } => 
+      app !== null && app.coordinates !== null
+    );
+    
+    setApplications(transformedData || []);
+  };
+
+  const handleBoundsChange = (bounds: L.LatLngBounds) => {
+    fetchApplicationsInBounds(bounds);
+  };
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      const { data, error } = await supabase
-        .from('applications')
-        .select('*, geom')
-        .not('geom', 'is', null);
-
-      if (error) {
-        toast({
-          title: "Error fetching applications",
-          description: error.message,
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        return;
-      }
-
-      // Transform the data to match the Application type
-      const transformedData = data?.map(app => {
-        // Extract coordinates from PostGIS geometry
-        const geomObj = app.geom;
-        let coordinates: [number, number] | null = null;
-
-        // Handle PostGIS geometry object
-        if (geomObj && typeof geomObj === 'object' && 'coordinates' in geomObj) {
-          // Assuming the geometry is in GeoJSON format
-          coordinates = [
-            geomObj.coordinates[1] as number, // Latitude
-            geomObj.coordinates[0] as number  // Longitude
-          ];
-        }
-
-        if (!coordinates) {
-          return null;
-        }
-
-        return {
-          id: app.application_id,
-          title: app.description || '',
-          address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
-          status: app.status || '',
-          distance: 'N/A',
-          reference: app.lpa_app_no || '',
-          description: app.description || '',
-          applicant: typeof app.application_details === 'object' ? 
-            (app.application_details as any)?.applicant || '' : '',
-          submissionDate: app.valid_date || '',
-          decisionDue: app.decision_target_date || '',
-          type: app.application_type || '',
-          ward: app.ward || '',
-          officer: typeof app.application_details === 'object' ? 
-            (app.application_details as any)?.officer || '' : '',
-          consultationEnd: app.last_date_consultation_comments || '',
-          image: '/placeholder.svg',
-          coordinates
-        };
-      }).filter((app): app is Application & { coordinates: [number, number] } => 
-        app !== null && app.coordinates !== null
-      );
-      
-      setApplications(transformedData || []);
-    };
-
-    fetchApplications();
-  }, [toast]);
+    // Initial fetch when map loads
+    if (mapRef.current) {
+      fetchApplicationsInBounds(mapRef.current.getBounds());
+    }
+  }, []);
 
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
@@ -97,10 +126,13 @@ export const ApplicationsDashboardMap = () => {
     <div className="h-screen w-full flex">
       <div className="w-full h-full relative">
         <MapContainer
+          ref={mapRef}
           center={LONDON_COORDINATES}
           zoom={12}
+          minZoom={12}
           style={{ height: "100%", width: "100%" }}
         >
+          <MapEventHandler onBoundsChange={handleBoundsChange} />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
