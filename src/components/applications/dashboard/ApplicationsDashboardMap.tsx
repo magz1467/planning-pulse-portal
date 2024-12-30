@@ -6,6 +6,8 @@ import { useApplicationsData } from "./hooks/useApplicationsData";
 import { MapView } from "./components/MapView";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { FilterBar } from "@/components/FilterBar";
+import { Link } from "react-router-dom";
+import { Home } from "lucide-react";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -40,6 +42,16 @@ export const ApplicationsDashboardMap = () => {
 
   return (
     <div className="h-screen w-full flex flex-col">
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
+              <Home className="h-6 w-6" />
+              PlanningPulse
+            </Link>
+          </div>
+        </div>
+      </header>
       <div className="flex flex-1 min-h-0 relative">
         <DesktopSidebar
           applications={applications}
