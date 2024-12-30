@@ -14,10 +14,11 @@ SOURCES = [
 
 URL = "https://planningdata.london.gov.uk/api-guest/applications/_search"
 
-HEADERS = {"X-API-AllowRequest": "be2rmRnt&", "Content-Type": "application/json"}
+HEADERS = {"X-API-AllowRequest": "be2rmRnt&",
+           "Content-Type": "application/json"}
 
 
-def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
+def fetch_planning_data_paginated(size: int = 499) -> Generator[Any, Any, Any]:
     """
     Fetch all planning data using pagination.
     Args:
@@ -74,10 +75,6 @@ def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
 
             # Get the sort values of the last record for the next iteration
             search_after = hits[-1]["sort"]
-
-            if total_fetched > 10:
-                print("Breaking after 10")
-                break
         except requests.exceptions.RequestException as e:
             print(f"Error making request: {e}")
             break

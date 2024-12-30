@@ -12,3 +12,8 @@ infrastructure-project-decision
 
 
 https://planningdata.london.gov.uk/dashboard/app/dashboards#/view/26232d10-87d7-11eb-9557-b96feee58904?_g=(filters:!())
+
+
+2024 applications
+Completed fetching 95835 total records
+Processed 85735 records to database

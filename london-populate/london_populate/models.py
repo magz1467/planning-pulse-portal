@@ -2,6 +2,7 @@ import json
 
 from sqlalchemy import (
     JSON,
+    TEXT,
     Column,
     Integer,
     MetaData,
@@ -9,10 +10,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.types import TypeDecorator
 from geoalchemy2 import Geometry
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import validates
-from sqlalchemy import MetaData, create_engine
+from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
+
+from sqlalchemy import delete
 
 metadata = MetaData()
 Base = declarative_base()
@@ -43,7 +44,7 @@ class FlexibleType(TypeDecorator):
 
 
 class PlanningApplication(Base):
-    __tablename__ = "planning_applications"
+    __tablename__ = "applications"
 
     # Primary key
     application_id = Column(Integer, primary_key=True, autoincrement=True)
@@ -57,7 +58,7 @@ class PlanningApplication(Base):
     application_type = Column(String(255))
     application_type_full = Column(String(255))
     status = Column(String(255))
-    description = Column(String(1000))
+    description = Column(TEXT)
     bo_system = Column(String(255))
 
     # Dates
@@ -71,7 +72,8 @@ class PlanningApplication(Base):
     actual_commencement_date = Column(String(255))
     actual_completion_date = Column(String(255))
     date_building_work_started_under_previous_permission = Column(String(255))
-    date_building_work_completed_under_previous_permission = Column(String(255))
+    date_building_work_completed_under_previous_permission = Column(
+        String(255))
 
     # Location details
     borough = Column(String(255))
@@ -113,10 +115,10 @@ class PlanningApplication(Base):
 
     # Additional details
     development_type = Column(String(255))
-    subdivision_of_building = Column(String(255))
+    subdivision_of_building = Column(TEXT)
     parking_details = Column(JSON)
     application_details = Column(JSON)
-    url_planning_app = Column(String(1000))
+    url_planning_app = Column(TEXT)
     cil_liability = Column(String(255))
     last_updated_by = Column(String(255))
 
@@ -131,12 +133,30 @@ class PlanningApplication(Base):
         """
         Create a PlanningApplication instance from API response data
         """
-        # Convert any nested dictionaries to JSON strings
-        # for key, value in data.items():
-        #     if isinstance(value, (dict, list)):
-        #         data[key] = json.dumps(value)
-        #
+
+        def truncate_strings(value):
+            """Recursively truncate string values to 1000 characters."""
+            if isinstance(value, str):  # If the value is a string, truncate it
+                return value[:1000]
+            elif isinstance(
+                value, dict
+            ):  # If it's a dictionary, recurse through its items
+                return {key: truncate_strings(val) for key, val in value.items()}
+            elif isinstance(value, list):  # If it's a list, recurse through each item
+                return [truncate_strings(item) for item in value]
+            else:
+                return (
+                    value  # Return the value as is if it's not a string, dict, or list
+                )
+
+        # Truncate the `id` field to ensure it's within the 255 character limit
+        if "id" in data and isinstance(data["id"], str):
+            data["id"] = data["id"][:255]
+
+        # Recursively truncate all other strings in the data
         # Handle geom explicitly from centroid if available
+        data = truncate_strings(data)
+
         if "centroid" in data:
             try:
                 centroid = data["centroid"]
@@ -161,3 +181,9 @@ def create_tables_orm(engine):
     print("Creating tables orm")
     # Base.metadata.drop_all(engine, checkfirst=True)
     Base.metadata.create_all(engine, checkfirst=True)
+
+
+def delete_tables_orm(session):
+    stmt = delete(PlanningApplication)
+    session.execute(stmt)
+    session.commit()

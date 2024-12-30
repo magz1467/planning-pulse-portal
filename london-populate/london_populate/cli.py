@@ -1,21 +1,23 @@
 import click
-from sqlalchemy import insert
 import itertools
 
 from london_populate.db import (
     create_session,
     db_connect,
 )
-from london_populate.models import PlanningApplication, create_tables_orm
+from london_populate.models import (
+    PlanningApplication,
+    create_tables_orm,
+    delete_tables_orm,
+)
 from london_populate.plan_data import fetch_planning_data_paginated
-from london_populate.utils import save_to_file
 
 engine, connection = db_connect(False)
 session = create_session(engine)
 batch_size: int = 1000
 
 
-def bulk_insert_from_application_resp(api_data, batch_size=1000):
+def bulk_insert_from_application_resp(api_data, batch_size=100):
     """
     Bulk insert planning applications from API data with conflict handling.
 
@@ -27,8 +29,8 @@ def bulk_insert_from_application_resp(api_data, batch_size=1000):
         Dictionary containing counts of inserted and updated records
     """
     inserted_count = 0
-    try:
-        while True:
+    while True:
+        try:
             # Extract the next batch of data from the generator
             # Safe handling of generators
             batch = list(itertools.islice(api_data, batch_size))
@@ -45,10 +47,9 @@ def bulk_insert_from_application_resp(api_data, batch_size=1000):
             # Update counters (assumes result.rowcount reflects total processed)
             inserted_count += len(prepared_batch)
 
-    except Exception as e:
-        session.rollback()
-        print(f"Error inserting: {str(e)}")
-        raise e
+        except Exception as e:
+            session.rollback()
+            print(f"Error inserting: {str(e)}")
 
     print(f"Processed {inserted_count} records to database")
 
@@ -58,7 +59,8 @@ def cli(): ...
 
 
 @cli.command("clear", help="Clear the table")
-def _clear(): ...
+def _clear():
+    delete_tables_orm(session)
 
 
 @cli.command(
