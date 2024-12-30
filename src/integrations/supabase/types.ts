@@ -40,223 +40,11 @@ export type Database = {
             columns: ["application_id"]
             isOneToOne: false
             referencedRelation: "applications"
-            referencedColumns: ["id"]
+            referencedColumns: ["application_id"]
           },
         ]
       }
       applications: {
-        Row: {
-          address: string | null
-          applicant: string | null
-          consultation_end: string | null
-          created_at: string
-          dataset: string | null
-          decision_due: string | null
-          description: string | null
-          end_date: string | null
-          entity: number | null
-          entry_date: string | null
-          external_id: string | null
-          id: number
-          lat: number | null
-          lng: number | null
-          local_planning_authority: string | null
-          location: unknown | null
-          officer: string | null
-          opendatacommunities_uri: string | null
-          organisation_entity: string | null
-          parliament_thesaurus: string | null
-          prefix: string | null
-          raw_data: Json | null
-          start_date: string | null
-          statistical_geography: string | null
-          status: string | null
-          submission_date: string | null
-          title: string
-          twitter: string | null
-          type: string | null
-          typology: string | null
-          updated_at: string
-          ward: string | null
-          website: string | null
-          wikidata: string | null
-          wikipedia: string | null
-        }
-        Insert: {
-          address?: string | null
-          applicant?: string | null
-          consultation_end?: string | null
-          created_at?: string
-          dataset?: string | null
-          decision_due?: string | null
-          description?: string | null
-          end_date?: string | null
-          entity?: number | null
-          entry_date?: string | null
-          external_id?: string | null
-          id?: number
-          lat?: number | null
-          lng?: number | null
-          local_planning_authority?: string | null
-          location?: unknown | null
-          officer?: string | null
-          opendatacommunities_uri?: string | null
-          organisation_entity?: string | null
-          parliament_thesaurus?: string | null
-          prefix?: string | null
-          raw_data?: Json | null
-          start_date?: string | null
-          statistical_geography?: string | null
-          status?: string | null
-          submission_date?: string | null
-          title: string
-          twitter?: string | null
-          type?: string | null
-          typology?: string | null
-          updated_at?: string
-          ward?: string | null
-          website?: string | null
-          wikidata?: string | null
-          wikipedia?: string | null
-        }
-        Update: {
-          address?: string | null
-          applicant?: string | null
-          consultation_end?: string | null
-          created_at?: string
-          dataset?: string | null
-          decision_due?: string | null
-          description?: string | null
-          end_date?: string | null
-          entity?: number | null
-          entry_date?: string | null
-          external_id?: string | null
-          id?: number
-          lat?: number | null
-          lng?: number | null
-          local_planning_authority?: string | null
-          location?: unknown | null
-          officer?: string | null
-          opendatacommunities_uri?: string | null
-          organisation_entity?: string | null
-          parliament_thesaurus?: string | null
-          prefix?: string | null
-          raw_data?: Json | null
-          start_date?: string | null
-          statistical_geography?: string | null
-          status?: string | null
-          submission_date?: string | null
-          title?: string
-          twitter?: string | null
-          type?: string | null
-          typology?: string | null
-          updated_at?: string
-          ward?: string | null
-          website?: string | null
-          wikidata?: string | null
-          wikipedia?: string | null
-        }
-        Relationships: []
-      }
-      contact_requests: {
-        Row: {
-          created_at: string
-          email: string | null
-          id: number
-          message: string
-          phone: string | null
-          status: string | null
-        }
-        Insert: {
-          created_at?: string
-          email?: string | null
-          id?: number
-          message: string
-          phone?: string | null
-          status?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string | null
-          id?: number
-          message?: string
-          phone?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      council_contacts: {
-        Row: {
-          contact_name: string
-          council_name: string
-          created_at: string
-          email: string
-          id: number
-          message: string | null
-          phone: string | null
-          status: string | null
-        }
-        Insert: {
-          contact_name: string
-          council_name: string
-          created_at?: string
-          email: string
-          id?: number
-          message?: string | null
-          phone?: string | null
-          status?: string | null
-        }
-        Update: {
-          contact_name?: string
-          council_name?: string
-          created_at?: string
-          email?: string
-          id?: number
-          message?: string | null
-          phone?: string | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      petitions: {
-        Row: {
-          address: string | null
-          application_id: number | null
-          created_at: string
-          id: number
-          reasons: string[]
-          user_email: string
-          user_id: string | null
-        }
-        Insert: {
-          address?: string | null
-          application_id?: number | null
-          created_at?: string
-          id?: never
-          reasons: string[]
-          user_email: string
-          user_id?: string | null
-        }
-        Update: {
-          address?: string | null
-          application_id?: number | null
-          created_at?: string
-          id?: never
-          reasons?: string[]
-          user_email?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "petitions_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: false
-            referencedRelation: "applications"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      planning_applications: {
         Row: {
           actual_commencement_date: string | null
           actual_completion_date: string | null
@@ -427,6 +215,104 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_requests: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: number
+          message: string
+          phone: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: number
+          message: string
+          phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: number
+          message?: string
+          phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      council_contacts: {
+        Row: {
+          contact_name: string
+          council_name: string
+          created_at: string
+          email: string
+          id: number
+          message: string | null
+          phone: string | null
+          status: string | null
+        }
+        Insert: {
+          contact_name: string
+          council_name: string
+          created_at?: string
+          email: string
+          id?: number
+          message?: string | null
+          phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          contact_name?: string
+          council_name?: string
+          created_at?: string
+          email?: string
+          id?: number
+          message?: string | null
+          phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      petitions: {
+        Row: {
+          address: string | null
+          application_id: number | null
+          created_at: string
+          id: number
+          reasons: string[]
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          application_id?: number | null
+          created_at?: string
+          id?: never
+          reasons: string[]
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          application_id?: number | null
+          created_at?: string
+          id?: never
+          reasons?: string[]
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "petitions_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["application_id"]
+          },
+        ]
+      }
       saved_applications: {
         Row: {
           application_id: number
@@ -452,7 +338,7 @@ export type Database = {
             columns: ["application_id"]
             isOneToOne: false
             referencedRelation: "applications"
-            referencedColumns: ["id"]
+            referencedColumns: ["application_id"]
           },
         ]
       }
