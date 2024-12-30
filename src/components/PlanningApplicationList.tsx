@@ -21,6 +21,14 @@ export const PlanningApplicationList = ({
     return path.startsWith('/') ? path : `/${path}`;
   };
 
+  const truncateTitle = (title: string) => {
+    const words = title.split(' ');
+    if (words.length > 15) {
+      return words.slice(0, 15).join(' ') + '...';
+    }
+    return title;
+  };
+
   return (
     <div className="divide-y">
       {applications.map((application) => (
@@ -46,7 +54,7 @@ export const PlanningApplicationList = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-primary truncate">{application.title}</h3>
+              <h3 className="font-semibold text-primary truncate">{truncateTitle(application.title)}</h3>
               <div className="flex items-center gap-1 mt-1 text-gray-600">
                 <MapPin className="w-3 h-3" />
                 <p className="text-sm truncate">{application.address}</p>
