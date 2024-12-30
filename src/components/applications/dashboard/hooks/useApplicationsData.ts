@@ -40,7 +40,7 @@ export const useApplicationsData = () => {
           sw_lat: sw.lat,
           ne_lng: ne.lng,
           ne_lat: ne.lat
-        })
+        }).then(response => response)
       );
 
       if (countError) throw countError;
@@ -55,7 +55,7 @@ export const useApplicationsData = () => {
           ne_lat: ne.lat,
           page_size: PAGE_SIZE,
           page_number: currentPage
-        })
+        }).then(response => response)
       );
 
       if (error) throw error;
