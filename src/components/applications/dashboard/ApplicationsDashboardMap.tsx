@@ -8,7 +8,7 @@ import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { MapListToggle } from "@/components/map/mobile/MapListToggle";
+import { FilterBar } from "@/components/FilterBar";
 import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
 
 export const ApplicationsDashboardMap = () => {
@@ -53,15 +53,19 @@ export const ApplicationsDashboardMap = () => {
               <Home className="h-6 w-6" />
               PlanningPulse
             </Link>
-            {isMobile && (
-              <MapListToggle 
-                isMapView={isMapView} 
-                onToggle={() => setIsMapView(!isMapView)} 
-              />
-            )}
           </div>
         </div>
       </header>
+
+      <FilterBar 
+        onFilterChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+        isMapView={isMapView}
+        onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
+      />
+
       <div className="flex flex-1 min-h-0 relative">
         {(!isMobile || !isMapView) && (
           <DesktopSidebar

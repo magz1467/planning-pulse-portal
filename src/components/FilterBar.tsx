@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { FilterDropdown } from "@/components/map/filter/FilterDropdown";
 import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Filter, ArrowUpDown, Map, List } from "lucide-react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -11,6 +12,8 @@ interface FilterBarProps {
     type?: string;
   };
   activeSort?: 'closingSoon' | 'newest' | null;
+  isMapView?: boolean;
+  onToggleView?: () => void;
 }
 
 export const FilterBar = ({
@@ -18,23 +21,67 @@ export const FilterBar = ({
   onSortChange,
   activeFilters = {},
   activeSort = null,
+  isMapView = true,
+  onToggleView
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-1">
         <FilterDropdown
           onFilterChange={onFilterChange}
           activeFilters={activeFilters}
           isMobile={isMobile}
-        />
+        >
+          <Button 
+            variant="outline" 
+            size={isMobile ? "sm" : "default"}
+            className="flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        </FilterDropdown>
+
         <SortDropdown
           onSortChange={onSortChange}
           activeSort={activeSort}
           isMobile={isMobile}
-        />
+        >
+          <Button 
+            variant="outline" 
+            size={isMobile ? "sm" : "default"}
+            className="flex items-center gap-2"
+          >
+            <ArrowUpDown className="h-4 w-4" />
+            Sort
+          </Button>
+        </SortDropdown>
       </div>
+
+      {isMobile && onToggleView && (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleView}
+            className={isMapView ? "text-primary" : "text-gray-500"}
+          >
+            <Map className="h-5 w-5 mr-1" />
+            Map
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleView}
+            className={!isMapView ? "text-primary" : "text-gray-500"}
+          >
+            <List className="h-5 w-5 mr-1" />
+            List
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
