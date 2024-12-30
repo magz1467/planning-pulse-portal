@@ -29,7 +29,10 @@ export const PlanningApplicationList = ({
     const generateHeaders = async () => {
       const headers: { [key: number]: string } = {};
       
-      for (const app of applications) {
+      // Only process the first 10 applications
+      const firstTenApps = applications.slice(0, 10);
+      
+      for (const app of firstTenApps) {
         if (!aiHeaders[app.id] && app.description) {
           try {
             const { data, error } = await supabase.functions.invoke('generate-listing-header', {
