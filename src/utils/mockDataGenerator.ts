@@ -1,4 +1,4 @@
-import { Application } from "@/types/planning";
+import { Application } from '@/types/planning';
 
 const streets = [
   "High Street", "Station Road", "Church Street", "Mill Lane", "School Lane",
@@ -65,6 +65,22 @@ const generateReference = (index: number): string => {
   return `MK/${year}/${String(index + 1).padStart(4, '0')}`;
 };
 
+// Generate random coordinates within London area
+const generateRandomLondonCoordinates = (): [number, number] => {
+  // London approximate bounds
+  const londonBounds = {
+    minLat: 51.28,
+    maxLat: 51.686,
+    minLng: -0.489,
+    maxLng: 0.236
+  };
+
+  const lat = londonBounds.minLat + Math.random() * (londonBounds.maxLat - londonBounds.minLat);
+  const lng = londonBounds.minLng + Math.random() * (londonBounds.maxLng - londonBounds.minLng);
+
+  return [lat, lng];
+};
+
 export const generateMockApplications = (count: number): Application[] => {
   const applications: Application[] = [];
   const now = new Date();
@@ -116,7 +132,8 @@ export const generateMockApplications = (count: number): Application[] => {
       ward: getRandomElement(wards),
       officer: getRandomElement(officers),
       consultationEnd: consultationEnd.toISOString().split('T')[0],
-      image: getRandomElement(planningImages)
+      image: getRandomElement(planningImages),
+      coordinates: generateRandomLondonCoordinates()
     };
 
     applications.push(application);
