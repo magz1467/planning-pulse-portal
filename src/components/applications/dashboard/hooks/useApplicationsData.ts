@@ -11,6 +11,20 @@ export const useApplicationsData = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const { toast } = useToast();
   const PAGE_SIZE = 100;
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 1000; // 1 second
+
+  const fetchWithRetry = async (fn: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
+    try {
+      return await fn();
+    } catch (error: any) {
+      if (retries > 0 && error?.status === 500) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        return fetchWithRetry(fn, retries - 1);
+      }
+      throw error;
+    }
+  };
 
   const fetchApplicationsInBounds = async (bounds: LatLngBounds) => {
     const sw = bounds.getSouthWest();
@@ -19,28 +33,30 @@ export const useApplicationsData = () => {
     setIsLoading(true);
     
     try {
-      // First get the total count
-      const { data: countData, error: countError } = await supabase
-        .rpc('get_applications_count_in_bounds', {
+      // First get the total count with retry logic
+      const { data: countData, error: countError } = await fetchWithRetry(() => 
+        supabase.rpc('get_applications_count_in_bounds', {
           sw_lng: sw.lng,
           sw_lat: sw.lat,
           ne_lng: ne.lng,
           ne_lat: ne.lat
-        });
+        })
+      );
 
       if (countError) throw countError;
       setTotalCount(countData || 0);
 
-      // Then get the paginated data
-      const { data, error } = await supabase
-        .rpc('get_applications_in_bounds_paginated', {
+      // Then get the paginated data with retry logic
+      const { data, error } = await fetchWithRetry(() =>
+        supabase.rpc('get_applications_in_bounds_paginated', {
           sw_lng: sw.lng,
           sw_lat: sw.lat,
           ne_lng: ne.lng,
           ne_lat: ne.lat,
           page_size: PAGE_SIZE,
           page_number: currentPage
-        });
+        })
+      );
 
       if (error) throw error;
 
