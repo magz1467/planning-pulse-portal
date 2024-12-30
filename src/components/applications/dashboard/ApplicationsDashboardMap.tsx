@@ -16,12 +16,15 @@ export const ApplicationsDashboardMap = () => {
 
   useEffect(() => {
     const fetchApplications = async () => {
+      console.log('Fetching applications...');
+      
       const { data, error } = await supabase
         .from('applications')
         .select('*, geom')
-        .not('geom', 'is', null); // Only fetch records with geometry
+        .not('geom', 'is', null);
 
       if (error) {
+        console.error('Error fetching applications:', error);
         toast({
           title: "Error fetching applications",
           description: error.message,
@@ -30,14 +33,23 @@ export const ApplicationsDashboardMap = () => {
         return;
       }
 
+      console.log('Raw data from database:', data);
+
+      if (!data || data.length === 0) {
+        console.log('No applications found in the database');
+        return;
+      }
+
       // Transform the data to match the Application type
       const transformedData = data?.map(app => {
         // Extract coordinates from PostGIS geometry
         const geomText = app.geom as string;
+        console.log('Processing geometry for app:', app.application_id, 'Geometry:', geomText);
+        
         const match = geomText?.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
         const coordinates = match ? [parseFloat(match[2]), parseFloat(match[1])] as [number, number] : null;
 
-        console.log('Application ID:', app.application_id, 'Coordinates:', coordinates, 'Raw geom:', geomText);
+        console.log('Extracted coordinates:', coordinates);
 
         if (!coordinates) {
           console.warn('Invalid geometry for application:', app.application_id);
@@ -68,7 +80,9 @@ export const ApplicationsDashboardMap = () => {
         app !== null && app.coordinates !== null
       );
 
-      console.log('Transformed applications:', transformedData);
+      console.log('Final transformed applications:', transformedData);
+      console.log('Number of valid applications:', transformedData.length);
+      
       setApplications(transformedData || []);
     };
 
@@ -76,6 +90,7 @@ export const ApplicationsDashboardMap = () => {
   }, [toast]);
 
   const handleMarkerClick = (id: number) => {
+    console.log('Marker clicked:', id);
     setSelectedId(id === selectedId ? null : id);
   };
 
