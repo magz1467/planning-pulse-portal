@@ -18,7 +18,8 @@ export const ApplicationsDashboardMap = () => {
     const fetchApplications = async () => {
       const { data, error } = await supabase
         .from('applications')
-        .select('*');
+        .select('*, geom')
+        .not('geom', 'is', null); // Only fetch records with geometry
 
       if (error) {
         toast({
@@ -30,25 +31,40 @@ export const ApplicationsDashboardMap = () => {
       }
 
       // Transform the data to match the Application type
-      const transformedData = data?.map(app => ({
-        id: app.application_id,
-        title: app.description || '',
-        address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
-        status: app.status || '',
-        distance: 'N/A',
-        reference: app.lpa_app_no || '',
-        description: app.description || '',
-        applicant: typeof app.application_details === 'object' ? 
-          (app.application_details as any)?.applicant || '' : '',
-        submissionDate: app.valid_date || '',
-        decisionDue: app.decision_target_date || '',
-        type: app.application_type || '',
-        ward: app.ward || '',
-        officer: typeof app.application_details === 'object' ? 
-          (app.application_details as any)?.officer || '' : '',
-        consultationEnd: app.last_date_consultation_comments || '',
-        image: '/placeholder.svg'
-      }));
+      const transformedData = data?.map(app => {
+        // Extract coordinates from PostGIS geometry
+        const geomText = app.geom as string;
+        const match = geomText?.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
+        const coordinates = match ? [parseFloat(match[2]), parseFloat(match[1])] as [number, number] : null;
+
+        if (!coordinates) {
+          console.warn('Invalid geometry for application:', app.application_id);
+          return null;
+        }
+
+        return {
+          id: app.application_id,
+          title: app.description || '',
+          address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
+          status: app.status || '',
+          distance: 'N/A',
+          reference: app.lpa_app_no || '',
+          description: app.description || '',
+          applicant: typeof app.application_details === 'object' ? 
+            (app.application_details as any)?.applicant || '' : '',
+          submissionDate: app.valid_date || '',
+          decisionDue: app.decision_target_date || '',
+          type: app.application_type || '',
+          ward: app.ward || '',
+          officer: typeof app.application_details === 'object' ? 
+            (app.application_details as any)?.officer || '' : '',
+          consultationEnd: app.last_date_consultation_comments || '',
+          image: '/placeholder.svg',
+          coordinates
+        };
+      }).filter((app): app is Application & { coordinates: [number, number] } => 
+        app !== null && app.coordinates !== null
+      );
 
       setApplications(transformedData || []);
     };
@@ -74,38 +90,30 @@ export const ApplicationsDashboardMap = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {applications.map((app, index) => {
-            // Generate coordinates based on index to spread markers around London
-            const angle = (index * Math.PI * 0.08) % (2 * Math.PI);
-            const distance = (0.005 + (index % 5) * 0.002);
-            const lat = LONDON_COORDINATES[0] + distance * Math.cos(angle);
-            const lng = LONDON_COORDINATES[1] + distance * Math.sin(angle);
-
-            return (
-              <Marker
-                key={app.id}
-                position={[lat, lng]}
-                icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
-                eventHandlers={{
-                  click: () => handleMarkerClick(app.id),
-                }}
-              >
-                <Popup>
-                  <Card className="p-4">
-                    <h3 className="font-semibold mb-2">{app.title}</h3>
-                    <p className="text-sm text-gray-600">{app.address}</p>
-                    <p className="text-sm text-gray-600 mt-1">Status: {app.status}</p>
-                    <Button 
-                      className="mt-2 w-full"
-                      onClick={() => handleMarkerClick(app.id)}
-                    >
-                      View Details
-                    </Button>
-                  </Card>
-                </Popup>
-              </Marker>
-            );
-          })}
+          {applications.map((app) => (
+            <Marker
+              key={app.id}
+              position={app.coordinates}
+              icon={app.id === selectedId ? selectedApplicationIcon : applicationIcon}
+              eventHandlers={{
+                click: () => handleMarkerClick(app.id),
+              }}
+            >
+              <Popup>
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-2">{app.title}</h3>
+                  <p className="text-sm text-gray-600">{app.address}</p>
+                  <p className="text-sm text-gray-600 mt-1">Status: {app.status}</p>
+                  <Button 
+                    className="mt-2 w-full"
+                    onClick={() => handleMarkerClick(app.id)}
+                  >
+                    View Details
+                  </Button>
+                </Card>
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
       </div>
 

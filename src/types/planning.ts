@@ -14,6 +14,7 @@ export interface Application {
   officer: string;
   consultationEnd: string;
   image: string;
+  coordinates: [number, number];
 }
 
 export interface Comment {
