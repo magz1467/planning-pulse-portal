@@ -40,12 +40,6 @@ export const ApplicationsDashboardMap = () => {
 
   return (
     <div className="h-screen w-full flex flex-col">
-      <FilterBar 
-        onFilterChange={handleFilterChange}
-        onSortChange={handleSortChange}
-        activeFilters={activeFilters}
-        activeSort={activeSort}
-      />
       <div className="flex flex-1 min-h-0 relative">
         <DesktopSidebar
           applications={applications}
@@ -59,13 +53,21 @@ export const ApplicationsDashboardMap = () => {
           onClose={() => setSelectedId(null)}
         />
 
-        <div className="flex-1 relative">
-          <MapView
-            applications={applications}
-            selectedId={selectedId}
-            onMarkerClick={handleMarkerClick}
-            onBoundsChange={fetchApplicationsInBounds}
+        <div className="flex-1 flex flex-col">
+          <FilterBar 
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
           />
+          <div className="flex-1 relative">
+            <MapView
+              applications={applications}
+              selectedId={selectedId}
+              onMarkerClick={handleMarkerClick}
+              onBoundsChange={fetchApplicationsInBounds}
+            />
+          </div>
         </div>
       </div>
     </div>
