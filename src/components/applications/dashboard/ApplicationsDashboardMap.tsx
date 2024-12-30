@@ -43,11 +43,19 @@ export const ApplicationsDashboardMap = () => {
       // Transform the data to match the Application type
       const transformedData = data?.map(app => {
         // Extract coordinates from PostGIS geometry
-        const geomText = app.geom as string;
-        console.log('Processing geometry for app:', app.application_id, 'Geometry:', geomText);
+        const geomObj = app.geom;
+        console.log('Processing geometry for app:', app.application_id, 'Geometry:', JSON.stringify(geomObj, null, 2));
         
-        const match = geomText?.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
-        const coordinates = match ? [parseFloat(match[2]), parseFloat(match[1])] as [number, number] : null;
+        let coordinates: [number, number] | null = null;
+
+        // Handle PostGIS geometry object
+        if (geomObj && typeof geomObj === 'object' && 'coordinates' in geomObj) {
+          // Assuming the geometry is in GeoJSON format
+          coordinates = [
+            geomObj.coordinates[1] as number, // Latitude
+            geomObj.coordinates[0] as number  // Longitude
+          ];
+        }
 
         console.log('Extracted coordinates:', coordinates);
 
