@@ -21,21 +21,14 @@ export const PlanningApplicationList = ({
     return path.startsWith('/') ? path : `/${path}`;
   };
 
-  const truncateTitle = (title: string) => {
-    if (!title) return '';
+  const truncateDescription = (description: string) => {
+    if (!description) return '';
     
-    // First try to find a natural breakpoint with parentheses
-    const parenthesesMatch = title.match(/^([^(]+)/);
-    if (parenthesesMatch && parenthesesMatch[1].trim().split(' ').length <= 15) {
-      return parenthesesMatch[1].trim();
+    if (description.length <= 80) {
+      return description;
     }
-
-    // Otherwise limit to 15 words
-    const words = title.split(' ');
-    if (words.length > 15) {
-      return words.slice(0, 15).join(' ') + '...';
-    }
-    return title;
+    
+    return description.substring(0, 80) + '...';
   };
 
   return (
@@ -51,7 +44,7 @@ export const PlanningApplicationList = ({
               {application.image ? (
                 <Image
                   src={getImageUrl(application.image)}
-                  alt={application.title}
+                  alt={application.description || ''}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
@@ -63,7 +56,9 @@ export const PlanningApplicationList = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-primary truncate">{truncateTitle(application.title)}</h3>
+              <h3 className="font-semibold text-primary truncate">
+                {truncateDescription(application.description)}
+              </h3>
               <div className="flex items-center gap-1 mt-1 text-gray-600">
                 <MapPin className="w-3 h-3" />
                 <p className="text-sm truncate">{application.address}</p>
