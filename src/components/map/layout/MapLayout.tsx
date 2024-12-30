@@ -2,7 +2,6 @@ import { MobileApplicationCards } from "../MobileApplicationCards";
 import { DesktopSidebar } from "../DesktopSidebar";
 import { MapHeader } from "../MapHeader";
 import { MapContainerComponent } from "../MapContainer";
-import { LoadingOverlay } from "../LoadingOverlay";
 import { FilterBar } from "@/components/FilterBar";
 import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { getStatusColor } from "@/utils/statusColors";

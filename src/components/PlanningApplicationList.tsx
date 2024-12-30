@@ -22,6 +22,15 @@ export const PlanningApplicationList = ({
   };
 
   const truncateTitle = (title: string) => {
+    if (!title) return '';
+    
+    // First try to find a natural breakpoint with parentheses
+    const parenthesesMatch = title.match(/^([^(]+)/);
+    if (parenthesesMatch && parenthesesMatch[1].trim().split(' ').length <= 15) {
+      return parenthesesMatch[1].trim();
+    }
+
+    // Otherwise limit to 15 words
     const words = title.split(' ');
     if (words.length > 15) {
       return words.slice(0, 15).join(' ') + '...';
