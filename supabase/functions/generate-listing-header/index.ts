@@ -15,11 +15,14 @@ serve(async (req) => {
     const { description } = await req.json()
     
     if (!description) {
+      console.error('No description provided')
       return new Response(
         JSON.stringify({ header: '' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log('Processing description:', description)
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -44,14 +47,28 @@ serve(async (req) => {
       }),
     })
 
+    if (!response.ok) {
+      console.error('API response not ok:', response.status, response.statusText)
+      throw new Error(`API response not ok: ${response.status}`)
+    }
+
     const data = await response.json()
+    console.log('API response:', data)
+
+    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid API response structure:', data)
+      throw new Error('Invalid API response structure')
+    }
+
     const header = data.choices[0].message.content.trim()
+    console.log('Generated header:', header)
 
     return new Response(
       JSON.stringify({ header }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
+    console.error('Error in generate-listing-header:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
