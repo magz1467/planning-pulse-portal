@@ -4,7 +4,6 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useApplicationsData } from "./hooks/useApplicationsData";
 import { MapView } from "./components/MapView";
-import { ApplicationDetails } from "./components/ApplicationDetails";
 import { DesktopSidebar } from "@/components/map/DesktopSidebar";
 import { FilterBar } from "@/components/FilterBar";
 
@@ -69,10 +68,6 @@ export const ApplicationsDashboardMap = () => {
             onBoundsChange={fetchApplicationsInBounds}
           />
         </div>
-
-        {selectedApplication && (
-          <ApplicationDetails application={selectedApplication} />
-        )}
       </div>
     </div>
   );
