@@ -21,16 +21,6 @@ export const PlanningApplicationList = ({
     return path.startsWith('/') ? path : `/${path}`;
   };
 
-  const truncateDescription = (description: string) => {
-    if (!description) return '';
-    
-    if (description.length <= 80) {
-      return description;
-    }
-    
-    return description.substring(0, 77) + '...';
-  };
-
   return (
     <div className="divide-y">
       {applications.map((application) => (
@@ -56,8 +46,8 @@ export const PlanningApplicationList = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-primary truncate">
-                {truncateDescription(application.description)}
+              <h3 className="font-semibold text-primary line-clamp-3">
+                {application.description || ''}
               </h3>
               <div className="flex items-center gap-1 mt-1 text-gray-600">
                 <MapPin className="w-3 h-3" />
