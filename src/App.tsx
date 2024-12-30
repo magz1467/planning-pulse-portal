@@ -29,6 +29,7 @@ import HeritageConservation from './pages/content/HeritageConservation';
 import PlanningAuthorities from './pages/content/PlanningAuthorities';
 
 import SavedPage from './pages/saved';
+import ApplicationsDashboardMapPage from './pages/applications/dashboard/map';
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/map" element={<MapView />} />
+        <Route path="/applications/dashboard/map" element={<ApplicationsDashboardMapPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/help" element={<Help />} />
         <Route path="/contact" element={<Contact />} />
