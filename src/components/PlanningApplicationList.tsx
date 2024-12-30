@@ -33,17 +33,25 @@ export const PlanningApplicationList = ({
       const firstTenApps = applications.slice(0, 10);
       
       for (const app of firstTenApps) {
-        if (!aiHeaders[app.id] && app.description) {
-          try {
-            const { data, error } = await supabase.functions.invoke('generate-listing-header', {
-              body: { description: app.description }
-            });
-            
-            if (!error && data?.header) {
-              headers[app.id] = data.header;
+        if (!aiHeaders[app.id]) {
+          // Check session storage first
+          const storedHeader = sessionStorage.getItem(`ai_header_${app.id}`);
+          if (storedHeader) {
+            headers[app.id] = storedHeader;
+          } else if (app.description) {
+            try {
+              const { data, error } = await supabase.functions.invoke('generate-listing-header', {
+                body: { description: app.description }
+              });
+              
+              if (!error && data?.header) {
+                headers[app.id] = data.header;
+                // Store in session storage
+                sessionStorage.setItem(`ai_header_${app.id}`, data.header);
+              }
+            } catch (error) {
+              console.error('Error generating header:', error);
             }
-          } catch (error) {
-            console.error('Error generating header:', error);
           }
         }
       }
