@@ -39,14 +39,13 @@ export const ApplicationsDashboardMap = () => {
     const sw = bounds.getSouthWest();
     const ne = bounds.getNorthEast();
     
-    const envelope = `ST_MakeEnvelope(${sw.lng}, ${sw.lat}, ${ne.lng}, ${ne.lat}, 4326)`;
-    
     const { data, error } = await supabase
-      .from('applications')
-      .select('*, geom')
-      .not('geom', 'is', null)
-      .filter('geom', 'not.is', null)
-      .filter(`st_within(geom, ${envelope})`, 'is', true);
+      .rpc('get_applications_in_bounds', {
+        sw_lng: sw.lng,
+        sw_lat: sw.lat,
+        ne_lng: ne.lng,
+        ne_lat: ne.lat
+      });
 
     if (error) {
       toast({
