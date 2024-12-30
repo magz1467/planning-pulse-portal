@@ -46,23 +46,33 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
       if (error) throw error;
 
       // Transform the data to match the Application type
-      const transformedData = data?.map(app => ({
-        id: app.application_id,
-        title: app.description || '', // Using description as title since there's no direct title field
-        address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
-        status: app.status || '',
-        distance: 'N/A',
-        reference: app.lpa_app_no || '',
-        description: app.description || '',
-        applicant: app.application_details?.applicant || '',
-        submissionDate: app.valid_date || '',
-        decisionDue: app.decision_target_date || '',
-        type: app.application_type || '',
-        ward: app.ward || '',
-        officer: app.application_details?.officer || '',
-        consultationEnd: app.last_date_consultation_comments || '',
-        image: '/placeholder.svg'
-      }));
+      const transformedData = data?.map(app => {
+        // Extract coordinates from PostGIS geometry
+        const geomText = app.geom as string;
+        const match = geomText?.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
+        const coordinates = match ? [parseFloat(match[2]), parseFloat(match[1])] as [number, number] : [0, 0];
+
+        return {
+          id: app.application_id,
+          title: app.description || '', // Using description as title since there's no direct title field
+          address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
+          status: app.status || '',
+          distance: 'N/A',
+          reference: app.lpa_app_no || '',
+          description: app.description || '',
+          applicant: typeof app.application_details === 'object' ? 
+            (app.application_details as any)?.applicant || '' : '',
+          submissionDate: app.valid_date || '',
+          decisionDue: app.decision_target_date || '',
+          type: app.application_type || '',
+          ward: app.ward || '',
+          officer: typeof app.application_details === 'object' ? 
+            (app.application_details as any)?.officer || '' : '',
+          consultationEnd: app.last_date_consultation_comments || '',
+          image: '/placeholder.svg',
+          coordinates
+        };
+      });
 
       setSavedApplicationsList(transformedData || []);
     } catch (error) {
