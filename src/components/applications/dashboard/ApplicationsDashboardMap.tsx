@@ -44,8 +44,7 @@ export const ApplicationsDashboardMap = () => {
       .select('*, geom')
       .not('geom', 'is', null)
       .filter('geom', 'not.is', null)
-      // PostGIS query to check if point is within bounds
-      .filter(`geom && ST_MakeEnvelope(${sw.lng}, ${sw.lat}, ${ne.lng}, ${ne.lat}, 4326)`);
+      .filter(`st_within(geom, st_makeenvelope(${sw.lng}, ${sw.lat}, ${ne.lng}, ${ne.lat}, 4326))`);
 
     if (error) {
       toast({
