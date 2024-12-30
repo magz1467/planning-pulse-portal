@@ -50,7 +50,9 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
         // Extract coordinates from PostGIS geometry
         const geomText = app.geom as string;
         const match = geomText?.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
-        const coordinates = match ? [parseFloat(match[2]), parseFloat(match[1])] as [number, number] : [0, 0];
+        const coordinates: [number, number] = match 
+          ? [parseFloat(match[2]), parseFloat(match[1])] 
+          : [51.5074, -0.1278]; // Default to London coordinates if no valid geometry
 
         return {
           id: app.application_id,
