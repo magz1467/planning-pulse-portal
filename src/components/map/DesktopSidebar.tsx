@@ -1,5 +1,4 @@
 import { Application } from "@/types/planning";
-import { FilterBar } from "@/components/FilterBar";
 import { EmailDialog } from "@/components/EmailDialog";
 import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
@@ -54,13 +53,6 @@ export const DesktopSidebar = ({
 
   return (
     <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
-      <FilterBar 
-        onFilterChange={onFilterChange} 
-        onSortChange={onSortChange}
-        activeFilters={activeFilters}
-        activeSort={activeSort}
-      />
-      
       {selectedApplication === null ? (
         <ApplicationListView
           applications={applications}
