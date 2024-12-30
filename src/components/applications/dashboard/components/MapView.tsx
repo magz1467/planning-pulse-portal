@@ -3,6 +3,7 @@ import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { LatLngBounds } from 'leaflet';
 import { Application } from "@/types/planning";
 import { ApplicationMarker } from "./ApplicationMarker";
+import { useEffect } from "react";
 
 interface MapViewProps {
   applications: Application[];
