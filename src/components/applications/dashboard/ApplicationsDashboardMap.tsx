@@ -5,9 +5,17 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useApplicationsData } from "./hooks/useApplicationsData";
 import { MapView } from "./components/MapView";
 import { ApplicationDetails } from "./components/ApplicationDetails";
+import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import { FilterBar } from "@/components/FilterBar";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [activeFilters, setActiveFilters] = useState<{
+    status?: string;
+    type?: string;
+  }>({});
+  const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
+  
   const { 
     applications, 
     isLoading, 
@@ -18,22 +26,54 @@ export const ApplicationsDashboardMap = () => {
     setSelectedId(id === selectedId ? null : id);
   };
 
+  const handleFilterChange = (filterType: string, value: string) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
+  const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
+    setActiveSort(sortType);
+  };
+
   const selectedApplication = applications.find(app => app.id === selectedId);
 
   return (
-    <div className="h-screen w-full flex">
-      <div className="w-full h-full relative">
-        <MapView
+    <div className="h-screen w-full flex flex-col">
+      <FilterBar 
+        onFilterChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+      />
+      
+      <div className="flex flex-1 min-h-0 relative">
+        <DesktopSidebar
           applications={applications}
-          selectedId={selectedId}
-          onMarkerClick={handleMarkerClick}
-          onBoundsChange={fetchApplicationsInBounds}
+          selectedApplication={selectedId}
+          postcode=""
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={handleFilterChange}
+          onSortChange={handleSortChange}
+          onSelectApplication={handleMarkerClick}
+          onClose={() => setSelectedId(null)}
         />
-      </div>
 
-      {selectedApplication && (
-        <ApplicationDetails application={selectedApplication} />
-      )}
+        <div className="flex-1 relative">
+          <MapView
+            applications={applications}
+            selectedId={selectedId}
+            onMarkerClick={handleMarkerClick}
+            onBoundsChange={fetchApplicationsInBounds}
+          />
+        </div>
+
+        {selectedApplication && (
+          <ApplicationDetails application={selectedApplication} />
+        )}
+      </div>
     </div>
   );
 };

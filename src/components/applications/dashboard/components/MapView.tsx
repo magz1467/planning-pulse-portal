@@ -12,7 +12,6 @@ interface MapViewProps {
   onBoundsChange: (bounds: LatLngBounds) => void;
 }
 
-// Component to handle map events and bounds
 const MapEventHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: LatLngBounds) => void }) => {
   const map = useMapEvents({
     moveend: () => {
@@ -26,7 +25,6 @@ const MapEventHandler = ({ onBoundsChange }: { onBoundsChange: (bounds: LatLngBo
     }
   });
 
-  // Initial bounds fetch
   useEffect(() => {
     onBoundsChange(map.getBounds());
   }, []);
