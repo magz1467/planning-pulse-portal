@@ -18,6 +18,11 @@ def query_all(session):
     print(result.all())
 
 
+# Example of how to create the table
+def create_tables(engine):
+    Base.metadata.create_all(engine)
+
+
 class PoolState(Base):
     __tablename__ = "BlockPriceLiquidity"
 
@@ -28,8 +33,3 @@ class PoolState(Base):
 
     def __repr__(self):
         return f"<BlockData(block={self.block}, created_at={self.created_at}, liquidity={self.liquidity}, price={self.price})>"
-
-
-# Example of how to create the table
-def create_tables(engine):
-    Base.metadata.create_all(engine)

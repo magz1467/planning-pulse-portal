@@ -27,3 +27,5 @@ dist-ssr
 # supabase
 supabase/.temp
 london/populate/bin/
+*.ropeproject/*
+london-populate/.ropeproject/autoimport.db

@@ -84,31 +84,3 @@ def fetch_planning_data_paginated(size: int = 100) -> List[Dict[Any, Any]]:
     return all_records
 
 
-def save_to_file(
-    records: List[Dict[Any, Any]], filename: str = "planning_data.json"
-) -> None:
-    """
-    Save the fetched records to a JSON file.
-    Args:
-        records: List of planning records
-        filename: Output filename (default: 'planning_data.json')
-    """
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(records, f, indent=2)
-    print(f"Saved {len(records)} records to {filename}")
-
-
-if __name__ == "__main__":
-    # Fetch all records
-    all_records = fetch_planning_data_paginated()
-
-    record_keys = set()
-    for record in all_records:
-        for k, v in record.items():
-            record_keys.add((k, type(v)))
-
-    # Save to file
-    if all_records:
-        save_to_file(all_records)
-
-    print(list(record_keys))
