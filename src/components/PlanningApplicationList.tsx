@@ -28,7 +28,7 @@ export const PlanningApplicationList = ({
       return description;
     }
     
-    return description.substring(0, 80) + '...';
+    return description.substring(0, 77) + '...';
   };
 
   return (
