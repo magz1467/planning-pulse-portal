@@ -41,27 +41,27 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
       const { data, error } = await supabase
         .from('applications')
         .select('*')
-        .in('id', savedApplications);
+        .in('application_id', savedApplications);
 
       if (error) throw error;
 
       // Transform the data to match the Application type
       const transformedData = data?.map(app => ({
-        id: app.id,
-        title: app.title,
-        address: app.address || '',
+        id: app.application_id,
+        title: app.description || '', // Using description as title since there's no direct title field
+        address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
         status: app.status || '',
-        distance: 'N/A', // This might need to be calculated
-        reference: app.external_id || '',
+        distance: 'N/A',
+        reference: app.lpa_app_no || '',
         description: app.description || '',
-        applicant: app.applicant || '',
-        submissionDate: app.submission_date || '',
-        decisionDue: app.decision_due || '',
-        type: app.type || '',
+        applicant: app.application_details?.applicant || '',
+        submissionDate: app.valid_date || '',
+        decisionDue: app.decision_target_date || '',
+        type: app.application_type || '',
         ward: app.ward || '',
-        officer: app.officer || '',
-        consultationEnd: app.consultation_end || '',
-        image: '/placeholder.svg' // Using absolute path from public directory
+        officer: app.application_details?.officer || '',
+        consultationEnd: app.last_date_consultation_comments || '',
+        image: '/placeholder.svg'
       }));
 
       setSavedApplicationsList(transformedData || []);
