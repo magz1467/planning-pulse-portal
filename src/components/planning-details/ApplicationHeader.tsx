@@ -7,7 +7,7 @@ interface ApplicationHeaderProps {
 export const ApplicationHeader = ({ application }: ApplicationHeaderProps) => {
   return (
     <div>
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-xl font-semibold line-clamp-2 leading-tight">
         {application.title || application.description}
       </h2>
       <p className="text-sm text-gray-600">{application.reference}</p>
