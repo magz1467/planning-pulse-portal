@@ -34,23 +34,26 @@ export const MapView = ({
   const mapRef = useRef(null);
 
   return (
-    <MapContainer
-      ref={mapRef}
-      center={initialCenter}
-      zoom={14}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <MapUpdater center={initialCenter} />
-      
-      {applications.map((application) => (
-        <ApplicationMarker
-          key={application.id}
-          application={application}
-          isSelected={application.id === selectedId}
-          onClick={() => onMarkerClick(application.id)}
-        />
-      ))}
-    </MapContainer>
+    <div className="w-full h-full relative">
+      <MapContainer
+        ref={mapRef}
+        center={initialCenter}
+        zoom={14}
+        className="w-full h-full"
+        style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <MapUpdater center={initialCenter} />
+        
+        {applications.map((application) => (
+          <ApplicationMarker
+            key={application.id}
+            application={application}
+            isSelected={application.id === selectedId}
+            onClick={() => onMarkerClick(application.id)}
+          />
+        ))}
+      </MapContainer>
+    </div>
   );
 };
