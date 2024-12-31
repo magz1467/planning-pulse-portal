@@ -6,12 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 export default function Admin2() {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [processingBatchSize, setProcessingBatchSize] = useState<number | null>(null);
   
   const handleGenerateTitles = async (batchSize: number) => {
     if (isGenerating) return;
     
     try {
       setIsGenerating(true);
+      setProcessingBatchSize(batchSize);
+      
       toast({
         title: "Generating titles...",
         description: `This may take a few minutes for ${batchSize} records`,
@@ -39,6 +42,7 @@ export default function Admin2() {
       return null;
     } finally {
       setIsGenerating(false);
+      setProcessingBatchSize(null);
     }
   };
 
@@ -55,8 +59,9 @@ export default function Admin2() {
               onClick={() => handleGenerateTitles(50)}
               className="w-full md:w-auto"
               disabled={isGenerating}
+              variant={processingBatchSize === 50 ? "secondary" : "default"}
             >
-              Generate 50 AI Titles
+              {processingBatchSize === 50 ? "Processing..." : "Generate 50 AI Titles"}
             </Button>
             <p className="mt-2 text-sm text-muted-foreground">
               Click to generate AI titles for up to 50 applications that don't have titles yet.
@@ -68,8 +73,9 @@ export default function Admin2() {
               onClick={() => handleGenerateTitles(100)}
               className="w-full md:w-auto"
               disabled={isGenerating}
+              variant={processingBatchSize === 100 ? "secondary" : "default"}
             >
-              Generate 100 AI Titles
+              {processingBatchSize === 100 ? "Processing..." : "Generate 100 AI Titles"}
             </Button>
             <p className="mt-2 text-sm text-muted-foreground">
               Click to generate AI titles for up to 100 applications that don't have titles yet.
@@ -81,8 +87,9 @@ export default function Admin2() {
               onClick={() => handleGenerateTitles(250)}
               className="w-full md:w-auto"
               disabled={isGenerating}
+              variant={processingBatchSize === 250 ? "secondary" : "default"}
             >
-              Generate 250 AI Titles
+              {processingBatchSize === 250 ? "Processing..." : "Generate 250 AI Titles"}
             </Button>
             <p className="mt-2 text-sm text-muted-foreground">
               Click to generate AI titles for up to 250 applications that don't have titles yet.
@@ -94,8 +101,9 @@ export default function Admin2() {
               onClick={() => handleGenerateTitles(500)}
               className="w-full md:w-auto"
               disabled={isGenerating}
+              variant={processingBatchSize === 500 ? "secondary" : "default"}
             >
-              Generate 500 AI Titles
+              {processingBatchSize === 500 ? "Processing..." : "Generate 500 AI Titles"}
             </Button>
             <p className="mt-2 text-sm text-muted-foreground">
               Click to generate AI titles for up to 500 applications that don't have titles yet.

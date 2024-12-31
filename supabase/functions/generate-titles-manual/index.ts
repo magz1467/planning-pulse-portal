@@ -10,6 +10,7 @@ const corsHeaders = {
 interface Application {
   application_id: number;
   description: string;
+  status: string;
 }
 
 const createSupabaseClient = () => {
@@ -28,20 +29,41 @@ const createSupabaseClient = () => {
 const fetchApplications = async (supabase: any, limit: number): Promise<Application[]> => {
   console.log(`Fetching up to ${limit} applications without AI titles...`);
   
-  const { data: applications, error } = await supabase
+  // First fetch applications under consideration
+  const { data: priorityApps, error: priorityError } = await supabase
     .from('applications')
-    .select('application_id, description')
+    .select('application_id, description, status')
     .is('ai_title', null)
     .not('description', 'is', null)
+    .eq('status', 'application under consideration')
     .limit(limit);
 
-  if (error) {
-    console.error('Error fetching applications:', error);
-    throw new Error(`Error fetching applications: ${error.message}`);
+  if (priorityError) {
+    console.error('Error fetching priority applications:', priorityError);
+    throw new Error(`Error fetching priority applications: ${priorityError.message}`);
   }
 
-  console.log(`Found ${applications?.length || 0} applications to process`);
-  return applications || [];
+  const remainingLimit = limit - (priorityApps?.length || 0);
+  
+  // If we still have room in our limit, fetch other applications
+  if (remainingLimit > 0) {
+    const { data: otherApps, error: otherError } = await supabase
+      .from('applications')
+      .select('application_id, description, status')
+      .is('ai_title', null)
+      .not('description', 'is', null)
+      .neq('status', 'application under consideration')
+      .limit(remainingLimit);
+
+    if (otherError) {
+      console.error('Error fetching other applications:', otherError);
+      throw new Error(`Error fetching other applications: ${otherError.message}`);
+    }
+
+    return [...(priorityApps || []), ...(otherApps || [])];
+  }
+
+  return priorityApps || [];
 }
 
 const generateAITitle = async (description: string): Promise<string> => {
