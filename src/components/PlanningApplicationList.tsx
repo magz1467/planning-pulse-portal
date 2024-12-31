@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, Bookmark, Heart } from "lucide-react";
 import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
 
@@ -46,7 +46,7 @@ export const PlanningApplicationList = ({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-primary line-clamp-2">
+              <h3 className="font-semibold text-primary">
                 {application.ai_title || application.description || ''}
               </h3>
               <div className="flex items-center gap-1 mt-1 text-gray-600">
@@ -58,6 +58,14 @@ export const PlanningApplicationList = ({
                   {application.status}
                 </span>
                 <span className="text-xs text-gray-500">{application.distance}</span>
+              </div>
+              <div className="flex justify-end gap-2 mt-2">
+                <button className="text-gray-400 hover:text-gray-600">
+                  <Bookmark className="w-4 h-4" />
+                </button>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <Heart className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
