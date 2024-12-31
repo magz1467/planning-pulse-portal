@@ -81,7 +81,7 @@ export const FilterDropdown = ({
             className="justify-between"
           >
             <span>
-              {option.label} ({statusCounts[option.value]})
+              {option.label} ({statusCounts && statusCounts[option.value] !== undefined ? statusCounts[option.value] : 0})
             </span>
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>
