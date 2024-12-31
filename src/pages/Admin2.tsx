@@ -20,12 +20,17 @@ export default function Admin2() {
         description: `This may take a few minutes for ${batchSize} records`,
       });
 
+      console.log(`Starting title generation for batch size: ${batchSize}`);
       const { data, error } = await supabase.functions.invoke('generate-titles-manual', {
         body: { limit: batchSize }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw error;
+      }
 
+      console.log('Edge function response:', data);
       toast({
         title: "Success!",
         description: data.message || "Titles have been generated successfully",

@@ -43,10 +43,13 @@ const fetchApplications = async (supabase: any, limit: number): Promise<Applicat
     throw new Error(`Error fetching priority applications: ${priorityError.message}`);
   }
 
+  console.log(`Found ${priorityApps?.length || 0} priority applications under consideration`);
+
   const remainingLimit = limit - (priorityApps?.length || 0);
   
   // If we still have room in our limit, fetch other applications
   if (remainingLimit > 0) {
+    console.log(`Fetching ${remainingLimit} additional non-priority applications...`);
     const { data: otherApps, error: otherError } = await supabase
       .from('applications')
       .select('application_id, description, status')
@@ -60,6 +63,7 @@ const fetchApplications = async (supabase: any, limit: number): Promise<Applicat
       throw new Error(`Error fetching other applications: ${otherError.message}`);
     }
 
+    console.log(`Found ${otherApps?.length || 0} additional non-priority applications`);
     return [...(priorityApps || []), ...(otherApps || [])];
   }
 
@@ -69,37 +73,43 @@ const fetchApplications = async (supabase: any, limit: number): Promise<Applicat
 const generateAITitle = async (description: string): Promise<string> => {
   console.log('Generating AI title for description:', description.substring(0, 100) + '...');
   
-  const response = await fetch('https://api.perplexity.ai/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${Deno.env.get('PERPLEXITY_API_KEY')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'llama-3.1-sonar-small-128k-online',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a planning application expert. Create a concise 6-12 word header that captures the essence of the planning application description. Focus on the key changes or developments proposed.'
-        },
-        {
-          role: 'user',
-          content: `Create a concise header for this planning application: ${description}`
-        }
-      ],
-      temperature: 0.2,
-      max_tokens: 100
-    }),
-  });
+  try {
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('PERPLEXITY_API_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-sonar-small-128k-online',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a planning application expert. Create a concise 6-12 word header that captures the essence of the planning application description. Focus on the key changes or developments proposed.'
+          },
+          {
+            role: 'user',
+            content: `Create a concise header for this planning application: ${description}`
+          }
+        ],
+        temperature: 0.2,
+        max_tokens: 100
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`API response not ok: ${response.status} ${response.statusText}`);
+    if (!response.ok) {
+      console.error(`API response not ok: ${response.status}`, await response.text());
+      throw new Error(`API response not ok: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const title = data.choices[0].message.content.trim();
+    console.log('Generated title:', title);
+    return title;
+  } catch (error) {
+    console.error('Error generating AI title:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  const title = data.choices[0].message.content.trim();
-  console.log('Generated title:', title);
-  return title;
 }
 
 const updateApplicationTitle = async (supabase: any, applicationId: number, title: string): Promise<void> => {
@@ -125,6 +135,7 @@ const processApplication = async (supabase: any, app: Application): Promise<bool
       return false;
     }
 
+    console.log(`Processing application ${app.application_id} with status: ${app.status}`);
     const title = await generateAITitle(app.description);
     await updateApplicationTitle(supabase, app.application_id, title);
     return true;
@@ -148,6 +159,7 @@ serve(async (req) => {
     const applications = await fetchApplications(supabase, limit);
     
     if (applications.length === 0) {
+      console.log('No applications found that need AI titles');
       return new Response(
         JSON.stringify({ 
           message: 'No applications found that need AI titles',
@@ -158,12 +170,15 @@ serve(async (req) => {
       );
     }
 
+    console.log(`Found ${applications.length} total applications to process`);
     const results = await Promise.all(
       applications.map(app => processApplication(supabase, app))
     );
 
     const successCount = results.filter(result => result).length;
     const errorCount = results.filter(result => !result).length;
+
+    console.log(`Processing complete. Successes: ${successCount}, Errors: ${errorCount}`);
 
     return new Response(
       JSON.stringify({ 
