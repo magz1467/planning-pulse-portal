@@ -10,10 +10,8 @@ const corsHeaders = {
 interface Application {
   application_id: number;
   description: string;
-  [key: string]: any;
 }
 
-// Create Supabase client with service role key
 const createSupabaseClient = () => {
   return createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
@@ -27,24 +25,28 @@ const createSupabaseClient = () => {
   );
 }
 
-// Fetch applications that need AI titles
-const fetchApplications = async (supabase: any, limit: number) => {
-  const { data: applications, error: fetchError } = await supabase
+const fetchApplications = async (supabase: any, limit: number): Promise<Application[]> => {
+  console.log(`Fetching up to ${limit} applications without AI titles...`);
+  
+  const { data: applications, error } = await supabase
     .from('applications')
-    .select('*')
+    .select('application_id, description')
     .is('ai_title', null)
     .not('description', 'is', null)
     .limit(limit);
 
-  if (fetchError) {
-    throw new Error(`Error fetching applications: ${fetchError.message}`);
+  if (error) {
+    console.error('Error fetching applications:', error);
+    throw new Error(`Error fetching applications: ${error.message}`);
   }
 
-  return applications;
+  console.log(`Found ${applications?.length || 0} applications to process`);
+  return applications || [];
 }
 
-// Generate AI title using Perplexity API
-const generateAITitle = async (description: string) => {
+const generateAITitle = async (description: string): Promise<string> => {
+  console.log('Generating AI title for description:', description.substring(0, 100) + '...');
+  
   const response = await fetch('https://api.perplexity.ai/chat/completions', {
     method: 'POST',
     headers: {
@@ -73,37 +75,36 @@ const generateAITitle = async (description: string) => {
   }
 
   const data = await response.json();
-  return data.choices[0].message.content.trim();
+  const title = data.choices[0].message.content.trim();
+  console.log('Generated title:', title);
+  return title;
 }
 
-// Update application with generated AI title
-const updateApplicationTitle = async (supabase: any, applicationId: number, title: string) => {
-  const { error: updateError } = await supabase
+const updateApplicationTitle = async (supabase: any, applicationId: number, title: string): Promise<void> => {
+  console.log(`Updating application ${applicationId} with title: ${title}`);
+  
+  const { error } = await supabase
     .from('applications')
     .update({ ai_title: title })
     .eq('application_id', applicationId);
 
-  if (updateError) {
-    throw new Error(`Error updating application ${applicationId}: ${updateError.message}`);
+  if (error) {
+    console.error(`Error updating application ${applicationId}:`, error);
+    throw new Error(`Error updating application ${applicationId}: ${error.message}`);
   }
+
+  console.log(`Successfully updated application ${applicationId}`);
 }
 
-// Process a single application
-const processApplication = async (supabase: any, app: Application) => {
+const processApplication = async (supabase: any, app: Application): Promise<boolean> => {
   try {
-    console.log(`Processing application ${app.application_id} - Description length: ${app.description?.length || 0} chars`);
-    
     if (!app.description) {
       console.log(`Skipping application ${app.application_id} - No description available`);
       return false;
     }
 
     const title = await generateAITitle(app.description);
-    console.log(`Generated title for ${app.application_id}: ${title}`);
-    
     await updateApplicationTitle(supabase, app.application_id, title);
-    console.log(`Successfully updated application ${app.application_id}`);
-    
     return true;
   } catch (error) {
     console.error(`Error processing application ${app.application_id}:`, error);
@@ -111,9 +112,7 @@ const processApplication = async (supabase: any, app: Application) => {
   }
 }
 
-// Main handler function
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -126,25 +125,17 @@ serve(async (req) => {
     
     const applications = await fetchApplications(supabase, limit);
     
-    if (!applications || applications.length === 0) {
+    if (applications.length === 0) {
       return new Response(
         JSON.stringify({ 
           message: 'No applications found that need AI titles',
           success: true,
           processed: 0 
         }),
-        { 
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json' 
-          } 
-        }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`Found ${applications.length} applications without AI titles`);
-
-    // Process applications and track success/failure
     const results = await Promise.all(
       applications.map(app => processApplication(supabase, app))
     );
@@ -158,25 +149,14 @@ serve(async (req) => {
         success: true,
         processed: successCount
       }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in generate-titles-manual:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
