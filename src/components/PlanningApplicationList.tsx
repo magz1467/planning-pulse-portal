@@ -4,6 +4,7 @@ import { MapPin, Bookmark, Heart } from "lucide-react";
 import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -15,19 +16,6 @@ export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
 }: PlanningApplicationListProps) => {
-  const fallbackImage = "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
-
-  const getImageUrl = (path: string | undefined) => {
-    if (!path || path.trim() === '' || path === 'undefined' || path === 'null') {
-      return fallbackImage;
-    }
-    // Ensure path starts with / or http
-    if (!path.startsWith('/') && !path.startsWith('http')) {
-      return fallbackImage;
-    }
-    return path;
-  };
-
   return (
     <div className="divide-y">
       {applications.map((application) => (

@@ -8,7 +8,7 @@ interface ApplicationImageProps {
 export const ApplicationImage = ({ src, alt }: ApplicationImageProps) => {
   return (
     <div className="aspect-video relative overflow-hidden rounded-lg mb-2">
-      <img
+      <Image
         src={src}
         alt={alt}
         className="object-cover w-full h-full"

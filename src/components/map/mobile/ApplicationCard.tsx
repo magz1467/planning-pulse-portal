@@ -7,6 +7,7 @@ import { ApplicationMeta } from "./ApplicationMeta";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EmailDialog } from "@/components/EmailDialog";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface ApplicationCardProps {
   application: Application;
@@ -53,17 +54,6 @@ export const ApplicationCard = ({
       duration: 5000,
     });
     setShowEmailDialog(false);
-  };
-
-  const fallbackImage = "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
-  const getImageUrl = (path: string | undefined) => {
-    if (!path || path.trim() === '' || path === 'undefined' || path === 'null') {
-      return fallbackImage;
-    }
-    if (!path.startsWith('/') && !path.startsWith('http')) {
-      return fallbackImage;
-    }
-    return path;
   };
 
   return (
