@@ -89,7 +89,7 @@ export const ApplicationsDashboardMap = () => {
       <div className="container mx-auto px-4 py-4">
         <PostcodeSearch 
           onSelect={handlePostcodeSelect}
-          placeholder="Enter a postcode to search within 1km radius"
+          placeholder="Search new location"
           className="w-full max-w-xl mx-auto"
         />
       </div>
@@ -150,7 +150,7 @@ export const ApplicationsDashboardMap = () => {
       {!searchPoint && !isLoading && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center text-gray-500">
-            <p className="text-lg">Enter a postcode to view planning applications within 1km</p>
+            <p className="text-lg">Enter a location to view planning applications</p>
           </div>
         </div>
       )}
