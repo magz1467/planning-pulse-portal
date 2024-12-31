@@ -15,7 +15,7 @@ export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
 }: PlanningApplicationListProps) => {
-  const getImageUrl = (path: string) => {
+  const getImageUrl = (path: string | undefined) => {
     if (!path) {
       return "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
     }
