@@ -24,15 +24,17 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
   
   const { data: suggestions = [], isLoading } = useAddressSuggestions(search);
 
-  const handleSelect = (postcode: string) => {
+  const handleSelect = async (postcode: string) => {
     setSearch(postcode);
     setOpen(false);
-    onSelect(postcode);
-    // Trigger form submission by creating and dispatching a submit event
-    const form = document.querySelector('form');
-    if (form) {
-      form.requestSubmit();
-    }
+    await onSelect(postcode);
+    // Only submit the form after the state has been updated
+    setTimeout(() => {
+      const form = document.querySelector('form');
+      if (form) {
+        form.requestSubmit();
+      }
+    }, 0);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
