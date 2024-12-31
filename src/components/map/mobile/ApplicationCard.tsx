@@ -55,6 +55,17 @@ export const ApplicationCard = ({
     setShowEmailDialog(false);
   };
 
+  const fallbackImage = "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
+  const getImageUrl = (path: string | undefined) => {
+    if (!path || path.trim() === '' || path === 'undefined' || path === 'null') {
+      return fallbackImage;
+    }
+    if (!path.startsWith('/') && !path.startsWith('http')) {
+      return fallbackImage;
+    }
+    return path;
+  };
+
   return (
     <Card
       className={`overflow-hidden cursor-pointer transition-all p-4 ${
@@ -63,7 +74,7 @@ export const ApplicationCard = ({
       onClick={onClick}
     >
       {application.image && (
-        <ApplicationImage src={application.image} alt={application.title} />
+        <ApplicationImage src={getImageUrl(application.image)} alt={application.title} />
       )}
 
       <h3 className="font-semibold text-primary mt-3">{application.title}</h3>
