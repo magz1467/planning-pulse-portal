@@ -28,11 +28,32 @@ const Profile = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       setUser(session.user);
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('User_data')
         .select('*')
         .eq('Email', session.user.email)
-        .single();
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load user profile",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!profile) {
+        console.warn('No user profile found');
+        toast({
+          title: "Warning",
+          description: "User profile not found",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setUserProfile(profile);
     } else {
       navigate('/');
@@ -107,13 +128,25 @@ const Profile = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <ProfileHeader user={user} />
         <div className="mt-8">
-          <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          <ProfileTabs 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab}
+            user={user}
+            userProfile={userProfile}
+            petitions={[]}
+            onPostcodeUpdate={handlePostcodeUpdate}
+            onEmailSubmit={async () => {}}
+            onMarketingUpdate={handleMarketingUpdate}
+            onSignOut={handleSignOut}
+            onInterestTypeUpdate={async () => {}}
+          />
           <div className="mt-6">
             {activeTab === "overview" && (
               <ProfileOverview 
                 user={user}
                 userProfile={userProfile}
                 onPostcodeUpdate={handlePostcodeUpdate}
+                onInterestTypeUpdate={async () => {}}
               />
             )}
             {activeTab === "saved" && <SavedApplicationsTab onSelectApplication={() => {}} />}

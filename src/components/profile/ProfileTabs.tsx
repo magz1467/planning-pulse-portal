@@ -6,6 +6,7 @@ import { PetitionsTab } from './PetitionsTab';
 import { SettingsTab } from './SettingsTab';
 import { ActivityTab } from './ActivityTab';
 import { useNavigate } from 'react-router-dom';
+import { Dispatch, SetStateAction } from 'react';
 
 interface ProfileTabsProps {
   user: User | null;
@@ -16,6 +17,8 @@ interface ProfileTabsProps {
   onMarketingUpdate: (value: boolean) => Promise<void>;
   onSignOut: () => Promise<void>;
   onInterestTypeUpdate: (type: string) => Promise<void>;
+  activeTab: string;
+  onTabChange: Dispatch<SetStateAction<string>>;
 }
 
 export const ProfileTabs = ({ 
@@ -26,12 +29,14 @@ export const ProfileTabs = ({
   onEmailSubmit,
   onMarketingUpdate,
   onSignOut,
-  onInterestTypeUpdate
+  onInterestTypeUpdate,
+  activeTab,
+  onTabChange
 }: ProfileTabsProps) => {
   const navigate = useNavigate();
 
   return (
-    <Tabs defaultValue="overview" className="space-y-6">
+    <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-6">
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="activity">Activity</TabsTrigger>
