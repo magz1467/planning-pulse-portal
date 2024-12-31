@@ -10,6 +10,7 @@ import { Home } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FilterBar } from "@/components/FilterBar";
 import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
+import { LatLngBounds } from "leaflet";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -32,14 +33,29 @@ export const ApplicationsDashboardMap = () => {
   };
 
   const handleFilterChange = (filterType: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
+    setActiveFilters(prev => {
+      const newFilters = {
+        ...prev,
+        [filterType]: value
+      };
+      // Fetch applications with new filters
+      const mapElement = document.querySelector('.leaflet-container');
+      if (mapElement) {
+        const map = (mapElement as any)._leaflet_map;
+        if (map) {
+          fetchApplicationsInBounds(map.getBounds() as LatLngBounds, newFilters);
+        }
+      }
+      return newFilters;
+    });
   };
 
   const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
     setActiveSort(sortType);
+  };
+
+  const handleBoundsChange = (bounds: LatLngBounds) => {
+    fetchApplicationsInBounds(bounds, activeFilters);
   };
 
   const selectedApplication = applications.find(app => app.id === selectedId);
@@ -88,7 +104,7 @@ export const ApplicationsDashboardMap = () => {
                 applications={applications}
                 selectedId={selectedId}
                 onMarkerClick={handleMarkerClick}
-                onBoundsChange={fetchApplicationsInBounds}
+                onBoundsChange={handleBoundsChange}
               />
             </div>
           )}

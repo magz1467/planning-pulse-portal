@@ -26,45 +26,50 @@ export const useApplicationsData = () => {
     }
   };
 
-  const fetchApplicationsInBounds = async (bounds: LatLngBounds) => {
+  const fetchApplicationsInBounds = async (
+    bounds: LatLngBounds,
+    filters?: { status?: string; type?: string }
+  ) => {
     const sw = bounds.getSouthWest();
     const ne = bounds.getNorthEast();
     
     setIsLoading(true);
     
     try {
-      // First get the total count with retry logic
-      const countPromise = Promise.resolve(
-        fetchWithRetry(async () => 
-          await supabase.rpc('get_applications_count_in_bounds', {
-            sw_lng: sw.lng,
-            sw_lat: sw.lat,
-            ne_lng: ne.lng,
-            ne_lat: ne.lat
-          })
-        )
-      );
+      let query = supabase.rpc('get_applications_count_in_bounds', {
+        sw_lng: sw.lng,
+        sw_lat: sw.lat,
+        ne_lng: ne.lng,
+        ne_lat: ne.lat
+      });
 
-      const { data: countData, error: countError } = await countPromise;
+      // First get the total count with retry logic
+      const { data: countData, error: countError } = await fetchWithRetry(async () => 
+        await query
+      );
 
       if (countError) throw countError;
       setTotalCount(countData || 0);
 
       // Then get the paginated data with retry logic
-      const dataPromise = Promise.resolve(
-        fetchWithRetry(async () =>
-          await supabase.rpc('get_applications_in_bounds_paginated', {
-            sw_lng: sw.lng,
-            sw_lat: sw.lat,
-            ne_lng: ne.lng,
-            ne_lat: ne.lat,
-            page_size: PAGE_SIZE,
-            page_number: currentPage
-          })
-        )
-      );
+      let dataQuery = supabase.rpc('get_applications_in_bounds_paginated', {
+        sw_lng: sw.lng,
+        sw_lat: sw.lat,
+        ne_lng: ne.lng,
+        ne_lat: ne.lat,
+        page_size: PAGE_SIZE,
+        page_number: currentPage
+      });
 
-      const { data, error } = await dataPromise;
+      // Apply filters if they exist
+      if (filters?.status) {
+        dataQuery = dataQuery.eq('status', filters.status);
+      }
+      if (filters?.type) {
+        dataQuery = dataQuery.eq('application_type', filters.type);
+      }
+
+      const { data, error } = await fetchWithRetry(async () => await dataQuery);
 
       if (error) throw error;
 
