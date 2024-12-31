@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapPin } from "lucide-react";
 import Image from "@/components/ui/image";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface MiniCardProps {
   application: Application;
@@ -19,16 +20,6 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       default:
         return 'bg-primary/10 text-primary';
     }
-  };
-
-  const getImageUrl = (path: string | undefined) => {
-    if (!path || path.trim() === '') {
-      return "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
-    }
-    if (path.startsWith('http')) {
-      return path;
-    }
-    return path.startsWith('/') ? path : `/${path}`;
   };
 
   return (
