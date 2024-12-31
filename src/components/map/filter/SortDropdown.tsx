@@ -1,6 +1,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
+import { PropsWithChildren } from "react";
 
 interface SortDropdownProps {
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
@@ -8,7 +9,12 @@ interface SortDropdownProps {
   isMobile: boolean;
 }
 
-export const SortDropdown = ({ onSortChange, activeSort, isMobile }: SortDropdownProps) => {
+export const SortDropdown = ({ 
+  onSortChange, 
+  activeSort, 
+  isMobile,
+  children 
+}: PropsWithChildren<SortDropdownProps>) => {
   const getSortButtonText = () => {
     switch (activeSort) {
       case 'closingSoon':
@@ -23,14 +29,7 @@ export const SortDropdown = ({ onSortChange, activeSort, isMobile }: SortDropdow
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size={isMobile ? "sm" : "default"}
-          className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between`}
-        >
-          <span className="truncate">{getSortButtonText()}</span>
-          <ArrowUpDown className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
-        </Button>
+        {children}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem

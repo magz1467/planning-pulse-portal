@@ -1,6 +1,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
+import { PropsWithChildren } from "react";
 
 interface FilterDropdownProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -11,7 +12,12 @@ interface FilterDropdownProps {
   isMobile: boolean;
 }
 
-export const FilterDropdown = ({ onFilterChange, activeFilters, isMobile }: FilterDropdownProps) => {
+export const FilterDropdown = ({ 
+  onFilterChange, 
+  activeFilters, 
+  isMobile,
+  children 
+}: PropsWithChildren<FilterDropdownProps>) => {
   const statusOptions = ["Under Review", "Approved", "Declined"];
   const typeOptions = [
     "New Build Residential",
@@ -31,14 +37,7 @@ export const FilterDropdown = ({ onFilterChange, activeFilters, isMobile }: Filt
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size={isMobile ? "sm" : "default"}
-          className={`${isMobile ? 'px-3' : 'w-[180px]'} justify-between`}
-        >
-          <span className="truncate">{activeFilterText}</span>
-          <Filter className={`ml-2 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
-        </Button>
+        {children}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {hasActiveFilters && (
