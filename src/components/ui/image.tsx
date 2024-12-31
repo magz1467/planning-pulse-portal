@@ -15,10 +15,11 @@ const Image = ({ src, alt, className, width, height, loading = "lazy", ...props 
   const handleError = () => {
     console.warn(`Image failed to load: ${src}`);
     setError(true);
+    setIsLoading(false);
   };
 
   // Ensure we have a valid src, otherwise use fallback
-  const imageSrc = (!src || src.trim() === '') ? fallbackImage : src;
+  const imageSrc = (!src || src.trim() === '' || src === 'undefined' || src === 'null') ? fallbackImage : src;
 
   return (
     <div className="relative">
@@ -27,8 +28,8 @@ const Image = ({ src, alt, className, width, height, loading = "lazy", ...props 
       )}
       <img
         src={error ? fallbackImage : imageSrc}
-        alt={alt}
-        className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        alt={alt || ''}
+        className={`${className || ''} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
         onError={handleError}
         onLoad={() => setIsLoading(false)}
         loading={loading}
