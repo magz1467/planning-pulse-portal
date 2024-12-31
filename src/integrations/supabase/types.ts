@@ -1314,6 +1314,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      geometry_spg_config: {
+        Args: {
+          "": unknown
+        }
+        Returns: undefined
+      }
+      geometry_spg_choose_nd: {
+        Args: {
+          "": unknown
+        }
+        Returns: undefined
+      }
       geometry_spgist_compress_2d: {
         Args: {
           "": unknown

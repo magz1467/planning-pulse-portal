@@ -1,24 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { StatusDisplay } from '@/components/admin/StatusDisplay';
+import { AutomationControl } from '@/components/admin/AutomationControl';
+import { ManualProcessing } from '@/components/admin/ManualProcessing';
 
 export default function Admin2() {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [processingBatchSize, setProcessingBatchSize] = useState<number | null>(null);
   const [totalAITitles, setTotalAITitles] = useState<number | null>(null);
-  const [isAutomationRunning, setIsAutomationRunning] = useState(false);
-  const automationIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
     fetchTotalAITitles();
-    // Cleanup interval on unmount
-    return () => {
-      if (automationIntervalRef.current) {
-        clearInterval(automationIntervalRef.current);
-      }
-    };
   }, []);
 
   const fetchTotalAITitles = async () => {
@@ -28,35 +22,6 @@ export default function Admin2() {
       .not('ai_title', 'is', null);
     
     setTotalAITitles(count);
-  };
-
-  const toggleAutomation = () => {
-    if (!isAutomationRunning) {
-      // Start automation
-      automationIntervalRef.current = setInterval(() => {
-        handleGenerateTitles(50);
-      }, 60000); // Run every minute
-      
-      // Trigger first run immediately
-      handleGenerateTitles(50);
-      
-      setIsAutomationRunning(true);
-      toast({
-        title: "Automation Started",
-        description: "Generating 50 AI titles every minute. You can stop this at any time.",
-      });
-    } else {
-      // Stop automation
-      if (automationIntervalRef.current) {
-        clearInterval(automationIntervalRef.current);
-        automationIntervalRef.current = null;
-      }
-      setIsAutomationRunning(false);
-      toast({
-        title: "Automation Stopped",
-        description: "AI title generation automation has been stopped.",
-      });
-    }
   };
 
   const handleGenerateTitles = async (batchSize: number) => {
@@ -117,89 +82,13 @@ export default function Admin2() {
       <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
       
       <div className="space-y-8">
-        <div className="bg-muted p-4 rounded-lg mb-6">
-          <h2 className="text-lg font-medium mb-2">Current Status</h2>
-          <p className="text-sm text-muted-foreground">
-            Total applications with AI titles: {totalAITitles !== null ? totalAITitles.toLocaleString() : 'Loading...'}
-          </p>
-        </div>
-
-        <div className="bg-muted p-4 rounded-lg mb-6">
-          <h2 className="text-lg font-medium mb-2">Automation Control</h2>
-          <Button 
-            onClick={toggleAutomation}
-            className="w-full md:w-auto"
-            disabled={isGenerating}
-            variant={isAutomationRunning ? "destructive" : "default"}
-          >
-            {isAutomationRunning ? "Stop Automation" : "Start Automation (50 titles/minute)"}
-          </Button>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {isAutomationRunning 
-              ? "Automation is running - generating 50 titles every minute" 
-              : "Click to start automated generation of 50 titles every minute"}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Manual Processing</h2>
-          
-          <div>
-            <Button 
-              onClick={() => handleGenerateTitles(50)}
-              className="w-full md:w-auto"
-              disabled={isGenerating}
-              variant={processingBatchSize === 50 ? "secondary" : "default"}
-            >
-              {processingBatchSize === 50 ? "Processing..." : "Generate 50 AI Titles"}
-            </Button>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Click to generate AI titles for up to 50 applications that don't have titles yet.
-            </p>
-          </div>
-
-          <div>
-            <Button 
-              onClick={() => handleGenerateTitles(100)}
-              className="w-full md:w-auto"
-              disabled={isGenerating}
-              variant={processingBatchSize === 100 ? "secondary" : "default"}
-            >
-              {processingBatchSize === 100 ? "Processing..." : "Generate 100 AI Titles"}
-            </Button>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Click to generate AI titles for up to 100 applications that don't have titles yet.
-            </p>
-          </div>
-
-          <div>
-            <Button 
-              onClick={() => handleGenerateTitles(250)}
-              className="w-full md:w-auto"
-              disabled={isGenerating}
-              variant={processingBatchSize === 250 ? "secondary" : "default"}
-            >
-              {processingBatchSize === 250 ? "Processing..." : "Generate 250 AI Titles"}
-            </Button>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Click to generate AI titles for up to 250 applications that don't have titles yet.
-            </p>
-          </div>
-
-          <div>
-            <Button 
-              onClick={() => handleGenerateTitles(500)}
-              className="w-full md:w-auto"
-              disabled={isGenerating}
-              variant={processingBatchSize === 500 ? "secondary" : "default"}
-            >
-              {processingBatchSize === 500 ? "Processing..." : "Generate 500 AI Titles"}
-            </Button>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Click to generate AI titles for up to 500 applications that don't have titles yet.
-            </p>
-          </div>
-        </div>
+        <StatusDisplay totalAITitles={totalAITitles} />
+        <AutomationControl isGenerating={isGenerating} />
+        <ManualProcessing 
+          isGenerating={isGenerating}
+          processingBatchSize={processingBatchSize}
+          onGenerate={handleGenerateTitles}
+        />
       </div>
     </div>
   );
