@@ -82,6 +82,19 @@ export default function Admin() {
             Click to generate AI titles for up to 250 applications that don't have titles yet.
           </p>
         </div>
+
+        <div>
+          <Button 
+            onClick={() => handleGenerateTitles(500)}
+            className="w-full md:w-auto"
+            disabled={isGenerating}
+          >
+            Generate 500 AI Titles
+          </Button>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Click to generate AI titles for up to 500 applications that don't have titles yet.
+          </p>
+        </div>
       </div>
     </div>
   );
