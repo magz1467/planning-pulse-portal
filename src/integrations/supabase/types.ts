@@ -48,6 +48,7 @@ export type Database = {
         Row: {
           actual_commencement_date: string | null
           actual_completion_date: string | null
+          ai_title: string | null
           appeal_decision: string | null
           appeal_decision_date: string | null
           appeal_start_date: string | null
@@ -104,6 +105,7 @@ export type Database = {
         Insert: {
           actual_commencement_date?: string | null
           actual_completion_date?: string | null
+          ai_title?: string | null
           appeal_decision?: string | null
           appeal_decision_date?: string | null
           appeal_start_date?: string | null
@@ -160,6 +162,7 @@ export type Database = {
         Update: {
           actual_commencement_date?: string | null
           actual_completion_date?: string | null
+          ai_title?: string | null
           appeal_decision?: string | null
           appeal_decision_date?: string | null
           appeal_start_date?: string | null
@@ -1349,6 +1352,7 @@ export type Database = {
         Returns: {
           actual_commencement_date: string | null
           actual_completion_date: string | null
+          ai_title: string | null
           appeal_decision: string | null
           appeal_decision_date: string | null
           appeal_start_date: string | null
