@@ -1,5 +1,6 @@
 import { Application } from "@/types/planning";
 import { MapPin } from "lucide-react";
+import Image from "@/components/ui/image";
 
 interface MiniCardProps {
   application: Application;
@@ -37,10 +38,12 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       style={{ zIndex: 1500 }}
     >
       <div className="flex gap-4 items-center">
-        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
-          <img
+        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+          <Image
             src={getImageUrl(application.image)}
             alt={application.title}
+            width={80}
+            height={80}
             className="w-full h-full object-cover"
           />
         </div>
