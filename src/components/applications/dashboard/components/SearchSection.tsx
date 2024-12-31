@@ -1,5 +1,6 @@
 import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { FilterBar } from "@/components/FilterBar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SearchSectionProps {
   onPostcodeSelect: (postcode: string) => void;
@@ -23,6 +24,8 @@ export const SearchSection = ({
   isMapView,
   onToggleView
 }: SearchSectionProps) => {
+  const isMobile = useIsMobile();
+
   return (
     <>
       <div className="container mx-auto px-4 py-4">
@@ -33,7 +36,8 @@ export const SearchSection = ({
         />
       </div>
 
-      {onFilterChange && (
+      {/* Only show FilterBar in mobile view */}
+      {isMobile && onFilterChange && (
         <FilterBar 
           onFilterChange={onFilterChange}
           onSortChange={onSortChange}
