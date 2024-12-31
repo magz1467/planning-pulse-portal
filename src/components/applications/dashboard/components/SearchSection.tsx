@@ -32,7 +32,7 @@ export const SearchSection = ({
         <PostcodeSearch 
           onSelect={onPostcodeSelect}
           placeholder="Search new location"
-          className="w-full max-w-2xl"
+          className="w-full"
         />
       </div>
 
