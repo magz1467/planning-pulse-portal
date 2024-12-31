@@ -34,6 +34,7 @@ export const useApplicationsData = () => {
   ) => {
     setIsLoading(true);
     console.log('Fetching applications with center:', center);
+    console.log('Current filters:', filters);
     
     try {
       // First get the total count
@@ -47,7 +48,11 @@ export const useApplicationsData = () => {
         await query
       );
 
-      if (countError) throw countError;
+      if (countError) {
+        console.error('Count error:', countError);
+        throw countError;
+      }
+      
       setTotalCount(countData || 0);
       console.log('Total count:', countData);
 
@@ -62,18 +67,23 @@ export const useApplicationsData = () => {
 
       // Apply filters if they exist
       if (filters?.status) {
+        console.log('Applying status filter:', filters.status);
         dataQuery = dataQuery.eq('status', filters.status);
       }
       if (filters?.type) {
+        console.log('Applying type filter:', filters.type);
         dataQuery = dataQuery.eq('application_type', filters.type);
       }
 
       const { data, error } = await fetchWithRetry(async () => await dataQuery);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Data fetch error:', error);
+        throw error;
+      }
 
       if (!data || data.length === 0) {
-        console.log('No applications found');
+        console.log('No applications found in radius', RADIUS, 'meters from', center);
         setApplications([]);
         return;
       }
@@ -92,7 +102,10 @@ export const useApplicationsData = () => {
           ];
         }
 
-        if (!coordinates) return null;
+        if (!coordinates) {
+          console.log('Missing coordinates for application:', app.application_id);
+          return null;
+        }
 
         // Extract image URL from application_details if it exists
         let imageUrl = '/placeholder.svg';
@@ -121,7 +134,8 @@ export const useApplicationsData = () => {
             (app.application_details as any)?.officer || '' : '',
           consultationEnd: app.last_date_consultation_comments || '',
           image: imageUrl,
-          coordinates
+          coordinates,
+          ai_title: app.ai_title
         };
       }).filter((app): app is Application & { coordinates: [number, number] } => 
         app !== null && app.coordinates !== null
@@ -130,6 +144,7 @@ export const useApplicationsData = () => {
       console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
     } catch (error: any) {
+      console.error('Error in fetchApplicationsInRadius:', error);
       toast({
         title: "Error fetching applications",
         description: error.message,
