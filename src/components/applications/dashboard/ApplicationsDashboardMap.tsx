@@ -100,6 +100,7 @@ export const ApplicationsDashboardMap = () => {
               postcode=""
               onSelectApplication={handleMarkerClick}
               onShowEmailDialog={() => {}}
+              hideFilterBar={true} // Add this prop to hide the FilterBar in MobileListContainer
             />
           )}
         </div>
