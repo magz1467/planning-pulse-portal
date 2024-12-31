@@ -31,9 +31,18 @@ export default function Admin2() {
       }
 
       console.log('Edge function response:', data);
+
+      // Verify the results by querying the database
+      const { count } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .not('ai_title', 'is', null);
+
+      console.log(`Total applications with AI titles: ${count}`);
+
       toast({
         title: "Success!",
-        description: data.message || "Titles have been generated successfully",
+        description: `${data.message}. Total applications with AI titles: ${count}`,
       });
       
       return data;
