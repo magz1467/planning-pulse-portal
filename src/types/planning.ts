@@ -15,6 +15,7 @@ export interface Application {
   consultationEnd: string;
   image: string;
   coordinates: [number, number];
+  ai_title?: string;
 }
 
 export interface Comment {
