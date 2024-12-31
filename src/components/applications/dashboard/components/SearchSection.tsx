@@ -1,6 +1,7 @@
 import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { FilterBar } from "@/components/FilterBar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Application } from "@/types/planning";
 
 interface SearchSectionProps {
   onPostcodeSelect: (postcode: string) => void;
@@ -13,6 +14,7 @@ interface SearchSectionProps {
   activeSort?: 'closingSoon' | 'newest' | null;
   isMapView?: boolean;
   onToggleView?: () => void;
+  applications?: Application[];
 }
 
 export const SearchSection = ({
@@ -22,7 +24,8 @@ export const SearchSection = ({
   activeFilters,
   activeSort,
   isMapView,
-  onToggleView
+  onToggleView,
+  applications = []
 }: SearchSectionProps) => {
   const isMobile = useIsMobile();
 
@@ -46,6 +49,7 @@ export const SearchSection = ({
             activeSort={activeSort}
             isMapView={isMapView}
             onToggleView={onToggleView}
+            applications={applications}
           />
         </div>
       )}

@@ -1,81 +1,128 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
-import { PropsWithChildren } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Application } from "@/types/planning";
+import { cn } from "@/lib/utils";
 
 interface FilterDropdownProps {
+  children: React.ReactNode;
   onFilterChange: (filterType: string, value: string) => void;
   activeFilters: {
     status?: string;
     type?: string;
   };
+  applications: Application[];
   isMobile: boolean;
 }
 
-export const FilterDropdown = ({ 
-  onFilterChange, 
-  activeFilters, 
+const statusOptions = [
+  { label: "Under Review", value: "Under Review" },
+  { label: "Approved", value: "Approved" },
+  { label: "Declined", value: "Declined" },
+];
+
+const typeOptions = [
+  { label: "New Build Residential", value: "New Build Residential" },
+  { label: "New Build Commercial", value: "New Build Commercial" },
+  { label: "Extension Residential", value: "Extension Residential" },
+  { label: "Extension Commercial", value: "Extension Commercial" },
+];
+
+export const FilterDropdown = ({
+  children,
+  onFilterChange,
+  activeFilters,
+  applications,
   isMobile,
-  children 
-}: PropsWithChildren<FilterDropdownProps>) => {
-  const statusOptions = ["Under Review", "Approved", "Declined"];
-  const typeOptions = [
-    "New Build Residential",
-    "New Build Commercial",
-    "Extension Residential",
-    "Extension Commercial",
-  ];
+}: FilterDropdownProps) => {
+  const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
-  const hasActiveFilters = activeFilters.status || activeFilters.type;
-  const activeFilterText = activeFilters.status || activeFilters.type || "Filter";
+  // Calculate counts for each status
+  const statusCounts = statusOptions.reduce((acc, { value }) => {
+    acc[value] = applications.filter(app => app.status === value).length;
+    return acc;
+  }, {} as Record<string, number>);
 
-  const handleClearFilters = () => {
-    onFilterChange("status", "");
-    onFilterChange("type", "");
-  };
+  // Calculate counts for each type
+  const typeCounts = typeOptions.reduce((acc, { value }) => {
+    acc[value] = applications.filter(app => app.type === value).length;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {children}
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent 
+        align="start"
+        className="w-[280px] bg-white z-[9999]"
+      >
         {hasActiveFilters && (
           <>
             <DropdownMenuItem
-              onClick={handleClearFilters}
-              className="cursor-pointer text-blue-600 font-medium"
+              onClick={() => {
+                onFilterChange("status", "");
+                onFilterChange("type", "");
+              }}
+              className="text-blue-600 font-medium"
             >
               Clear filters
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
+
         <DropdownMenuItem disabled className="text-sm font-semibold">
           Status
         </DropdownMenuItem>
-        {statusOptions.map((status) => (
+
+        <DropdownMenuItem
+          onClick={() => onFilterChange("status", "")}
+          className="justify-between"
+        >
+          All statuses
+          {!activeFilters.status && <span>✓</span>}
+        </DropdownMenuItem>
+
+        {statusOptions.map((option) => (
           <DropdownMenuItem
-            key={status}
-            onClick={() => onFilterChange("status", status)}
-            className="cursor-pointer"
+            key={option.value}
+            onClick={() => onFilterChange("status", option.value)}
+            className="justify-between"
           >
-            {status}
+            <span>{option.label} ({statusCounts[option.value] || 0})</span>
+            {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>
         ))}
-        
+
         <DropdownMenuSeparator />
         
         <DropdownMenuItem disabled className="text-sm font-semibold">
           Type
         </DropdownMenuItem>
-        {typeOptions.map((type) => (
+
+        <DropdownMenuItem
+          onClick={() => onFilterChange("type", "")}
+          className="justify-between"
+        >
+          All types
+          {!activeFilters.type && <span>✓</span>}
+        </DropdownMenuItem>
+
+        {typeOptions.map((option) => (
           <DropdownMenuItem
-            key={type}
-            onClick={() => onFilterChange("type", type)}
-            className="cursor-pointer"
+            key={option.value}
+            onClick={() => onFilterChange("type", option.value)}
+            className="justify-between"
           >
-            {type}
+            <span>{option.label} ({typeCounts[option.value] || 0})</span>
+            {activeFilters.type === option.value && <span>✓</span>}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

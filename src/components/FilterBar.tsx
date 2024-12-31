@@ -3,6 +3,7 @@ import { FilterDropdown } from "@/components/map/filter/FilterDropdown";
 import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Filter, ArrowUpDown, Map, List } from "lucide-react";
+import { Application } from "@/types/planning";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -14,6 +15,7 @@ interface FilterBarProps {
   activeSort?: 'closingSoon' | 'newest' | null;
   isMapView?: boolean;
   onToggleView?: () => void;
+  applications?: Application[];
 }
 
 export const FilterBar = ({
@@ -22,7 +24,8 @@ export const FilterBar = ({
   activeFilters = {},
   activeSort = null,
   isMapView = true,
-  onToggleView
+  onToggleView,
+  applications = []
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
@@ -33,6 +36,7 @@ export const FilterBar = ({
           onFilterChange={onFilterChange}
           activeFilters={activeFilters}
           isMobile={isMobile}
+          applications={applications}
         >
           <Button 
             variant="outline" 
