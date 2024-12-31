@@ -8,9 +8,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Application } from "@/types/planning";
 import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
 
 interface FilterDropdownProps {
-  children: React.ReactNode;
+  children: ReactNode;
   onFilterChange: (filterType: string, value: string) => void;
   activeFilters: {
     status?: string;
@@ -20,7 +21,7 @@ interface FilterDropdownProps {
   isMobile: boolean;
 }
 
-const statusOptions = [
+const predefinedStatuses = [
   { label: "Under Review", value: "Under Review" },
   { label: "Approved", value: "Approved" },
   { label: "Declined", value: "Declined" },
@@ -36,18 +37,30 @@ export const FilterDropdown = ({
 }: FilterDropdownProps) => {
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
-  // Calculate status counts
+  // Calculate counts for each status
   const getStatusCounts = () => {
     const counts: { [key: string]: number } = {};
-    const predefinedStatuses = statusOptions.map(opt => opt.value.toLowerCase());
+    const predefinedStatusValues = predefinedStatuses.map(s => s.value.toLowerCase());
+    
+    // Initialize counts
+    predefinedStatuses.forEach(status => {
+      counts[status.value] = 0;
+    });
 
     applications.forEach(app => {
       const status = app.status?.toLowerCase() || '';
       
-      if (predefinedStatuses.includes(status)) {
-        counts[status] = (counts[status] || 0) + 1;
+      if (predefinedStatusValues.includes(status)) {
+        // Count predefined statuses
+        const matchedStatus = predefinedStatuses.find(
+          s => s.value.toLowerCase() === status
+        );
+        if (matchedStatus) {
+          counts[matchedStatus.value]++;
+        }
       } else {
-        counts['other'] = (counts['other'] || 0) + 1;
+        // Count everything else as "Other"
+        counts["Other"]++;
       }
     });
 
@@ -70,7 +83,6 @@ export const FilterDropdown = ({
             <DropdownMenuItem
               onClick={() => {
                 onFilterChange("status", "");
-                onFilterChange("type", "");
               }}
               className="text-blue-600 font-medium"
             >
@@ -92,14 +104,14 @@ export const FilterDropdown = ({
           {!activeFilters.status && <span>✓</span>}
         </DropdownMenuItem>
 
-        {statusOptions.map((option) => (
+        {predefinedStatuses.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => onFilterChange("status", option.value)}
             className="justify-between"
           >
             <span>
-              {option.label} ({statusCounts[option.value.toLowerCase()] || 0})
+              {option.label} ({statusCounts[option.value] || 0})
             </span>
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>
