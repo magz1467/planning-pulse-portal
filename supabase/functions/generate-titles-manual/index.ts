@@ -20,13 +20,16 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    // Get the requested limit from the request body
+    const { limit = 50 } = await req.json();
+    
     // Get applications without AI titles
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
       .select('application_id, description')
       .is('ai_title', null)
       .not('description', 'is', null)
-      .limit(50) // Process in batches
+      .limit(limit) // Use the requested limit
 
     if (fetchError) {
       throw new Error(`Error fetching applications: ${fetchError.message}`)
