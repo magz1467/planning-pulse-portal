@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
-import { Tables } from '@/integrations/supabase/types';
-
-type Application = Tables<'applications'>;
+import { Application } from "@/types/planning";
 
 interface ActiveFilters {
   status?: string;
@@ -9,7 +7,10 @@ interface ActiveFilters {
   search?: string;
 }
 
-export const useFilteredApplications = (applications: Application[], activeFilters: ActiveFilters) => {
+export const useFilteredApplications = (
+  applications: Application[],
+  activeFilters: ActiveFilters
+) => {
   return useMemo(() => {
     let filtered = [...applications];
 
@@ -17,7 +18,7 @@ export const useFilteredApplications = (applications: Application[], activeFilte
     if (activeFilters.status) {
       filtered = filtered.filter(app => {
         if (activeFilters.status === 'Under Review') {
-          return app.status === 'Application Under Consideration';
+          return app.status.toLowerCase() === 'application under consideration';
         }
         return app.status === activeFilters.status;
       });
@@ -25,7 +26,7 @@ export const useFilteredApplications = (applications: Application[], activeFilte
 
     // Filter by type
     if (activeFilters.type) {
-      filtered = filtered.filter(app => app.application_type === activeFilters.type);
+      filtered = filtered.filter(app => app.type === activeFilters.type);
     }
 
     // Filter by search
@@ -34,10 +35,9 @@ export const useFilteredApplications = (applications: Application[], activeFilte
       filtered = filtered.filter(app => {
         const searchableFields = [
           app.description,
-          app.street_name,
-          app.postcode,
-          app.lpa_app_no,
-          app.ai_title
+          app.address,
+          app.reference,
+          app.title
         ];
         return searchableFields.some(field => 
           field?.toLowerCase().includes(searchLower)

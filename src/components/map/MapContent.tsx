@@ -7,6 +7,8 @@ import { useMapState } from "@/hooks/use-map-state";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { generateMockApplications } from "@/utils/mockDataGenerator";
+import { Application } from "@/types/planning";
+import { Tables } from "@/integrations/supabase/types";
 
 // Generate 200 mock applications
 const mockPlanningApplications = generateMockApplications(200);
@@ -35,10 +37,33 @@ export const MapContent = () => {
     }
   }, [initialFilter, handleFilterChange]);
 
+  const transformApplication = (app: Tables<'applications'>): Application => ({
+    id: app.application_id,
+    title: app.description || '',
+    address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
+    status: app.status || '',
+    distance: 'N/A',
+    reference: app.lpa_app_no || '',
+    description: app.description || '',
+    applicant: typeof app.application_details === 'object' ? 
+      (app.application_details as any)?.applicant || '' : '',
+    submissionDate: app.valid_date || '',
+    decisionDue: app.decision_target_date || '',
+    type: app.application_type || '',
+    ward: app.ward || '',
+    officer: typeof app.application_details === 'object' ? 
+      (app.application_details as any)?.officer || '' : '',
+    consultationEnd: app.last_date_consultation_comments || '',
+    image: '/placeholder.svg',
+    coordinates: app.geom ? [
+      (app.geom as any).coordinates[1],
+      (app.geom as any).coordinates[0]
+    ] as [number, number] : [51.5074, -0.1278]
+  });
+
   const filteredApplications = useFilteredApplications(
-    mockPlanningApplications,
-    activeFilters,
-    activeSort
+    mockPlanningApplications.map(transformApplication),
+    activeFilters
   );
 
   // Only auto-select first application on mobile and in map view
