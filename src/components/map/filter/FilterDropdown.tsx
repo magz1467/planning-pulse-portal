@@ -48,20 +48,18 @@ export const FilterDropdown = ({
     // Count applications for each status
     if (applications && applications.length > 0) {
       applications.forEach(app => {
-        if (!app.status) {
-          counts["Other"]++;
-          return;
-        }
+        const appStatus = app.status?.trim() || '';
+        const normalizedStatus = appStatus.toLowerCase();
 
-        const appStatus = app.status.trim();
+        // Check if the status matches any predefined status
         const matchedStatus = predefinedStatuses.find(
-          status => status.value.toLowerCase() === appStatus.toLowerCase()
+          status => status.value.toLowerCase() === normalizedStatus
         );
 
-        if (matchedStatus) {
+        if (!appStatus || (!matchedStatus && appStatus !== 'Other')) {
+          counts['Other']++;
+        } else if (matchedStatus) {
           counts[matchedStatus.value]++;
-        } else {
-          counts["Other"]++;
         }
       });
     }
