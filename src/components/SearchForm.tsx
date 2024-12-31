@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PostcodeSearch } from "./PostcodeSearch";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useSearchLogger } from "@/hooks/use-search-logger";
 import { SearchTabs } from "./search/SearchTabs";
 
@@ -19,8 +19,7 @@ export const SearchForm = () => {
     
     if (!postcode.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a postcode",
+        title: "Please enter a postcode",
         variant: "destructive",
       });
       return;
@@ -40,8 +39,8 @@ export const SearchForm = () => {
     } catch (error) {
       console.error('Error during search:', error);
       toast({
-        title: "Error",
-        description: "There was a problem with the search. Please try again.",
+        title: "Search Error",
+        description: "There was a problem with your search. Please try again.",
         variant: "destructive",
       });
     } finally {
