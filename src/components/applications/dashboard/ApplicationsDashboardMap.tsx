@@ -66,41 +66,43 @@ export const ApplicationsDashboardMap = () => {
         onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
       />
 
-      <div className="flex flex-1 min-h-0 relative">
-        {(!isMobile || !isMapView) && (
-          <DesktopSidebar
-            applications={applications}
-            selectedApplication={selectedId}
-            postcode=""
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            onFilterChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            onSelectApplication={handleMarkerClick}
-            onClose={() => setSelectedId(null)}
-          />
-        )}
-
-        {(!isMobile || isMapView) && (
-          <div className="flex-1 relative">
-            <MapView
+      <div className="flex-1 relative w-full">
+        <div className="absolute inset-0 flex">
+          {(!isMobile || !isMapView) && (
+            <DesktopSidebar
               applications={applications}
-              selectedId={selectedId}
-              onMarkerClick={handleMarkerClick}
-              onBoundsChange={fetchApplicationsInBounds}
+              selectedApplication={selectedId}
+              postcode=""
+              activeFilters={activeFilters}
+              activeSort={activeSort}
+              onFilterChange={handleFilterChange}
+              onSortChange={handleSortChange}
+              onSelectApplication={handleMarkerClick}
+              onClose={() => setSelectedId(null)}
             />
-          </div>
-        )}
+          )}
 
-        {isMobile && !isMapView && (
-          <MobileListContainer
-            applications={applications}
-            selectedApplication={selectedId}
-            postcode=""
-            onSelectApplication={handleMarkerClick}
-            onShowEmailDialog={() => {}}
-          />
-        )}
+          {(!isMobile || isMapView) && (
+            <div className="flex-1 relative">
+              <MapView
+                applications={applications}
+                selectedId={selectedId}
+                onMarkerClick={handleMarkerClick}
+                onBoundsChange={fetchApplicationsInBounds}
+              />
+            </div>
+          )}
+
+          {isMobile && !isMapView && (
+            <MobileListContainer
+              applications={applications}
+              selectedApplication={selectedId}
+              postcode=""
+              onSelectApplication={handleMarkerClick}
+              onShowEmailDialog={() => {}}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
