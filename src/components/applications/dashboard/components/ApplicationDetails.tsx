@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin, Bookmark, Heart } from "lucide-react";
 import { getStatusColor } from "@/utils/statusColors";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 
 interface ApplicationDetailsProps {
   application: Application;
@@ -23,9 +24,10 @@ export const ApplicationDetails = ({ application, onClose }: ApplicationDetailsP
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-xl text-primary">
-              {application.ai_title || application.description || ''}
-            </h3>
+            <ApplicationTitle 
+              title={application.ai_title || application.description || ''} 
+              className="mb-2"
+            />
             <div className="flex items-center gap-1 mt-2 text-gray-600">
               <MapPin className="w-4 h-4" />
               <span className="text-sm truncate">{application.address}</span>

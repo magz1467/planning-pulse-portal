@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { MapPin, Bookmark, Heart } from "lucide-react";
 import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -47,9 +48,10 @@ export const PlanningApplicationList = ({
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-primary line-clamp-2 text-sm leading-tight mb-1">
-                  {application.ai_title || application.description || ''}
-                </h3>
+                <ApplicationTitle 
+                  title={application.ai_title || application.description || ''} 
+                  className="mb-1"
+                />
                 <div className="flex items-center gap-1 mt-1 text-gray-600">
                   <MapPin className="w-3 h-3" />
                   <p className="text-sm truncate">{application.address}</p>
