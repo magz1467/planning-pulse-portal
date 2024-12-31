@@ -27,7 +27,7 @@ export const SearchSection = ({
   const isMobile = useIsMobile();
 
   return (
-    <>
+    <div className="flex flex-col">
       <div className="container mx-auto px-4 py-4">
         <PostcodeSearch 
           onSelect={onPostcodeSelect}
@@ -38,15 +38,17 @@ export const SearchSection = ({
 
       {/* Only show FilterBar in mobile view */}
       {isMobile && onFilterChange && (
-        <FilterBar 
-          onFilterChange={onFilterChange}
-          onSortChange={onSortChange}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          isMapView={isMapView}
-          onToggleView={onToggleView}
-        />
+        <div className="px-4">
+          <FilterBar 
+            onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            isMapView={isMapView}
+            onToggleView={onToggleView}
+          />
+        </div>
       )}
-    </>
+    </div>
   );
 };

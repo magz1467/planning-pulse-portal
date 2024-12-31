@@ -52,7 +52,7 @@ export const DesktopSidebar = ({
   }, [onSelectApplication]);
 
   return (
-    <div className="w-full md:w-[400px] h-full overflow-hidden border-r border-gray-200 bg-white">
+    <div className="w-full md:w-[350px] h-full overflow-hidden border-r border-gray-200 bg-white">
       {selectedApplication === null ? (
         <ApplicationListView
           applications={applications}
