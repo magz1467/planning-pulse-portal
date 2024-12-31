@@ -37,6 +37,7 @@ export const FilterDropdown = ({
   statusCounts,
 }: FilterDropdownProps) => {
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
+  console.log('FilterDropdown statusCounts:', statusCounts);
 
   return (
     <DropdownMenu>
