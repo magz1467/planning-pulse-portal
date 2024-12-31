@@ -82,6 +82,7 @@ export const ApplicationsDashboardMap = () => {
         activeSort={activeSort}
         isMapView={isMapView}
         onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
+        applications={applications}
       />
 
       <div className="flex-1 relative w-full">
