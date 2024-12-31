@@ -239,6 +239,30 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_status: {
+        Row: {
+          created_at: string
+          id: number
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_requests: {
         Row: {
           created_at: string
@@ -3731,6 +3755,13 @@ export type Database = {
           "": unknown
         }
         Returns: string
+      }
+      toggle_automation: {
+        Args: {
+          automation_name: string
+          new_status: boolean
+        }
+        Returns: boolean
       }
       unlockrows: {
         Args: {
