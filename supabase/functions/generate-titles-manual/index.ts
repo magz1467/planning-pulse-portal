@@ -23,24 +23,29 @@ serve(async (req) => {
     // Get the requested limit from the request body
     const { limit = 50 } = await req.json();
     
+    console.log(`Starting batch processing with limit: ${limit}`);
+    
     // Get applications without AI titles
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
       .select('application_id, description')
       .is('ai_title', null)
       .not('description', 'is', null)
-      .limit(limit) // Use the requested limit
+      .limit(limit)
 
     if (fetchError) {
       throw new Error(`Error fetching applications: ${fetchError.message}`)
     }
 
-    console.log(`Processing ${applications?.length} applications`)
+    console.log(`Found ${applications?.length || 0} applications without AI titles`);
 
     // Process each application
+    let successCount = 0;
+    let errorCount = 0;
+    
     for (const app of applications || []) {
       try {
-        console.log(`Processing application ${app.application_id}`)
+        console.log(`Processing application ${app.application_id} - Description length: ${app.description?.length || 0} chars`);
         
         const response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
@@ -71,6 +76,7 @@ serve(async (req) => {
 
         const data = await response.json()
         const title = data.choices[0].message.content.trim()
+        console.log(`Generated title for ${app.application_id}: ${title}`);
 
         // Update the application with the AI title
         const { error: updateError } = await supabase
@@ -82,16 +88,18 @@ serve(async (req) => {
           throw new Error(`Error updating application ${app.application_id}: ${updateError.message}`)
         }
 
-        console.log(`Successfully updated application ${app.application_id} with title: ${title}`)
+        console.log(`Successfully updated application ${app.application_id}`);
+        successCount++;
       } catch (error) {
         console.error(`Error processing application ${app.application_id}:`, error)
+        errorCount++;
         // Continue with next application even if one fails
       }
     }
 
     return new Response(
       JSON.stringify({ 
-        message: `Processed ${applications?.length} applications`,
+        message: `Processed ${applications?.length} applications. Success: ${successCount}, Errors: ${errorCount}`,
         success: true 
       }),
       { 
