@@ -16,6 +16,8 @@ export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
 }: PlanningApplicationListProps) => {
+  console.log("PlanningApplicationList applications:", applications); // Debug log
+
   return (
     <div className="divide-y">
       {applications.map((application) => (
