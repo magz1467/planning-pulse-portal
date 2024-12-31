@@ -49,17 +49,20 @@ export const FilterDropdown = ({
     if (applications && applications.length > 0) {
       applications.forEach(app => {
         const appStatus = app.status?.trim() || '';
-        const normalizedStatus = appStatus.toLowerCase();
+        
+        if (!appStatus) {
+          counts['Other']++;
+          return;
+        }
 
-        // Check if the status matches any predefined status
         const matchedStatus = predefinedStatuses.find(
-          status => status.value.toLowerCase() === normalizedStatus
+          status => status.value.toLowerCase() === appStatus.toLowerCase()
         );
 
-        if (!appStatus || (!matchedStatus && appStatus !== 'Other')) {
-          counts['Other']++;
-        } else if (matchedStatus) {
+        if (matchedStatus) {
           counts[matchedStatus.value]++;
+        } else {
+          counts['Other']++;
         }
       });
     }
