@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Bookmark, Heart } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
