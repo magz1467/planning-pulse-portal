@@ -6,14 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 export default function Admin() {
   const { toast } = useToast();
 
-  const handleGenerateTitles = async () => {
+  const handleGenerateTitles = async (limit: number) => {
     try {
       toast({
         title: "Generating titles...",
-        description: "This may take a few minutes",
+        description: `This may take a few minutes for ${limit} records`,
       });
 
-      const { data, error } = await supabase.functions.invoke('generate-titles-manual');
+      const { data, error } = await supabase.functions.invoke('generate-titles-manual', {
+        body: { limit }
+      });
       
       if (error) throw error;
 
@@ -34,15 +36,32 @@ export default function Admin() {
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
-      <Button 
-        onClick={handleGenerateTitles}
-        className="w-full md:w-auto"
-      >
-        Generate AI Titles for Applications
-      </Button>
-      <p className="mt-4 text-sm text-muted-foreground">
-        This will generate AI titles for up to 50 applications that don't have titles yet.
-      </p>
+      
+      <div className="space-y-8">
+        <div>
+          <Button 
+            onClick={() => handleGenerateTitles(50)}
+            className="w-full md:w-auto"
+          >
+            Generate 50 AI Titles
+          </Button>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Click to generate AI titles for up to 50 applications that don't have titles yet.
+          </p>
+        </div>
+
+        <div>
+          <Button 
+            onClick={() => handleGenerateTitles(100)}
+            className="w-full md:w-auto"
+          >
+            Generate 100 AI Titles
+          </Button>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Click to generate AI titles for up to 100 applications that don't have titles yet.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
