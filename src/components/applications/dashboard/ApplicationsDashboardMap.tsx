@@ -19,7 +19,7 @@ export const ApplicationsDashboardMap = () => {
   }>({});
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isMapView, setIsMapView] = useState(true);
-  const [postcode, setPostcode] = useState('');
+  const [postcode, setPostcode] = useState('SW1A 0AA'); // Default to Westminster
   const isMobile = useIsMobile();
   
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
@@ -124,14 +124,6 @@ export const ApplicationsDashboardMap = () => {
           )}
         </div>
       </div>
-
-      {!searchPoint && !isLoading && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center text-gray-500">
-            <p className="text-lg">Enter a location to view planning applications</p>
-          </div>
-        </div>
-      )}
 
       {isLoading && (
         <div className="flex-1 flex items-center justify-center">
