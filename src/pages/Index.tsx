@@ -4,9 +4,10 @@ import Footer from "@/components/Footer";
 import { Hero } from "@/components/Hero";
 import StayUpToDate from "@/components/StayUpToDate";
 import { AdminControls } from "@/components/AdminControls";
+import { Toaster } from "@/components/ui/toaster";
 
 // Lazy load components that are not immediately visible
-const Features = lazy(() => import("@/components/Features"));
+const Features = lazy(() => import("@/components/Features")); 
 const Mission = lazy(() => import("@/components/Mission")); 
 const Services = lazy(() => import("@/components/Services"));
 const GetInTouch = lazy(() => import("@/components/GetInTouch"));
@@ -35,6 +36,7 @@ const Index = () => {
         </div>
       </main>
       <Footer />
+      <Toaster />
     </div>
   );
 };
