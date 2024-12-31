@@ -45,6 +45,9 @@ export const FilterDropdown = ({
       counts[status.value] = 0;
     });
 
+    console.log('Applications in FilterDropdown:', applications);
+    console.log('Current counts object:', counts);
+
     // Count applications for each status
     if (applications && applications.length > 0) {
       applications.forEach(app => {
@@ -67,6 +70,7 @@ export const FilterDropdown = ({
       });
     }
 
+    console.log('Final counts:', counts);
     return counts;
   };
 
