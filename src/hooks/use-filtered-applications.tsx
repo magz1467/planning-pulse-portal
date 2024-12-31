@@ -16,7 +16,12 @@ export const useFilteredApplications = (
     
     // Apply filters
     if (activeFilters.status) {
-      filtered = filtered.filter(app => app.status === activeFilters.status);
+      filtered = filtered.filter(app => {
+        if (activeFilters.status === 'Under Review') {
+          return app.status.toLowerCase() === 'application under consideration';
+        }
+        return app.status === activeFilters.status;
+      });
     }
     if (activeFilters.type) {
       filtered = filtered.filter(app => app.type === activeFilters.type);
