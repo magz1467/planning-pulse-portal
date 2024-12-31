@@ -9,11 +9,17 @@ import { supabase } from "@/integrations/supabase/client";
 export const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     checkAuth();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
+      if (session) {
+        checkAdminStatus(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => {
@@ -25,8 +31,26 @@ export const MobileMenu = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+      if (session) {
+        checkAdminStatus(session.user.id);
+      }
     } catch (error) {
       console.error('Error checking auth status:', error);
+    }
+  };
+
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      const { data: adminUser } = await supabase
+        .from('admin_users')
+        .select('id')
+        .eq('user_id', userId)
+        .single();
+      
+      setIsAdmin(!!adminUser);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
     }
   };
 
@@ -109,6 +133,11 @@ export const MobileMenu = () => {
                 <User className="h-5 w-5" />
                 My Profile
               </Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-lg">
+                  Admin Dashboard
+                </Link>
+              )}
               <Button 
                 variant="outline" 
                 className="w-full border-primary text-primary hover:bg-primary/10"
