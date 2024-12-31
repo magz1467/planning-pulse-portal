@@ -17,16 +17,24 @@ export const useFilteredApplications = (
     // Filter by status
     if (activeFilters.status) {
       filtered = filtered.filter(app => {
-        if (activeFilters.status === 'Under Review') {
-          return app.status.toLowerCase() === 'application under consideration';
+        const appStatus = app.status?.toLowerCase() || '';
+        const filterStatus = activeFilters.status.toLowerCase();
+        
+        if (filterStatus === 'under review') {
+          return appStatus.includes('under consideration') || 
+                 appStatus.includes('under review');
         }
-        return app.status === activeFilters.status;
+        return appStatus.includes(filterStatus);
       });
     }
 
     // Filter by type
     if (activeFilters.type) {
-      filtered = filtered.filter(app => app.type === activeFilters.type);
+      filtered = filtered.filter(app => {
+        const appType = app.type?.toLowerCase() || '';
+        const filterType = activeFilters.type.toLowerCase();
+        return appType.includes(filterType);
+      });
     }
 
     // Filter by search
