@@ -33,6 +33,7 @@ export const useApplicationsData = () => {
     filters?: { status?: string; type?: string }
   ) => {
     setIsLoading(true);
+    console.log('Fetching applications with center:', center);
     
     try {
       // First get the total count
@@ -48,6 +49,7 @@ export const useApplicationsData = () => {
 
       if (countError) throw countError;
       setTotalCount(countData || 0);
+      console.log('Total count:', countData);
 
       // Then get the paginated data
       let dataQuery = supabase.rpc('get_applications_within_radius', {
@@ -71,9 +73,12 @@ export const useApplicationsData = () => {
       if (error) throw error;
 
       if (!data || data.length === 0) {
+        console.log('No applications found');
         setApplications([]);
         return;
       }
+
+      console.log('Raw applications data:', data);
 
       // Transform the data to match the Application type
       const transformedData = data?.map(app => {
@@ -113,6 +118,7 @@ export const useApplicationsData = () => {
         app !== null && app.coordinates !== null
       );
       
+      console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
     } catch (error: any) {
       toast({

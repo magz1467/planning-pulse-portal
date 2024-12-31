@@ -31,6 +31,7 @@ export const FilterBar = ({
 
   // Calculate counts for each status
   const getStatusCounts = () => {
+    console.log('Calculating status counts for applications:', applications);
     const counts: { [key: string]: number } = {
       "Under Review": 0,
       "Approved": 0,
@@ -40,6 +41,7 @@ export const FilterBar = ({
     
     if (applications && applications.length > 0) {
       applications.forEach(app => {
+        console.log('Processing application status:', app.status);
         const appStatus = app.status?.trim() || '';
         
         if (!appStatus) {
@@ -60,7 +62,7 @@ export const FilterBar = ({
       });
     }
 
-    console.log('Status counts:', counts);
+    console.log('Final status counts:', counts);
     return counts;
   };
 
