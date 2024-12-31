@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Application } from "@/types/planning";
-import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
 interface FilterDropdownProps {
@@ -40,26 +39,23 @@ export const FilterDropdown = ({
   // Calculate counts for each status
   const getStatusCounts = () => {
     const counts: { [key: string]: number } = {};
-    const predefinedStatusValues = predefinedStatuses.map(s => s.value.toLowerCase());
     
-    // Initialize counts
+    // Initialize counts for predefined statuses
     predefinedStatuses.forEach(status => {
       counts[status.value] = 0;
     });
 
     applications.forEach(app => {
-      const status = app.status?.toLowerCase() || '';
+      const appStatus = app.status?.trim() || '';
       
-      if (predefinedStatusValues.includes(status)) {
-        // Count predefined statuses
-        const matchedStatus = predefinedStatuses.find(
-          s => s.value.toLowerCase() === status
-        );
-        if (matchedStatus) {
-          counts[matchedStatus.value]++;
-        }
+      // Check if status matches any predefined status (case insensitive)
+      const matchedStatus = predefinedStatuses.find(
+        status => status.value.toLowerCase() === appStatus.toLowerCase()
+      );
+
+      if (matchedStatus) {
+        counts[matchedStatus.value]++;
       } else {
-        // Count everything else as "Other"
         counts["Other"]++;
       }
     });

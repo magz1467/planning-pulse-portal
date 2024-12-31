@@ -7,8 +7,6 @@ interface ActiveFilters {
   search?: string;
 }
 
-const predefinedStatuses = ['under review', 'approved', 'declined'];
-
 export const useFilteredApplications = (
   applications: Application[],
   activeFilters: ActiveFilters
@@ -19,18 +17,16 @@ export const useFilteredApplications = (
     // Filter by status
     if (activeFilters.status) {
       filtered = filtered.filter(app => {
-        const appStatus = app.status?.toLowerCase() || '';
+        const appStatus = (app.status || '').trim().toLowerCase();
         const filterStatus = activeFilters.status.toLowerCase();
         
         if (filterStatus === 'other') {
+          // Check if status doesn't match any predefined status
+          const predefinedStatuses = ['under review', 'approved', 'declined'];
           return !predefinedStatuses.includes(appStatus);
         }
         
-        if (filterStatus === 'under review') {
-          return appStatus.includes('under consideration') || 
-                 appStatus.includes('under review');
-        }
-        return appStatus.includes(filterStatus);
+        return appStatus === filterStatus;
       });
     }
 
