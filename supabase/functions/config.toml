@@ -1,0 +1,4 @@
+project_id = "jposqxdboetyioymfswd"
+
+[generate-titles-manual]
+verify_jwt = false
