@@ -46,7 +46,6 @@ export const FilterDropdown = ({
     });
 
     console.log('Applications in FilterDropdown:', applications);
-    console.log('Current counts object:', counts);
 
     // Count applications for each status
     if (applications && applications.length > 0) {
@@ -58,6 +57,7 @@ export const FilterDropdown = ({
           return;
         }
 
+        // Convert both strings to lowercase for comparison
         const matchedStatus = predefinedStatuses.find(
           status => status.value.toLowerCase() === appStatus.toLowerCase()
         );
