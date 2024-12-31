@@ -48,10 +48,12 @@ export const useAutomationStatus = () => {
   }, []);
 
   const toggleAutomation = async () => {
+    const newStatus = !isAutomationRunning;
+    
     const { data, error } = await supabase
       .rpc('toggle_automation', {
         automation_name: 'generate_ai_titles',
-        new_status: !isAutomationRunning
+        new_status: newStatus
       });
 
     if (error) {
@@ -61,14 +63,14 @@ export const useAutomationStatus = () => {
         description: "Failed to toggle automation. Please try again.",
         variant: "destructive",
       });
-      return;
+      throw error;
     }
 
     toast({
-      title: isAutomationRunning ? "Automation Stopped" : "Automation Started",
-      description: isAutomationRunning 
-        ? "AI title generation automation has been stopped."
-        : "Generating 50 AI titles every minute. You can stop this at any time.",
+      title: newStatus ? "Automation Started" : "Automation Stopped",
+      description: newStatus 
+        ? "Generating 50 AI titles every minute. You can stop this at any time."
+        : "AI title generation automation has been stopped.",
     });
   };
 
