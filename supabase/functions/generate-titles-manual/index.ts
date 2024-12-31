@@ -14,10 +14,16 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client
+    // Create Supabase client with service role key to bypass RLS
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false
+        }
+      }
     )
 
     // Get the requested limit from the request body
@@ -43,10 +49,32 @@ serve(async (req) => {
     let successCount = 0;
     let errorCount = 0;
     
-    for (const app of applications || []) {
+    if (!applications || applications.length === 0) {
+      return new Response(
+        JSON.stringify({ 
+          message: 'No applications found that need AI titles',
+          success: true,
+          processed: 0 
+        }),
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json' 
+          } 
+        }
+      )
+    }
+
+    for (const app of applications) {
       try {
         console.log(`Processing application ${app.application_id} - Description length: ${app.description?.length || 0} chars`);
         
+        if (!app.description) {
+          console.log(`Skipping application ${app.application_id} - No description available`);
+          errorCount++;
+          continue;
+        }
+
         const response = await fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
@@ -71,20 +99,21 @@ serve(async (req) => {
         })
 
         if (!response.ok) {
-          throw new Error(`API response not ok: ${response.status}`)
+          throw new Error(`API response not ok: ${response.status} ${response.statusText}`)
         }
 
         const data = await response.json()
         const title = data.choices[0].message.content.trim()
         console.log(`Generated title for ${app.application_id}: ${title}`);
 
-        // Update the application with the AI title
+        // Update the application with the AI title using upsert to ensure the update happens
         const { error: updateError } = await supabase
           .from('applications')
           .update({ ai_title: title })
           .eq('application_id', app.application_id)
 
         if (updateError) {
+          console.error(`Error updating application ${app.application_id}:`, updateError)
           throw new Error(`Error updating application ${app.application_id}: ${updateError.message}`)
         }
 
@@ -93,14 +122,14 @@ serve(async (req) => {
       } catch (error) {
         console.error(`Error processing application ${app.application_id}:`, error)
         errorCount++;
-        // Continue with next application even if one fails
       }
     }
 
     return new Response(
       JSON.stringify({ 
-        message: `Processed ${applications?.length} applications. Success: ${successCount}, Errors: ${errorCount}`,
-        success: true 
+        message: `Processed ${applications.length} applications. Success: ${successCount}, Errors: ${errorCount}`,
+        success: true,
+        processed: successCount
       }),
       { 
         headers: { 
