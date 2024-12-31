@@ -10,7 +10,8 @@ import { Home } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FilterBar } from "@/components/FilterBar";
 import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
-import { LatLngBounds } from "leaflet";
+import { PostcodeSearch } from "@/components/PostcodeSearch";
+import { useCoordinates } from "@/hooks/use-coordinates";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -20,12 +21,17 @@ export const ApplicationsDashboardMap = () => {
   }>({});
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isMapView, setIsMapView] = useState(true);
+  const [postcode, setPostcode] = useState('');
   const isMobile = useIsMobile();
+  
+  const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
   const { 
     applications, 
-    isLoading, 
-    fetchApplicationsInBounds 
+    isLoading: isLoadingApps, 
+    fetchApplicationsInRadius,
+    searchPoint,
+    setSearchPoint
   } = useApplicationsData();
 
   const handleMarkerClick = (id: number) => {
@@ -38,27 +44,34 @@ export const ApplicationsDashboardMap = () => {
         ...prev,
         [filterType]: value
       };
-      // Fetch applications with new filters
-      const mapElement = document.querySelector('.leaflet-container');
-      if (mapElement) {
-        const map = (mapElement as any)._leaflet_map;
-        if (map) {
-          fetchApplicationsInBounds(map.getBounds() as LatLngBounds, newFilters);
-        }
+      if (searchPoint) {
+        fetchApplicationsInRadius(searchPoint, newFilters);
       }
       return newFilters;
     });
   };
 
+  const handlePostcodeSelect = async (newPostcode: string) => {
+    setPostcode(newPostcode);
+  };
+
+  // When coordinates are loaded, update the search point and fetch applications
+  const isInitialSearch = !searchPoint && coordinates;
+  const isNewSearch = searchPoint && coordinates && 
+    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
+
+  if ((isInitialSearch || isNewSearch) && coordinates) {
+    setSearchPoint(coordinates);
+    fetchApplicationsInRadius(coordinates, activeFilters);
+  }
+
   const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
     setActiveSort(sortType);
   };
 
-  const handleBoundsChange = (bounds: LatLngBounds) => {
-    fetchApplicationsInBounds(bounds, activeFilters);
-  };
-
   const selectedApplication = applications.find(app => app.id === selectedId);
+
+  const isLoading = isLoadingCoords || isLoadingApps;
 
   return (
     <div className="h-screen w-full flex flex-col">
@@ -73,54 +86,82 @@ export const ApplicationsDashboardMap = () => {
         </div>
       </header>
 
-      <FilterBar 
-        onFilterChange={handleFilterChange}
-        onSortChange={handleSortChange}
-        activeFilters={activeFilters}
-        activeSort={activeSort}
-        isMapView={isMapView}
-        onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
-      />
-
-      <div className="flex-1 relative w-full">
-        <div className="absolute inset-0 flex">
-          {(!isMobile || !isMapView) && (
-            <DesktopSidebar
-              applications={applications}
-              selectedApplication={selectedId}
-              postcode=""
-              activeFilters={activeFilters}
-              activeSort={activeSort}
-              onFilterChange={handleFilterChange}
-              onSortChange={handleSortChange}
-              onSelectApplication={handleMarkerClick}
-              onClose={() => setSelectedId(null)}
-            />
-          )}
-
-          {(!isMobile || isMapView) && (
-            <div className="flex-1 relative">
-              <MapView
-                applications={applications}
-                selectedId={selectedId}
-                onMarkerClick={handleMarkerClick}
-                onBoundsChange={handleBoundsChange}
-              />
-            </div>
-          )}
-
-          {isMobile && !isMapView && (
-            <MobileListContainer
-              applications={applications}
-              selectedApplication={selectedId}
-              postcode=""
-              onSelectApplication={handleMarkerClick}
-              onShowEmailDialog={() => {}}
-              hideFilterBar={true}
-            />
-          )}
-        </div>
+      <div className="container mx-auto px-4 py-4">
+        <PostcodeSearch 
+          onSelect={handlePostcodeSelect}
+          placeholder="Enter a postcode to search within 1km radius"
+          className="w-full max-w-xl mx-auto"
+        />
       </div>
+
+      {searchPoint && (
+        <>
+          <FilterBar 
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            isMapView={isMapView}
+            onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
+          />
+
+          <div className="flex-1 relative w-full">
+            <div className="absolute inset-0 flex">
+              {(!isMobile || !isMapView) && (
+                <DesktopSidebar
+                  applications={applications}
+                  selectedApplication={selectedId}
+                  postcode={postcode}
+                  activeFilters={activeFilters}
+                  activeSort={activeSort}
+                  onFilterChange={handleFilterChange}
+                  onSortChange={handleSortChange}
+                  onSelectApplication={handleMarkerClick}
+                  onClose={() => setSelectedId(null)}
+                />
+              )}
+
+              {(!isMobile || isMapView) && coordinates && (
+                <div className="flex-1 relative">
+                  <MapView
+                    applications={applications}
+                    selectedId={selectedId}
+                    onMarkerClick={handleMarkerClick}
+                    initialCenter={coordinates}
+                  />
+                </div>
+              )}
+
+              {isMobile && !isMapView && (
+                <MobileListContainer
+                  applications={applications}
+                  selectedApplication={selectedId}
+                  postcode={postcode}
+                  onSelectApplication={handleMarkerClick}
+                  onShowEmailDialog={() => {}}
+                  hideFilterBar={true}
+                />
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {!searchPoint && !isLoading && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <p className="text-lg">Enter a postcode to view planning applications within 1km</p>
+          </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <p className="text-lg">Loading...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

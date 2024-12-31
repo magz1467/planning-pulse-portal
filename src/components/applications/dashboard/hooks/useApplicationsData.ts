@@ -2,17 +2,19 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
-import { LatLngBounds } from 'leaflet';
+import { LatLngTuple } from 'leaflet';
 
 export const useApplicationsData = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchPoint, setSearchPoint] = useState<LatLngTuple | null>(null);
   const { toast } = useToast();
   const PAGE_SIZE = 100;
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 1000; // 1 second
+  const RADIUS = 1000; // 1km in meters
 
   const fetchWithRetry = async (fn: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
     try {
@@ -26,24 +28,20 @@ export const useApplicationsData = () => {
     }
   };
 
-  const fetchApplicationsInBounds = async (
-    bounds: LatLngBounds,
+  const fetchApplicationsInRadius = async (
+    center: LatLngTuple,
     filters?: { status?: string; type?: string }
   ) => {
-    const sw = bounds.getSouthWest();
-    const ne = bounds.getNorthEast();
-    
     setIsLoading(true);
     
     try {
-      let query = supabase.rpc('get_applications_count_in_bounds', {
-        sw_lng: sw.lng,
-        sw_lat: sw.lat,
-        ne_lng: ne.lng,
-        ne_lat: ne.lat
+      // First get the total count
+      let query = supabase.rpc('get_applications_count_within_radius', {
+        center_lng: center[1],
+        center_lat: center[0],
+        radius_meters: RADIUS
       });
 
-      // First get the total count with retry logic
       const { data: countData, error: countError } = await fetchWithRetry(async () => 
         await query
       );
@@ -51,12 +49,11 @@ export const useApplicationsData = () => {
       if (countError) throw countError;
       setTotalCount(countData || 0);
 
-      // Then get the paginated data with retry logic
-      let dataQuery = supabase.rpc('get_applications_in_bounds_paginated', {
-        sw_lng: sw.lng,
-        sw_lat: sw.lat,
-        ne_lng: ne.lng,
-        ne_lat: ne.lat,
+      // Then get the paginated data
+      let dataQuery = supabase.rpc('get_applications_within_radius', {
+        center_lng: center[1],
+        center_lat: center[0],
+        radius_meters: RADIUS,
         page_size: PAGE_SIZE,
         page_number: currentPage
       });
@@ -134,7 +131,9 @@ export const useApplicationsData = () => {
     totalCount,
     currentPage,
     setCurrentPage,
-    fetchApplicationsInBounds,
+    fetchApplicationsInRadius,
+    searchPoint,
+    setSearchPoint,
     PAGE_SIZE
   };
 };
