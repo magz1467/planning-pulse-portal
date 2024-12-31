@@ -19,7 +19,9 @@ const Image = ({ src, alt, className, width, height, loading = "lazy", ...props 
   };
 
   // Ensure we have a valid src, otherwise use fallback
-  const imageSrc = (!src || src.trim() === '' || src === 'undefined' || src === 'null') ? fallbackImage : src;
+  const imageSrc = (!src || src.trim() === '' || src === 'undefined' || src === 'null' || !src.startsWith('/') && !src.startsWith('http')) 
+    ? fallbackImage 
+    : src;
 
   return (
     <div className="relative">
