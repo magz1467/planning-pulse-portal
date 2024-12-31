@@ -40,6 +40,9 @@ export default function Admin() {
       >
         Generate AI Titles for Applications
       </Button>
+      <p className="mt-4 text-sm text-muted-foreground">
+        This will generate AI titles for up to 50 applications that don't have titles yet.
+      </p>
     </div>
   );
 }
