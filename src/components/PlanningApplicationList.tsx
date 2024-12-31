@@ -16,6 +16,9 @@ export const PlanningApplicationList = ({
   onSelectApplication,
 }: PlanningApplicationListProps) => {
   const getImageUrl = (path: string) => {
+    if (!path) {
+      return "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
+    }
     if (path.startsWith('http')) {
       return path;
     }
@@ -32,19 +35,13 @@ export const PlanningApplicationList = ({
         >
           <div className="flex gap-3">
             <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-              {application.image ? (
-                <Image
-                  src={getImageUrl(application.image)}
-                  alt={application.description || ''}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <MapPin className="w-8 h-8 text-gray-400" />
-                </div>
-              )}
+              <Image
+                src={getImageUrl(application.image)}
+                alt={application.description || ''}
+                width={80}
+                height={80}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <ApplicationTitle 

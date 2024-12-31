@@ -20,6 +20,16 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     }
   };
 
+  const getImageUrl = (path: string | undefined) => {
+    if (!path) {
+      return "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
+    }
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return path.startsWith('/') ? path : `/${path}`;
+  };
+
   return (
     <div 
       className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
@@ -27,15 +37,13 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       style={{ zIndex: 1500 }}
     >
       <div className="flex gap-4 items-center">
-        {application.image && (
-          <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
-            <img
-              src={application.image}
-              alt={application.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
+          <img
+            src={getImageUrl(application.image)}
+            alt={application.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-primary truncate">{application.title}</h3>
           <div className="flex items-center gap-1 mt-1 text-gray-600">
