@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AdminControls } from "@/components/AdminControls";
 import { Toaster } from "@/components/ui/toaster";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -27,12 +27,14 @@ const Admin = () => {
           return;
         }
 
+        // Check admin status
         const { data: adminUser, error } = await supabase
           .from('admin_users')
-          .select('id')
+          .select('*')
           .eq('user_id', session.user.id)
           .single();
 
+        // Only redirect if there's an error or no admin user found
         if (error || !adminUser) {
           toast({
             title: "Access Denied",
@@ -55,14 +57,14 @@ const Admin = () => {
       }
     };
 
+    checkAdminAccess();
+
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         navigate('/auth');
       }
     });
-
-    checkAdminAccess();
 
     // Cleanup subscription
     return () => {
