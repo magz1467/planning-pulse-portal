@@ -1,221 +1,101 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
-import { User } from '@supabase/supabase-js';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import Footer from "@/components/Footer";
+import { ProfileTabs } from "@/components/profile/ProfileTabs";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { ProfileOverview } from "@/components/profile/ProfileOverview";
+import { SavedApplicationsTab } from "@/components/profile/SavedApplicationsTab";
+import { PetitionsTab } from "@/components/profile/PetitionsTab";
+import { ActivityTab } from "@/components/profile/ActivityTab";
+import { SettingsTab } from "@/components/profile/SettingsTab";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileHeader } from '@/components/profile/ProfileHeader';
-import { ProfileTabs } from '@/components/profile/ProfileTabs';
 
 const Profile = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [petitions, setPetitions] = useState<any[]>([]);
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    checkUser();
-    fetchUserData();
+    checkAdminStatus();
   }, []);
 
-  const checkUser = async () => {
+  const checkAdminStatus = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/auth');
-        return;
+      if (session?.user) {
+        const { data: adminData } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        setIsAdmin(!!adminData);
       }
-      setUser(session.user);
     } catch (error) {
-      console.error('Error checking user:', error);
-      navigate('/auth');
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
     }
   };
 
-  const fetchUserData = async () => {
+  const handleGenerateTitles = async () => {
+    setIsProcessing(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      // Get most recent user profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('User_data')
-        .select('*')
-        .eq('Email', session.user.email)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (profileError) throw profileError;
-      setUserProfile(profileData?.[0] || null);
-
-      // Get petitions with application data - Fixed the table name from 'developments' to 'applications'
-      const { data: petitionsData, error: petitionsError } = await supabase
-        .from('petitions')
-        .select(`
-          *,
-          applications (
-            title,
-            address,
-            status
-          )
-        `)
-        .eq('user_id', session.user.id);
-
-      if (petitionsError) throw petitionsError;
-      setPetitions(petitionsData || []);
-
-      setLoading(false);
-    } catch (error: any) {
-      console.error('Error fetching user data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile data",
-        variant: "destructive",
-      });
-      setLoading(false);
-    }
-  };
-
-  const handleInterestTypeUpdate = async (type: string) => {
-    try {
-      const { error } = await supabase
-        .from('User_data')
-        .update({ Type: type })
-        .eq('Email', user?.email);
-
+      const { data, error } = await supabase.functions.invoke('generate-titles-manual');
+      
       if (error) throw error;
-
-      setUserProfile(prev => ({ ...prev, Type: type }));
+      
       toast({
         title: "Success",
-        description: "Interest type updated successfully",
+        description: data.message,
       });
     } catch (error) {
-      console.error('Error updating interest type:', error);
+      console.error('Error generating titles:', error);
       toast({
         title: "Error",
-        description: "Failed to update interest type",
+        description: "Failed to generate titles. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
-
-  const handleEmailSubmit = async (email: string, radius: string) => {
-    try {
-      const { error } = await supabase
-        .from('User_data')
-        .update({
-          'Post Code': userProfile?.Post_Code,
-          'Radius_from_pc': parseInt(radius),
-        })
-        .eq('Email', email);
-
-      if (error) throw error;
-
-      setUserProfile(prev => ({
-        ...prev,
-        Radius_from_pc: parseInt(radius)
-      }));
-
-      toast({
-        title: "Success",
-        description: "Your notification preferences have been updated",
-      });
-
-      fetchUserData();
-    } catch (error) {
-      console.error('Error updating notification preferences:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update notification preferences",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleMarketingUpdate = async (value: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('User_data')
-        .update({ Marketing: value })
-        .eq('Email', user?.email);
-
-      if (error) throw error;
-
-      setUserProfile(prev => ({ ...prev, Marketing: value }));
-      toast({
-        title: "Success",
-        description: "Marketing preferences updated",
-      });
-    } catch (error) {
-      console.error('Error updating marketing preferences:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update marketing preferences",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handlePostcodeUpdate = async (postcode: string) => {
-    try {
-      const { error } = await supabase
-        .from('User_data')
-        .update({ 'Post Code': postcode })
-        .eq('Email', user?.email);
-
-      if (error) throw error;
-
-      setUserProfile(prev => ({ ...prev, 'Post Code': postcode }));
-      toast({
-        title: "Success",
-        description: "Postcode updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating postcode:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update postcode",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-grow flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <ProfileHeader user={user} />
-        <ProfileTabs 
-          user={user}
-          userProfile={userProfile}
-          petitions={petitions}
-          onPostcodeUpdate={handlePostcodeUpdate}
-          onEmailSubmit={handleEmailSubmit}
-          onMarketingUpdate={handleMarketingUpdate}
-          onSignOut={handleSignOut}
-          onInterestTypeUpdate={handleInterestTypeUpdate}
-        />
+        <ProfileHeader />
+        <div className="mt-8">
+          <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+          
+          {isAdmin && (
+            <div className="mb-6 p-4 bg-white rounded-lg shadow">
+              <h3 className="text-lg font-semibold mb-2">Admin Controls</h3>
+              <Button 
+                onClick={handleGenerateTitles}
+                disabled={isProcessing}
+                className="bg-primary text-white"
+              >
+                {isProcessing ? "Processing..." : "Generate AI Titles"}
+              </Button>
+            </div>
+          )}
+
+          <div className="mt-6">
+            {activeTab === "overview" && <ProfileOverview />}
+            {activeTab === "saved" && <SavedApplicationsTab />}
+            {activeTab === "petitions" && <PetitionsTab />}
+            {activeTab === "activity" && <ActivityTab />}
+            {activeTab === "settings" && <SettingsTab />}
+          </div>
+        </div>
       </main>
+      <Footer />
+      <Toaster />
     </div>
   );
 };
