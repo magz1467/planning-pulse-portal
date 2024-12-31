@@ -47,7 +47,7 @@ export const PlanningApplicationList = ({
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-primary line-clamp-2">
+                <h3 className="font-semibold text-primary line-clamp-2 max-h-[3em] overflow-hidden">
                   {application.ai_title || application.description || ''}
                 </h3>
                 <div className="flex items-center gap-1 mt-1 text-gray-600">
