@@ -45,10 +45,14 @@ export const FilterDropdown = ({
       counts[status.value] = 0;
     });
 
+    // Count applications for each status
     applications.forEach(app => {
-      const appStatus = app.status?.trim() || '';
-      
-      // Check if status matches any predefined status (case insensitive)
+      if (!app.status) {
+        counts["Other"]++;
+        return;
+      }
+
+      const appStatus = app.status.trim();
       const matchedStatus = predefinedStatuses.find(
         status => status.value.toLowerCase() === appStatus.toLowerCase()
       );

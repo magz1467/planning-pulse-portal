@@ -17,16 +17,22 @@ export const useFilteredApplications = (
     // Filter by status
     if (activeFilters.status) {
       filtered = filtered.filter(app => {
-        const appStatus = (app.status || '').trim().toLowerCase();
-        const filterStatus = activeFilters.status.toLowerCase();
+        if (!app.status) {
+          return activeFilters.status === "Other";
+        }
+
+        const appStatus = app.status.trim();
+        const filterStatus = activeFilters.status;
         
-        if (filterStatus === 'other') {
+        if (filterStatus === "Other") {
           // Check if status doesn't match any predefined status
-          const predefinedStatuses = ['under review', 'approved', 'declined'];
-          return !predefinedStatuses.includes(appStatus);
+          const predefinedStatuses = ["Under Review", "Approved", "Declined"];
+          return !predefinedStatuses.some(
+            status => status.toLowerCase() === appStatus.toLowerCase()
+          );
         }
         
-        return appStatus === filterStatus;
+        return appStatus.toLowerCase() === filterStatus.toLowerCase();
       });
     }
 
