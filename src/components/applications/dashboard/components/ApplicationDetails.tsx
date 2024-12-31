@@ -33,7 +33,7 @@ export const ApplicationDetails = ({ application, onClose }: ApplicationDetailsP
               <span className="text-sm truncate">{application.address}</span>
             </div>
             <div className="flex items-center gap-2 mt-2">
-              <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
+              <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status.toLowerCase())}`}>
                 {application.status}
               </span>
               <span className="text-xs text-gray-500">{application.distance}</span>
