@@ -28,11 +28,11 @@ export const SearchSection = ({
 
   return (
     <div className="flex flex-col">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto pl-4 pr-8 py-4">
         <PostcodeSearch 
           onSelect={onPostcodeSelect}
           placeholder="Search new location"
-          className="w-full max-w-xl mx-auto"
+          className="w-full max-w-2xl"
         />
       </div>
 
