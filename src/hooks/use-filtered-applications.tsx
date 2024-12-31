@@ -1,20 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Application } from "@/types/planning";
+import { useMemo } from 'react';
+import { Tables } from '@/integrations/supabase/types';
 
-export const useFilteredApplications = (
-  applications: Application[],
-  activeFilters: {
-    status?: string;
-    type?: string;
-  },
-  activeSort: 'closingSoon' | 'newest' | null
-) => {
-  const [filteredApplications, setFilteredApplications] = useState(applications);
+type Application = Tables<'applications'>;
 
-  useEffect(() => {
+interface ActiveFilters {
+  status?: string;
+  type?: string;
+  search?: string;
+}
+
+export const useFilteredApplications = (applications: Application[], activeFilters: ActiveFilters) => {
+  return useMemo(() => {
     let filtered = [...applications];
-    
-    // Apply filters
+
+    // Filter by status
     if (activeFilters.status) {
       filtered = filtered.filter(app => {
         if (activeFilters.status === 'Under Review') {
@@ -23,24 +22,29 @@ export const useFilteredApplications = (
         return app.status === activeFilters.status;
       });
     }
+
+    // Filter by type
     if (activeFilters.type) {
-      filtered = filtered.filter(app => app.type === activeFilters.type);
+      filtered = filtered.filter(app => app.application_type === activeFilters.type);
     }
 
-    // Apply sorting
-    if (activeSort) {
-      filtered = [...filtered].sort((a, b) => {
-        if (activeSort === 'closingSoon') {
-          return new Date(a.decisionDue).getTime() - new Date(b.decisionDue).getTime();
-        } else if (activeSort === 'newest') {
-          return new Date(b.submissionDate).getTime() - new Date(a.submissionDate).getTime();
-        }
-        return 0;
+    // Filter by search
+    if (activeFilters.search) {
+      const searchLower = activeFilters.search.toLowerCase();
+      filtered = filtered.filter(app => {
+        const searchableFields = [
+          app.description,
+          app.street_name,
+          app.postcode,
+          app.lpa_app_no,
+          app.ai_title
+        ];
+        return searchableFields.some(field => 
+          field?.toLowerCase().includes(searchLower)
+        );
       });
     }
-    
-    setFilteredApplications(filtered);
-  }, [applications, activeFilters, activeSort]);
 
-  return filteredApplications;
+    return filtered;
+  }, [applications, activeFilters]);
 };
