@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Admin() {
   const { toast } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerateTitles = async (limit: number) => {
+    if (isGenerating) return;
+    
     try {
+      setIsGenerating(true);
       toast({
         title: "Generating titles...",
         description: `This may take a few minutes for ${limit} records`,
@@ -30,6 +34,8 @@ export default function Admin() {
         description: "Failed to generate titles. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -42,6 +48,7 @@ export default function Admin() {
           <Button 
             onClick={() => handleGenerateTitles(50)}
             className="w-full md:w-auto"
+            disabled={isGenerating}
           >
             Generate 50 AI Titles
           </Button>
@@ -54,6 +61,7 @@ export default function Admin() {
           <Button 
             onClick={() => handleGenerateTitles(100)}
             className="w-full md:w-auto"
+            disabled={isGenerating}
           >
             Generate 100 AI Titles
           </Button>
