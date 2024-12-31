@@ -11,12 +11,15 @@ interface MapViewProps {
   initialCenter: LatLngTuple;
 }
 
-// Helper component to update map center
+// Helper component to update map center and zoom
 const MapUpdater = ({ center }: { center: LatLngTuple }) => {
   const map = useMap();
   
   useEffect(() => {
-    map.setView(center, 15);
+    // Calculate zoom level for approximately 1km radius view
+    // Using zoom level 14 which typically shows about 1-2km radius
+    const zoomLevel = 14;
+    map.setView(center, zoomLevel);
   }, [center, map]);
   
   return null;
@@ -34,7 +37,7 @@ export const MapView = ({
     <MapContainer
       ref={mapRef}
       center={initialCenter}
-      zoom={15}
+      zoom={14}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
