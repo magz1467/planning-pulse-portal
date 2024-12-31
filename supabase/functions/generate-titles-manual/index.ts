@@ -106,11 +106,15 @@ serve(async (req) => {
         const title = data.choices[0].message.content.trim()
         console.log(`Generated title for ${app.application_id}: ${title}`);
 
-        // Update the application with the AI title using upsert to ensure the update happens
+        // Using upsert instead of update to ensure the operation succeeds
         const { error: updateError } = await supabase
           .from('applications')
-          .update({ ai_title: title })
-          .eq('application_id', app.application_id)
+          .upsert({ 
+            application_id: app.application_id,
+            ai_title: title 
+          }, {
+            onConflict: 'application_id'
+          })
 
         if (updateError) {
           console.error(`Error updating application ${app.application_id}:`, updateError)
