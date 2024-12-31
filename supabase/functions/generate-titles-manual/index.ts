@@ -34,7 +34,7 @@ serve(async (req) => {
     // Get applications without AI titles
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
-      .select('application_id, description')
+      .select('*')  // Select all fields to preserve data
       .is('ai_title', null)
       .not('description', 'is', null)
       .limit(limit)
@@ -106,15 +106,11 @@ serve(async (req) => {
         const title = data.choices[0].message.content.trim()
         console.log(`Generated title for ${app.application_id}: ${title}`);
 
-        // Using upsert instead of update to ensure the operation succeeds
+        // Update only the ai_title field while preserving all other data
         const { error: updateError } = await supabase
           .from('applications')
-          .upsert({ 
-            application_id: app.application_id,
-            ai_title: title 
-          }, {
-            onConflict: 'application_id'
-          })
+          .update({ ai_title: title })
+          .eq('application_id', app.application_id)
 
         if (updateError) {
           console.error(`Error updating application ${app.application_id}:`, updateError)
