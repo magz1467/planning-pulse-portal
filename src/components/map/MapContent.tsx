@@ -37,6 +37,7 @@ export const MapContent = () => {
     }
   }, [initialFilter, handleFilterChange]);
 
+  // This function is for transforming Supabase data, not used with mock data
   const transformApplication = (app: Tables<'applications'>): Application => ({
     id: app.application_id,
     title: app.description || '',
@@ -62,7 +63,7 @@ export const MapContent = () => {
   });
 
   const filteredApplications = useFilteredApplications(
-    mockPlanningApplications.map(transformApplication),
+    mockPlanningApplications,  // Use mock data directly since it's already in Application format
     activeFilters
   );
 
