@@ -18,6 +18,7 @@ interface FilterDropdownProps {
   };
   applications: Application[];
   isMobile: boolean;
+  statusCounts: { [key: string]: number };
 }
 
 const predefinedStatuses = [
@@ -33,48 +34,9 @@ export const FilterDropdown = ({
   activeFilters,
   applications,
   isMobile,
+  statusCounts,
 }: FilterDropdownProps) => {
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
-
-  // Calculate counts for each status
-  const getStatusCounts = () => {
-    const counts: { [key: string]: number } = {};
-    
-    // Initialize counts for predefined statuses
-    predefinedStatuses.forEach(status => {
-      counts[status.value] = 0;
-    });
-
-    console.log('Applications in FilterDropdown:', applications);
-
-    // Count applications for each status
-    if (applications && applications.length > 0) {
-      applications.forEach(app => {
-        const appStatus = app.status?.trim() || '';
-        
-        if (!appStatus) {
-          counts['Other']++;
-          return;
-        }
-
-        // Convert both strings to lowercase for comparison
-        const matchedStatus = predefinedStatuses.find(
-          status => status.value.toLowerCase() === appStatus.toLowerCase()
-        );
-
-        if (matchedStatus) {
-          counts[matchedStatus.value]++;
-        } else {
-          counts['Other']++;
-        }
-      });
-    }
-
-    console.log('Final counts:', counts);
-    return counts;
-  };
-
-  const statusCounts = getStatusCounts();
 
   return (
     <DropdownMenu>

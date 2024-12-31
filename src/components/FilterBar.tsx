@@ -29,6 +29,43 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
+  // Calculate counts for each status
+  const getStatusCounts = () => {
+    const counts: { [key: string]: number } = {
+      "Under Review": 0,
+      "Approved": 0,
+      "Declined": 0,
+      "Other": 0
+    };
+    
+    if (applications && applications.length > 0) {
+      applications.forEach(app => {
+        const appStatus = app.status?.trim() || '';
+        
+        if (!appStatus) {
+          counts['Other']++;
+          return;
+        }
+
+        const statusLower = appStatus.toLowerCase();
+        if (statusLower.includes('under review')) {
+          counts['Under Review']++;
+        } else if (statusLower.includes('approved')) {
+          counts['Approved']++;
+        } else if (statusLower.includes('declined') || statusLower.includes('refused')) {
+          counts['Declined']++;
+        } else {
+          counts['Other']++;
+        }
+      });
+    }
+
+    console.log('Status counts:', counts);
+    return counts;
+  };
+
+  const statusCounts = getStatusCounts();
+
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">
@@ -37,6 +74,7 @@ export const FilterBar = ({
           activeFilters={activeFilters}
           isMobile={isMobile}
           applications={applications}
+          statusCounts={statusCounts}
         >
           <Button 
             variant="outline" 
