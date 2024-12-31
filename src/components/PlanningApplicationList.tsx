@@ -15,14 +15,17 @@ export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
 }: PlanningApplicationListProps) => {
+  const fallbackImage = "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
+
   const getImageUrl = (path: string | undefined) => {
-    if (!path || path.trim() === '') {
-      return "/lovable-uploads/6bb62e8c-63db-446c-8450-6c39332edb97.png";
+    if (!path || path.trim() === '' || path === 'undefined' || path === 'null') {
+      return fallbackImage;
     }
-    if (path.startsWith('http')) {
-      return path;
+    // Ensure path starts with / or http
+    if (!path.startsWith('/') && !path.startsWith('http')) {
+      return fallbackImage;
     }
-    return path.startsWith('/') ? path : `/${path}`;
+    return path;
   };
 
   return (
