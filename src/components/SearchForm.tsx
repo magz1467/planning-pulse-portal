@@ -27,16 +27,14 @@ export const SearchForm = () => {
 
     setIsSearching(true);
     try {
-      const result = await logSearch(postcode.trim(), activeTab);
-      if (result) {
-        navigate('/map', { 
-          state: { 
-            postcode: postcode.trim(),
-            tab: activeTab,
-            initialFilter: activeTab === 'completed' ? 'Approved' : undefined
-          } 
-        });
-      }
+      await logSearch(postcode.trim(), activeTab);
+      navigate('/map', { 
+        state: { 
+          postcode: postcode.trim(),
+          tab: activeTab,
+          initialFilter: activeTab === 'completed' ? 'Approved' : undefined
+        } 
+      });
     } catch (error) {
       console.error('Error during search:', error);
       toast({
