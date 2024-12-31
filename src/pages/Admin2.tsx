@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,21 @@ export default function Admin2() {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
   const [processingBatchSize, setProcessingBatchSize] = useState<number | null>(null);
+  const [totalAITitles, setTotalAITitles] = useState<number | null>(null);
   
+  useEffect(() => {
+    fetchTotalAITitles();
+  }, []);
+
+  const fetchTotalAITitles = async () => {
+    const { count } = await supabase
+      .from('applications')
+      .select('*', { count: 'exact', head: true })
+      .not('ai_title', 'is', null);
+    
+    setTotalAITitles(count);
+  };
+
   const handleGenerateTitles = async (batchSize: number) => {
     if (isGenerating) return;
     
@@ -39,6 +53,7 @@ export default function Admin2() {
         .not('ai_title', 'is', null);
 
       console.log(`Total applications with AI titles: ${count}`);
+      setTotalAITitles(count);
 
       toast({
         title: "Success!",
@@ -65,6 +80,13 @@ export default function Admin2() {
       <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
       
       <div className="space-y-8">
+        <div className="bg-muted p-4 rounded-lg mb-6">
+          <h2 className="text-lg font-medium mb-2">Current Status</h2>
+          <p className="text-sm text-muted-foreground">
+            Total applications with AI titles: {totalAITitles !== null ? totalAITitles.toLocaleString() : 'Loading...'}
+          </p>
+        </div>
+
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Manual Processing</h2>
           
