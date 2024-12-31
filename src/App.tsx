@@ -19,7 +19,6 @@ import AuthSuccess from './pages/AuthSuccess';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import Cookies from './pages/Cookies';
-import Admin from './pages/Admin';
 
 // Content pages
 import PlanningBasics from './pages/content/PlanningBasics';
@@ -57,7 +56,6 @@ const App = () => {
         <Route path="/auth/success" element={<AuthSuccess />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/admin" element={<Admin />} />
         
         {/* Content pages */}
         <Route path="/content/planning-basics" element={<PlanningBasics />} />
