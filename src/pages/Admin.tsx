@@ -17,6 +17,17 @@ export default function Admin() {
         description: `This may take a few minutes for ${limit} records`,
       });
 
+      // First, rotate the API key
+      const { data: keyData, error: keyError } = await supabase.functions.invoke('rotate-perplexity-key', {
+        body: { action: 'rotate' }
+      });
+
+      if (keyError) {
+        console.error('Error rotating API key:', keyError);
+        throw keyError;
+      }
+
+      // Then generate titles with the fresh key
       const { data, error } = await supabase.functions.invoke('generate-titles-manual', {
         body: { limit }
       });
