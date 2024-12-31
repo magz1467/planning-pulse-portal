@@ -24,13 +24,7 @@ const statusOptions = [
   { label: "Under Review", value: "Under Review" },
   { label: "Approved", value: "Approved" },
   { label: "Declined", value: "Declined" },
-];
-
-const typeOptions = [
-  { label: "New Build Residential", value: "New Build Residential" },
-  { label: "New Build Commercial", value: "New Build Commercial" },
-  { label: "Extension Residential", value: "Extension Residential" },
-  { label: "Extension Commercial", value: "Extension Commercial" },
+  { label: "Other", value: "Other" }
 ];
 
 export const FilterDropdown = ({
@@ -42,17 +36,25 @@ export const FilterDropdown = ({
 }: FilterDropdownProps) => {
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
-  // Calculate counts for each status
-  const statusCounts = statusOptions.reduce((acc, { value }) => {
-    acc[value] = applications.filter(app => app.status === value).length;
-    return acc;
-  }, {} as Record<string, number>);
+  // Calculate status counts
+  const getStatusCounts = () => {
+    const counts: { [key: string]: number } = {};
+    const predefinedStatuses = statusOptions.map(opt => opt.value.toLowerCase());
 
-  // Calculate counts for each type
-  const typeCounts = typeOptions.reduce((acc, { value }) => {
-    acc[value] = applications.filter(app => app.type === value).length;
-    return acc;
-  }, {} as Record<string, number>);
+    applications.forEach(app => {
+      const status = app.status?.toLowerCase() || '';
+      
+      if (predefinedStatuses.includes(status)) {
+        counts[status] = (counts[status] || 0) + 1;
+      } else {
+        counts['other'] = (counts['other'] || 0) + 1;
+      }
+    });
+
+    return counts;
+  };
+
+  const statusCounts = getStatusCounts();
 
   return (
     <DropdownMenu>
@@ -96,33 +98,10 @@ export const FilterDropdown = ({
             onClick={() => onFilterChange("status", option.value)}
             className="justify-between"
           >
-            <span>{option.label} ({statusCounts[option.value] || 0})</span>
+            <span>
+              {option.label} ({statusCounts[option.value.toLowerCase()] || 0})
+            </span>
             {activeFilters.status === option.value && <span>✓</span>}
-          </DropdownMenuItem>
-        ))}
-
-        <DropdownMenuSeparator />
-        
-        <DropdownMenuItem disabled className="text-sm font-semibold">
-          Type
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          onClick={() => onFilterChange("type", "")}
-          className="justify-between"
-        >
-          All types
-          {!activeFilters.type && <span>✓</span>}
-        </DropdownMenuItem>
-
-        {typeOptions.map((option) => (
-          <DropdownMenuItem
-            key={option.value}
-            onClick={() => onFilterChange("type", option.value)}
-            className="justify-between"
-          >
-            <span>{option.label} ({typeCounts[option.value] || 0})</span>
-            {activeFilters.type === option.value && <span>✓</span>}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

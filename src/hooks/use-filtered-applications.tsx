@@ -7,6 +7,8 @@ interface ActiveFilters {
   search?: string;
 }
 
+const predefinedStatuses = ['under review', 'approved', 'declined'];
+
 export const useFilteredApplications = (
   applications: Application[],
   activeFilters: ActiveFilters
@@ -20,20 +22,15 @@ export const useFilteredApplications = (
         const appStatus = app.status?.toLowerCase() || '';
         const filterStatus = activeFilters.status.toLowerCase();
         
+        if (filterStatus === 'other') {
+          return !predefinedStatuses.includes(appStatus);
+        }
+        
         if (filterStatus === 'under review') {
           return appStatus.includes('under consideration') || 
                  appStatus.includes('under review');
         }
         return appStatus.includes(filterStatus);
-      });
-    }
-
-    // Filter by type
-    if (activeFilters.type) {
-      filtered = filtered.filter(app => {
-        const appType = app.type?.toLowerCase() || '';
-        const filterType = activeFilters.type.toLowerCase();
-        return appType.includes(filterType);
       });
     }
 
