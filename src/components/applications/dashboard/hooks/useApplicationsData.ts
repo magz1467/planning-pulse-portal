@@ -94,6 +94,15 @@ export const useApplicationsData = () => {
 
         if (!coordinates) return null;
 
+        // Extract image URL from application_details if it exists
+        let imageUrl = '/placeholder.svg';
+        if (app.application_details && typeof app.application_details === 'object') {
+          const details = app.application_details as any;
+          if (details.images && Array.isArray(details.images) && details.images.length > 0) {
+            imageUrl = details.images[0];
+          }
+        }
+
         return {
           id: app.application_id,
           title: app.description || '',
@@ -111,7 +120,7 @@ export const useApplicationsData = () => {
           officer: typeof app.application_details === 'object' ? 
             (app.application_details as any)?.officer || '' : '',
           consultationEnd: app.last_date_consultation_comments || '',
-          image: '/placeholder.svg',
+          image: imageUrl,
           coordinates
         };
       }).filter((app): app is Application & { coordinates: [number, number] } => 
