@@ -41,6 +41,8 @@ async function processApplication(
 
     const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/${coordinates.lon},${coordinates.lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
 
+    console.log(`Generated URL for application ${app.application_id}: ${staticMapUrl}`);
+
     // Update the application with the new image URL
     const { error: updateError } = await supabase
       .from('applications')
@@ -51,6 +53,7 @@ async function processApplication(
       .eq('application_id', app.application_id);
 
     if (updateError) {
+      console.error(`Error updating application ${app.application_id}:`, updateError);
       throw updateError;
     }
 
