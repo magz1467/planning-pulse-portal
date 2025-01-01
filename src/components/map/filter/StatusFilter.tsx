@@ -53,6 +53,8 @@ export const StatusFilter = ({
     return counts;
   }, [applications]);
 
+  console.log('Status counts:', statusCounts);
+
   return (
     <FilterDropdown
       onFilterChange={onFilterChange}

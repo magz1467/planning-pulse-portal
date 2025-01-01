@@ -32,8 +32,6 @@ export const ApplicationsDashboardMap = () => {
     setSearchPoint
   } = useApplicationsData();
 
-  console.log('ApplicationsDashboardMap - Current applications:', applications?.length);
-
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
   };
