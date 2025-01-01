@@ -7,10 +7,26 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 import { supabase } from "@/integrations/supabase/client"
+import { RadiusSelect } from "./RadiusSelect"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form"
+
+const formSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  radius: z.string(),
+})
+
+type FormValues = z.infer<typeof formSchema>
 
 interface EmailDialogProps {
   open: boolean
@@ -27,12 +43,17 @@ export const EmailDialog = ({
   applicationRef,
   postcode 
 }: EmailDialogProps) => {
-  const [email, setEmail] = useState("")
-  const [radius, setRadius] = useState("100")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      radius: "100"
+    }
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true)
 
     try {
@@ -41,10 +62,10 @@ export const EmailDialog = ({
         .from('User_data')
         .insert([
           {
-            Email: email,
+            Email: values.email,
             Marketing: true,
             Post_Code: postcode,
-            Radius_from_pc: parseInt(radius),
+            Radius_from_pc: parseInt(values.radius),
           }
         ])
 
@@ -55,9 +76,9 @@ export const EmailDialog = ({
       // Send verification email
       const { error: verificationError } = await supabase.functions.invoke('send-verification', {
         body: { 
-          email,
+          email: values.email,
           postcode,
-          radius,
+          radius: values.radius,
           applicationRef 
         }
       });
@@ -66,10 +87,13 @@ export const EmailDialog = ({
         throw verificationError;
       }
 
-      onSubmit(email, radius)
+      onSubmit(values.email, values.radius)
       onOpenChange(false)
     } catch (error) {
       console.error('Error saving notification preferences:', error)
+      form.setError("root", {
+        message: "There was an error saving your preferences. Please try again."
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -89,44 +113,52 @@ export const EmailDialog = ({
             Enter your email address to receive notifications about new planning applications
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            type="email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            aria-label="Email address"
-          />
-          
-          <div className="space-y-3">
-            <Label>Notification radius</Label>
-            <RadioGroup
-              defaultValue="100"
-              value={radius}
-              onValueChange={setRadius}
-              className="flex flex-col space-y-2"
-              aria-label="Select notification radius"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="100" id="r100" />
-                <Label htmlFor="r100">Within 100 metres</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="500" id="r500" />
-                <Label htmlFor="r500">Within 500 metres</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="1000" id="r1000" />
-                <Label htmlFor="r1000">Within 1 kilometre</Label>
-              </div>
-            </RadioGroup>
-          </div>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      {...field}
+                      aria-label="Email address"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Subscribing..." : "Subscribe"}
-          </Button>
-        </form>
+            <FormField
+              control={form.control}
+              name="radius"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <RadiusSelect 
+                      value={field.value} 
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Subscribing..." : "Subscribe"}
+            </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )
