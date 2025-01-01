@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import { LatLngTuple } from 'leaflet';
+import { supabase } from "@/integrations/supabase/client";
 
 export class MapboxInitializer {
   static async initialize(
@@ -8,26 +9,86 @@ export class MapboxInitializer {
     onError: (error: string, debug: string) => void
   ): Promise<mapboxgl.Map | null> {
     try {
-      const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
-      if (!token) {
-        onError('Mapbox token not found', 'Please check environment variables');
+      console.log('Starting map initialization...');
+      console.log('Fetching Mapbox token from Supabase...');
+      
+      const { data, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+      
+      if (tokenError) {
+        const msg = `Error getting Mapbox token: ${tokenError.message}`;
+        console.error(msg, {
+          error: tokenError,
+          context: 'Token fetch failed'
+        });
+        onError(msg, JSON.stringify(tokenError, null, 2));
         return null;
       }
 
-      mapboxgl.accessToken = token;
+      if (!data || !data.token) {
+        const msg = `No Mapbox token returned from function. Response: ${JSON.stringify(data)}`;
+        console.error(msg, {
+          data,
+          context: 'Invalid token response'
+        });
+        onError('Failed to initialize map: No access token available', msg);
+        return null;
+      }
 
+      console.log('Successfully retrieved Mapbox token');
+      mapboxgl.accessToken = data.token;
+
+      console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: 'mapbox://styles/mapbox/streets-v12',
         center: [initialCenter[1], initialCenter[0]],
-        zoom: 14
+        zoom: 14,
+        maxZoom: 18,
+        minZoom: 9,
+        attributionControl: true,
+        failIfMajorPerformanceCaveat: true,
+        preserveDrawingBuffer: true,
+        antialias: true
       });
 
+      // Add navigation control
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+      // Add error handling with proper TypeScript types
+      map.on('error', (e: mapboxgl.ErrorEvent) => {
+        const msg = `Map error: ${e.error?.message || 'Unknown error'}`;
+        console.error(msg, {
+          error: e.error,
+          context: 'Map runtime error',
+          token: data.token.slice(0, 8) + '...' // Log first 8 chars of token for debugging
+        });
+        onError(msg, JSON.stringify(e.error, null, 2));
+      });
+
+      // Add style load success handler
+      map.on('style.load', () => {
+        console.log('Map style loaded successfully');
+      });
+
+      // Add style load error handler with proper TypeScript types
+      map.on('style.error', (e: mapboxgl.ErrorEvent) => {
+        const msg = `Style error: ${e.error?.message || 'Unknown error'}`;
+        console.error(msg, {
+          error: e.error,
+          context: 'Style loading error'
+        });
+        onError(msg, JSON.stringify(e.error, null, 2));
+      });
+
       return map;
-    } catch (err) {
-      onError('Failed to initialize map', err instanceof Error ? err.message : String(err));
+
+    } catch (error) {
+      const msg = `Error initializing map: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      console.error(msg, {
+        error,
+        context: 'Map initialization'
+      });
+      onError(msg, JSON.stringify(error, null, 2));
       return null;
     }
   }
