@@ -4,8 +4,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Application } from '@/types/planning';
 import { LatLngTuple } from 'leaflet';
 import { MapboxMarkerManager } from './mapbox/MapboxMarkerManager';
-import { MapboxInitializer } from './mapbox/MapboxInitializer';
-import { MapboxErrorDisplay } from './mapbox/MapboxErrorDisplay';
 
 interface MapboxMapProps {
   applications: Application[];
@@ -37,16 +35,25 @@ export const MapboxMap = ({
         return;
       }
 
-      const newMap = await MapboxInitializer.initialize(
-        mapContainer.current,
-        initialCenter,
-        (error, debug) => {
-          setError(error);
-          setDebugInfo(debug);
+      try {
+        const token = process.env.REACT_APP_MAPBOX_TOKEN || '';
+        if (!token) {
+          setError('Mapbox token not found');
+          setDebugInfo('Please check environment variables');
+          return;
         }
-      );
 
-      if (newMap) {
+        mapboxgl.accessToken = token;
+
+        const newMap = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [initialCenter[1], initialCenter[0]],
+          zoom: 14
+        });
+
+        newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
         map.current = newMap;
         markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
         
@@ -76,6 +83,10 @@ export const MapboxMap = ({
             }
           }
         });
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        setError('Failed to initialize map');
+        setDebugInfo(errorMsg);
       }
     };
 
@@ -109,7 +120,17 @@ export const MapboxMap = ({
   return (
     <div className="w-full h-full relative">
       <div ref={mapContainer} className="absolute inset-0" />
-      <MapboxErrorDisplay error={error} debugInfo={debugInfo} />
+      {error && (
+        <div className="absolute inset-0 bg-red-50 p-4">
+          <h3 className="text-red-800 font-bold">Map Error</h3>
+          <p className="text-red-600">{error}</p>
+          {debugInfo && (
+            <pre className="mt-2 text-sm text-red-500 whitespace-pre-wrap">
+              {debugInfo}
+            </pre>
+          )}
+        </div>
+      )}
     </div>
   );
 };
