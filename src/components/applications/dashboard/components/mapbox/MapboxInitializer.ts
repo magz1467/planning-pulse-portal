@@ -40,7 +40,7 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: 'mapbox://styles/mapbox/light-v11', // Using a simpler style
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
         maxZoom: 18,
@@ -54,8 +54,8 @@ export class MapboxInitializer {
       // Add navigation control
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Add error handling
-      map.on('error', (e) => {
+      // Add error handling with proper TypeScript types
+      map.on('error', (e: mapboxgl.ErrorEvent) => {
         const msg = `Map error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
@@ -69,8 +69,8 @@ export class MapboxInitializer {
         console.log('Map style loaded successfully');
       });
 
-      // Add style load error handler
-      map.on('style.error', (e) => {
+      // Add style load error handler with proper TypeScript types
+      map.on('style.error', (e: mapboxgl.ErrorEvent) => {
         const msg = `Style error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
