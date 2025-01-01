@@ -25,6 +25,7 @@ export const MapboxMap = ({
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -54,8 +55,8 @@ export const MapboxMap = ({
             markerManager.current?.addMarker(application, application.id === selectedId);
           });
 
-          // Fit bounds to show all markers if there are any applications
-          if (applications.length > 0) {
+          // Only fit bounds on initial load
+          if (!hasInitiallyLoaded && applications.length > 0) {
             const bounds = new mapboxgl.LngLatBounds();
             applications.forEach(application => {
               if (application.coordinates) {
@@ -68,6 +69,7 @@ export const MapboxMap = ({
               padding: { top: 50, bottom: 50, left: 50, right: 50 },
               maxZoom: 15 // Prevent zooming in too close
             });
+            setHasInitiallyLoaded(true);
           }
         });
       }
@@ -90,7 +92,7 @@ export const MapboxMap = ({
         map.current = null;
       }
     };
-  }, [initialCenter, applications, selectedId, onMarkerClick]);
+  }, [initialCenter, applications, selectedId, onMarkerClick, hasInitiallyLoaded]);
 
   // Update markers when selection changes
   useEffect(() => {
