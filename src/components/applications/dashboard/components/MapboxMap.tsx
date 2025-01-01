@@ -46,7 +46,7 @@ export const MapboxMap = ({
         // Create the map instance with a simpler style URL
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12', // Using a simpler style URL
+          style: 'mapbox://styles/mapbox/streets-v12',
           center: [initialCenter[1], initialCenter[0]], // Mapbox uses [lng, lat]
           zoom: 14,
         });
@@ -100,8 +100,19 @@ export const MapboxMap = ({
     initializeMap();
 
     return () => {
+      // Cleanup function
+      if (markers.current) {
+        // Remove all markers first
+        Object.values(markers.current).forEach(marker => {
+          if (marker) marker.remove();
+        });
+        markers.current = {};
+      }
+      
+      // Then remove the map
       if (map.current) {
         map.current.remove();
+        map.current = null;
       }
     };
   }, [initialCenter, applications]);
