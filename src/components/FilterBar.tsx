@@ -29,18 +29,18 @@ export const FilterBar = ({
   applications = []
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
-  const [isLoading, setIsLoading] = useState(true);
   const [statusCounts, setStatusCounts] = useState({
     "Under Review": 0,
     "Approved": 0,
     "Declined": 0,
     "Other": 0
   });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Calculate counts for each status
   useEffect(() => {
     if (!applications) {
       console.log('No applications provided');
+      setIsLoading(false);
       return;
     }
 
@@ -53,10 +53,7 @@ export const FilterBar = ({
     };
 
     applications.forEach(app => {
-      if (!app) {
-        console.log('Found null application');
-        return;
-      }
+      if (!app) return;
 
       const status = (app.status || '').trim().toLowerCase();
       
