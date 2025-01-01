@@ -44,45 +44,40 @@ export const FilterBar = ({
       return;
     }
 
-    // Add a small delay to ensure data is ready
-    const timer = setTimeout(() => {
-      console.log('Processing', applications.length, 'applications');
-      const counts = {
-        "Under Review": 0,
-        "Approved": 0,
-        "Declined": 0,
-        "Other": 0
-      };
+    console.log('Processing', applications.length, 'applications');
+    const counts = {
+      "Under Review": 0,
+      "Approved": 0,
+      "Declined": 0,
+      "Other": 0
+    };
 
-      applications.forEach(app => {
-        if (!app) {
-          console.log('Found null application');
-          return;
-        }
+    applications.forEach(app => {
+      if (!app) {
+        console.log('Found null application');
+        return;
+      }
 
-        console.log('Processing application:', app.id, 'with status:', app.status);
-        
-        const status = (app.status || '').trim().toLowerCase();
-        
-        if (!status) {
-          counts['Other']++;
-        } else if (status.includes('under review') || status.includes('under consideration')) {
-          counts['Under Review']++;
-        } else if (status.includes('approved')) {
-          counts['Approved']++;
-        } else if (status.includes('declined') || status.includes('refused')) {
-          counts['Declined']++;
-        } else {
-          counts['Other']++;
-        }
-      });
+      console.log('Processing application:', app.id, 'with status:', app.status);
+      
+      const status = (app.status || '').trim().toLowerCase();
+      
+      if (!status) {
+        counts['Other']++;
+      } else if (status.includes('under review') || status.includes('under consideration')) {
+        counts['Under Review']++;
+      } else if (status.includes('approved')) {
+        counts['Approved']++;
+      } else if (status.includes('declined') || status.includes('refused')) {
+        counts['Declined']++;
+      } else {
+        counts['Other']++;
+      }
+    });
 
-      console.log('Final status counts:', counts);
-      setStatusCounts(counts);
-      setIsLoading(false);
-    }, 1000); // 1 second delay
-
-    return () => clearTimeout(timer);
+    console.log('Final status counts:', counts);
+    setStatusCounts(counts);
+    setIsLoading(false);
   }, [applications]);
 
   // Log whenever applications change
