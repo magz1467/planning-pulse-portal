@@ -1,19 +1,16 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { SearchSection } from "./components/SearchSection";
-import { DesktopSidebar } from "@/components/map/DesktopSidebar";
-import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
-import { MapView } from "./components/MapView";
 import { LoadingOverlay } from "./components/LoadingOverlay";
 import { useDashboardState } from "@/hooks/use-dashboard-state";
-import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { useEffect } from "react";
+import { MapContent } from "./components/MapContent";
+import { SidebarContent } from "./components/SidebarContent";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
   const {
     selectedId,
-    selectedApplication,
     activeFilters,
     activeSort,
     isMapView,
@@ -65,48 +62,30 @@ export const ApplicationsDashboardMap = () => {
 
       <div className="flex-1 relative w-full">
         <div className="absolute inset-0 flex">
-          {!isMobile && coordinates && (
-            <DesktopSidebar
-              applications={filteredApplications}
-              selectedApplication={selectedId}
-              postcode={postcode}
-              activeFilters={activeFilters}
-              activeSort={activeSort}
-              onFilterChange={handleFilterChange}
-              onSortChange={handleSortChange}
-              onSelectApplication={handleMarkerClick}
-              onClose={handleClose}
-              statusCounts={statusCounts}
-            />
-          )}
+          <SidebarContent
+            isMobile={isMobile}
+            isMapView={isMapView}
+            applications={filteredApplications}
+            selectedId={selectedId}
+            postcode={postcode}
+            coordinates={coordinates as [number, number]}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            statusCounts={statusCounts}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            onSelectApplication={handleMarkerClick}
+            onClose={handleClose}
+          />
 
-          {(!isMobile || isMapView) && coordinates && (
-            <div className="flex-1 relative">
-              <MapView
-                applications={filteredApplications}
-                selectedId={selectedId}
-                onMarkerClick={handleMarkerClick}
-                initialCenter={coordinates}
-              />
-              {isMobile && selectedId && (
-                <MobileApplicationCards
-                  applications={filteredApplications}
-                  selectedId={selectedId}
-                  onSelectApplication={handleMarkerClick}
-                />
-              )}
-            </div>
-          )}
-
-          {isMobile && !isMapView && coordinates && (
-            <MobileListContainer
+          {(!isMobile || isMapView) && (
+            <MapContent
               applications={filteredApplications}
-              selectedApplication={selectedId}
-              postcode={postcode}
-              onSelectApplication={handleMarkerClick}
-              onShowEmailDialog={() => {}}
-              hideFilterBar={true}
-              onClose={handleClose}
+              selectedId={selectedId}
+              coordinates={coordinates as [number, number]}
+              isMobile={isMobile}
+              isMapView={isMapView}
+              onMarkerClick={handleMarkerClick}
             />
           )}
         </div>
