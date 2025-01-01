@@ -1,4 +1,4 @@
-import Image from "@/components/ui/Image";
+import Image from "@/components/ui/image";
 
 export const HeroImage = () => {
   return (

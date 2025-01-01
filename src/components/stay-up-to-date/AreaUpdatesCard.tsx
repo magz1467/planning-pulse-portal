@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import Image from "@/components/ui/Image";
+import Image from "@/components/ui/image";
 import { EmailDialog } from "@/components/EmailDialog";
 
 export const AreaUpdatesCard = () => {

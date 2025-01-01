@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { MapPin, Timer } from "lucide-react";
-import Image from "@/components/ui/Image";
+import Image from "@/components/ui/image";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
