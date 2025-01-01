@@ -1,6 +1,6 @@
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,6 +11,7 @@ interface AlertSectionProps {
 
 export const AlertSection = ({ postcode, onShowEmailDialog }: AlertSectionProps) => {
   const [session, setSession] = useState<any>(null);
+  const location = useLocation();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -44,7 +45,11 @@ export const AlertSection = ({ postcode, onShowEmailDialog }: AlertSectionProps)
             Get Alerts
           </Button>
         ) : (
-          <Link to="/auth" className="w-full">
+          <Link 
+            to="/auth" 
+            className="w-full"
+            state={{ from: location.pathname, postcode: postcode }}
+          >
             <Button className="w-full">
               Sign in to get alerts
             </Button>
