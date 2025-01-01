@@ -15,27 +15,28 @@ export const useSortApplications = (
 
     if (sortType === 'newest') {
       return sortedApps.sort((a, b) => {
-        const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
-        const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
-        return dateB.getTime() - dateA.getTime();
+        // Parse dates properly
+        const dateA = a.valid_date ? new Date(a.valid_date).getTime() : 0;
+        const dateB = b.valid_date ? new Date(b.valid_date).getTime() : 0;
+        return dateB - dateA; // Most recent first
       });
     }
 
     if (sortType === 'closingSoon') {
       return sortedApps.sort((a, b) => {
-        // First, check if items are closing soon
+        // First check if items are closing soon
         const aClosingSoon = a.last_date_consultation_comments ? 
           isWithinNextSevenDays(a.last_date_consultation_comments) : false;
         const bClosingSoon = b.last_date_consultation_comments ? 
           isWithinNextSevenDays(b.last_date_consultation_comments) : false;
 
-        // If both or neither are closing soon, sort by date
+        // If both or neither are closing soon, sort by actual date
         if (aClosingSoon === bClosingSoon) {
           const dateA = a.last_date_consultation_comments ? 
-            new Date(a.last_date_consultation_comments) : new Date(0);
+            new Date(a.last_date_consultation_comments).getTime() : Infinity;
           const dateB = b.last_date_consultation_comments ? 
-            new Date(b.last_date_consultation_comments) : new Date(0);
-          return dateA.getTime() - dateB.getTime();
+            new Date(b.last_date_consultation_comments).getTime() : Infinity;
+          return dateA - dateB; // Soonest first
         }
 
         // Put closing soon items first
