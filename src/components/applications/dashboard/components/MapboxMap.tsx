@@ -157,14 +157,22 @@ export const MapboxMap = ({
       // Cleanup function - remove markers first
       if (markers.current) {
         Object.values(markers.current).forEach(marker => {
-          if (marker) marker.remove();
+          try {
+            if (marker) marker.remove();
+          } catch (err) {
+            console.warn('Error removing marker:', err);
+          }
         });
         markers.current = {};
       }
       
       // Then remove the map instance
       if (map.current) {
-        map.current.remove();
+        try {
+          map.current.remove();
+        } catch (err) {
+          console.warn('Error removing map:', err);
+        }
         map.current = null;
       }
     };
