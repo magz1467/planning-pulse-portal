@@ -6,6 +6,7 @@ import { MobileListContainer } from "@/components/map/mobile/MobileListContainer
 import { MapView } from "./components/MapView";
 import { LoadingOverlay } from "./components/LoadingOverlay";
 import { useDashboardState } from "@/hooks/use-dashboard-state";
+import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -69,6 +70,13 @@ export const ApplicationsDashboardMap = () => {
                 onMarkerClick={handleMarkerClick}
                 initialCenter={coordinates}
               />
+              {isMobile && selectedId && (
+                <MobileApplicationCards
+                  applications={filteredApplications}
+                  selectedId={selectedId}
+                  onSelectApplication={handleMarkerClick}
+                />
+              )}
             </div>
           )}
 
