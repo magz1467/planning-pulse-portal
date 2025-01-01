@@ -31,8 +31,7 @@ export const SearchForm = () => {
       navigate('/applications/dashboard/map', { 
         state: { 
           postcode: postcode.trim(),
-          tab: activeTab,
-          initialFilter: activeTab === 'completed' ? 'Approved' : 'Under Review'
+          tab: activeTab
         } 
       });
     } catch (error) {

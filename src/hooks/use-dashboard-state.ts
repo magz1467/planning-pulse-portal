@@ -12,14 +12,15 @@ export const useDashboardState = () => {
   // Get initial values from URL params or location state
   const initialPostcode = searchParams.get('postcode') || location.state?.postcode || 'SW1A 0AA';
   const initialTab = (searchParams.get('tab') || location.state?.tab || 'recent') as 'recent' | 'completed';
-  // Remove the default filter initialization
   const initialFilter = searchParams.get('filter') || location.state?.initialFilter;
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
     type?: string;
-  }>({ status: initialFilter });
+  }>({
+    status: initialFilter || undefined
+  });
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode);
