@@ -25,20 +25,18 @@ export const MapboxMap = ({
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
-  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const prevApplicationsRef = useRef(applications);
+  const initializedRef = useRef(false);
 
+  // Initialize map only once
   useEffect(() => {
-    const initializeMap = async () => {
-      if (!mapContainer.current) {
-        const msg = 'Map container ref is not available';
-        console.error(msg);
-        setError(msg);
-        return;
-      }
+    if (initializedRef.current || !mapContainer.current) return;
 
+    const initializeMap = async () => {
+      console.log('Initializing map...');
+      
       const newMap = await MapboxInitializer.initialize(
-        mapContainer.current,
+        mapContainer.current!,
         initialCenter,
         (error, debug) => {
           setError(error);
@@ -58,8 +56,8 @@ export const MapboxMap = ({
             markerManager.current?.addMarker(application, application.id === selectedId);
           });
 
-          // Only fit bounds on initial load
-          if (!hasInitiallyLoaded && applications.length > 0) {
+          // Only fit bounds on initial load if we have applications
+          if (applications.length > 0) {
             const bounds = new mapboxgl.LngLatBounds();
             applications.forEach(application => {
               if (application.coordinates) {
@@ -67,14 +65,14 @@ export const MapboxMap = ({
               }
             });
             
-            // Add some padding around the bounds
             newMap.fitBounds(bounds, {
               padding: { top: 50, bottom: 50, left: 50, right: 50 },
-              maxZoom: 15 // Prevent zooming in too close
+              maxZoom: 15
             });
           }
-          setHasInitiallyLoaded(true);
         });
+
+        initializedRef.current = true;
       }
     };
 
@@ -87,19 +85,16 @@ export const MapboxMap = ({
       }
       
       if (map.current) {
-        try {
-          map.current.remove();
-        } catch (err) {
-          console.warn('Error removing map:', err);
-        }
+        map.current.remove();
         map.current = null;
       }
+      initializedRef.current = false;
     };
-  }, [initialCenter, onMarkerClick, hasInitiallyLoaded]);
+  }, [initialCenter, onMarkerClick]);
 
-  // Only update markers when applications array changes
+  // Update markers when applications array changes
   useEffect(() => {
-    if (!markerManager.current) return;
+    if (!markerManager.current || !map.current) return;
 
     const addedApplications = applications.filter(
       app => !prevApplicationsRef.current.find(prevApp => prevApp.id === app.id)
@@ -121,10 +116,11 @@ export const MapboxMap = ({
     prevApplicationsRef.current = applications;
   }, [applications, selectedId]);
 
-  // Update marker styles when selection changes
+  // Only update marker styles when selection changes
   useEffect(() => {
     if (markerManager.current) {
-      Object.keys(markerManager.current.getMarkers()).forEach(id => {
+      const markers = markerManager.current.getMarkers();
+      Object.keys(markers).forEach(id => {
         markerManager.current?.updateMarkerStyle(Number(id), Number(id) === selectedId);
       });
     }
