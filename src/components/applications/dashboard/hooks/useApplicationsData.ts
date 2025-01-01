@@ -103,7 +103,9 @@ export const useApplicationsData = () => {
         if (app.application_details && typeof app.application_details === 'object') {
           const details = app.application_details as any;
           if (details.images && Array.isArray(details.images) && details.images.length > 0) {
-            imageUrl = details.images[0];
+            // Make sure the image URL is absolute
+            const imgUrl = details.images[0];
+            imageUrl = imgUrl.startsWith('http') ? imgUrl : `${process.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${imgUrl}`;
           }
         }
 
