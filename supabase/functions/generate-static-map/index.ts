@@ -37,21 +37,6 @@ serve(async (req) => {
 
     const results = await Promise.all(
       processedApplications.map(async (app: Application) => {
-        // Check if image already exists
-        const { data: existingImage } = await supabase
-          .from('application_map_images')
-          .select('image_url')
-          .eq('application_id', app.application_id)
-          .single()
-
-        if (existingImage) {
-          console.log(`Using existing image for application ${app.application_id}`)
-          return {
-            application_id: app.application_id,
-            image_url: existingImage.image_url
-          }
-        }
-
         // Generate new static map image
         const [lng, lat] = app.coordinates
         const width = 800
@@ -63,20 +48,18 @@ serve(async (req) => {
         // Using satellite-v9 style with 3D buildings and terrain
         const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
 
-        // Store the URL in Supabase
-        const { error: insertError } = await supabase
-          .from('application_map_images')
-          .insert({
-            application_id: app.application_id,
-            image_url: staticMapUrl
-          })
+        // Update the applications table directly with the image URL
+        const { error: updateError } = await supabase
+          .from('applications')
+          .update({ image_map_url: staticMapUrl })
+          .eq('application_id', app.application_id)
 
-        if (insertError) {
-          console.error(`Error storing image for application ${app.application_id}:`, insertError)
-          throw insertError
+        if (updateError) {
+          console.error(`Error updating application ${app.application_id}:`, updateError)
+          throw updateError
         }
 
-        console.log(`Generated new image for application ${app.application_id}`)
+        console.log(`Updated image URL for application ${app.application_id}`)
         return {
           application_id: app.application_id,
           image_url: staticMapUrl
