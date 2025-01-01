@@ -10,6 +10,7 @@ import { MobileListContainer } from "@/components/map/mobile/MobileListContainer
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { SearchSection } from "./components/SearchSection";
+import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 
 export const ApplicationsDashboardMap = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -81,6 +82,12 @@ export const ApplicationsDashboardMap = () => {
   // Ensure applications is always an array
   const safeApplications = applications || [];
 
+  // Get filtered applications
+  const filteredApplications = useFilteredApplications(safeApplications, activeFilters);
+
+  // Debug logs for applications data
+  console.log('ApplicationsDashboardMap - Filtered applications:', filteredApplications);
+
   return (
     <div className="h-screen w-full flex flex-col">
       <DashboardHeader />
@@ -117,7 +124,7 @@ export const ApplicationsDashboardMap = () => {
           {(!isMobile || isMapView) && coordinates && (
             <div className="flex-1 relative">
               <MapView
-                applications={safeApplications}
+                applications={filteredApplications}
                 selectedId={selectedId}
                 onMarkerClick={handleMarkerClick}
                 initialCenter={coordinates}

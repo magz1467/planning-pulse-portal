@@ -33,6 +33,11 @@ export const MapView = ({
 }: MapViewProps) => {
   const mapRef = useRef(null);
 
+  // Log the number of visible applications for debugging
+  useEffect(() => {
+    console.log('MapView - Number of applications:', applications.length);
+  }, [applications]);
+
   return (
     <div className="w-full h-full relative">
       <MapContainer
