@@ -53,6 +53,22 @@ export const MapboxMap = ({
           applications.forEach(application => {
             markerManager.current?.addMarker(application, application.id === selectedId);
           });
+
+          // Fit bounds to show all markers if there are any applications
+          if (applications.length > 0) {
+            const bounds = new mapboxgl.LngLatBounds();
+            applications.forEach(application => {
+              if (application.coordinates) {
+                bounds.extend([application.coordinates[1], application.coordinates[0]]);
+              }
+            });
+            
+            // Add some padding around the bounds
+            newMap.fitBounds(bounds, {
+              padding: { top: 50, bottom: 50, left: 50, right: 50 },
+              maxZoom: 15 // Prevent zooming in too close
+            });
+          }
         });
       }
     };
