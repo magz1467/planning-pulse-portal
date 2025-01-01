@@ -50,11 +50,11 @@ export const useAutomationStatus = () => {
   const toggleAutomation = async () => {
     const newStatus = !isAutomationRunning;
     
-    const { data, error } = await supabase
-      .rpc('toggle_automation', {
-        automation_name: 'generate_ai_titles',
-        new_status: newStatus
-      });
+    // Update the status directly in the database
+    const { error } = await supabase
+      .from('automation_status')
+      .update({ is_active: newStatus })
+      .eq('name', 'generate_ai_titles');
 
     if (error) {
       console.error('Error toggling automation:', error);
