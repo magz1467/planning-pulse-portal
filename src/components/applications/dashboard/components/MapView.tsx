@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { MapboxMap } from "./MapboxMap";
+import { useEffect } from 'react';
 
 interface MapViewProps {
   applications: Application[];
