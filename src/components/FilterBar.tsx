@@ -38,6 +38,8 @@ export const FilterBar = ({
   const isMobile = useIsMobile();
 
   const handleSortedApplications = (sortedApps: Application[]) => {
+    if (!onSortChange) return;
+    
     // Find which sort type was applied based on the order
     let appliedSortType: 'closingSoon' | 'newest' | null = null;
     
@@ -62,9 +64,7 @@ export const FilterBar = ({
       }
     }
     
-    if (onSortChange) {
-      onSortChange(appliedSortType);
-    }
+    onSortChange(appliedSortType);
   };
 
   return (

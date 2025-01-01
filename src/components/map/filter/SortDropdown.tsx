@@ -14,7 +14,7 @@ export const SortDropdown = ({ children, applications = [], onSortedApplications
     let sortedApps = [...applications];
     
     if (sortType) {
-      sortedApps = sortedApps.sort((a, b) => {
+      sortedApps.sort((a, b) => {
         if (sortType === 'newest') {
           const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
           const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
