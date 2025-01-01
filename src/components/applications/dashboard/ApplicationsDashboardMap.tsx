@@ -35,6 +35,7 @@ export const ApplicationsDashboardMap = () => {
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView]);
 
   const handleClose = () => {
+    console.log("Closing application details");  // Debug log
     handleMarkerClick(null);
   };
 

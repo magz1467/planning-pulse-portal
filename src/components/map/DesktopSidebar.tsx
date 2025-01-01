@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { EmailDialog } from "@/components/EmailDialog";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ApplicationListView } from "./sidebar/ApplicationListView";
 import { ApplicationDetailView } from "./sidebar/ApplicationDetailView";
