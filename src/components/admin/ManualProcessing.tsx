@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -32,6 +33,28 @@ export const ManualProcessing = ({
           </p>
         </div>
       ))}
+
+      <Separator className="my-6" />
+      
+      <div>
+        <Button
+          onClick={() => {
+            fetch('https://jposqxdboetyioymfswd.supabase.co/functions/v1/generate-static-maps-manual', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+              }
+            });
+          }}
+          className="w-full md:w-auto"
+        >
+          Generate Static Maps
+        </Button>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Click to generate static map images for applications that don't have them yet (processes up to 100 at a time).
+        </p>
+      </div>
     </div>
   );
 };
