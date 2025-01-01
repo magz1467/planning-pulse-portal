@@ -56,6 +56,7 @@ export const FilterBar = ({
         <SortDropdown
           applications={applications}
           onSortedApplications={handleSortedApplications}
+          activeSort={activeSort}
         >
           <Button 
             variant="outline" 
