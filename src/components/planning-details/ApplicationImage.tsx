@@ -17,11 +17,11 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
 
       try {
         // First check if we already have a static map image
-        const { data: existingImage } = await supabase
+        const { data: existingImage, error } = await supabase
           .from('application_map_images')
           .select('image_url')
           .eq('application_id', application.id)
-          .single();
+          .maybeSingle()
 
         if (existingImage) {
           setStaticMapUrl(existingImage.image_url);
@@ -29,11 +29,11 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
         }
 
         // If not, generate a new one
-        const { data, error } = await supabase.functions.invoke('generate-static-map', {
+        const { data, error: fnError } = await supabase.functions.invoke('generate-static-map', {
           body: { applications: [application] }
         });
 
-        if (error) throw error;
+        if (fnError) throw fnError;
         if (data?.images?.[0]) {
           setStaticMapUrl(data.images[0].image_url);
         }
