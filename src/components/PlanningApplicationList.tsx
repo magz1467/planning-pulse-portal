@@ -5,20 +5,25 @@ import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
+import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 
 interface PlanningApplicationListProps {
   applications: Application[];
   postcode: string;
   onSelectApplication: (id: number | null) => void;
+  activeSort?: SortType;
 }
 
 export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
+  activeSort
 }: PlanningApplicationListProps) => {
+  const sortedApplications = useSortApplications(applications, activeSort);
+
   return (
     <div className="divide-y">
-      {applications.map((application) => {
+      {sortedApplications.map((application) => {
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 

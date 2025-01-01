@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 import { AlertSection } from "./AlertSection";
 import { FilterBar } from "@/components/FilterBar";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface ApplicationListViewProps {
   applications: Application[];
@@ -9,12 +10,12 @@ interface ApplicationListViewProps {
   onSelectApplication: (id: number | null) => void;
   onShowEmailDialog: () => void;
   onFilterChange?: (filterType: string, value: string) => void;
-  onSortChange?: (sortType: 'closingSoon' | 'newest' | null) => void;
+  onSortChange?: (sortType: SortType) => void;
   activeFilters?: {
     status?: string;
     type?: string;
   };
-  activeSort?: 'closingSoon' | 'newest' | null;
+  activeSort?: SortType;
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
@@ -55,6 +56,7 @@ export const ApplicationListView = ({
           applications={applications}
           postcode={postcode}
           onSelectApplication={onSelectApplication}
+          activeSort={activeSort}
         />
       </div>
     </div>

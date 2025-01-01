@@ -1,35 +1,21 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Application } from "@/types/planning";
 import { Check } from "lucide-react";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface SortDropdownProps {
   children?: React.ReactNode;
-  applications?: Application[];
-  onSortedApplications?: (sortedApps: Application[], sortType: 'closingSoon' | 'newest' | null) => void;
-  activeSort?: 'closingSoon' | 'newest' | null;
+  activeSort?: SortType;
+  onSortChange?: (sortType: SortType) => void;
 }
 
-export const SortDropdown = ({ children, applications = [], onSortedApplications, activeSort }: SortDropdownProps) => {
-  const handleSort = (sortType: 'closingSoon' | 'newest' | null) => {
-    if (!applications || !onSortedApplications) return;
-    
-    let sortedApps = [...applications];
-    
-    if (sortType === 'newest') {
-      sortedApps.sort((a, b) => {
-        const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
-        const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
-        return dateB.getTime() - dateA.getTime();
-      });
-    } else if (sortType === 'closingSoon') {
-      sortedApps.sort((a, b) => {
-        const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : new Date(0);
-        const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : new Date(0);
-        return dateA.getTime() - dateB.getTime();
-      });
-    }
-
-    onSortedApplications(sortedApps, sortType);
+export const SortDropdown = ({ 
+  children, 
+  activeSort, 
+  onSortChange 
+}: SortDropdownProps) => {
+  const handleSort = (sortType: SortType) => {
+    if (!onSortChange) return;
+    onSortChange(sortType);
   };
 
   return (

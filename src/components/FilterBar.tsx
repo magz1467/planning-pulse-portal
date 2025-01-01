@@ -5,15 +5,16 @@ import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
-  onSortChange?: (sortType: 'closingSoon' | 'newest' | null) => void;
+  onSortChange?: (sortType: SortType) => void;
   activeFilters?: {
     status?: string;
     type?: string;
   };
-  activeSort?: 'closingSoon' | 'newest' | null;
+  activeSort?: SortType;
   isMapView?: boolean;
   onToggleView?: () => void;
   applications?: Application[];
@@ -37,11 +38,6 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
-  const handleSortedApplications = (sortedApps: Application[], sortType: 'closingSoon' | 'newest' | null) => {
-    if (!onSortChange) return;
-    onSortChange(sortType);
-  };
-
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">
@@ -54,9 +50,8 @@ export const FilterBar = ({
         />
 
         <SortDropdown
-          applications={applications}
-          onSortedApplications={handleSortedApplications}
           activeSort={activeSort}
+          onSortChange={onSortChange}
         >
           <Button 
             variant="outline" 
