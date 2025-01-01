@@ -154,7 +154,7 @@ export const MapboxMap = ({
 
     return () => {
       console.log('Cleaning up map...');
-      // Cleanup function
+      // Cleanup function - remove markers first
       if (markers.current) {
         Object.values(markers.current).forEach(marker => {
           if (marker) marker.remove();
@@ -162,6 +162,7 @@ export const MapboxMap = ({
         markers.current = {};
       }
       
+      // Then remove the map instance
       if (map.current) {
         map.current.remove();
         map.current = null;
