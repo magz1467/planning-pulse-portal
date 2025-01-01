@@ -22,7 +22,6 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
     setShowEmailDialog(false)
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
     
-    // Show pending toast
     toast({
       title: "Subscription pending",
       description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
@@ -65,6 +64,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+        postcode={postcode}
       />
     </>
   )

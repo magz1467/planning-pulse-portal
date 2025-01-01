@@ -17,13 +17,15 @@ interface EmailDialogProps {
   onOpenChange: (open: boolean) => void
   onSubmit: (email: string, radius: string) => void
   applicationRef?: string
+  postcode?: string
 }
 
 export const EmailDialog = ({ 
   open, 
   onOpenChange, 
   onSubmit,
-  applicationRef 
+  applicationRef,
+  postcode 
 }: EmailDialogProps) => {
   const [email, setEmail] = useState("")
   const [radius, setRadius] = useState("100")
@@ -34,21 +36,30 @@ export const EmailDialog = ({
     setIsSubmitting(true)
 
     try {
-      if (applicationRef) {
-        await supabase
-          .from('User_data')
-          .insert([
-            {
-              Email: email,
-              Marketing: true,
-              Radius_from_pc: parseInt(radius),
-            }
-          ])
+      // Save user preferences
+      const { error: dbError } = await supabase
+        .from('User_data')
+        .insert([
+          {
+            Email: email,
+            Marketing: true,
+            Post_Code: postcode,
+            Radius_from_pc: parseInt(radius),
+          }
+        ])
+
+      if (dbError) {
+        throw dbError;
       }
 
       // Send verification email
       const { error: verificationError } = await supabase.functions.invoke('send-verification', {
-        body: { email }
+        body: { 
+          email,
+          postcode,
+          radius,
+          applicationRef 
+        }
       });
 
       if (verificationError) {
