@@ -27,15 +27,23 @@ export const useFilteredApplications = (
         const appStatus = app.status.trim();
         const filterStatus = activeFilters.status;
         
+        if (filterStatus === "Under Review") {
+          return appStatus.toLowerCase().includes('under consideration');
+        }
+        
         if (filterStatus === "Other") {
           // Check if status doesn't match any predefined status
           const predefinedStatuses = ["Under Review", "Approved", "Declined"];
-          return !predefinedStatuses.some(
-            status => status.toLowerCase() === appStatus.toLowerCase()
-          );
+          const predefinedMatches = predefinedStatuses.some(status => {
+            if (status === "Under Review") {
+              return appStatus.toLowerCase().includes('under consideration');
+            }
+            return appStatus.toLowerCase().includes(status.toLowerCase());
+          });
+          return !predefinedMatches;
         }
         
-        return appStatus.toLowerCase() === filterStatus.toLowerCase();
+        return appStatus.toLowerCase().includes(filterStatus.toLowerCase());
       });
     }
 
