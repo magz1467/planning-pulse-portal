@@ -62,7 +62,7 @@ export const ApplicationsDashboardMap = () => {
       />
 
       <div className="flex-1 relative w-full">
-        <div className="absolute inset-0 flex">
+        <div className="absolute inset-0 flex" style={{ zIndex: 10 }}>
           <SidebarContent
             isMobile={isMobile}
             isMapView={isMapView}
