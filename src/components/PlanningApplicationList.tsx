@@ -4,7 +4,6 @@ import { MapPin } from "lucide-react";
 import Image from "@/components/ui/image";
 import { getStatusColor } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
-import { getImageUrl } from "@/utils/imageUtils";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -29,12 +28,11 @@ export const PlanningApplicationList = ({
           <div className="flex gap-3">
             <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
               <Image
-                src={getImageUrl(application.image)}
+                src={application.image}
                 alt={application.description || ''}
                 width={80}
                 height={80}
                 className="w-full h-full object-cover"
-                fallback="/placeholder.svg"
               />
             </div>
             <div className="flex-1 min-w-0">
