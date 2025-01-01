@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface StatusCounts {
   'Under Review': number;
