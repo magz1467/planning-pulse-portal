@@ -53,29 +53,27 @@ export const MapboxMap = ({
         newMap.on('load', () => {
           console.log('Map loaded successfully');
           
-          // Only add markers if they haven't been added yet
-          if (!hasInitiallyLoaded) {
-            applications.forEach(application => {
-              markerManager.current?.addMarker(application, application.id === selectedId);
-            });
+          // Add markers
+          applications.forEach(application => {
+            markerManager.current?.addMarker(application, application.id === selectedId);
+          });
 
-            // Only fit bounds on initial load
-            if (applications.length > 0) {
-              const bounds = new mapboxgl.LngLatBounds();
-              applications.forEach(application => {
-                if (application.coordinates) {
-                  bounds.extend([application.coordinates[1], application.coordinates[0]]);
-                }
-              });
-              
-              // Add some padding around the bounds
-              newMap.fitBounds(bounds, {
-                padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                maxZoom: 15 // Prevent zooming in too close
-              });
-              setHasInitiallyLoaded(true);
-            }
+          // Only fit bounds on initial load
+          if (!hasInitiallyLoaded && applications.length > 0) {
+            const bounds = new mapboxgl.LngLatBounds();
+            applications.forEach(application => {
+              if (application.coordinates) {
+                bounds.extend([application.coordinates[1], application.coordinates[0]]);
+              }
+            });
+            
+            // Add some padding around the bounds
+            newMap.fitBounds(bounds, {
+              padding: { top: 50, bottom: 50, left: 50, right: 50 },
+              maxZoom: 15 // Prevent zooming in too close
+            });
           }
+          setHasInitiallyLoaded(true);
         });
       }
     };
@@ -101,7 +99,7 @@ export const MapboxMap = ({
 
   // Only update markers when applications array changes
   useEffect(() => {
-    if (!hasInitiallyLoaded || !markerManager.current) return;
+    if (!markerManager.current) return;
 
     const addedApplications = applications.filter(
       app => !prevApplicationsRef.current.find(prevApp => prevApp.id === app.id)
@@ -121,7 +119,7 @@ export const MapboxMap = ({
     });
 
     prevApplicationsRef.current = applications;
-  }, [applications, selectedId, hasInitiallyLoaded]);
+  }, [applications, selectedId]);
 
   // Update marker styles when selection changes
   useEffect(() => {
