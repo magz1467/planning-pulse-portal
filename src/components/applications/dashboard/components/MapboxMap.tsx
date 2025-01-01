@@ -26,6 +26,7 @@ export const MapboxMap = ({
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
+  const previousApplicationsRef = useRef<Application[]>([]);
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -51,25 +52,31 @@ export const MapboxMap = ({
         
         newMap.on('load', () => {
           console.log('Map loaded successfully');
-          applications.forEach(application => {
-            markerManager.current?.addMarker(application, application.id === selectedId);
-          });
-
-          // Only fit bounds on initial load
-          if (!hasInitiallyLoaded && applications.length > 0) {
-            const bounds = new mapboxgl.LngLatBounds();
+          
+          // Only update markers if the applications array has changed
+          if (applications !== previousApplicationsRef.current) {
+            markerManager.current?.removeAllMarkers();
             applications.forEach(application => {
-              if (application.coordinates) {
-                bounds.extend([application.coordinates[1], application.coordinates[0]]);
-              }
+              markerManager.current?.addMarker(application, application.id === selectedId);
             });
-            
-            // Add some padding around the bounds
-            newMap.fitBounds(bounds, {
-              padding: { top: 50, bottom: 50, left: 50, right: 50 },
-              maxZoom: 15 // Prevent zooming in too close
-            });
-            setHasInitiallyLoaded(true);
+            previousApplicationsRef.current = applications;
+
+            // Only fit bounds on initial load and when there are applications
+            if (!hasInitiallyLoaded && applications.length > 0) {
+              const bounds = new mapboxgl.LngLatBounds();
+              applications.forEach(application => {
+                if (application.coordinates) {
+                  bounds.extend([application.coordinates[1], application.coordinates[0]]);
+                }
+              });
+              
+              // Add some padding around the bounds
+              newMap.fitBounds(bounds, {
+                padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                maxZoom: 15 // Prevent zooming in too close
+              });
+              setHasInitiallyLoaded(true);
+            }
           }
         });
       }
