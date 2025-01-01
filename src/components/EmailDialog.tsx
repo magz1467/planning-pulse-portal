@@ -5,32 +5,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { RadiusSelect } from "./RadiusSelect"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form"
 import { supabase } from "@/integrations/supabase/client"
-
-const formSchema = z.object({
-  radius: z.string(),
-})
-
-type FormValues = z.infer<typeof formSchema>
+import { EmailDialogForm } from "./email-dialog/EmailDialogForm"
+import { useToast } from "@/components/ui/use-toast"
 
 interface EmailDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (radius: string) => void
-  postcode: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (radius: string) => void;
+  postcode: string;
 }
 
 export const EmailDialog = ({ 
@@ -39,17 +23,11 @@ export const EmailDialog = ({
   onSubmit,
   postcode 
 }: EmailDialogProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
   
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      radius: "100"
-    }
-  })
-
-  const handleSubmit = async (values: FormValues) => {
-    setIsSubmitting(true)
+  const handleSubmit = async (values: { radius: string }) => {
+    setIsSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -63,7 +41,7 @@ export const EmailDialog = ({
           user_id: user.id,
           postcode: postcode,
           radius: values.radius,
-          User_email: user.email // Add the user's email
+          User_email: user.email
         });
 
       if (error) throw error;
@@ -71,14 +49,16 @@ export const EmailDialog = ({
       await onSubmit(values.radius);
       onOpenChange(false);
     } catch (error) {
-      console.error('Error saving notification preferences:', error)
-      form.setError("root", {
-        message: "There was an error saving your preferences. Please try again."
-      })
+      console.error('Error saving notification preferences:', error);
+      toast({
+        title: "Error",
+        description: "There was an error saving your preferences. Please try again.",
+        variant: "destructive"
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,34 +75,11 @@ export const EmailDialog = ({
           </DialogDescription>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="radius"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <RadiusSelect 
-                      value={field.value} 
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Setting up..." : "Add to watchlist"}
-            </Button>
-          </form>
-        </Form>
+        <EmailDialogForm 
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+        />
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
