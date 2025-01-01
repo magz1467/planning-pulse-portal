@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
+import { calculateDistance } from '@/utils/distance';
 
 interface StatusCounts {
   'Under Review': number;
@@ -98,6 +99,11 @@ export const useApplicationsData = () => {
           return null;
         }
 
+        // Calculate distance in miles
+        const distanceInKm = calculateDistance(center, coordinates);
+        const distanceInMiles = distanceInKm * 0.621371; // Convert km to miles
+        const formattedDistance = `${distanceInMiles.toFixed(1)} mi`;
+
         // Extract image URL from application_details if it exists
         let imageUrl = '/placeholder.svg';
         if (app.application_details && typeof app.application_details === 'object') {
@@ -114,7 +120,7 @@ export const useApplicationsData = () => {
           title: app.description || '',
           address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
           status: app.status || '',
-          distance: 'N/A',
+          distance: formattedDistance,
           reference: app.lpa_app_no || '',
           description: app.description || '',
           applicant: typeof app.application_details === 'object' ? 
