@@ -78,7 +78,7 @@ export const useDashboardState = () => {
   const safeApplications = applications || [];
 
   // Get filtered applications
-  const filteredApplications = useFilteredApplications(safeApplications, activeFilters);
+  const filteredApplications = useFilteredApplications(safeApplications, activeFilters, activeSort);
 
   // Debug logs for filtered applications
   console.log('ApplicationsDashboardMap - Filtered applications:', filteredApplications?.length);
