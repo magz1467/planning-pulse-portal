@@ -31,6 +31,7 @@ export class MapboxInitializer {
 
       const map = new mapboxgl.Map({
         container,
+        // Using a simpler style that should be more reliable
         style: 'mapbox://styles/mapbox/streets-v12',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
@@ -40,8 +41,20 @@ export class MapboxInitializer {
 
       map.on('error', (e) => {
         const msg = `Mapbox map error: ${e.error?.message || 'Unknown error'}`;
-        console.error(msg, e);
-        onError(msg, JSON.stringify(e, null, 2));
+        console.error(msg, {
+          error: {
+            message: e.error?.message,
+            status: e.error?.status,
+            url: e.error?.url
+          }
+        });
+        onError(msg, JSON.stringify({
+          error: {
+            message: e.error?.message,
+            status: e.error?.status,
+            url: e.error?.url
+          }
+        }, null, 2));
       });
 
       return map;
