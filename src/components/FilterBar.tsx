@@ -4,7 +4,7 @@ import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Filter, ArrowUpDown, Map, List } from "lucide-react";
 import { Application } from "@/types/planning";
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -30,7 +30,7 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
-  // Use useMemo instead of useState + useEffect to compute statusCounts
+  // Compute status counts using useMemo to prevent unnecessary recalculations
   const statusCounts = useMemo(() => {
     const counts = {
       "Under Review": 0,
