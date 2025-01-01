@@ -1,13 +1,15 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Application } from "@/types/planning";
+import { Check } from "lucide-react";
 
 interface SortDropdownProps {
   children?: React.ReactNode;
   applications?: Application[];
   onSortedApplications?: (sortedApps: Application[], sortType: 'closingSoon' | 'newest' | null) => void;
+  activeSort?: 'closingSoon' | 'newest' | null;
 }
 
-export const SortDropdown = ({ children, applications = [], onSortedApplications }: SortDropdownProps) => {
+export const SortDropdown = ({ children, applications = [], onSortedApplications, activeSort }: SortDropdownProps) => {
   const handleSort = (sortType: 'closingSoon' | 'newest' | null) => {
     if (!applications || !onSortedApplications) return;
     
@@ -36,14 +38,17 @@ export const SortDropdown = ({ children, applications = [], onSortedApplications
         {children}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleSort(null)}>
+        <DropdownMenuItem onClick={() => handleSort(null)} className="flex items-center justify-between">
           Default
+          {activeSort === null && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleSort('newest')}>
+        <DropdownMenuItem onClick={() => handleSort('newest')} className="flex items-center justify-between">
           Newest
+          {activeSort === 'newest' && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleSort('closingSoon')}>
+        <DropdownMenuItem onClick={() => handleSort('closingSoon')} className="flex items-center justify-between">
           Closing Soon
+          {activeSort === 'closingSoon' && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
