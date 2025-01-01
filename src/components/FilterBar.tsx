@@ -37,6 +37,36 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
+  const handleSortedApplications = (sortedApps: Application[]) => {
+    // Find which sort type was applied based on the order
+    let appliedSortType: 'closingSoon' | 'newest' | null = null;
+    
+    if (sortedApps.length > 1) {
+      const first = sortedApps[0];
+      const last = sortedApps[sortedApps.length - 1];
+      
+      if (first.valid_date && last.valid_date) {
+        const firstDate = new Date(first.valid_date);
+        const lastDate = new Date(last.valid_date);
+        if (firstDate > lastDate) {
+          appliedSortType = 'newest';
+        }
+      }
+      
+      if (first.last_date_consultation_comments && last.last_date_consultation_comments) {
+        const firstDate = new Date(first.last_date_consultation_comments);
+        const lastDate = new Date(last.last_date_consultation_comments);
+        if (firstDate < lastDate) {
+          appliedSortType = 'closingSoon';
+        }
+      }
+    }
+    
+    if (onSortChange) {
+      onSortChange(appliedSortType);
+    }
+  };
+
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">
@@ -49,9 +79,8 @@ export const FilterBar = ({
         />
 
         <SortDropdown
-          onSortChange={onSortChange}
-          activeSort={activeSort}
-          isMobile={isMobile}
+          applications={applications}
+          onSortedApplications={handleSortedApplications}
         >
           <Button 
             variant="outline" 

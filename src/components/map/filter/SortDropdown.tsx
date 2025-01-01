@@ -1,22 +1,15 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Application } from "@/types/planning";
-import { useState } from "react";
 
 interface SortDropdownProps {
-  applications: Application[];
-  onSortedApplications: (sortedApps: Application[]) => void;
   children?: React.ReactNode;
+  applications?: Application[];
+  onSortedApplications?: (sortedApps: Application[]) => void;
 }
 
-export const SortDropdown = ({ applications, onSortedApplications, children }: SortDropdownProps) => {
-  const [currentSort, setCurrentSort] = useState<'closingSoon' | 'newest' | null>(null);
-  const isMobile = useIsMobile();
-
+export const SortDropdown = ({ children, applications = [], onSortedApplications }: SortDropdownProps) => {
   const handleSort = (sortType: 'closingSoon' | 'newest' | null) => {
-    setCurrentSort(sortType);
+    if (!applications || !onSortedApplications) return;
     
     const sortedApps = [...applications].sort((a, b) => {
       if (sortType === 'newest') {
@@ -37,17 +30,7 @@ export const SortDropdown = ({ applications, onSortedApplications, children }: S
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {children || (
-          <Button 
-            variant="outline" 
-            size={isMobile ? "sm" : "default"}
-            className="flex items-center gap-2"
-          >
-            <ArrowUpDown className="h-4 w-4" />
-            {currentSort === 'closingSoon' ? 'Closing Soon' : 
-             currentSort === 'newest' ? 'Newest' : 'Sort'}
-          </Button>
-        )}
+        {children}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleSort(null)}>
