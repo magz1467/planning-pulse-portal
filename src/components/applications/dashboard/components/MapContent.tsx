@@ -25,6 +25,14 @@ export const MapContent = ({
     <div className="flex-1 relative h-full">
       <div 
         className={`absolute inset-0 ${isMobile ? 'h-[calc(100vh-120px)]' : 'h-full'}`}
+        style={{ 
+          position: 'fixed',
+          top: isMobile ? '120px' : 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1
+        }}
       >
         <MapView
           applications={applications}
