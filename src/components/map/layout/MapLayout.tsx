@@ -50,11 +50,11 @@ export const MapLayout = ({
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
 
-  const handleEmailSubmit = (email: string, radius: string) => {
+  const handleEmailSubmit = (radius: string) => {
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
     toast({
       title: "Subscription pending",
-      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
+      description: `We've sent a confirmation email to your registered email. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
       duration: 5000,
     });
   };
@@ -190,6 +190,7 @@ export const MapLayout = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+        postcode={postcode}
       />
     </div>
   );

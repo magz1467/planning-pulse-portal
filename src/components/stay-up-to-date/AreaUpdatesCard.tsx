@@ -8,7 +8,7 @@ export const AreaUpdatesCard = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
 
-  const handleEmailSubmit = (email: string, radius: string) => {
+  const handleEmailSubmit = (radius: string) => {
     toast({
       title: "Success!",
       description: "You've been subscribed to local updates.",
@@ -39,6 +39,7 @@ export const AreaUpdatesCard = () => {
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+        postcode="Your Area"
       />
     </div>
   );

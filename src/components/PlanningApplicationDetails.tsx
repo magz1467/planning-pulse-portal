@@ -69,12 +69,13 @@ export const PlanningApplicationDetails = ({
     });
   };
 
-  const handleEmailSubmit = (email: string, radius: string) => {
+  const handleEmailSubmit = (radius: string) => {
     toast({
       title: "Notification setup",
-      description: `We'll email you at ${email} when a decision is made on this application.`,
+      description: `We'll notify you when a decision is made on this application.`,
       duration: 5000,
     });
+    setShowEmailDialog(false);
   };
 
   const handleFeedbackEmailSubmit = (email: string) => {
@@ -176,7 +177,7 @@ export const PlanningApplicationDetails = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
-        applicationRef={application?.reference}
+        postcode={application?.postcode || ''}
       />
 
       <FeedbackEmailDialog

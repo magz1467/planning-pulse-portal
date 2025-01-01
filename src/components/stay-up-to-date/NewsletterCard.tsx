@@ -8,7 +8,7 @@ export const NewsletterCard = () => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
 
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (radius: string) => {
     toast({
       title: "Success!",
       description: "You've been subscribed to our newsletter.",
@@ -39,6 +39,7 @@ export const NewsletterCard = () => {
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+        postcode="Newsletter"
       />
     </div>
   );

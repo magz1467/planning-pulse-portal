@@ -100,7 +100,7 @@ export const EmailDialog = ({
               className="w-full" 
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Setting up..." : "Confirm"}
+              {isSubmitting ? "Setting up..." : "Add to watchlist"}
             </Button>
           </form>
         </Form>

@@ -47,10 +47,10 @@ export const ApplicationCard = ({
     }
   };
 
-  const handleEmailSubmit = (email: string) => {
+  const handleEmailSubmit = (radius: string) => {
     toast({
       title: "Notification setup",
-      description: `We'll email you at ${email} when a decision is made on this application.`,
+      description: `We'll notify you when a decision is made on this application.`,
       duration: 5000,
     });
     setShowEmailDialog(false);
@@ -128,6 +128,7 @@ export const ApplicationCard = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
+        postcode={application.postcode}
       />
     </Card>
   );

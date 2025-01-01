@@ -120,7 +120,7 @@ export const PostcodeSection = ({
     }
   };
 
-  const handleEmailSubmit = async (email: string, radius: string) => {
+  const handleEmailSubmit = async (radius: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -222,7 +222,7 @@ export const PostcodeSection = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
-        applicationRef={selectedPostcode}
+        postcode={selectedPostcode}
       />
 
       <RadiusDialog
