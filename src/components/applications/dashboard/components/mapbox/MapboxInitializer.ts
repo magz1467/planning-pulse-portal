@@ -44,15 +44,15 @@ export class MapboxInitializer {
         console.error(msg, {
           error: {
             message: e.error?.message,
-            status: e.error?.status,
-            url: e.error?.url
+            status: (e.error as any)?.status,
+            url: (e.error as any)?.url
           }
         });
         onError(msg, JSON.stringify({
           error: {
             message: e.error?.message,
-            status: e.error?.status,
-            url: e.error?.url
+            status: (e.error as any)?.status,
+            url: (e.error as any)?.url
           }
         }, null, 2));
       });
