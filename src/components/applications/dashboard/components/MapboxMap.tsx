@@ -101,11 +101,6 @@ export const MapboxMap = ({
       }
     };
 
-    // Set CORS headers for Mapbox requests
-    if (typeof window !== 'undefined') {
-      mapboxgl.prototypeAccessToken = true;
-    }
-
     initializeMap();
 
     // Cleanup function
