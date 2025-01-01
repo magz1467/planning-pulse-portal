@@ -53,7 +53,7 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        // Using a simpler style that should be more reliable
+        // Using a standard style URL format
         style: 'mapbox://styles/mapbox/streets-v12',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
@@ -62,21 +62,21 @@ export class MapboxInitializer {
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       // Add detailed error logging
-      map.on('error', (e) => {
+      map.on('error', (e: mapboxgl.ErrorEvent) => {
         const msg = `Mapbox map error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: {
             message: e.error?.message,
-            status: (e.error as any)?.status,
-            url: (e.error as any)?.url
+            status: e.status,
+            url: e.sourceId
           },
           context: 'Map runtime error'
         });
         onError(msg, JSON.stringify({
           error: {
             message: e.error?.message,
-            status: (e.error as any)?.status,
-            url: (e.error as any)?.url
+            status: e.status,
+            url: e.sourceId
           }
         }, null, 2));
       });
@@ -86,7 +86,7 @@ export class MapboxInitializer {
         console.log('Map style loaded successfully');
       });
 
-      map.on('style.error', (e) => {
+      map.on('style.error', (e: mapboxgl.ErrorEvent) => {
         const msg = `Map style error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
