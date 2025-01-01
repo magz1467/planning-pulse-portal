@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
-import { MapPin } from "lucide-react";
+import { MapPin, Timer } from "lucide-react";
 import Image from "@/components/ui/image";
+import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
 interface MiniCardProps {
   application: Application;
@@ -21,7 +22,9 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     }
   };
 
-  console.log("MiniCard rendering with image:", application.image); // Debug log
+  console.log("MiniCard rendering with image:", application.image);
+
+  const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
 
   return (
     <div 
@@ -40,7 +43,15 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-primary truncate">{application.title}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-primary truncate">{application.title}</h3>
+            {isClosingSoon && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                <Timer className="w-3 h-3 mr-1" />
+                Closing soon
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-1 mt-1 text-gray-600">
             <MapPin className="w-3 h-3" />
             <p className="text-sm truncate">{application.address}</p>

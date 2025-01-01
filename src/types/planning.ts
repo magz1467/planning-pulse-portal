@@ -16,11 +16,6 @@ export interface Application {
   image: string;
   coordinates: [number, number];
   ai_title?: string;
-}
-
-export interface Comment {
-  id: number;
-  content: string;
-  author: string;
-  timestamp: string;
+  last_date_consultation_comments?: string;
+  valid_date?: string;
 }
