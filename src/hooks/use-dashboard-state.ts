@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useApplicationsData } from "@/components/applications/dashboard/hooks/useApplicationsData";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
+import { SortType } from "./use-application-sorting";
 
 export const useDashboardState = () => {
   const location = useLocation();
@@ -13,7 +14,7 @@ export const useDashboardState = () => {
     status?: string;
     type?: string;
   }>({});
-  const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
+  const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(searchPostcode || 'SW1A 0AA');
 
@@ -53,7 +54,7 @@ export const useDashboardState = () => {
     setPostcode(newPostcode);
   };
 
-  const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
+  const handleSortChange = (sortType: SortType) => {
     console.log('Changing sort to:', sortType);
     setActiveSort(sortType);
   };
