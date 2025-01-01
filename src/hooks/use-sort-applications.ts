@@ -15,7 +15,7 @@ export const useSortApplications = (
 
     if (sortType === 'newest') {
       return sortedApps.sort((a, b) => {
-        // Parse dates properly
+        // Convert valid_date strings to timestamps for comparison
         const dateA = a.valid_date ? new Date(a.valid_date).getTime() : 0;
         const dateB = b.valid_date ? new Date(b.valid_date).getTime() : 0;
         return dateB - dateA; // Most recent first
