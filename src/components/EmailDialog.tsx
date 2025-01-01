@@ -35,21 +35,48 @@ export const EmailDialog = ({
         throw new Error('No authenticated user found');
       }
 
-      const { error } = await supabase
+      // First check if user already has an alert for this postcode
+      const { data: existingAlert } = await supabase
         .from('user_postcodes')
-        .insert({
-          user_id: user.id,
-          postcode: postcode,
-          radius: values.radius,
-          User_email: user.email
+        .select()
+        .eq('user_id', user.id)
+        .eq('postcode', postcode)
+        .maybeSingle();
+
+      if (existingAlert) {
+        // Update existing alert
+        const { error } = await supabase
+          .from('user_postcodes')
+          .update({
+            radius: values.radius,
+            User_email: user.email
+          })
+          .eq('id', existingAlert.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: `Your alert radius has been updated to ${values.radius === "1000" ? "1 kilometre" : values.radius + " metres"} for ${postcode}.`,
         });
+      } else {
+        // Create new alert
+        const { error } = await supabase
+          .from('user_postcodes')
+          .insert({
+            user_id: user.id,
+            postcode: postcode,
+            radius: values.radius,
+            User_email: user.email
+          });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: `You will now receive alerts for planning applications within ${values.radius === "1000" ? "1 kilometre" : values.radius + " metres"} of ${postcode}.`,
-      });
+        toast({
+          title: "Success",
+          description: `You will now receive alerts for planning applications within ${values.radius === "1000" ? "1 kilometre" : values.radius + " metres"} of ${postcode}.`,
+        });
+      }
 
       await onSubmit(values.radius);
       onOpenChange(false);
