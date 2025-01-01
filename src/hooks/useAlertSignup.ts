@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
@@ -74,7 +74,7 @@ export const useAlertSignup = (postcode: string) => {
   }
 
   // Check subscription status on mount and when postcode changes
-  useState(() => {
+  useEffect(() => {
     const checkSubscription = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
