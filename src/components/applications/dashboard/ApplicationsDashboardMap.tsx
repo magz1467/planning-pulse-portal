@@ -147,9 +147,12 @@ export const ApplicationsDashboardMap = () => {
       </div>
 
       {isLoading && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center text-gray-500">
-            <p className="text-lg">Loading...</p>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-lg font-medium text-gray-900">Loading...</p>
+            </div>
           </div>
         </div>
       )}
