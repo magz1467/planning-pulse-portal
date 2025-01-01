@@ -29,21 +29,24 @@ export const MapboxMap = ({
 
       try {
         // Get Mapbox token from Supabase
-        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
-        if (error) {
-          console.error('Error getting Mapbox token:', error);
+        const { data: { token }, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (tokenError) {
+          console.error('Error getting Mapbox token:', tokenError);
           setError('Failed to initialize map: Could not retrieve access token');
           return;
         }
 
         if (!token) {
+          console.error('No Mapbox token returned from function');
           setError('Failed to initialize map: No access token available');
           return;
         }
 
+        console.log('Successfully retrieved Mapbox token');
         mapboxgl.accessToken = token;
 
-        // Create map with original style that was working
+        // Create map
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -56,6 +59,8 @@ export const MapboxMap = ({
 
         // Wait for map to load before adding markers
         map.current.on('load', () => {
+          console.log('Map loaded successfully');
+          
           // Clear existing markers
           Object.values(markers.current).forEach(marker => marker.remove());
           markers.current = {};
