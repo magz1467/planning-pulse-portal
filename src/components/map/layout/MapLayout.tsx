@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
 import { EmailDialog } from "@/components/EmailDialog";
 import { useToast } from "@/components/ui/use-toast";
+import { AlertSignupLoggedOut } from "../mobile/AlertSignupLoggedOut";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MapLayoutProps {
   isLoading: boolean;
@@ -49,6 +51,21 @@ export const MapLayout = ({
   const detailsContainerRef = useRef<HTMLDivElement>(null);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleEmailSubmit = (radius: string) => {
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
@@ -135,21 +152,25 @@ export const MapLayout = ({
             ) : (
               <div className="flex-1 overflow-y-auto overscroll-contain">
                 <div className="p-4 bg-white border-b">
-                  <div className="bg-primary/5 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Bell className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+                  {session ? (
+                    <div className="bg-primary/5 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Bell className="h-5 w-5 text-primary" />
+                        <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Stay informed about new planning applications near {postcode}
+                      </p>
+                      <Button 
+                        className="w-full"
+                        onClick={() => setShowEmailDialog(true)}
+                      >
+                        Get Alerts
+                      </Button>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Stay informed about new planning applications near {postcode}
-                    </p>
-                    <Button 
-                      className="w-full"
-                      onClick={() => setShowEmailDialog(true)}
-                    >
-                      Get Alerts
-                    </Button>
-                  </div>
+                  ) : (
+                    <AlertSignupLoggedOut postcode={postcode} />
+                  )}
                 </div>
                 <div className="p-4 space-y-4">
                   {filteredApplications.map((app) => (
