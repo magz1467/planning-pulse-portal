@@ -53,8 +53,8 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        // Using a standard style URL format
-        style: 'mapbox://styles/mapbox/streets-v12',
+        // Using a basic vector style that should work with any token
+        style: 'mapbox://styles/mapbox/basic-v9',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
       });
@@ -62,23 +62,20 @@ export class MapboxInitializer {
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       // Add detailed error logging
-      map.on('error', (e: mapboxgl.ErrorEvent) => {
+      map.on('error', (e: mapboxgl.MapboxEvent & { error?: Error }) => {
         const msg = `Mapbox map error: ${e.error?.message || 'Unknown error'}`;
+        const errorDetails = {
+          message: e.error?.message || '',
+          type: e.type,
+          target: e.target.getStyle()?.name || 'unknown style'
+        };
+        
         console.error(msg, {
-          error: {
-            message: e.error?.message,
-            status: e.status,
-            url: e.sourceId
-          },
+          error: errorDetails,
           context: 'Map runtime error'
         });
-        onError(msg, JSON.stringify({
-          error: {
-            message: e.error?.message,
-            status: e.status,
-            url: e.sourceId
-          }
-        }, null, 2));
+        
+        onError(msg, JSON.stringify(errorDetails, null, 2));
       });
 
       // Add style load error handling
@@ -86,7 +83,7 @@ export class MapboxInitializer {
         console.log('Map style loaded successfully');
       });
 
-      map.on('style.error', (e: mapboxgl.ErrorEvent) => {
+      map.on('style.error', (e: mapboxgl.MapboxEvent & { error?: Error }) => {
         const msg = `Map style error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
