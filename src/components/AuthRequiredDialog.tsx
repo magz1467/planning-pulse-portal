@@ -29,10 +29,10 @@ export const AuthRequiredDialog = ({
         aria-describedby="auth-dialog-description"
       >
         <AlertDialogHeader>
-          <AlertDialogTitle id="auth-dialog-title">Sign in required</AlertDialogTitle>
+          <AlertDialogTitle id="auth-dialog-title">Create an account to get alerts</AlertDialogTitle>
           <AlertDialogDescription id="auth-dialog-description" className="space-y-2">
             <p>
-              To save developments and get notified about updates, you'll need to create
+              To get notified about new planning applications in your area, you'll need to create
               a free account or sign in.
             </p>
             <p className="text-muted-foreground">
