@@ -27,12 +27,12 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Select first application by default when applications are loaded, but only in map view
+  // Select first application by default when applications are loaded, but only on mobile and in map view
   useEffect(() => {
-    if (filteredApplications.length > 0 && !selectedId && isMapView) {
+    if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
       handleMarkerClick(filteredApplications[0].id);
     }
-  }, [filteredApplications, selectedId, handleMarkerClick, isMapView]);
+  }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
   const handleClose = () => {
     console.log("Closing application details");  // Debug log
