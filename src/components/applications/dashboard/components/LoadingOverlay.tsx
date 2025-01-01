@@ -17,7 +17,7 @@ export const LoadingOverlay = () => {
           {/* Loading message */}
           <div className="space-y-4 text-center">
             <h3 className="text-xl font-semibold text-gray-800">
-              Loading Your Planning Data
+              Loading Planning Data
             </h3>
             <p className="text-sm text-gray-600 max-w-sm">
               We're gathering the latest planning applications in your area
