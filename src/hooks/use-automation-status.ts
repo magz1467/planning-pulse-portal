@@ -53,7 +53,7 @@ export const useAutomationStatus = () => {
     // Update the status directly in the database
     const { error } = await supabase
       .from('automation_status')
-      .update({ is_active: newStatus })
+      .update({ is_active: newStatus, updated_at: new Date().toISOString() })
       .eq('name', 'generate_ai_titles');
 
     if (error) {
