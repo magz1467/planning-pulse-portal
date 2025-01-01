@@ -54,6 +54,7 @@ export const ApplicationListView = ({
           applications={applications}
           postcode={postcode}
           onSelectApplication={onSelectApplication}
+          activeSort={activeSort}
         />
       </div>
     </div>
