@@ -12,7 +12,10 @@ export const useFilteredApplications = (
   activeFilters: ActiveFilters
 ) => {
   return useMemo(() => {
-    let filtered = [...applications];
+    console.log('useFilteredApplications - Input applications:', applications?.length);
+    console.log('useFilteredApplications - Active filters:', activeFilters);
+    
+    let filtered = [...(applications || [])];
 
     // Filter by status
     if (activeFilters.status) {
@@ -52,6 +55,7 @@ export const useFilteredApplications = (
       });
     }
 
+    console.log('useFilteredApplications - Filtered applications:', filtered?.length);
     return filtered;
   }, [applications, activeFilters]);
 };

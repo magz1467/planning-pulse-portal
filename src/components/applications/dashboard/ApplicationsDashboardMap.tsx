@@ -38,6 +38,7 @@ export const ApplicationsDashboardMap = () => {
   console.log('ApplicationsDashboardMap - Raw applications data:', applications);
   console.log('ApplicationsDashboardMap - Number of applications:', applications?.length);
   console.log('ApplicationsDashboardMap - Status counts:', statusCounts);
+  console.log('ApplicationsDashboardMap - Active filters:', activeFilters);
 
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
@@ -85,8 +86,8 @@ export const ApplicationsDashboardMap = () => {
   // Get filtered applications
   const filteredApplications = useFilteredApplications(safeApplications, activeFilters);
 
-  // Debug logs for applications data
-  console.log('ApplicationsDashboardMap - Filtered applications:', filteredApplications);
+  // Debug logs for filtered applications
+  console.log('ApplicationsDashboardMap - Filtered applications:', filteredApplications?.length);
 
   return (
     <div className="h-screen w-full flex flex-col">
@@ -108,7 +109,7 @@ export const ApplicationsDashboardMap = () => {
         <div className="absolute inset-0 flex">
           {(!isMobile || !isMapView) && searchPoint && (
             <DesktopSidebar
-              applications={safeApplications}
+              applications={filteredApplications}
               selectedApplication={selectedId}
               postcode={postcode}
               activeFilters={activeFilters}
@@ -134,7 +135,7 @@ export const ApplicationsDashboardMap = () => {
 
           {isMobile && !isMapView && searchPoint && (
             <MobileListContainer
-              applications={safeApplications}
+              applications={filteredApplications}
               selectedApplication={selectedId}
               postcode={postcode}
               onSelectApplication={handleMarkerClick}
