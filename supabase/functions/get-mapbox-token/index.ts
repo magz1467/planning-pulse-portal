@@ -7,11 +7,21 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Retrieving Mapbox token from environment...');
     const token = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
     
     if (!token) {
+      console.error('MAPBOX_PUBLIC_TOKEN not found in environment');
       throw new Error('MAPBOX_PUBLIC_TOKEN not found')
     }
+
+    // Validate token format
+    if (!token.startsWith('pk.')) {
+      console.error('Invalid token format - must start with pk.');
+      throw new Error('Invalid token format')
+    }
+
+    console.log('Successfully retrieved and validated token format');
 
     return new Response(
       JSON.stringify({ token }),
@@ -24,8 +34,13 @@ serve(async (req) => {
       },
     )
   } catch (error) {
+    console.error('Error in get-mapbox-token function:', error);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        context: 'Token retrieval failed'
+      }),
       {
         headers: {
           ...corsHeaders,
