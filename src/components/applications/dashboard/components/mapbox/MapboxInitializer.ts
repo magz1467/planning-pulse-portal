@@ -53,10 +53,15 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        // Using the standard Mapbox style
-        style: 'mapbox://styles/mapbox/standard',
+        style: 'mapbox://styles/mapbox/streets-v12', // Using a more stable style
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
+        transformRequest: (url, resourceType) => {
+          if (resourceType === 'Style' && !url.includes('mapbox://styles')) {
+            return { url: `${url}?access_token=${data.token}` };
+          }
+          return null;
+        }
       });
 
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
