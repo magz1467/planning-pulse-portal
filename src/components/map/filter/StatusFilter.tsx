@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { Application } from "@/types/planning";
-import { useMemo } from "react";
 import { FilterDropdown } from "./FilterDropdown";
 
 interface StatusFilterProps {
@@ -20,38 +19,32 @@ export const StatusFilter = ({
   applications = [],
   isMobile
 }: StatusFilterProps) => {
-  const statusCounts = useMemo(() => {
-    const counts = {
-      "Under Review": 0,
-      "Approved": 0,
-      "Declined": 0,
-      "Other": 0
-    };
+  // Initialize counts with explicit values
+  const statusCounts = {
+    "Under Review": 0,
+    "Approved": 0,
+    "Declined": 0,
+    "Other": 0
+  };
 
-    if (!applications?.length) {
-      return counts;
+  // Calculate counts from applications
+  applications.forEach(app => {
+    if (!app?.status) {
+      statusCounts['Other']++;
+      return;
     }
 
-    applications.forEach(app => {
-      if (!app?.status) {
-        counts['Other']++;
-        return;
-      }
-
-      const status = app.status.trim().toLowerCase();
-      if (status.includes('under review') || status.includes('under consideration')) {
-        counts['Under Review']++;
-      } else if (status.includes('approved')) {
-        counts['Approved']++;
-      } else if (status.includes('declined') || status.includes('refused')) {
-        counts['Declined']++;
-      } else {
-        counts['Other']++;
-      }
-    });
-
-    return counts;
-  }, [applications]);
+    const status = app.status.trim();
+    if (status.toLowerCase().includes('under review') || status.toLowerCase().includes('under consideration')) {
+      statusCounts['Under Review']++;
+    } else if (status.toLowerCase().includes('approved')) {
+      statusCounts['Approved']++;
+    } else if (status.toLowerCase().includes('declined') || status.toLowerCase().includes('refused')) {
+      statusCounts['Declined']++;
+    } else {
+      statusCounts['Other']++;
+    }
+  });
 
   console.log('Status counts:', statusCounts);
 
