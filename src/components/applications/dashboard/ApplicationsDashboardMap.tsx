@@ -74,6 +74,9 @@ export const ApplicationsDashboardMap = () => {
   // Ensure applications is always an array
   const safeApplications = applications || [];
 
+  console.log('ApplicationsDashboardMap - Current applications:', safeApplications?.length);
+  console.log('ApplicationsDashboardMap - Current filters:', activeFilters);
+
   return (
     <div className="h-screen w-full flex flex-col">
       <DashboardHeader />

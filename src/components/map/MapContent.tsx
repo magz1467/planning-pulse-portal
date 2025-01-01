@@ -6,12 +6,7 @@ import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { useMapState } from "@/hooks/use-map-state";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
-import { generateMockApplications } from "@/utils/mockDataGenerator";
 import { Application } from "@/types/planning";
-import { Tables } from "@/integrations/supabase/types";
-
-// Generate 200 mock applications
-const mockPlanningApplications = generateMockApplications(200);
 
 export const MapContent = () => {
   const location = useLocation();
@@ -29,50 +24,13 @@ export const MapContent = () => {
     handleMarkerClick,
     handleFilterChange,
     handleSortChange,
-  } = useMapState(coordinates as [number, number], mockPlanningApplications, isMobile, isMapView);
+  } = useMapState(coordinates as [number, number], [], isMobile, isMapView);
 
   useEffect(() => {
     if (initialFilter) {
       handleFilterChange("status", initialFilter);
     }
   }, [initialFilter, handleFilterChange]);
-
-  // This function is for transforming Supabase data, not used with mock data
-  const transformApplication = (app: Tables<'applications'>): Application => ({
-    id: app.application_id,
-    title: app.description || '',
-    address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
-    status: app.status || '',
-    distance: 'N/A',
-    reference: app.lpa_app_no || '',
-    description: app.description || '',
-    applicant: typeof app.application_details === 'object' ? 
-      (app.application_details as any)?.applicant || '' : '',
-    submissionDate: app.valid_date || '',
-    decisionDue: app.decision_target_date || '',
-    type: app.application_type || '',
-    ward: app.ward || '',
-    officer: typeof app.application_details === 'object' ? 
-      (app.application_details as any)?.officer || '' : '',
-    consultationEnd: app.last_date_consultation_comments || '',
-    image: '/placeholder.svg',
-    coordinates: app.geom ? [
-      (app.geom as any).coordinates[1],
-      (app.geom as any).coordinates[0]
-    ] as [number, number] : [51.5074, -0.1278]
-  });
-
-  const filteredApplications = useFilteredApplications(
-    mockPlanningApplications,  // Use mock data directly since it's already in Application format
-    activeFilters
-  );
-
-  // Only auto-select first application on mobile and in map view
-  useEffect(() => {
-    if (isMobile && isMapView && filteredApplications.length > 0 && !selectedApplication) {
-      handleMarkerClick(filteredApplications[0].id);
-    }
-  }, [postcode, filteredApplications, selectedApplication, handleMarkerClick, isMapView, isMobile]);
 
   // Ensure coordinates are properly typed
   const safeCoordinates: [number, number] = coordinates ? [coordinates[0], coordinates[1]] : [52.0406, -0.7594];
@@ -82,6 +40,12 @@ export const MapContent = () => {
     // Clear selection when switching views
     handleMarkerClick(null);
   };
+
+  // Use filtered applications from Supabase data
+  const filteredApplications = useFilteredApplications(
+    [], // We'll get applications directly from the dashboard component
+    activeFilters
+  );
 
   return (
     <MapContentLayout
