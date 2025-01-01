@@ -26,19 +26,6 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
     setShowEmailDialog(true)
   }
 
-  // When auth dialog is closed after successful login, show the email dialog
-  const handleAuthDialogClose = (open: boolean) => {
-    setShowAuthDialog(open)
-    if (!open) {
-      // Check if user is now logged in
-      supabase.auth.getSession().then(({ data: { session }}) => {
-        if (session?.user) {
-          setShowEmailDialog(true)
-        }
-      })
-    }
-  }
-
   if (isSubscribed) {
     return <SubscribedAlert />
   }
@@ -58,7 +45,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
       />
       <AuthRequiredDialog
         open={showAuthDialog}
-        onOpenChange={handleAuthDialogClose} 
+        onOpenChange={setShowAuthDialog} 
       />
     </>
   )
