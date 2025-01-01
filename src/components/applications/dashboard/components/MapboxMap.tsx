@@ -27,6 +27,7 @@ export const MapboxMap = ({
   const [debugInfo, setDebugInfo] = useState<string>('');
   const prevApplicationsRef = useRef(applications);
   const initializedRef = useRef(false);
+  const initialBoundsFitRef = useRef(false);
 
   // Initialize map only once
   useEffect(() => {
@@ -56,23 +57,8 @@ export const MapboxMap = ({
             markerManager.current?.addMarker(application, application.id === selectedId);
           });
 
-          // Only fit bounds on initial load if we have applications
-          if (applications.length > 0) {
-            const bounds = new mapboxgl.LngLatBounds();
-            applications.forEach(application => {
-              if (application.coordinates) {
-                bounds.extend([application.coordinates[1], application.coordinates[0]]);
-              }
-            });
-            
-            newMap.fitBounds(bounds, {
-              padding: { top: 50, bottom: 50, left: 50, right: 50 },
-              maxZoom: 15
-            });
-          }
+          initializedRef.current = true;
         });
-
-        initializedRef.current = true;
       }
     };
 
@@ -89,8 +75,32 @@ export const MapboxMap = ({
         map.current = null;
       }
       initializedRef.current = false;
+      initialBoundsFitRef.current = false;
     };
   }, [initialCenter, onMarkerClick]);
+
+  // Fit bounds only on initial load with applications
+  useEffect(() => {
+    if (!map.current || initialBoundsFitRef.current || applications.length === 0) return;
+
+    const bounds = new mapboxgl.LngLatBounds();
+    let hasValidCoordinates = false;
+
+    applications.forEach(application => {
+      if (application.coordinates) {
+        bounds.extend([application.coordinates[1], application.coordinates[0]]);
+        hasValidCoordinates = true;
+      }
+    });
+
+    if (hasValidCoordinates) {
+      map.current.fitBounds(bounds, {
+        padding: { top: 50, bottom: 50, left: 50, right: 50 },
+        maxZoom: 15
+      });
+      initialBoundsFitRef.current = true;
+    }
+  }, [applications, map.current]);
 
   // Update markers when applications array changes
   useEffect(() => {
