@@ -1,6 +1,6 @@
 import mapboxgl from 'mapbox-gl';
-import { supabase } from "@/integrations/supabase/client";
 import { LatLngTuple } from 'leaflet';
+import { supabase } from "@/integrations/supabase/client";
 
 export class MapboxInitializer {
   static async initialize(
@@ -40,7 +40,7 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        style: 'mapbox://styles/mapbox/light-v11', // Using a simpler style
+        style: 'mapbox://styles/mapbox/streets-v12',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
         maxZoom: 18,
