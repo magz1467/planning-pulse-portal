@@ -25,34 +25,45 @@ export const MapboxMap = ({
 
   useEffect(() => {
     const initializeMap = async () => {
-      if (!mapContainer.current) return;
+      if (!mapContainer.current) {
+        console.error('Map container ref is not available');
+        return;
+      }
 
       try {
         // Get Mapbox token from Supabase
-        const { data: { token }, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+        console.log('Fetching Mapbox token from Supabase...');
+        const { data, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
         
         if (tokenError) {
           console.error('Error getting Mapbox token:', tokenError);
-          setError('Failed to initialize map: Could not retrieve access token');
+          setError(`Failed to initialize map: ${tokenError.message}`);
           return;
         }
 
-        if (!token) {
-          console.error('No Mapbox token returned from function');
+        if (!data || !data.token) {
+          console.error('No Mapbox token returned from function. Response:', data);
           setError('Failed to initialize map: No access token available');
           return;
         }
 
         console.log('Successfully retrieved Mapbox token');
-        mapboxgl.accessToken = token;
+        mapboxgl.accessToken = data.token;
 
         // Create map
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12',
-          center: [initialCenter[1], initialCenter[0]], // Mapbox uses [lng, lat]
-          zoom: 14,
-        });
+        console.log('Initializing map with center:', [initialCenter[1], initialCenter[0]]);
+        try {
+          map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [initialCenter[1], initialCenter[0]], // Mapbox uses [lng, lat]
+            zoom: 14,
+          });
+        } catch (mapError) {
+          console.error('Error creating Mapbox map:', mapError);
+          setError(`Failed to create map: ${mapError instanceof Error ? mapError.message : 'Unknown error'}`);
+          return;
+        }
 
         // Add navigation controls
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -60,6 +71,7 @@ export const MapboxMap = ({
         // Wait for map to load before adding markers
         map.current.on('load', () => {
           console.log('Map loaded successfully');
+          console.log('Adding markers for', applications.length, 'applications');
           
           // Clear existing markers
           Object.values(markers.current).forEach(marker => marker.remove());
@@ -67,7 +79,10 @@ export const MapboxMap = ({
 
           // Add markers for each application
           applications.forEach(application => {
-            if (!application.coordinates) return;
+            if (!application.coordinates) {
+              console.warn(`Application ${application.id} has no coordinates`);
+              return;
+            }
             
             const el = document.createElement('div');
             el.className = 'marker';
@@ -78,33 +93,38 @@ export const MapboxMap = ({
             el.style.border = '2px solid white';
             el.style.cursor = 'pointer';
 
-            const marker = new mapboxgl.Marker(el)
-              .setLngLat([application.coordinates[1], application.coordinates[0]])
-              .addTo(map.current!);
+            try {
+              const marker = new mapboxgl.Marker(el)
+                .setLngLat([application.coordinates[1], application.coordinates[0]])
+                .addTo(map.current!);
 
-            el.addEventListener('click', () => {
-              onMarkerClick(application.id);
-            });
+              el.addEventListener('click', () => {
+                onMarkerClick(application.id);
+              });
 
-            markers.current[application.id] = marker;
+              markers.current[application.id] = marker;
+            } catch (markerError) {
+              console.error(`Error adding marker for application ${application.id}:`, markerError);
+            }
           });
         });
 
         // Add error handling for map load
         map.current.on('error', (e) => {
           console.error('Mapbox map error:', e);
-          setError('Error loading map. Please try again later.');
+          setError(`Error loading map: ${e.error?.message || 'Please try again later.'}`);
         });
 
       } catch (err) {
         console.error('Error initializing map:', err);
-        setError('Failed to initialize map: An unexpected error occurred');
+        setError(`Failed to initialize map: ${err instanceof Error ? err.message : 'An unexpected error occurred'}`);
       }
     };
 
     initializeMap();
 
     return () => {
+      console.log('Cleaning up map...');
       // Cleanup function
       if (markers.current) {
         // Remove all markers first
