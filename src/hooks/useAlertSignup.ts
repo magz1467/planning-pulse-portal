@@ -36,6 +36,7 @@ export const useAlertSignup = (postcode: string) => {
           .update({
             "Post Code": postcode,
             Radius_from_pc: parseInt(radius),
+            Type: 'area_alert'
           })
           .eq('Email', session.user.email)
         dbError = error
@@ -48,6 +49,7 @@ export const useAlertSignup = (postcode: string) => {
               Email: session.user.email,
               "Post Code": postcode,
               Radius_from_pc: parseInt(radius),
+              Type: 'area_alert'
             }
           ])
         dbError = error
