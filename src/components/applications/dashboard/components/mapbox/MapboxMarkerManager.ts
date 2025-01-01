@@ -2,7 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import { Application } from '@/types/planning';
 
 export class MapboxMarkerManager {
-  private markers: { [key: number]: mapboxgl.Marker } = {};
+  private markers: { [key: number]: { marker: mapboxgl.Marker, application: Application } } = {};
   
   constructor(private map: mapboxgl.Map, private onMarkerClick: (id: number) => void) {}
 
@@ -48,31 +48,30 @@ export class MapboxMarkerManager {
         this.onMarkerClick(application.id);
       });
 
-      this.markers[application.id] = marker;
+      this.markers[application.id] = { marker, application };
     } catch (error) {
       console.error(`Error adding marker for application ${application.id}:`, error);
     }
   }
 
   updateMarkerStyle(id: number, isSelected: boolean) {
-    const marker = this.markers[id];
-    if (marker) {
-      const el = marker.getElement();
-      const application = this.map.getStyle().sources[`marker-${id}`]?.data?.properties;
-      el.style.backgroundColor = isSelected ? '#065F46' : this.getStatusColor(application?.status || '');
+    const markerData = this.markers[id];
+    if (markerData) {
+      const el = markerData.marker.getElement();
+      el.style.backgroundColor = isSelected ? '#065F46' : this.getStatusColor(markerData.application.status);
     }
   }
 
   removeMarker(id: number) {
-    const marker = this.markers[id];
-    if (marker) {
-      marker.remove();
+    const markerData = this.markers[id];
+    if (markerData) {
+      markerData.marker.remove();
       delete this.markers[id];
     }
   }
 
   removeAllMarkers() {
-    Object.values(this.markers).forEach(marker => {
+    Object.values(this.markers).forEach(({ marker }) => {
       try {
         if (marker) {
           marker.remove();
