@@ -19,3 +19,10 @@ export interface Application {
   last_date_consultation_comments?: string;
   valid_date?: string;
 }
+
+export interface Comment {
+  id: number;
+  content: string;
+  author: string;
+  timestamp: string;
+}
