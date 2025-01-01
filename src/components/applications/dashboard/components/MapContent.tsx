@@ -23,7 +23,10 @@ export const MapContent = ({
 
   return (
     <div className="flex-1 relative h-full">
-      <div className={`absolute inset-0 ${isMobile ? 'h-[calc(100vh-120px)]' : 'h-full'}`}>
+      <div 
+        className={`absolute inset-0 ${isMobile ? 'h-[calc(100vh-120px)] top-0 left-0 right-0 bottom-0 z-10' : 'h-full'}`}
+        style={{ position: 'absolute' }}
+      >
         <MapView
           applications={applications}
           selectedId={selectedId}
