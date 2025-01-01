@@ -32,7 +32,7 @@ export const SearchForm = () => {
         state: { 
           postcode: postcode.trim(),
           tab: activeTab,
-          initialFilter: activeTab === 'completed' ? 'Approved' : undefined
+          initialFilter: activeTab === 'completed' ? 'Approved' : 'Under Review'
         } 
       });
     } catch (error) {
