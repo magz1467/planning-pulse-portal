@@ -99,6 +99,7 @@ export const MapContentLayout = ({
             postcode={postcode}
             onSelectApplication={onMarkerClick}
             onShowEmailDialog={() => setShowEmailDialog(true)}
+            onClose={handleClose}
           />
         )}
       </div>
