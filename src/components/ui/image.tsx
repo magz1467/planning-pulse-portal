@@ -1,23 +1,26 @@
-import NextImage, { ImageProps as NextImageProps } from 'next/image';
-import { useState } from 'react';
+import { useState } from "react";
 
-interface ImageProps extends Omit<NextImageProps, 'src'> {
-  src: string;
+interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  width?: number;
+  height?: number;
 }
 
-const Image = ({ src, alt, ...props }: ImageProps) => {
+const Image = ({ src, alt, className, width, height, loading = "lazy", ...props }: ImageProps) => {
   const [error, setError] = useState(false);
   
   // If the image is a local asset (starts with /) use it directly
-  const imageSrc = src.startsWith('/') ? src : src;
+  const imageSrc = src?.startsWith('/') ? src : src;
 
   return (
-    <NextImage
-      {...props}
+    <img
       src={error ? '/placeholder.svg' : imageSrc}
-      alt={alt}
+      alt={alt || ''}
+      className={className || ''}
       onError={() => setError(true)}
-      unoptimized={src.startsWith('/')} // Don't optimize local assets
+      loading={loading}
+      width={width}
+      height={height}
+      {...props}
     />
   );
 };
