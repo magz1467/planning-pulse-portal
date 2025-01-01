@@ -37,51 +37,31 @@ export class MapboxInitializer {
       console.log('Successfully retrieved Mapbox token');
       mapboxgl.accessToken = data.token;
 
-      // Test token validity before map creation
-      try {
-        await fetch(`https://api.mapbox.com/tokens/v2/validate?access_token=${data.token}`);
-      } catch (validationError) {
-        const msg = 'Mapbox token validation failed';
-        console.error(msg, {
-          error: validationError,
-          context: 'Token validation'
-        });
-        onError(msg, JSON.stringify(validationError, null, 2));
-        return null;
-      }
-
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        style: 'mapbox://styles/mapbox/streets-v12', // Using a more stable style
+        style: 'mapbox://styles/mapbox/streets-v12',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
-        transformRequest: (url, resourceType) => {
-          if (resourceType === 'Style' && !url.includes('mapbox://styles')) {
-            return { url: `${url}?access_token=${data.token}` };
-          }
-          return null;
-        }
+        maxZoom: 18,
+        minZoom: 9,
+        attributionControl: true,
+        failIfMajorPerformanceCaveat: true,
+        preserveDrawingBuffer: true,
+        antialias: true
       });
 
+      // Add navigation control
       map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-      // Add detailed error logging
-      map.on('error', (e: mapboxgl.MapboxEvent & { error?: Error }) => {
-        const msg = `Mapbox map error: ${e.error?.message || 'Unknown error'}`;
-        const errorDetails = {
-          message: e.error?.message || '',
-          type: e.type,
-          target: e.target.getStyle()?.name || 'unknown style',
-          style: e.target.getStyle()?.name
-        };
-        
+      // Add error handling
+      map.on('error', (e) => {
+        const msg = `Map error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
-          error: errorDetails,
+          error: e.error,
           context: 'Map runtime error'
         });
-        
-        onError(msg, JSON.stringify(errorDetails, null, 2));
+        onError(msg, JSON.stringify(e.error, null, 2));
       });
 
       // Add style load success handler
@@ -89,17 +69,18 @@ export class MapboxInitializer {
         console.log('Map style loaded successfully');
       });
 
-      // Add style load error handling
-      map.on('style.error', (e: mapboxgl.MapboxEvent & { error?: Error }) => {
-        const msg = `Map style error: ${e.error?.message || 'Unknown error'}`;
+      // Add style load error handler
+      map.on('style.error', (e) => {
+        const msg = `Style error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
-          context: 'Style loading error',
-          style: e.target.getStyle()?.name
+          context: 'Style loading error'
         });
+        onError(msg, JSON.stringify(e.error, null, 2));
       });
 
       return map;
+
     } catch (error) {
       const msg = `Error initializing map: ${error instanceof Error ? error.message : 'Unknown error'}`;
       console.error(msg, {
