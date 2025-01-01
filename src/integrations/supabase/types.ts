@@ -126,6 +126,7 @@ export type Database = {
           epc_number: string | null
           geom: unknown | null
           id: string
+          image_map_url: string | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
@@ -183,6 +184,7 @@ export type Database = {
           epc_number?: string | null
           geom?: unknown | null
           id: string
+          image_map_url?: string | null
           lapsed_date?: string | null
           last_date_consultation_comments?: string | null
           last_synced?: string | null
@@ -240,6 +242,7 @@ export type Database = {
           epc_number?: string | null
           geom?: unknown | null
           id?: string
+          image_map_url?: string | null
           lapsed_date?: string | null
           last_date_consultation_comments?: string | null
           last_synced?: string | null
@@ -1465,6 +1468,7 @@ export type Database = {
           epc_number: string | null
           geom: unknown | null
           id: string
+          image_map_url: string | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
@@ -1531,6 +1535,7 @@ export type Database = {
           epc_number: string | null
           geom: unknown | null
           id: string
+          image_map_url: string | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null

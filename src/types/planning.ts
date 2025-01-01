@@ -14,6 +14,7 @@ export interface Application {
   officer: string;
   consultationEnd: string;
   image?: string;
+  image_map_url?: string;
   coordinates: [number, number];
   postcode: string;
   ai_title?: string;
