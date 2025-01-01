@@ -24,13 +24,10 @@ export const MapContent = ({
   return (
     <div className="flex-1 relative h-full">
       <div 
-        className={`absolute inset-0 ${isMobile ? 'h-[calc(100vh-120px)]' : 'h-full'}`}
+        className="absolute inset-0"
         style={{ 
-          position: 'fixed',
-          top: isMobile ? '120px' : 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
+          height: isMobile ? 'calc(100vh - 120px)' : '100%',
+          position: 'relative', // Changed from fixed to relative
           zIndex: 1
         }}
       >

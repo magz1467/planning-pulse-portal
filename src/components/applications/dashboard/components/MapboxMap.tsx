@@ -34,12 +34,19 @@ export const MapboxMap = ({
     if (initializedRef.current || !mapContainer.current) return;
 
     const initializeMap = async () => {
-      console.log('Initializing map...');
+      console.log('Initializing map...', {
+        containerExists: !!mapContainer.current,
+        dimensions: mapContainer.current ? {
+          width: mapContainer.current.offsetWidth,
+          height: mapContainer.current.offsetHeight
+        } : null
+      });
       
       const newMap = await MapboxInitializer.initialize(
         mapContainer.current!,
         initialCenter,
         (error, debug) => {
+          console.error('Map initialization error:', error, debug);
           setError(error);
           setDebugInfo(debug);
         }
@@ -80,13 +87,19 @@ export const MapboxMap = ({
 
           initializedRef.current = true;
         });
+
+        // Add error handler
+        newMap.on('error', (e) => {
+          console.error('Mapbox error:', e);
+        });
       }
     };
 
     initializeMap();
 
-    // Cleanup function should only run when component unmounts
+    // Cleanup function
     return () => {
+      console.log('Cleaning up map...');
       if (markerManager.current) {
         markerManager.current.removeAllMarkers();
         markerManager.current = null;
@@ -137,7 +150,11 @@ export const MapboxMap = ({
 
   return (
     <div className="w-full h-full relative">
-      <div ref={mapContainer} className="absolute inset-0" />
+      <div 
+        ref={mapContainer} 
+        className="absolute inset-0"
+        style={{ backgroundColor: '#f8f9fa' }} // Add background color to make it visible while loading
+      />
       <MapboxErrorDisplay error={error} debugInfo={debugInfo} />
     </div>
   );
