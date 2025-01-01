@@ -2,7 +2,7 @@ import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin, Timer } from "lucide-react";
 import Image from "@/components/ui/image";
-import { getStatusColor } from "@/utils/statusColors";
+import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
@@ -55,7 +55,7 @@ export const PlanningApplicationList = ({
                 <div className="flex justify-between items-center mt-2">
                   <div className="flex items-center gap-2">
                     <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-                      {application.status}
+                      {getStatusText(application.status)}
                     </span>
                     {isClosingSoon && (
                       <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
