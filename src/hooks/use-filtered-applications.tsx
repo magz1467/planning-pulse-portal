@@ -69,15 +69,45 @@ export const useFilteredApplications = (
     // Sort applications if sort is active
     if (activeSort === 'closingSoon') {
       filtered.sort((a, b) => {
-        const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : null;
-        const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : null;
+        // Parse dates, handling potential invalid formats
+        let dateA: Date | null = null;
+        let dateB: Date | null = null;
+        
+        try {
+          if (a.last_date_consultation_comments) {
+            dateA = new Date(a.last_date_consultation_comments);
+            // Check if date is valid
+            if (isNaN(dateA.getTime())) dateA = null;
+          }
+        } catch (e) {
+          console.log('Invalid date format for app:', a.id);
+          dateA = null;
+        }
+        
+        try {
+          if (b.last_date_consultation_comments) {
+            dateB = new Date(b.last_date_consultation_comments);
+            // Check if date is valid
+            if (isNaN(dateB.getTime())) dateB = null;
+          }
+        } catch (e) {
+          console.log('Invalid date format for app:', b.id);
+          dateB = null;
+        }
+
         const now = new Date();
+        now.setHours(0, 0, 0, 0);
 
         // Helper function to check if date is in the future
         const isFuture = (date: Date | null) => date && date > now;
         
         // Helper function to check if date is within next 7 days
-        const isClosingSoon = (date: Date | null) => date && isWithinNextSevenDays(date.toISOString());
+        const isClosingSoon = (date: Date | null) => {
+          if (!date) return false;
+          const diffTime = date.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays > 0 && diffDays <= 7;
+        };
 
         // If both dates are in the future
         if (isFuture(dateA) && isFuture(dateB)) {
@@ -110,8 +140,28 @@ export const useFilteredApplications = (
       });
     } else if (activeSort === 'newest') {
       filtered.sort((a, b) => {
-        const dateA = a.valid_date ? new Date(a.valid_date) : null;
-        const dateB = b.valid_date ? new Date(b.valid_date) : null;
+        let dateA: Date | null = null;
+        let dateB: Date | null = null;
+
+        try {
+          if (a.valid_date) {
+            dateA = new Date(a.valid_date);
+            if (isNaN(dateA.getTime())) dateA = null;
+          }
+        } catch (e) {
+          console.log('Invalid valid_date format for app:', a.id);
+          dateA = null;
+        }
+
+        try {
+          if (b.valid_date) {
+            dateB = new Date(b.valid_date);
+            if (isNaN(dateB.getTime())) dateB = null;
+          }
+        } catch (e) {
+          console.log('Invalid valid_date format for app:', b.id);
+          dateB = null;
+        }
         
         if (dateA && dateB) {
           return dateB.getTime() - dateA.getTime();
