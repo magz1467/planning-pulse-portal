@@ -36,7 +36,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
         throw new Error("User not authenticated")
       }
 
-      // Check if user already has a record
+      // Check if user already has a record - note the capital E in Email
       const { data: existingData } = await supabase
         .from('User_data')
         .select()
@@ -50,7 +50,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
           .from('User_data')
           .update({
             Marketing: true,
-            Post_Code: postcode,
+            "Post Code": postcode,
             Radius_from_pc: parseInt(radius),
           })
           .eq('Email', session.user.email)
@@ -63,7 +63,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
             {
               Email: session.user.email,
               Marketing: true,
-              Post_Code: postcode,
+              "Post Code": postcode,
               Radius_from_pc: parseInt(radius),
             }
           ])
