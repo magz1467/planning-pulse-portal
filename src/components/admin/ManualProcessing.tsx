@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -12,7 +14,44 @@ export const ManualProcessing = ({
   processingBatchSize, 
   onGenerate 
 }: ManualProcessingProps) => {
+  const { toast } = useToast();
+  const [isGeneratingMaps, setIsGeneratingMaps] = useState(false);
   const batchSizes = [50, 100, 250, 500];
+
+  const handleGenerateMaps = async () => {
+    try {
+      setIsGeneratingMaps(true);
+      toast({
+        title: "Generating static maps",
+        description: "This may take a few minutes for up to 100 applications",
+      });
+
+      const response = await fetch('https://jposqxdboetyioymfswd.supabase.co/functions/v1/generate-static-maps-manual', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        }
+      });
+
+      const data = await response.json();
+      
+      toast({
+        title: "Success!",
+        description: `Generated ${data.success} static maps. ${data.errors} failed.`,
+      });
+
+    } catch (error) {
+      console.error('Error generating maps:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate static maps. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingMaps(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -38,18 +77,11 @@ export const ManualProcessing = ({
       
       <div>
         <Button
-          onClick={() => {
-            fetch('https://jposqxdboetyioymfswd.supabase.co/functions/v1/generate-static-maps-manual', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-              }
-            });
-          }}
+          onClick={handleGenerateMaps}
           className="w-full md:w-auto"
+          disabled={isGeneratingMaps}
         >
-          Generate Static Maps
+          {isGeneratingMaps ? "Generating Maps..." : "Generate Static Maps"}
         </Button>
         <p className="mt-2 text-sm text-muted-foreground">
           Click to generate static map images for applications that don't have them yet (processes up to 100 at a time).
