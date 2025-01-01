@@ -53,7 +53,6 @@ export const MapboxMap = ({
         newMap.on('load', () => {
           console.log('Map loaded successfully');
           
-          // Only update markers if the applications array has changed
           if (applications !== previousApplicationsRef.current) {
             markerManager.current?.removeAllMarkers();
             applications.forEach(application => {
@@ -61,7 +60,6 @@ export const MapboxMap = ({
             });
             previousApplicationsRef.current = applications;
 
-            // Only fit bounds on initial load and when there are applications
             if (!hasInitiallyLoaded && applications.length > 0) {
               const bounds = new mapboxgl.LngLatBounds();
               applications.forEach(application => {
@@ -70,10 +68,9 @@ export const MapboxMap = ({
                 }
               });
               
-              // Add some padding around the bounds
               newMap.fitBounds(bounds, {
                 padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                maxZoom: 15 // Prevent zooming in too close
+                maxZoom: 15
               });
               setHasInitiallyLoaded(true);
             }
@@ -101,7 +98,6 @@ export const MapboxMap = ({
     };
   }, [initialCenter, applications, selectedId, onMarkerClick, hasInitiallyLoaded]);
 
-  // Update markers when selection changes
   useEffect(() => {
     if (markerManager.current) {
       Object.keys(markerManager.current.getMarkers()).forEach(id => {
