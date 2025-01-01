@@ -6,6 +6,24 @@ export class MapboxMarkerManager {
   
   constructor(private map: mapboxgl.Map, private onMarkerClick: (id: number) => void) {}
 
+  private getStatusColor(status: string): string {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
+      case 'declined':
+      case 'refused':
+        return '#ea384c'; // Red for declined/refused
+      case 'under review':
+      case 'pending':
+      case 'under consideration':
+      case 'application under consideration':
+        return '#F97316'; // Orange for in-progress
+      case 'approved':
+        return '#16a34a'; // Green for approved
+      default:
+        return '#10B981'; // Default color
+    }
+  }
+
   addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
       console.warn(`Application ${application.id} has no coordinates`);
@@ -18,7 +36,7 @@ export class MapboxMarkerManager {
       el.style.width = '25px';
       el.style.height = '25px';
       el.style.borderRadius = '50%';
-      el.style.backgroundColor = isSelected ? '#065F46' : '#10B981';
+      el.style.backgroundColor = isSelected ? '#065F46' : this.getStatusColor(application.status);
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
 
@@ -40,7 +58,8 @@ export class MapboxMarkerManager {
     const marker = this.markers[id];
     if (marker) {
       const el = marker.getElement();
-      el.style.backgroundColor = isSelected ? '#065F46' : '#10B981';
+      const application = this.map.getStyle().sources[`marker-${id}`]?.data?.properties;
+      el.style.backgroundColor = isSelected ? '#065F46' : this.getStatusColor(application?.status || '');
     }
   }
 
