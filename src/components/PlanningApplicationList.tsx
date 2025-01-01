@@ -36,7 +36,7 @@ export const PlanningApplicationList = ({
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <Image
-                  src={application.image}
+                  src="/placeholder.svg"
                   alt={application.description || ''}
                   width={80}
                   height={80}

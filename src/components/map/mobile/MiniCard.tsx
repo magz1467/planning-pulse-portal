@@ -22,7 +22,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-4 items-center">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
           <Image
-            src={application.image}
+            src="/placeholder.svg"
             alt={application.title}
             width={80}
             height={80}
