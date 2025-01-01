@@ -43,10 +43,10 @@ export const MapboxMap = ({
 
         mapboxgl.accessToken = token;
 
-        // Create the map instance
+        // Create the map instance with a simpler style URL
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/light-v11',
+          style: 'mapbox://styles/mapbox/streets-v12', // Using a simpler style URL
           center: [initialCenter[1], initialCenter[0]], // Mapbox uses [lng, lat]
           zoom: 14,
         });
@@ -84,6 +84,13 @@ export const MapboxMap = ({
             markers.current[application.id] = marker;
           });
         });
+
+        // Add error handling for map load
+        map.current.on('error', (e) => {
+          console.error('Mapbox map error:', e);
+          setError('Error loading map. Please try again later.');
+        });
+
       } catch (err) {
         console.error('Error initializing map:', err);
         setError('Failed to initialize map: An unexpected error occurred');
