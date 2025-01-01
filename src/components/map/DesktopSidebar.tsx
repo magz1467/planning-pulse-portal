@@ -54,10 +54,6 @@ export const DesktopSidebar = ({
     });
   };
 
-  const handleClose = useCallback(() => {
-    onSelectApplication(null);
-  }, [onSelectApplication]);
-
   return (
     <div className="w-[350px] h-full overflow-hidden border-r border-gray-200 bg-white">
       {selectedApplication === null ? (
@@ -75,7 +71,7 @@ export const DesktopSidebar = ({
       ) : selectedApplicationData && (
         <ApplicationDetailView
           application={selectedApplicationData}
-          onClose={handleClose}
+          onClose={onClose}
         />
       )}
 
