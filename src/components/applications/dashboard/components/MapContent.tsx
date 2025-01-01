@@ -22,20 +22,22 @@ export const MapContent = ({
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   return (
-    <div className="flex-1 relative">
-      <MapView
-        applications={applications}
-        selectedId={selectedId}
-        onMarkerClick={onMarkerClick}
-        initialCenter={coordinates}
-      />
-      {isMobile && selectedId && (
-        <MobileApplicationCards
+    <div className="flex-1 relative h-full">
+      <div className={`absolute inset-0 ${isMobile ? 'h-[calc(100vh-120px)]' : 'h-full'}`}>
+        <MapView
           applications={applications}
           selectedId={selectedId}
-          onSelectApplication={onMarkerClick}
+          onMarkerClick={onMarkerClick}
+          initialCenter={coordinates}
         />
-      )}
+        {isMobile && selectedId && (
+          <MobileApplicationCards
+            applications={applications}
+            selectedId={selectedId}
+            onSelectApplication={onMarkerClick}
+          />
+        )}
+      </div>
     </div>
   );
 };
