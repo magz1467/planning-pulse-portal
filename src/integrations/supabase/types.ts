@@ -65,6 +65,35 @@ export type Database = {
         }
         Relationships: []
       }
+      application_map_images: {
+        Row: {
+          application_id: number | null
+          created_at: string
+          id: number
+          image_url: string
+        }
+        Insert: {
+          application_id?: number | null
+          created_at?: string
+          id?: never
+          image_url: string
+        }
+        Update: {
+          application_id?: number | null
+          created_at?: string
+          id?: never
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_map_images_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "applications"
+            referencedColumns: ["application_id"]
+          },
+        ]
+      }
       applications: {
         Row: {
           actual_commencement_date: string | null
