@@ -4,7 +4,7 @@ import { Application } from "@/types/planning";
 interface SortDropdownProps {
   children?: React.ReactNode;
   applications?: Application[];
-  onSortedApplications?: (sortedApps: Application[]) => void;
+  onSortedApplications?: (sortedApps: Application[], sortType: 'closingSoon' | 'newest' | null) => void;
 }
 
 export const SortDropdown = ({ children, applications = [], onSortedApplications }: SortDropdownProps) => {
@@ -13,22 +13,21 @@ export const SortDropdown = ({ children, applications = [], onSortedApplications
     
     let sortedApps = [...applications];
     
-    if (sortType) {
+    if (sortType === 'newest') {
       sortedApps.sort((a, b) => {
-        if (sortType === 'newest') {
-          const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
-          const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
-          return dateB.getTime() - dateA.getTime();
-        } else if (sortType === 'closingSoon') {
-          const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : new Date(0);
-          const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : new Date(0);
-          return dateA.getTime() - dateB.getTime();
-        }
-        return 0;
+        const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
+        const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+    } else if (sortType === 'closingSoon') {
+      sortedApps.sort((a, b) => {
+        const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : new Date(0);
+        const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : new Date(0);
+        return dateA.getTime() - dateB.getTime();
       });
     }
 
-    onSortedApplications(sortedApps);
+    onSortedApplications(sortedApps, sortType);
   };
 
   return (

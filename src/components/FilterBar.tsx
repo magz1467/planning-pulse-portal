@@ -37,34 +37,9 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
-  const handleSortedApplications = (sortedApps: Application[]) => {
+  const handleSortedApplications = (sortedApps: Application[], sortType: 'closingSoon' | 'newest' | null) => {
     if (!onSortChange) return;
-    
-    // Find which sort type was applied based on the order
-    let appliedSortType: 'closingSoon' | 'newest' | null = null;
-    
-    if (sortedApps.length > 1) {
-      const first = sortedApps[0];
-      const last = sortedApps[sortedApps.length - 1];
-      
-      if (first.valid_date && last.valid_date) {
-        const firstDate = new Date(first.valid_date);
-        const lastDate = new Date(last.valid_date);
-        if (firstDate > lastDate) {
-          appliedSortType = 'newest';
-        }
-      }
-      
-      if (first.last_date_consultation_comments && last.last_date_consultation_comments) {
-        const firstDate = new Date(first.last_date_consultation_comments);
-        const lastDate = new Date(last.last_date_consultation_comments);
-        if (firstDate < lastDate) {
-          appliedSortType = 'closingSoon';
-        }
-      }
-    }
-    
-    onSortChange(appliedSortType);
+    onSortChange(sortType);
   };
 
   return (
