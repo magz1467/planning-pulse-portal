@@ -28,8 +28,9 @@ serve(async (req) => {
     // Get all applications with coordinates
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
-      .select('application_id, coordinates')
-      .not('coordinates', 'is', null)
+      .select('application_id, geom')
+      .is('image_map_url', null)  // Only get applications without an image
+      .not('geom', 'is', null)
       .limit(100) // Process in batches
 
     if (fetchError) {
@@ -41,12 +42,19 @@ serve(async (req) => {
     const results = await Promise.all(
       applications.map(async (app) => {
         try {
-          if (!app.coordinates) {
+          if (!app.geom) {
             console.log(`Skipping application ${app.application_id} - no coordinates`)
             return null
           }
 
-          const [lat, lng] = app.coordinates
+          // Extract coordinates from geom
+          const coordinates = app.geom.coordinates
+          if (!coordinates || coordinates.length < 2) {
+            console.log(`Invalid coordinates for application ${app.application_id}`)
+            return null
+          }
+
+          const [lng, lat] = coordinates
           
           // Generate static map URL with 3D effect
           const width = 800
@@ -57,18 +65,14 @@ serve(async (req) => {
 
           const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/${lng},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
 
-          // Store or update the URL in Supabase
-          const { error: upsertError } = await supabase
-            .from('application_map_images')
-            .upsert({
-              application_id: app.application_id,
-              image_url: staticMapUrl
-            }, {
-              onConflict: 'application_id'
-            })
+          // Update the application with the new image URL
+          const { error: updateError } = await supabase
+            .from('applications')
+            .update({ image_map_url: staticMapUrl })
+            .eq('application_id', app.application_id)
 
-          if (upsertError) {
-            throw upsertError
+          if (updateError) {
+            throw updateError
           }
 
           console.log(`Successfully processed application ${app.application_id}`)
