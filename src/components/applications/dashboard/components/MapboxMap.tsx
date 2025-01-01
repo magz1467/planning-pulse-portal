@@ -43,10 +43,10 @@ export const MapboxMap = ({
 
         mapboxgl.accessToken = token;
 
-        // Create the map instance with a simpler style URL
+        // Create map with basic style
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12',
+          style: 'mapbox://styles/mapbox/light-v11', // Using a basic style
           center: [initialCenter[1], initialCenter[0]], // Mapbox uses [lng, lat]
           zoom: 14,
         });
