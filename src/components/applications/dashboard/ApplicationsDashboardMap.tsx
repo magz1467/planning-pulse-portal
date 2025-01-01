@@ -46,7 +46,7 @@ export const ApplicationsDashboardMap = () => {
 
       <div className="flex-1 relative w-full">
         <div className="absolute inset-0 flex">
-          {(!isMobile || !isMapView) && coordinates && (
+          {!isMobile && coordinates && (
             <DesktopSidebar
               applications={filteredApplications}
               selectedApplication={selectedId}

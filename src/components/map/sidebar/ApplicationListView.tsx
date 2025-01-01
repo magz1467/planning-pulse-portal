@@ -2,8 +2,6 @@ import { Application } from "@/types/planning";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 import { AlertSection } from "./AlertSection";
 import { FilterBar } from "@/components/FilterBar";
-import { useState } from "react";
-import { SortDropdown } from "../filter/SortDropdown";
 
 interface ApplicationListViewProps {
   applications: Application[];
@@ -32,32 +30,29 @@ export const ApplicationListView = ({
   onShowEmailDialog,
   onFilterChange,
   activeFilters = {},
+  onSortChange,
+  activeSort,
   statusCounts
 }: ApplicationListViewProps) => {
-  const [sortedApplications, setSortedApplications] = useState(applications);
-
   return (
     <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-10 bg-white">
-          <div className="flex items-center justify-between p-2 border-b">
-            <FilterBar 
-              onFilterChange={onFilterChange}
-              activeFilters={activeFilters}
-              statusCounts={statusCounts}
-            />
-            <SortDropdown 
-              applications={applications}
-              onSortedApplications={setSortedApplications}
-            />
-          </div>
+          <FilterBar 
+            onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            applications={applications}
+            statusCounts={statusCounts}
+          />
         </div>
         <AlertSection 
           postcode={postcode}
           onShowEmailDialog={onShowEmailDialog}
         />
         <PlanningApplicationList
-          applications={sortedApplications}
+          applications={applications}
           postcode={postcode}
           onSelectApplication={onSelectApplication}
         />
