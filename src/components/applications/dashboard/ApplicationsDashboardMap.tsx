@@ -70,8 +70,11 @@ export const ApplicationsDashboardMap = () => {
     setActiveSort(sortType);
   };
 
-  const selectedApplication = applications.find(app => app.id === selectedId);
+  const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
+
+  // Ensure applications is always an array
+  const safeApplications = applications || [];
 
   return (
     <div className="h-screen w-full flex flex-col">
@@ -85,14 +88,14 @@ export const ApplicationsDashboardMap = () => {
         activeSort={activeSort}
         isMapView={isMapView}
         onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
-        applications={applications}
+        applications={safeApplications}
       />
 
       <div className="flex-1 relative w-full">
         <div className="absolute inset-0 flex">
           {(!isMobile || !isMapView) && searchPoint && (
             <DesktopSidebar
-              applications={applications}
+              applications={safeApplications}
               selectedApplication={selectedId}
               postcode={postcode}
               activeFilters={activeFilters}
@@ -107,7 +110,7 @@ export const ApplicationsDashboardMap = () => {
           {(!isMobile || isMapView) && coordinates && (
             <div className="flex-1 relative">
               <MapView
-                applications={applications}
+                applications={safeApplications}
                 selectedId={selectedId}
                 onMarkerClick={handleMarkerClick}
                 initialCenter={coordinates}
@@ -117,7 +120,7 @@ export const ApplicationsDashboardMap = () => {
 
           {isMobile && !isMapView && searchPoint && (
             <MobileListContainer
-              applications={applications}
+              applications={safeApplications}
               selectedApplication={selectedId}
               postcode={postcode}
               onSelectApplication={handleMarkerClick}
