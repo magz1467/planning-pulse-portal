@@ -1,21 +1,43 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { corsHeaders } from '../_shared/cors.ts'
 
-serve(async (req) => {
+interface StatusCount {
+  status: string;
+  count: number;
+}
+
+interface ApplicationsResponse {
+  applications: any[];
+  statusCounts: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
+  total: number;
+}
+
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
+
   try {
-    const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0 } = await req.json()
+    const { center_lng, center_lat, radius_meters = 1000, page_size = 100, page_number = 0 } = await req.json()
 
+    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get applications within radius
+    // Get applications
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
       {
         center_lng,
-        center_lat, 
+        center_lat,
         radius_meters,
         page_size,
         page_number
@@ -23,11 +45,55 @@ serve(async (req) => {
     )
 
     if (applicationsError) {
+      console.error('Error fetching applications:', applicationsError)
       throw applicationsError
     }
 
-    // Get status counts
-    const { data: statusCounts, error: statusError } = await supabaseClient.rpc(
+    if (!applications || applications.length === 0) {
+      console.log('No applications found in radius', radius_meters, 'meters from', [center_lat, center_lng])
+      return new Response(
+        JSON.stringify({
+          applications: [],
+          statusCounts: {
+            'Under Review': 0,
+            'Approved': 0,
+            'Declined': 0,
+            'Other': 0
+          },
+          total: 0
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Calculate status counts
+    const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
+      const status = app.status?.trim().toLowerCase() || ''
+      
+      if (status.includes('under review') || 
+          status.includes('under consideration') ||
+          status.includes('pending')) {
+        acc['Under Review'] = (acc['Under Review'] || 0) + 1
+      } else if (status.includes('approved') || 
+                 status.includes('granted')) {
+        acc['Approved'] = (acc['Approved'] || 0) + 1
+      } else if (status.includes('declined') || 
+                 status.includes('refused') || 
+                 status.includes('rejected')) {
+        acc['Declined'] = (acc['Declined'] || 0) + 1
+      } else {
+        acc['Other'] = (acc['Other'] || 0) + 1
+      }
+      return acc
+    }, {
+      'Under Review': 0,
+      'Approved': 0,
+      'Declined': 0,
+      'Other': 0
+    })
+
+    // Get total count
+    const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
         center_lng,
@@ -36,54 +102,26 @@ serve(async (req) => {
       }
     )
 
-    if (statusError) {
-      throw statusError
+    if (countError) {
+      console.error('Error fetching count:', countError)
+      throw countError
     }
 
-    // Format status counts
-    const formattedStatusCounts = {
-      'Under Review': 0,
-      'Approved': 0, 
-      'Declined': 0,
-      'Other': 0
+    const response: ApplicationsResponse = {
+      applications,
+      statusCounts,
+      total: totalCount
     }
 
-    if (statusCounts) {
-      formattedStatusCounts['Under Review'] = statusCounts.under_review || 0
-      formattedStatusCounts['Approved'] = statusCounts.approved || 0
-      formattedStatusCounts['Declined'] = statusCounts.declined || 0
-      formattedStatusCounts['Other'] = statusCounts.other || 0
-    }
-
-    return new Response(
-      JSON.stringify({
-        applications,
-        statusCounts: formattedStatusCounts
-      }),
-      { 
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Expose-Headers': 'Content-Length, X-JSON',
-          'Access-Control-Allow-Headers': 'apikey,X-Client-Info,Content-Type,Authorization'
-        }
-      }
-    )
+    return new Response(JSON.stringify(response), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
 
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 400,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Expose-Headers': 'Content-Length, X-JSON',
-          'Access-Control-Allow-Headers': 'apikey,X-Client-Info,Content-Type,Authorization'
-        }
-      }
-    )
+    console.error('Error:', error)
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    })
   }
 })

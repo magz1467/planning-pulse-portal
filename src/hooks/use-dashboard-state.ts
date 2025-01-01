@@ -70,9 +70,6 @@ export const useDashboardState = () => {
   const handleSortChange = (sortType: SortType) => {
     console.log('Changing sort to:', sortType);
     setActiveSort(sortType);
-    if (searchPoint) {
-      fetchApplicationsInRadius(searchPoint, activeFilters, sortType);
-    }
   };
 
   const isInitialSearch = !searchPoint && coordinates;

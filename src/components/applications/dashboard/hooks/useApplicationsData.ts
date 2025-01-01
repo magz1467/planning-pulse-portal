@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
-import { SortType } from "@/hooks/use-sort-applications";
 
 interface StatusCounts {
   'Under Review': number;
@@ -44,13 +43,11 @@ export const useApplicationsData = () => {
 
   const fetchApplicationsInRadius = async (
     center: LatLngTuple,
-    filters?: { status?: string; type?: string },
-    sortType?: SortType
+    filters?: { status?: string; type?: string }
   ) => {
     setIsLoading(true);
     console.log('Fetching applications with center:', center);
     console.log('Current filters:', filters);
-    console.log('Sort type:', sortType);
     
     try {
       const { data, error } = await supabase.functions.invoke('get-applications-with-counts', {
@@ -59,8 +56,7 @@ export const useApplicationsData = () => {
           center_lat: center[0],
           radius_meters: RADIUS,
           page_size: PAGE_SIZE,
-          page_number: currentPage,
-          sort_type: sortType
+          page_number: currentPage
         }
       });
 
