@@ -19,6 +19,7 @@ interface FilterDropdownProps {
   applications: Application[];
   isMobile: boolean;
   statusCounts: { [key: string]: number };
+  isLoading?: boolean;
 }
 
 const predefinedStatuses = [
@@ -35,6 +36,7 @@ export const FilterDropdown = ({
   applications,
   isMobile,
   statusCounts,
+  isLoading = false
 }: FilterDropdownProps) => {
   console.log('FilterDropdown statusCounts:', statusCounts);
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
@@ -81,7 +83,7 @@ export const FilterDropdown = ({
             className="justify-between"
           >
             <span>
-              {option.label} ({statusCounts && statusCounts[option.value] !== undefined ? statusCounts[option.value] : 0})
+              {option.label} ({isLoading ? '...' : statusCounts[option.value]})
             </span>
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>

@@ -4,7 +4,7 @@ import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Filter, ArrowUpDown, Map, List } from "lucide-react";
 import { Application } from "@/types/planning";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -29,56 +29,66 @@ export const FilterBar = ({
   applications = []
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
+  const [isLoading, setIsLoading] = useState(true);
+  const [statusCounts, setStatusCounts] = useState({
+    "Under Review": 0,
+    "Approved": 0,
+    "Declined": 0,
+    "Other": 0
+  });
 
   // Calculate counts for each status
-  const getStatusCounts = () => {
-    console.log('Calculating status counts for applications:', applications);
-    const counts: { [key: string]: number } = {
-      "Under Review": 0,
-      "Approved": 0,
-      "Declined": 0,
-      "Other": 0
-    };
-    
+  useEffect(() => {
     if (!applications) {
       console.log('No applications provided');
-      return counts;
+      return;
     }
 
-    console.log('Processing', applications.length, 'applications');
-    
-    applications.forEach(app => {
-      if (!app) {
-        console.log('Found null application');
-        return;
-      }
+    // Add a small delay to ensure data is ready
+    const timer = setTimeout(() => {
+      console.log('Processing', applications.length, 'applications');
+      const counts = {
+        "Under Review": 0,
+        "Approved": 0,
+        "Declined": 0,
+        "Other": 0
+      };
 
-      console.log('Processing application:', app.id, 'with status:', app.status);
-      
-      const status = (app.status || '').trim().toLowerCase();
-      
-      if (!status) {
-        counts['Other']++;
-      } else if (status.includes('under review') || status.includes('under consideration')) {
-        counts['Under Review']++;
-      } else if (status.includes('approved')) {
-        counts['Approved']++;
-      } else if (status.includes('declined') || status.includes('refused')) {
-        counts['Declined']++;
-      } else {
-        counts['Other']++;
-      }
-    });
+      applications.forEach(app => {
+        if (!app) {
+          console.log('Found null application');
+          return;
+        }
 
-    console.log('Final status counts:', counts);
-    return counts;
-  };
+        console.log('Processing application:', app.id, 'with status:', app.status);
+        
+        const status = (app.status || '').trim().toLowerCase();
+        
+        if (!status) {
+          counts['Other']++;
+        } else if (status.includes('under review') || status.includes('under consideration')) {
+          counts['Under Review']++;
+        } else if (status.includes('approved')) {
+          counts['Approved']++;
+        } else if (status.includes('declined') || status.includes('refused')) {
+          counts['Declined']++;
+        } else {
+          counts['Other']++;
+        }
+      });
 
-  const statusCounts = getStatusCounts();
+      console.log('Final status counts:', counts);
+      setStatusCounts(counts);
+      setIsLoading(false);
+    }, 1000); // 1 second delay
+
+    return () => clearTimeout(timer);
+  }, [applications]);
 
   // Log whenever applications change
   useEffect(() => {
     console.log('Applications updated in FilterBar:', applications?.length);
+    setIsLoading(true);
   }, [applications]);
 
   return (
@@ -90,6 +100,7 @@ export const FilterBar = ({
           isMobile={isMobile}
           applications={applications}
           statusCounts={statusCounts}
+          isLoading={isLoading}
         >
           <Button 
             variant="outline" 
