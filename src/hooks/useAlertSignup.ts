@@ -10,77 +10,96 @@ export const useAlertSignup = (postcode: string) => {
   const handleEmailSubmit = async (radius: string) => {
     try {
       setIsLoading(true)
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { user } } = await supabase.auth.getUser()
       
-      if (!session?.user) {
+      if (!user) {
         throw new Error("User not authenticated")
       }
 
-      // Check if user already has a record
-      const { data: existingData, error: selectError } = await supabase
-        .from('User_data')
+      // First check if user already has an alert for this postcode
+      const { data: existingAlert } = await supabase
+        .from('user_postcodes')
         .select()
-        .eq('Email', session.user.email)
+        .eq('user_id', user.id)
+        .eq('postcode', postcode)
         .maybeSingle()
 
-      if (selectError) {
-        console.error("Error checking existing data:", selectError)
-        throw selectError
-      }
-
-      let dbError
-      if (existingData) {
-        // Update existing record
+      if (existingAlert) {
+        // Update existing alert
         const { error } = await supabase
-          .from('User_data')
+          .from('user_postcodes')
           .update({
-            "Post Code": postcode,
-            Radius_from_pc: parseInt(radius),
-            Type: 'area_alert'
+            radius: radius,
+            User_email: user.email
           })
-          .eq('Email', session.user.email)
-        dbError = error
+          .eq('id', existingAlert.id)
+
+        if (error) throw error
+
+        toast({
+          title: "Success",
+          description: `Your alert radius has been updated to ${radius === "1000" ? "1 kilometre" : radius + " metres"} for ${postcode}.`,
+        })
       } else {
-        // Insert new record
+        // Create new alert
         const { error } = await supabase
-          .from('User_data')
-          .insert([
-            {
-              Email: session.user.email,
-              "Post Code": postcode,
-              Radius_from_pc: parseInt(radius),
-              Type: 'area_alert'
-            }
-          ])
-        dbError = error
+          .from('user_postcodes')
+          .insert({
+            user_id: user.id,
+            postcode: postcode,
+            radius: radius,
+            User_email: user.email
+          })
+
+        if (error) throw error
+
+        toast({
+          title: "Success",
+          description: `You will now receive alerts for planning applications within ${radius === "1000" ? "1 kilometre" : radius + " metres"} of ${postcode}.`,
+        })
       }
 
-      if (dbError) {
-        console.error("Database operation error:", dbError)
-        throw dbError
-      }
-
+      // Update local state to show subscribed status
       setIsSubscribed(true)
-      const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`
-      
-      toast({
-        title: "Added to watchlist",
-        description: `You will now receive alerts for planning applications within ${radiusText} of ${postcode}.`,
-        duration: 5000,
-      })
     } catch (error) {
-      console.error("Error in handleEmailSubmit:", error)
-      setIsSubscribed(false)
+      console.error('Error saving notification preferences:', error)
       toast({
-        title: "Error setting up alerts",
-        description: "There was a problem setting up your planning alerts. Please try again later.",
-        variant: "destructive",
-        duration: 5000,
+        title: "Error",
+        description: "There was an error saving your preferences. Please try again.",
+        variant: "destructive"
       })
     } finally {
       setIsLoading(false)
     }
   }
+
+  // Check subscription status on mount and when postcode changes
+  useState(() => {
+    const checkSubscription = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (!user) {
+          setIsSubscribed(false)
+          return
+        }
+
+        const { data: subscription } = await supabase
+          .from('user_postcodes')
+          .select()
+          .eq('user_id', user.id)
+          .eq('postcode', postcode)
+          .maybeSingle()
+
+        setIsSubscribed(!!subscription)
+      } catch (error) {
+        console.error('Error checking subscription:', error)
+        setIsSubscribed(false)
+      }
+    }
+
+    checkSubscription()
+  }, [postcode])
 
   return {
     isSubscribed,
