@@ -59,7 +59,8 @@ export const FilterBar = ({
             className="flex items-center gap-2"
           >
             <ArrowUpDown className="h-4 w-4" />
-            Sort
+            {activeSort === 'closingSoon' ? 'Closing Soon' : 
+             activeSort === 'newest' ? 'Newest' : 'Sort'}
           </Button>
         </SortDropdown>
       </div>
@@ -69,4 +70,4 @@ export const FilterBar = ({
       )}
     </div>
   );
-}
+};

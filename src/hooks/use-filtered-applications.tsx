@@ -35,7 +35,6 @@ export const useFilteredApplications = (
         }
         
         if (filterStatus === "Other") {
-          // Check if status doesn't match any predefined status
           const predefinedStatuses = ["Under Review", "Approved", "Declined"];
           const predefinedMatches = predefinedStatuses.some(status => {
             if (status === "Under Review") {
@@ -69,14 +68,12 @@ export const useFilteredApplications = (
     // Sort applications if sort is active
     if (activeSort === 'closingSoon') {
       filtered.sort((a, b) => {
-        // Parse dates, handling potential invalid formats
         let dateA: Date | null = null;
         let dateB: Date | null = null;
         
         try {
           if (a.last_date_consultation_comments) {
             dateA = new Date(a.last_date_consultation_comments);
-            // Check if date is valid
             if (isNaN(dateA.getTime())) dateA = null;
           }
         } catch (e) {
@@ -87,7 +84,6 @@ export const useFilteredApplications = (
         try {
           if (b.last_date_consultation_comments) {
             dateB = new Date(b.last_date_consultation_comments);
-            // Check if date is valid
             if (isNaN(dateB.getTime())) dateB = null;
           }
         } catch (e) {
