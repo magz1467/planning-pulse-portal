@@ -18,53 +18,61 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Base query
-    let query = supabaseClient
-      .from('applications')
-      .select('*')
-
-    // Add spatial filter if coordinates are provided
-    if (center_lng && center_lat && radius_meters) {
-      query = query.filter('geom', 'not.is.null')
-        .filter(
-          'geom',
-          'st_dwithin',
-          `SRID=4326;POINT(${center_lng} ${center_lat})`,
-          radius_meters
-        )
-    }
+    // Build the base SQL query for applications
+    let applicationsQuery = `
+      SELECT * FROM applications 
+      WHERE geom IS NOT NULL 
+      AND ST_DWithin(
+        geom::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+        $3
+      )
+    `
 
     // Add sorting based on sort_type
     if (sort_type) {
       switch (sort_type) {
         case 'newest':
-          query = query.order('valid_date', { ascending: false, nullsLast: true })
+          applicationsQuery += ` ORDER BY valid_date DESC NULLS LAST`
           break
         case 'closingSoon':
-          query = query
-            .filter('last_date_consultation_comments', 'gte', new Date().toISOString())
-            .order('last_date_consultation_comments', { ascending: true, nullsLast: true })
+          applicationsQuery += `
+            AND last_date_consultation_comments >= CURRENT_DATE
+            ORDER BY last_date_consultation_comments ASC NULLS LAST
+          `
           break
       }
     }
 
     // Add pagination
-    query = query.limit(page_size).offset(page_number * page_size)
+    applicationsQuery += ` LIMIT $4 OFFSET $5`
 
-    // Get applications
-    const { data: applications, error: applicationsError } = await query
+    // Execute the applications query
+    const { data: applications, error: applicationsError } = await supabaseClient.rpc(
+      'get_applications_in_radius',
+      {
+        center_longitude: center_lng,
+        center_latitude: center_lat,
+        search_radius: radius_meters,
+        limit_val: page_size,
+        offset_val: page_number * page_size,
+        sort_type: sort_type || null
+      }
+    )
 
     if (applicationsError) {
       throw applicationsError
     }
 
-    // Get status counts
-    const { data: statusCounts, error: statusError } = await supabaseClient
-      .rpc('get_status_counts', {
+    // Get status counts using a separate query
+    const { data: statusCounts, error: statusError } = await supabaseClient.rpc(
+      'get_status_counts',
+      {
         center_longitude: center_lng,
         center_latitude: center_lat,
         search_radius: radius_meters
-      })
+      }
+    )
 
     if (statusError) {
       throw statusError
