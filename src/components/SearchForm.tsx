@@ -28,7 +28,7 @@ export const SearchForm = () => {
     setIsSearching(true);
     try {
       await logSearch(postcode.trim(), activeTab);
-      navigate('/map', { 
+      navigate('/applications/dashboard/map', { 
         state: { 
           postcode: postcode.trim(),
           tab: activeTab,
