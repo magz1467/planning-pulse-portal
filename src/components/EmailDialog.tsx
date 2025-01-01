@@ -48,6 +48,11 @@ export const EmailDialog = ({
 
       await onSubmit(values.radius);
       onOpenChange(false);
+      
+      toast({
+        title: "Success",
+        description: `You will now receive alerts for planning applications within ${values.radius === "1000" ? "1 kilometre" : values.radius + " metres"} of ${postcode}.`,
+      });
     } catch (error) {
       console.error('Error saving notification preferences:', error);
       toast({
