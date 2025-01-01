@@ -53,8 +53,8 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        // Using the most basic style that should work with any token
-        style: 'mapbox://styles/mapbox/streets-v11',
+        // Using the custom style URL provided
+        style: 'mapbox://styles/marcoag/cm5ee5vgx000t01s91hfu61ef',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
       });
