@@ -59,7 +59,8 @@ export class MapboxInitializer {
         const msg = `Map error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
-          context: 'Map runtime error'
+          context: 'Map runtime error',
+          token: data.token.slice(0, 8) + '...' // Log first 8 chars of token for debugging
         });
         onError(msg, JSON.stringify(e.error, null, 2));
       });
