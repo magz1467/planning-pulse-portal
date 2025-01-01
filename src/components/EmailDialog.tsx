@@ -46,6 +46,15 @@ export const EmailDialog = ({
           ])
       }
 
+      // Send verification email
+      const { error: verificationError } = await supabase.functions.invoke('send-verification', {
+        body: { email }
+      });
+
+      if (verificationError) {
+        throw verificationError;
+      }
+
       onSubmit(email, radius)
       onOpenChange(false)
     } catch (error) {
