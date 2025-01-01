@@ -30,12 +30,12 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Select first application by default when applications are loaded
+  // Select first application by default when applications are loaded, but only in map view
   useEffect(() => {
-    if (filteredApplications.length > 0 && !selectedId) {
+    if (filteredApplications.length > 0 && !selectedId && isMapView) {
       handleMarkerClick(filteredApplications[0].id);
     }
-  }, [filteredApplications, selectedId, handleMarkerClick]);
+  }, [filteredApplications, selectedId, handleMarkerClick, isMapView]);
 
   return (
     <div className="h-screen w-full flex flex-col relative">
@@ -48,7 +48,13 @@ export const ApplicationsDashboardMap = () => {
         activeFilters={activeFilters}
         activeSort={activeSort}
         isMapView={isMapView}
-        onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
+        onToggleView={isMobile ? () => {
+          setIsMapView(!isMapView);
+          // Clear selection when switching to list view
+          if (isMapView) {
+            handleMarkerClick(null);
+          }
+        } : undefined}
         applications={applications}
         statusCounts={statusCounts}
       />
@@ -96,6 +102,7 @@ export const ApplicationsDashboardMap = () => {
               onSelectApplication={handleMarkerClick}
               onShowEmailDialog={() => {}}
               hideFilterBar={true}
+              onClose={() => handleMarkerClick(null)}
             />
           )}
         </div>

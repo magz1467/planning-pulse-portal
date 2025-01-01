@@ -15,6 +15,7 @@ interface MobileListContainerProps {
   onSelectApplication: (id: number) => void;
   onShowEmailDialog: () => void;
   hideFilterBar?: boolean;
+  onClose: () => void;
 }
 
 export const MobileListContainer = ({
@@ -24,6 +25,7 @@ export const MobileListContainer = ({
   onSelectApplication,
   onShowEmailDialog,
   hideFilterBar = false,
+  onClose,
 }: MobileListContainerProps) => {
   const detailsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +44,7 @@ export const MobileListContainer = ({
           <div className="sticky top-0 z-50 border-b py-2 px-4 bg-white flex justify-between items-center shadow-sm">
             <h2 className="font-semibold">Planning Application Details</h2>
             <button 
-              onClick={() => onSelectApplication(null)}
+              onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
             >
               ×
@@ -51,7 +53,7 @@ export const MobileListContainer = ({
           <div ref={detailsContainerRef} className="flex-1 overflow-y-auto">
             <PlanningApplicationDetails
               application={selectedApp}
-              onClose={() => onSelectApplication(null)}
+              onClose={onClose}
             />
           </div>
         </div>
