@@ -57,6 +57,27 @@ export const MapboxMap = ({
             markerManager.current?.addMarker(application, application.id === selectedId);
           });
 
+          // Only fit bounds on initial load if we have applications
+          if (!initialBoundsFitRef.current && applications.length > 0) {
+            const bounds = new mapboxgl.LngLatBounds();
+            let hasValidCoordinates = false;
+
+            applications.forEach(application => {
+              if (application.coordinates) {
+                bounds.extend([application.coordinates[1], application.coordinates[0]]);
+                hasValidCoordinates = true;
+              }
+            });
+
+            if (hasValidCoordinates) {
+              newMap.fitBounds(bounds, {
+                padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                maxZoom: 15
+              });
+              initialBoundsFitRef.current = true;
+            }
+          }
+
           initializedRef.current = true;
         });
       }
@@ -64,6 +85,7 @@ export const MapboxMap = ({
 
     initializeMap();
 
+    // Cleanup function should only run when component unmounts
     return () => {
       if (markerManager.current) {
         markerManager.current.removeAllMarkers();
@@ -77,30 +99,7 @@ export const MapboxMap = ({
       initializedRef.current = false;
       initialBoundsFitRef.current = false;
     };
-  }, [initialCenter, onMarkerClick]);
-
-  // Fit bounds only on initial load with applications
-  useEffect(() => {
-    if (!map.current || initialBoundsFitRef.current || applications.length === 0) return;
-
-    const bounds = new mapboxgl.LngLatBounds();
-    let hasValidCoordinates = false;
-
-    applications.forEach(application => {
-      if (application.coordinates) {
-        bounds.extend([application.coordinates[1], application.coordinates[0]]);
-        hasValidCoordinates = true;
-      }
-    });
-
-    if (hasValidCoordinates) {
-      map.current.fitBounds(bounds, {
-        padding: { top: 50, bottom: 50, left: 50, right: 50 },
-        maxZoom: 15
-      });
-      initialBoundsFitRef.current = true;
-    }
-  }, [applications, map.current]);
+  }, [initialCenter]); // Only depend on initialCenter
 
   // Update markers when applications array changes
   useEffect(() => {
