@@ -11,18 +11,22 @@ export const SortDropdown = ({ children, applications = [], onSortedApplications
   const handleSort = (sortType: 'closingSoon' | 'newest' | null) => {
     if (!applications || !onSortedApplications) return;
     
-    const sortedApps = [...applications].sort((a, b) => {
-      if (sortType === 'newest') {
-        const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
-        const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
-        return dateB.getTime() - dateA.getTime();
-      } else if (sortType === 'closingSoon') {
-        const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : new Date(0);
-        const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : new Date(0);
-        return dateA.getTime() - dateB.getTime();
-      }
-      return 0;
-    });
+    let sortedApps = [...applications];
+    
+    if (sortType) {
+      sortedApps = sortedApps.sort((a, b) => {
+        if (sortType === 'newest') {
+          const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
+          const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        } else if (sortType === 'closingSoon') {
+          const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : new Date(0);
+          const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : new Date(0);
+          return dateA.getTime() - dateB.getTime();
+        }
+        return 0;
+      });
+    }
 
     onSortedApplications(sortedApps);
   };
