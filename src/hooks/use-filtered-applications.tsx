@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Application } from "@/types/planning";
+import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
 interface ActiveFilters {
   status?: string;
@@ -74,9 +75,20 @@ export const useFilteredApplications = (
 
         // Helper function to check if date is in the future
         const isFuture = (date: Date | null) => date && date > now;
+        
+        // Helper function to check if date is within next 7 days
+        const isClosingSoon = (date: Date | null) => date && isWithinNextSevenDays(date.toISOString());
 
         // If both dates are in the future
         if (isFuture(dateA) && isFuture(dateB)) {
+          // If both are closing soon, sort by closest date
+          if (isClosingSoon(dateA) && isClosingSoon(dateB)) {
+            return dateA!.getTime() - dateB!.getTime();
+          }
+          // If only one is closing soon, prioritize it
+          if (isClosingSoon(dateA)) return -1;
+          if (isClosingSoon(dateB)) return 1;
+          // Otherwise sort by date
           return dateA!.getTime() - dateB!.getTime();
         }
         
