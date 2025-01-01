@@ -53,8 +53,8 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        // Using a light vector style that should work with any token
-        style: 'mapbox://styles/mapbox/light-v10',
+        // Using the most basic style that should work with any token
+        style: 'mapbox://styles/mapbox/streets-v11',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
       });
@@ -68,7 +68,7 @@ export class MapboxInitializer {
           message: e.error?.message || '',
           type: e.type,
           target: e.target.getStyle()?.name || 'unknown style',
-          styleUrl: e.target.getStyle()?.stylesheet?.sprite || 'none'
+          style: e.target.getStyle()?.name
         };
         
         console.error(msg, {
@@ -90,7 +90,7 @@ export class MapboxInitializer {
         console.error(msg, {
           error: e.error,
           context: 'Style loading error',
-          styleUrl: e.target.getStyle()?.stylesheet?.sprite || 'none'
+          style: e.target.getStyle()?.name
         });
       });
 
