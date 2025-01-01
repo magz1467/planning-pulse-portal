@@ -11,8 +11,12 @@ import { useCoordinates } from "@/hooks/use-coordinates";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { SearchSection } from "./components/SearchSection";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
+import { useLocation } from "react-router-dom";
 
 export const ApplicationsDashboardMap = () => {
+  const location = useLocation();
+  const searchPostcode = location.state?.postcode;
+  
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
@@ -20,7 +24,7 @@ export const ApplicationsDashboardMap = () => {
   }>({});
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isMapView, setIsMapView] = useState(true);
-  const [postcode, setPostcode] = useState('SW1A 0AA'); // Default to Westminster
+  const [postcode, setPostcode] = useState(searchPostcode || 'SW1A 0AA'); // Use Westminster only as fallback
   const isMobile = useIsMobile();
   
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
@@ -35,7 +39,7 @@ export const ApplicationsDashboardMap = () => {
   } = useApplicationsData();
 
   // Debug logs for applications data
-  console.log('ApplicationsDashboardMap - Raw applications data:', applications);
+  console.log('ApplicationsDashboardMap - Raw applications data:', applications?.length);
   console.log('ApplicationsDashboardMap - Number of applications:', applications?.length);
   console.log('ApplicationsDashboardMap - Status counts:', statusCounts);
   console.log('ApplicationsDashboardMap - Active filters:', activeFilters);
