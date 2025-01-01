@@ -85,6 +85,7 @@ serve(async (req) => {
               .eq('application_id', app.application_id)
 
             if (updateError) {
+              console.error(`Error updating application ${app.application_id}:`, updateError)
               throw updateError
             }
 
