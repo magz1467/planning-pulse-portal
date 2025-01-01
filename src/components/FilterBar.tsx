@@ -42,19 +42,15 @@ export const FilterBar = ({
     if (applications && applications.length > 0) {
       applications.forEach(app => {
         console.log('Processing application status:', app.status);
-        const appStatus = app.status?.trim() || '';
+        const appStatus = app.status?.trim().toLowerCase() || '';
         
         if (!appStatus) {
           counts['Other']++;
-          return;
-        }
-
-        const statusLower = appStatus.toLowerCase();
-        if (statusLower.includes('under review')) {
+        } else if (appStatus.includes('under review')) {
           counts['Under Review']++;
-        } else if (statusLower.includes('approved')) {
+        } else if (appStatus.includes('approved')) {
           counts['Approved']++;
-        } else if (statusLower.includes('declined') || statusLower.includes('refused')) {
+        } else if (appStatus.includes('declined') || appStatus.includes('refused')) {
           counts['Declined']++;
         } else {
           counts['Other']++;
