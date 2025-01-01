@@ -14,3 +14,13 @@ export const getStatusColor = (status: string) => {
       return 'bg-[#F2FCE2] text-[#16a34a]';
   }
 };
+
+export const getStatusText = (status: string) => {
+  const statusLower = status.toLowerCase();
+  switch (statusLower) {
+    case 'under consideration':
+      return 'Under Consideration';
+    default:
+      return status;
+  }
+};
