@@ -4,6 +4,7 @@ import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Filter, ArrowUpDown, Map, List } from "lucide-react";
 import { Application } from "@/types/planning";
+import { useEffect } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -39,30 +40,46 @@ export const FilterBar = ({
       "Other": 0
     };
     
-    if (applications && applications.length > 0) {
-      applications.forEach(app => {
-        console.log('Processing application status:', app.status);
-        const appStatus = app.status?.trim().toLowerCase() || '';
-        
-        if (!appStatus) {
-          counts['Other']++;
-        } else if (appStatus.includes('under review')) {
-          counts['Under Review']++;
-        } else if (appStatus.includes('approved')) {
-          counts['Approved']++;
-        } else if (appStatus.includes('declined') || appStatus.includes('refused')) {
-          counts['Declined']++;
-        } else {
-          counts['Other']++;
-        }
-      });
+    if (!applications) {
+      console.log('No applications provided');
+      return counts;
     }
+
+    console.log('Processing', applications.length, 'applications');
+    
+    applications.forEach(app => {
+      if (!app) {
+        console.log('Found null application');
+        return;
+      }
+
+      console.log('Processing application:', app.id, 'with status:', app.status);
+      
+      const status = (app.status || '').trim().toLowerCase();
+      
+      if (!status) {
+        counts['Other']++;
+      } else if (status.includes('under review') || status.includes('under consideration')) {
+        counts['Under Review']++;
+      } else if (status.includes('approved')) {
+        counts['Approved']++;
+      } else if (status.includes('declined') || status.includes('refused')) {
+        counts['Declined']++;
+      } else {
+        counts['Other']++;
+      }
+    });
 
     console.log('Final status counts:', counts);
     return counts;
   };
 
   const statusCounts = getStatusCounts();
+
+  // Log whenever applications change
+  useEffect(() => {
+    console.log('Applications updated in FilterBar:', applications?.length);
+  }, [applications]);
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">

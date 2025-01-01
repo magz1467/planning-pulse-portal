@@ -32,11 +32,14 @@ export const ApplicationsDashboardMap = () => {
     setSearchPoint
   } = useApplicationsData();
 
+  console.log('ApplicationsDashboardMap - Current applications:', applications?.length);
+
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
   };
 
   const handleFilterChange = (filterType: string, value: string) => {
+    console.log('Applying filter:', filterType, value);
     setActiveFilters(prev => {
       const newFilters = {
         ...prev,
