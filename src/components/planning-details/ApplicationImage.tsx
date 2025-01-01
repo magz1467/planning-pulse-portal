@@ -1,5 +1,4 @@
 import { Application } from "@/types/planning";
-import { getImageUrl } from "@/utils/imageUtils";
 import Image from "@/components/ui/image";
 
 interface ApplicationImageProps {
@@ -8,11 +7,13 @@ interface ApplicationImageProps {
 
 export const ApplicationImage = ({ application }: ApplicationImageProps) => {
   return (
-    <div className="aspect-video relative overflow-hidden rounded-lg">
+    <div className="w-full aspect-video relative overflow-hidden rounded-lg bg-gray-100">
       <Image
         src="/placeholder.svg"
-        alt={application?.title || ''}
-        className="object-cover w-full h-full"
+        alt={application?.description || ''}
+        width={800}
+        height={600}
+        className="w-full h-full object-cover"
       />
     </div>
   );
