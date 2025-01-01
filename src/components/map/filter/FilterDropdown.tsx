@@ -83,7 +83,7 @@ export const FilterDropdown = ({
             className="justify-between"
           >
             <span>
-              {option.label} ({isLoading ? '...' : statusCounts[option.value]})
+              {option.label} ({isLoading ? '...' : statusCounts[option.value] || 0})
             </span>
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>

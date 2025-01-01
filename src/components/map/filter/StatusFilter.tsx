@@ -33,44 +33,34 @@ export const StatusFilter = ({
       return Object.fromEntries(counts);
     }
 
+    console.log('StatusFilter - Processing applications:', applications.length);
+    
     applications.forEach(app => {
       if (!app || typeof app.status !== 'string') {
         counts.set('Other', counts.get('Other')! + 1);
         return;
       }
 
-      const status = app.status.trim();
-      
-      // Log each application status for debugging
+      const status = app.status.trim().toLowerCase();
       console.log('Processing application status:', status);
 
-      if (!status) {
-        counts.set('Other', counts.get('Other')! + 1);
-        return;
-      }
-
-      const statusLower = status.toLowerCase();
-      
-      if (statusLower.includes('under review') || 
-          statusLower.includes('under consideration') ||
-          statusLower.includes('pending')) {
+      if (status.includes('under review') || 
+          status.includes('under consideration') ||
+          status.includes('pending')) {
         counts.set('Under Review', counts.get('Under Review')! + 1);
-      } else if (statusLower.includes('approved') || 
-                 statusLower.includes('granted')) {
+      } else if (status.includes('approved') || 
+                 status.includes('granted')) {
         counts.set('Approved', counts.get('Approved')! + 1);
-      } else if (statusLower.includes('declined') || 
-                 statusLower.includes('refused') || 
-                 statusLower.includes('rejected')) {
+      } else if (status.includes('declined') || 
+                 status.includes('refused') || 
+                 status.includes('rejected')) {
         counts.set('Declined', counts.get('Declined')! + 1);
       } else {
         counts.set('Other', counts.get('Other')! + 1);
       }
     });
 
-    // Convert Map to plain object
     const statusCounts = Object.fromEntries(counts);
-    
-    // Log the final counts
     console.log('Final status counts:', statusCounts);
     console.log('Total applications processed:', applications.length);
     

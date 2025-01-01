@@ -32,12 +32,20 @@ export const ApplicationsDashboardMap = () => {
     setSearchPoint
   } = useApplicationsData();
 
+  // Debug logs for applications data
+  console.log('ApplicationsDashboardMap - Raw applications data:', applications);
+  console.log('ApplicationsDashboardMap - Number of applications:', applications?.length);
+  console.log('ApplicationsDashboardMap - Sample application statuses:', 
+    applications?.slice(0, 5).map(app => ({ id: app.id, status: app.status }))
+  );
+
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
   };
 
   const handleFilterChange = (filterType: string, value: string) => {
     console.log('Applying filter:', filterType, value);
+    console.log('Current applications before filter:', applications?.length);
     setActiveFilters(prev => {
       const newFilters = {
         ...prev,
@@ -73,9 +81,6 @@ export const ApplicationsDashboardMap = () => {
 
   // Ensure applications is always an array
   const safeApplications = applications || [];
-
-  console.log('ApplicationsDashboardMap - Current applications:', safeApplications?.length);
-  console.log('ApplicationsDashboardMap - Current filters:', activeFilters);
 
   return (
     <div className="h-screen w-full flex flex-col">
