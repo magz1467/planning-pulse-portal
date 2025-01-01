@@ -1,127 +1,119 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
-interface StatusCount {
-  status: string;
-  count: number;
-}
+console.log("Hello from get-applications-with-counts!")
 
-interface ApplicationsResponse {
-  applications: any[];
-  statusCounts: {
-    'Under Review': number;
-    'Approved': number;
-    'Declined': number;
-    'Other': number;
-  };
-  total: number;
-}
-
-Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { center_lng, center_lat, radius_meters = 1000, page_size = 100, page_number = 0 } = await req.json()
+    const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0, sort_type } = await req.json()
 
-    // Create Supabase client
+    // Create a Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get applications
-    const { data: applications, error: applicationsError } = await supabaseClient.rpc(
-      'get_applications_within_radius',
-      {
-        center_lng,
-        center_lat,
-        radius_meters,
-        page_size,
-        page_number
+    // Base query
+    let query = supabaseClient
+      .from('applications')
+      .select('*')
+      .limit(page_size)
+      .offset(page_number * page_size)
+
+    // Add spatial filter if coordinates are provided
+    if (center_lng && center_lat && radius_meters) {
+      query = query.filter('geom', 'not.is.null')
+        .filter(
+          'geom',
+          'st_dwithin',
+          `SRID=4326;POINT(${center_lng} ${center_lat})`,
+          radius_meters
+        )
+    }
+
+    // Add sorting based on sort_type
+    if (sort_type) {
+      switch (sort_type) {
+        case 'newest':
+          query = query.order('valid_date', { ascending: false, nullsLast: true })
+          break
+        case 'closingSoon':
+          // First get applications with consultation end date in the future
+          query = query
+            .filter('last_date_consultation_comments', 'gte', new Date().toISOString())
+            .order('last_date_consultation_comments', { ascending: true, nullsLast: true })
+          break
       }
-    )
+    }
+
+    // Get applications
+    const { data: applications, error: applicationsError } = await query
 
     if (applicationsError) {
-      console.error('Error fetching applications:', applicationsError)
       throw applicationsError
     }
 
-    if (!applications || applications.length === 0) {
-      console.log('No applications found in radius', radius_meters, 'meters from', [center_lat, center_lng])
-      return new Response(
-        JSON.stringify({
-          applications: [],
-          statusCounts: {
-            'Under Review': 0,
-            'Approved': 0,
-            'Declined': 0,
-            'Other': 0
-          },
-          total: 0
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    // Get status counts
+    const { data: statusCounts, error: statusError } = await supabaseClient
+      .rpc('get_status_counts', {
+        center_longitude: center_lng,
+        center_latitude: center_lat,
+        search_radius: radius_meters
+      })
+
+    if (statusError) {
+      throw statusError
     }
 
-    // Calculate status counts
-    const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
-      const status = app.status?.trim().toLowerCase() || ''
-      
-      if (status.includes('under review') || 
-          status.includes('under consideration') ||
-          status.includes('pending')) {
-        acc['Under Review'] = (acc['Under Review'] || 0) + 1
-      } else if (status.includes('approved') || 
-                 status.includes('granted')) {
-        acc['Approved'] = (acc['Approved'] || 0) + 1
-      } else if (status.includes('declined') || 
-                 status.includes('refused') || 
-                 status.includes('rejected')) {
-        acc['Declined'] = (acc['Declined'] || 0) + 1
-      } else {
-        acc['Other'] = (acc['Other'] || 0) + 1
-      }
-      return acc
-    }, {
-      'Under Review': 0,
-      'Approved': 0,
-      'Declined': 0,
-      'Other': 0
-    })
-
     // Get total count
-    const { data: totalCount, error: countError } = await supabaseClient.rpc(
-      'get_applications_count_within_radius',
-      {
-        center_lng,
-        center_lat,
+    const { count, error: countError } = await supabaseClient
+      .from('applications')
+      .select('*', { count: 'exact', head: true })
+      .filter('geom', 'not.is.null')
+      .filter(
+        'geom',
+        'st_dwithin',
+        `SRID=4326;POINT(${center_lng} ${center_lat})`,
         radius_meters
-      }
-    )
+      )
 
     if (countError) {
-      console.error('Error fetching count:', countError)
       throw countError
     }
 
-    const response: ApplicationsResponse = {
-      applications,
-      statusCounts,
-      total: totalCount
-    }
-
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    // Return the response
+    return new Response(
+      JSON.stringify({
+        applications,
+        statusCounts: statusCounts?.[0] || {
+          'Under Review': 0,
+          'Approved': 0,
+          'Declined': 0,
+          'Other': 0
+        },
+        total: count
+      }),
+      {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
 
   } catch (error) {
     console.error('Error:', error)
     return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      },
+      status: 400
     })
   }
 })

@@ -43,11 +43,13 @@ export const useApplicationsData = () => {
 
   const fetchApplicationsInRadius = async (
     center: LatLngTuple,
-    filters?: { status?: string; type?: string }
+    filters?: { status?: string; type?: string },
+    sortType?: SortType
   ) => {
     setIsLoading(true);
     console.log('Fetching applications with center:', center);
     console.log('Current filters:', filters);
+    console.log('Sort type:', sortType);
     
     try {
       const { data, error } = await supabase.functions.invoke('get-applications-with-counts', {
@@ -56,7 +58,8 @@ export const useApplicationsData = () => {
           center_lat: center[0],
           radius_meters: RADIUS,
           page_size: PAGE_SIZE,
-          page_number: currentPage
+          page_number: currentPage,
+          sort_type: sortType
         }
       });
 
