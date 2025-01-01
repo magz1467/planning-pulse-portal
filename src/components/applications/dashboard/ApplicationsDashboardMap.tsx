@@ -37,6 +37,10 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView]);
 
+  const handleClose = () => {
+    handleMarkerClick(null);
+  };
+
   return (
     <div className="h-screen w-full flex flex-col relative">
       <DashboardHeader />
@@ -71,7 +75,7 @@ export const ApplicationsDashboardMap = () => {
               onFilterChange={handleFilterChange}
               onSortChange={handleSortChange}
               onSelectApplication={handleMarkerClick}
-              onClose={() => handleMarkerClick(null)}
+              onClose={handleClose}
               statusCounts={statusCounts}
             />
           )}
@@ -102,7 +106,7 @@ export const ApplicationsDashboardMap = () => {
               onSelectApplication={handleMarkerClick}
               onShowEmailDialog={() => {}}
               hideFilterBar={true}
-              onClose={() => handleMarkerClick(null)}
+              onClose={handleClose}
             />
           )}
         </div>
