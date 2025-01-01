@@ -519,6 +519,7 @@ export type Database = {
           id: number
           postcode: string
           radius: string | null
+          User_email: string | null
           user_id: string
         }
         Insert: {
@@ -526,6 +527,7 @@ export type Database = {
           id?: number
           postcode: string
           radius?: string | null
+          User_email?: string | null
           user_id: string
         }
         Update: {
@@ -533,6 +535,7 @@ export type Database = {
           id?: number
           postcode?: string
           radius?: string | null
+          User_email?: string | null
           user_id?: string
         }
         Relationships: []

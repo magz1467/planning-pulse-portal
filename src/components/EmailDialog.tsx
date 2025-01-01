@@ -18,6 +18,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form"
+import { supabase } from "@/integrations/supabase/client"
 
 const formSchema = z.object({
   radius: z.string(),
@@ -50,8 +51,24 @@ export const EmailDialog = ({
   const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true)
     try {
-      await onSubmit(values.radius)
-      onOpenChange(false)
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
+      const { error } = await supabase
+        .from('user_postcodes')
+        .insert({
+          user_id: user.id,
+          postcode: postcode,
+          radius: values.radius
+        });
+
+      if (error) throw error;
+
+      await onSubmit(values.radius);
+      onOpenChange(false);
     } catch (error) {
       console.error('Error saving notification preferences:', error)
       form.setError("root", {
