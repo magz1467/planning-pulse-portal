@@ -34,7 +34,7 @@ export const PlanningApplicationList = ({
                 width={80}
                 height={80}
                 className="w-full h-full object-cover"
-                fallback="/placeholder.svg"
+                defaultImage="/placeholder.svg"
               />
             </div>
             <div className="flex-1 min-w-0">
