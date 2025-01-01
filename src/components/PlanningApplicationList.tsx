@@ -10,36 +10,15 @@ interface PlanningApplicationListProps {
   applications: Application[];
   postcode: string;
   onSelectApplication: (id: number | null) => void;
-  activeSort?: 'closingSoon' | 'newest' | null;
 }
 
 export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
-  activeSort
 }: PlanningApplicationListProps) => {
-  console.log("PlanningApplicationList applications:", applications);
-  console.log("PlanningApplicationList activeSort:", activeSort);
-
-  // Sort applications based on activeSort
-  const sortedApplications = [...applications].sort((a, b) => {
-    if (activeSort === 'newest') {
-      const dateA = a.valid_date ? new Date(a.valid_date) : new Date(0);
-      const dateB = b.valid_date ? new Date(b.valid_date) : new Date(0);
-      return dateB.getTime() - dateA.getTime();
-    } else if (activeSort === 'closingSoon') {
-      const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : new Date(0);
-      const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : new Date(0);
-      return dateA.getTime() - dateB.getTime();
-    }
-    return 0;
-  });
-
-  console.log("PlanningApplicationList sortedApplications:", sortedApplications);
-
   return (
     <div className="divide-y">
-      {sortedApplications.map((application) => {
+      {applications.map((application) => {
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
