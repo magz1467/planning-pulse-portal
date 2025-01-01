@@ -31,7 +31,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
     setShowAuthDialog(open)
     // Only show email dialog if auth dialog was closed (meaning user logged in)
     if (!open) {
-      setShowEmailDialog(true)
+      handleSubscribe() // This will now check session again and show email dialog if logged in
     }
   }
 
