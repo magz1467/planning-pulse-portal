@@ -5,6 +5,10 @@ export const LoadingOverlay = () => {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center" style={{ zIndex: 9999 }}>
       <div className="bg-white rounded-lg p-8 shadow-lg max-w-md">
         <div className="flex flex-col items-center gap-6">
+          <div className="relative flex flex-col items-center">
+            <Home className="w-6 h-6 text-primary absolute -top-3" />
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
           <div className="space-y-4">
             <ul className="space-y-3 text-gray-600">
               <li className="flex items-center gap-2">
@@ -26,10 +30,6 @@ export const LoadingOverlay = () => {
                 <span>Have your say on local planning</span>
               </li>
             </ul>
-          </div>
-          <div className="relative flex flex-col items-center">
-            <Home className="w-6 h-6 text-primary absolute -top-3" />
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         </div>
       </div>
