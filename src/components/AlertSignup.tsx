@@ -14,6 +14,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [showEmailDialog, setShowEmailDialog] = useState(false)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
   const handleSubscribe = async () => {
@@ -29,30 +30,53 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
 
   const handleEmailSubmit = async (radius: string) => {
     try {
+      setIsLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) {
         throw new Error("User not authenticated")
       }
 
-      // Save user preferences
-      const { error: dbError } = await supabase
+      // Check if user already has a record
+      const { data: existingData } = await supabase
         .from('User_data')
-        .insert([
-          {
-            Email: session.user.email,
+        .select()
+        .eq('Email', session.user.email)
+        .single()
+
+      let dbError
+      if (existingData) {
+        // Update existing record
+        const { error } = await supabase
+          .from('User_data')
+          .update({
             Marketing: true,
             Post_Code: postcode,
             Radius_from_pc: parseInt(radius),
-          }
-        ])
+          })
+          .eq('Email', session.user.email)
+        dbError = error
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('User_data')
+          .insert([
+            {
+              Email: session.user.email,
+              Marketing: true,
+              Post_Code: postcode,
+              Radius_from_pc: parseInt(radius),
+            }
+          ])
+        dbError = error
+      }
 
       if (dbError) {
-        throw dbError;
+        throw dbError
       }
 
       setIsSubscribed(true)
       setShowEmailDialog(false)
-      const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+      const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`
       
       toast({
         title: "Added to watchlist",
@@ -68,6 +92,8 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
         duration: 5000,
       })
       console.error("Error in handleEmailSubmit:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -96,9 +122,9 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
           <Button
             variant={isSubscribed ? "outline" : "default"}
             onClick={handleSubscribe}
-            disabled={isSubscribed}
+            disabled={isSubscribed || isLoading}
           >
-            {isSubscribed ? "Subscribed" : "Add to watchlist"}
+            {isLoading ? "Setting up..." : isSubscribed ? "Subscribed" : "Add to watchlist"}
           </Button>
         </div>
       </div>
