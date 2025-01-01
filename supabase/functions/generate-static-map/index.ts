@@ -54,12 +54,14 @@ serve(async (req) => {
 
         // Generate new static map image
         const [lng, lat] = app.coordinates
-        const zoom = 17 // Increased zoom level for more detail
-        const width = 800 // Increased width for better quality
-        const height = 600 // Increased height for better quality
+        const width = 800
+        const height = 600
+        const zoom = 17
+        const pitch = 60 // Add pitch for 3D effect
+        const bearing = 45 // Add bearing for angled view
         
-        // Using satellite-v9 style with higher brightness and contrast
-        const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${zoom},0,45/${width}x${height}@2x?access_token=${mapboxToken}&setfilter=["brightness",1.1]&setfilter=["contrast",1.2]`
+        // Using satellite-v9 style with 3D buildings and terrain
+        const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
 
         // Store the URL in Supabase
         const { error: insertError } = await supabase
