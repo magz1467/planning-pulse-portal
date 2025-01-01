@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Bell, Check } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { EmailDialog } from "./EmailDialog"
+import { AuthRequiredDialog } from "./AuthRequiredDialog"
+import { supabase } from "@/integrations/supabase/client"
 
 interface AlertSignupProps {
   postcode: string
@@ -11,21 +13,50 @@ interface AlertSignupProps {
 export const AlertSignup = ({ postcode }: AlertSignupProps) => {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [showEmailDialog, setShowEmailDialog] = useState(false)
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
   const { toast } = useToast()
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session?.user) {
+      setShowAuthDialog(true)
+      return
+    }
+
     setShowEmailDialog(true)
   }
 
-  const handleEmailSubmit = async (email: string, radius: string) => {
+  const handleEmailSubmit = async (radius: string) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) {
+        throw new Error("User not authenticated")
+      }
+
+      // Save user preferences
+      const { error: dbError } = await supabase
+        .from('User_data')
+        .insert([
+          {
+            Email: session.user.email,
+            Marketing: true,
+            Post_Code: postcode,
+            Radius_from_pc: parseInt(radius),
+          }
+        ])
+
+      if (dbError) {
+        throw dbError;
+      }
+
       setIsSubscribed(true)
       setShowEmailDialog(false)
       const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
       
       toast({
-        title: "Subscription pending",
-        description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
+        title: "Added to watchlist",
+        description: `You will now receive email alerts for planning applications within ${radiusText} of ${postcode}.`,
         duration: 5000,
       })
     } catch (error) {
@@ -67,7 +98,7 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
             onClick={handleSubscribe}
             disabled={isSubscribed}
           >
-            {isSubscribed ? "Subscribed" : "Set up alerts"}
+            {isSubscribed ? "Subscribed" : "Add to watchlist"}
           </Button>
         </div>
       </div>
@@ -76,6 +107,10 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
         postcode={postcode}
+      />
+      <AuthRequiredDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog} 
       />
     </>
   )
