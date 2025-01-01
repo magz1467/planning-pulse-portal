@@ -44,6 +44,14 @@ export class MapboxMarkerManager {
     }
   }
 
+  removeMarker(id: number) {
+    const marker = this.markers[id];
+    if (marker) {
+      marker.remove();
+      delete this.markers[id];
+    }
+  }
+
   removeAllMarkers() {
     Object.values(this.markers).forEach(marker => {
       try {
