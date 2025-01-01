@@ -7,6 +7,7 @@ import { MapView } from "./components/MapView";
 import { LoadingOverlay } from "./components/LoadingOverlay";
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { useEffect } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -28,6 +29,13 @@ export const ApplicationsDashboardMap = () => {
     handlePostcodeSelect,
     handleSortChange,
   } = useDashboardState();
+
+  // Select first application by default when applications are loaded
+  useEffect(() => {
+    if (filteredApplications.length > 0 && !selectedId) {
+      handleMarkerClick(filteredApplications[0].id);
+    }
+  }, [filteredApplications, selectedId, handleMarkerClick]);
 
   return (
     <div className="h-screen w-full flex flex-col relative">
