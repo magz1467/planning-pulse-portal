@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useAlertSignup } from "@/hooks/useAlertSignup"
 import { EmailDialog } from "./EmailDialog"
-import { AuthRequiredDialog } from "./AuthRequiredDialog"
 import { AlertSignupButton } from "./alerts/AlertSignupButton"
 import { SubscribedAlert } from "./alerts/SubscribedAlert"
 import { supabase } from "@/integrations/supabase/client"
+import { AlertSignupLoggedOut } from "./alerts/AlertSignupLoggedOut"
 
 interface AlertSignupProps {
   postcode: string
@@ -12,27 +12,23 @@ interface AlertSignupProps {
 
 export const AlertSignup = ({ postcode }: AlertSignupProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false)
-  const [showAuthDialog, setShowAuthDialog] = useState(false)
   const { isSubscribed, isLoading, handleEmailSubmit } = useAlertSignup(postcode)
+  const [session, setSession] = useState<any>(null)
 
-  const handleSubscribe = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session?.user) {
-      setShowAuthDialog(true)
-      return
-    }
+  // Check session on mount
+  useState(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
 
-    setShowEmailDialog(true)
-  }
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  })
 
-  // When auth dialog is closed after successful login
-  const handleAuthDialogClose = (open: boolean) => {
-    setShowAuthDialog(open)
-    // Only show email dialog if auth dialog was closed (meaning user logged in)
-    if (!open) {
-      handleSubscribe() // This will now check session again and show email dialog if logged in
-    }
+  if (!session) {
+    return <AlertSignupLoggedOut />
   }
 
   if (isSubscribed) {
@@ -44,17 +40,13 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
       <AlertSignupButton 
         isSubscribed={isSubscribed}
         isLoading={isLoading}
-        onClick={handleSubscribe}
+        onClick={() => setShowEmailDialog(true)}
       />
       <EmailDialog 
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
         postcode={postcode}
-      />
-      <AuthRequiredDialog
-        open={showAuthDialog}
-        onOpenChange={handleAuthDialogClose} 
       />
     </>
   )
