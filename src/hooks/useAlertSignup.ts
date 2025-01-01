@@ -11,6 +11,7 @@ export const useAlertSignup = (postcode: string) => {
     try {
       setIsLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
+      
       if (!session?.user) {
         throw new Error("User not authenticated")
       }
@@ -20,9 +21,10 @@ export const useAlertSignup = (postcode: string) => {
         .from('User_data')
         .select()
         .eq('Email', session.user.email)
-        .single()
+        .maybeSingle()
 
-      if (selectError && selectError.code !== 'PGRST116') {
+      if (selectError) {
+        console.error("Error checking existing data:", selectError)
         throw selectError
       }
 
@@ -32,7 +34,6 @@ export const useAlertSignup = (postcode: string) => {
         const { error } = await supabase
           .from('User_data')
           .update({
-            Marketing: true,
             "Post Code": postcode,
             Radius_from_pc: parseInt(radius),
           })
@@ -45,7 +46,6 @@ export const useAlertSignup = (postcode: string) => {
           .insert([
             {
               Email: session.user.email,
-              Marketing: true,
               "Post Code": postcode,
               Radius_from_pc: parseInt(radius),
             }
@@ -54,6 +54,7 @@ export const useAlertSignup = (postcode: string) => {
       }
 
       if (dbError) {
+        console.error("Database operation error:", dbError)
         throw dbError
       }
 
@@ -62,10 +63,11 @@ export const useAlertSignup = (postcode: string) => {
       
       toast({
         title: "Added to watchlist",
-        description: `You will now receive email alerts for planning applications within ${radiusText} of ${postcode}.`,
+        description: `You will now receive alerts for planning applications within ${radiusText} of ${postcode}.`,
         duration: 5000,
       })
     } catch (error) {
+      console.error("Error in handleEmailSubmit:", error)
       setIsSubscribed(false)
       toast({
         title: "Error setting up alerts",
@@ -73,7 +75,6 @@ export const useAlertSignup = (postcode: string) => {
         variant: "destructive",
         duration: 5000,
       })
-      console.error("Error in handleEmailSubmit:", error)
     } finally {
       setIsLoading(false)
     }
