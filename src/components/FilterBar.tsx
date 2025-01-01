@@ -35,16 +35,19 @@ export const FilterBar = ({
     "Declined": 0,
     "Other": 0
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!applications) {
-      console.log('No applications provided');
-      setIsLoading(false);
+    if (!applications?.length) {
+      setStatusCounts({
+        "Under Review": 0,
+        "Approved": 0,
+        "Declined": 0,
+        "Other": 0
+      });
       return;
     }
 
-    console.log('Processing', applications.length, 'applications');
     const counts = {
       "Under Review": 0,
       "Approved": 0,
@@ -53,13 +56,13 @@ export const FilterBar = ({
     };
 
     applications.forEach(app => {
-      if (!app) return;
-
-      const status = (app.status || '').trim().toLowerCase();
-      
-      if (!status) {
+      if (!app?.status) {
         counts['Other']++;
-      } else if (status.includes('under review') || status.includes('under consideration')) {
+        return;
+      }
+
+      const status = app.status.trim().toLowerCase();
+      if (status.includes('under review') || status.includes('under consideration')) {
         counts['Under Review']++;
       } else if (status.includes('approved')) {
         counts['Approved']++;
@@ -70,9 +73,7 @@ export const FilterBar = ({
       }
     });
 
-    console.log('Final status counts:', counts);
     setStatusCounts(counts);
-    setIsLoading(false);
   }, [applications]);
 
   return (
