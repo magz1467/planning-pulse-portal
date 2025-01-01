@@ -29,15 +29,14 @@ export const ApplicationsDashboardMap = () => {
     isLoading: isLoadingApps, 
     fetchApplicationsInRadius,
     searchPoint,
-    setSearchPoint
+    setSearchPoint,
+    statusCounts
   } = useApplicationsData();
 
   // Debug logs for applications data
   console.log('ApplicationsDashboardMap - Raw applications data:', applications);
   console.log('ApplicationsDashboardMap - Number of applications:', applications?.length);
-  console.log('ApplicationsDashboardMap - Sample application statuses:', 
-    applications?.slice(0, 5).map(app => ({ id: app.id, status: app.status }))
-  );
+  console.log('ApplicationsDashboardMap - Status counts:', statusCounts);
 
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
@@ -95,6 +94,7 @@ export const ApplicationsDashboardMap = () => {
         isMapView={isMapView}
         onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
         applications={safeApplications}
+        statusCounts={statusCounts}
       />
 
       <div className="flex-1 relative w-full">
@@ -110,6 +110,7 @@ export const ApplicationsDashboardMap = () => {
               onSortChange={handleSortChange}
               onSelectApplication={handleMarkerClick}
               onClose={() => setSelectedId(null)}
+              statusCounts={statusCounts}
             />
           )}
 

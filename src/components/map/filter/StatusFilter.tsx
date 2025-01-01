@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
-import { Application } from "@/types/planning";
 import { FilterDropdown } from "./FilterDropdown";
+import { Application } from "@/types/planning";
 
 interface StatusFilterProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -9,66 +9,30 @@ interface StatusFilterProps {
     status?: string;
     type?: string;
   };
-  applications?: Application[];
   isMobile: boolean;
+  applications?: Application[];
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const StatusFilter = ({
   onFilterChange,
   activeFilters = {},
+  isMobile,
   applications = [],
-  isMobile
+  statusCounts = {
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  }
 }: StatusFilterProps) => {
-  // Create a Map to store the counts
-  const getStatusCounts = () => {
-    const counts = new Map([
-      ['Under Review', 0],
-      ['Approved', 0],
-      ['Declined', 0],
-      ['Other', 0]
-    ]);
-
-    if (!Array.isArray(applications)) {
-      console.warn('Applications is not an array:', applications);
-      return Object.fromEntries(counts);
-    }
-
-    console.log('StatusFilter - Processing applications:', applications.length);
-    
-    applications.forEach(app => {
-      if (!app || typeof app.status !== 'string') {
-        counts.set('Other', counts.get('Other')! + 1);
-        return;
-      }
-
-      const status = app.status.trim().toLowerCase();
-      console.log('Processing application status:', status);
-
-      if (status.includes('under review') || 
-          status.includes('under consideration') ||
-          status.includes('pending')) {
-        counts.set('Under Review', counts.get('Under Review')! + 1);
-      } else if (status.includes('approved') || 
-                 status.includes('granted')) {
-        counts.set('Approved', counts.get('Approved')! + 1);
-      } else if (status.includes('declined') || 
-                 status.includes('refused') || 
-                 status.includes('rejected')) {
-        counts.set('Declined', counts.get('Declined')! + 1);
-      } else {
-        counts.set('Other', counts.get('Other')! + 1);
-      }
-    });
-
-    const statusCounts = Object.fromEntries(counts);
-    console.log('Final status counts:', statusCounts);
-    console.log('Total applications processed:', applications.length);
-    
-    return statusCounts;
-  };
-
-  const statusCounts = getStatusCounts();
-
+  console.log('StatusFilter - Status counts:', statusCounts);
+  
   return (
     <FilterDropdown
       onFilterChange={onFilterChange}

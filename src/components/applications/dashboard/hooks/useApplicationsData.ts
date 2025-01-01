@@ -4,12 +4,25 @@ import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
 
+interface StatusCounts {
+  'Under Review': number;
+  'Approved': number;
+  'Declined': number;
+  'Other': number;
+}
+
 export const useApplicationsData = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [searchPoint, setSearchPoint] = useState<LatLngTuple | null>(null);
+  const [statusCounts, setStatusCounts] = useState<StatusCounts>({
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  });
   const { toast } = useToast();
   const PAGE_SIZE = 100;
   const MAX_RETRIES = 3;
@@ -37,61 +50,39 @@ export const useApplicationsData = () => {
     console.log('Current filters:', filters);
     
     try {
-      // First get the total count
-      let query = supabase.rpc('get_applications_count_within_radius', {
-        center_lng: center[1],
-        center_lat: center[0],
-        radius_meters: RADIUS
+      const { data, error } = await supabase.functions.invoke('get-applications-with-counts', {
+        body: {
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: RADIUS,
+          page_size: PAGE_SIZE,
+          page_number: currentPage
+        }
       });
-
-      const { data: countData, error: countError } = await fetchWithRetry(async () => 
-        await query
-      );
-
-      if (countError) {
-        console.error('Count error:', countError);
-        throw countError;
-      }
-      
-      setTotalCount(countData || 0);
-      console.log('Total count:', countData);
-
-      // Then get the paginated data
-      let dataQuery = supabase.rpc('get_applications_within_radius', {
-        center_lng: center[1],
-        center_lat: center[0],
-        radius_meters: RADIUS,
-        page_size: PAGE_SIZE,
-        page_number: currentPage
-      });
-
-      // Apply filters if they exist
-      if (filters?.status) {
-        console.log('Applying status filter:', filters.status);
-        dataQuery = dataQuery.eq('status', filters.status);
-      }
-      if (filters?.type) {
-        console.log('Applying type filter:', filters.type);
-        dataQuery = dataQuery.eq('application_type', filters.type);
-      }
-
-      const { data, error } = await fetchWithRetry(async () => await dataQuery);
 
       if (error) {
         console.error('Data fetch error:', error);
         throw error;
       }
 
-      if (!data || data.length === 0) {
+      if (!data || !data.applications || data.applications.length === 0) {
         console.log('No applications found in radius', RADIUS, 'meters from', center);
         setApplications([]);
+        setStatusCounts({
+          'Under Review': 0,
+          'Approved': 0,
+          'Declined': 0,
+          'Other': 0
+        });
+        setTotalCount(0);
         return;
       }
 
       console.log('Raw applications data:', data);
+      console.log('Status counts:', data.statusCounts);
 
       // Transform the data to match the Application type
-      const transformedData = data?.map(app => {
+      const transformedData = data.applications?.map((app: any) => {
         const geomObj = app.geom;
         let coordinates: [number, number] | null = null;
 
@@ -143,6 +134,8 @@ export const useApplicationsData = () => {
       
       console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
+      setStatusCounts(data.statusCounts);
+      setTotalCount(data.total || 0);
     } catch (error: any) {
       console.error('Error in fetchApplicationsInRadius:', error);
       toast({
@@ -164,6 +157,7 @@ export const useApplicationsData = () => {
     fetchApplicationsInRadius,
     searchPoint,
     setSearchPoint,
+    statusCounts,
     PAGE_SIZE
   };
 };
