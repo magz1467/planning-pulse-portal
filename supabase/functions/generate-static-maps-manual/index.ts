@@ -31,21 +31,22 @@ serve(async (req) => {
     // Get all applications with coordinates but no image
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
-      .select('application_id, geom')
+      .select('application_id, centroid')
       .is('image_map_url', null)  
-      .not('geom', 'is', null)
+      .not('centroid', 'is', null)
       .limit(limit)
 
     if (fetchError) {
+      console.error('Error fetching applications:', fetchError)
       throw fetchError
     }
 
-    console.log(`Processing ${applications.length} applications`)
+    console.log(`Processing ${applications?.length || 0} applications`)
 
     // Process in smaller chunks to avoid rate limits
     const chunkSize = 10;
     const chunks = [];
-    for (let i = 0; i < applications.length; i += chunkSize) {
+    for (let i = 0; i < (applications?.length || 0); i += chunkSize) {
       chunks.push(applications.slice(i, i + chunkSize));
     }
 
@@ -56,19 +57,17 @@ serve(async (req) => {
       const results = await Promise.all(
         chunk.map(async (app) => {
           try {
-            if (!app.geom) {
+            if (!app.centroid) {
               console.log(`Skipping application ${app.application_id} - no coordinates`)
-              return { status: 'error' }
+              return { status: 'error', reason: 'no_coordinates' }
             }
 
-            const coordinates = app.geom.coordinates
-            if (!coordinates || coordinates.length < 2) {
+            const coordinates = app.centroid
+            if (!coordinates.lon || !coordinates.lat) {
               console.log(`Invalid coordinates for application ${app.application_id}`)
-              return { status: 'error' }
+              return { status: 'error', reason: 'invalid_coordinates' }
             }
 
-            const [lng, lat] = coordinates
-            
             // Generate static map URL with 3D effect
             const width = 800
             const height = 600
@@ -76,7 +75,7 @@ serve(async (req) => {
             const pitch = 60
             const bearing = 45
 
-            const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/${lng},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
+            const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/${coordinates.lon},${coordinates.lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
 
             // Update the application with the new image URL
             const { error: updateError } = await supabase
@@ -86,7 +85,7 @@ serve(async (req) => {
 
             if (updateError) {
               console.error(`Error updating application ${app.application_id}:`, updateError)
-              throw updateError
+              return { status: 'error', reason: 'update_failed', error: updateError }
             }
 
             console.log(`Successfully processed application ${app.application_id}`)
@@ -94,7 +93,7 @@ serve(async (req) => {
 
           } catch (error) {
             console.error(`Error processing application ${app.application_id}:`, error)
-            return { status: 'error' }
+            return { status: 'error', reason: 'processing_failed', error }
           }
         })
       )
@@ -110,7 +109,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        message: `Processed ${applications.length} applications`,
+        message: `Processed ${applications?.length || 0} applications`,
         success: successCount,
         errors: errorCount,
       }),
