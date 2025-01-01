@@ -64,7 +64,7 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
           (app.application_details as any)?.officer || '' : '',
         consultationEnd: app.last_date_consultation_comments || '',
         image: '/placeholder.svg',
-        coordinates: extractCoordinates(app.geom),
+        coordinates: extractCoordinates(String(app.geom || '')),
         postcode: app.postcode || '',
         ai_title: app.ai_title,
         last_date_consultation_comments: app.last_date_consultation_comments,
