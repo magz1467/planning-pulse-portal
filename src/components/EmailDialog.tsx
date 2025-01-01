@@ -62,7 +62,8 @@ export const EmailDialog = ({
         .insert({
           user_id: user.id,
           postcode: postcode,
-          radius: values.radius
+          radius: values.radius,
+          User_email: user.email // Add the user's email
         });
 
       if (error) throw error;
