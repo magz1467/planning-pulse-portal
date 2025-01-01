@@ -15,7 +15,7 @@ export const useDashboardState = () => {
   }>({});
   const [activeSort, setActiveSort] = useState<'closingSoon' | 'newest' | null>(null);
   const [isMapView, setIsMapView] = useState(true);
-  const [postcode, setPostcode] = useState(searchPostcode || 'SW1A 0AA'); // Use Westminster only as fallback
+  const [postcode, setPostcode] = useState(searchPostcode || 'SW1A 0AA');
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
@@ -28,11 +28,8 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
-  // Debug logs for applications data
-  console.log('ApplicationsDashboardMap - Raw applications data:', applications?.length);
-  console.log('ApplicationsDashboardMap - Number of applications:', applications?.length);
-  console.log('ApplicationsDashboardMap - Status counts:', statusCounts);
-  console.log('ApplicationsDashboardMap - Active filters:', activeFilters);
+  console.log('DashboardState - Active sort:', activeSort);
+  console.log('DashboardState - Raw applications:', applications?.length);
 
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
@@ -40,7 +37,6 @@ export const useDashboardState = () => {
 
   const handleFilterChange = (filterType: string, value: string) => {
     console.log('Applying filter:', filterType, value);
-    console.log('Current applications before filter:', applications?.length);
     setActiveFilters(prev => {
       const newFilters = {
         ...prev,
@@ -58,10 +54,10 @@ export const useDashboardState = () => {
   };
 
   const handleSortChange = (sortType: 'closingSoon' | 'newest' | null) => {
+    console.log('Changing sort to:', sortType);
     setActiveSort(sortType);
   };
 
-  // When coordinates are loaded, update the search point and fetch applications
   const isInitialSearch = !searchPoint && coordinates;
   const isNewSearch = searchPoint && coordinates && 
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
@@ -74,14 +70,16 @@ export const useDashboardState = () => {
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
 
-  // Ensure applications is always an array
   const safeApplications = applications || [];
+  
+  // Get filtered and sorted applications
+  const filteredApplications = useFilteredApplications(
+    safeApplications,
+    activeFilters,
+    activeSort
+  );
 
-  // Get filtered applications
-  const filteredApplications = useFilteredApplications(safeApplications, activeFilters, activeSort);
-
-  // Debug logs for filtered applications
-  console.log('ApplicationsDashboardMap - Filtered applications:', filteredApplications?.length);
+  console.log('DashboardState - Filtered applications:', filteredApplications?.length);
 
   return {
     selectedId,
