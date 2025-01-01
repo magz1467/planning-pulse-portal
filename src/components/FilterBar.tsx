@@ -58,8 +58,6 @@ export const FilterBar = ({
         return;
       }
 
-      console.log('Processing application:', app.id, 'with status:', app.status);
-      
       const status = (app.status || '').trim().toLowerCase();
       
       if (!status) {
@@ -78,12 +76,6 @@ export const FilterBar = ({
     console.log('Final status counts:', counts);
     setStatusCounts(counts);
     setIsLoading(false);
-  }, [applications]);
-
-  // Log whenever applications change
-  useEffect(() => {
-    console.log('Applications updated in FilterBar:', applications?.length);
-    setIsLoading(true);
   }, [applications]);
 
   return (
