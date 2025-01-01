@@ -53,8 +53,8 @@ export class MapboxInitializer {
       console.log('Creating Mapbox instance...');
       const map = new mapboxgl.Map({
         container,
-        // Using a basic vector style that should work with any token
-        style: 'mapbox://styles/mapbox/basic-v9',
+        // Using a light vector style that should work with any token
+        style: 'mapbox://styles/mapbox/light-v10',
         center: [initialCenter[1], initialCenter[0]],
         zoom: 14,
       });
@@ -67,7 +67,8 @@ export class MapboxInitializer {
         const errorDetails = {
           message: e.error?.message || '',
           type: e.type,
-          target: e.target.getStyle()?.name || 'unknown style'
+          target: e.target.getStyle()?.name || 'unknown style',
+          styleUrl: e.target.getStyle()?.stylesheet?.sprite || 'none'
         };
         
         console.error(msg, {
@@ -78,16 +79,18 @@ export class MapboxInitializer {
         onError(msg, JSON.stringify(errorDetails, null, 2));
       });
 
-      // Add style load error handling
+      // Add style load success handler
       map.on('style.load', () => {
         console.log('Map style loaded successfully');
       });
 
+      // Add style load error handling
       map.on('style.error', (e: mapboxgl.MapboxEvent & { error?: Error }) => {
         const msg = `Map style error: ${e.error?.message || 'Unknown error'}`;
         console.error(msg, {
           error: e.error,
-          context: 'Style loading error'
+          context: 'Style loading error',
+          styleUrl: e.target.getStyle()?.stylesheet?.sprite || 'none'
         });
       });
 
