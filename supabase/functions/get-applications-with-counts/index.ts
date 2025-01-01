@@ -1,62 +1,24 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
-
-console.log("Hello from get-applications-with-counts!")
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
-
   try {
-    const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0, sort_type } = await req.json()
+    const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0 } = await req.json()
 
-    // Create a Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Build the base SQL query for applications
-    let applicationsQuery = `
-      SELECT * FROM applications 
-      WHERE geom IS NOT NULL 
-      AND ST_DWithin(
-        geom::geography,
-        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
-        $3
-      )
-    `
-
-    // Add sorting based on sort_type
-    if (sort_type) {
-      switch (sort_type) {
-        case 'newest':
-          applicationsQuery += ` ORDER BY valid_date DESC NULLS LAST`
-          break
-        case 'closingSoon':
-          applicationsQuery += `
-            AND last_date_consultation_comments >= CURRENT_DATE
-            ORDER BY last_date_consultation_comments ASC NULLS LAST
-          `
-          break
-      }
-    }
-
-    // Add pagination
-    applicationsQuery += ` LIMIT $4 OFFSET $5`
-
-    // Execute the applications query
+    // Get applications within radius
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
-      'get_applications_in_radius',
+      'get_applications_within_radius',
       {
-        center_longitude: center_lng,
-        center_latitude: center_lat,
-        search_radius: radius_meters,
-        limit_val: page_size,
-        offset_val: page_number * page_size,
-        sort_type: sort_type || null
+        center_lng,
+        center_lat, 
+        radius_meters,
+        page_size,
+        page_number
       }
     )
 
@@ -64,13 +26,13 @@ serve(async (req) => {
       throw applicationsError
     }
 
-    // Get status counts using a separate query
+    // Get status counts
     const { data: statusCounts, error: statusError } = await supabaseClient.rpc(
-      'get_status_counts',
+      'get_applications_count_within_radius',
       {
-        center_longitude: center_lng,
-        center_latitude: center_lat,
-        search_radius: radius_meters
+        center_lng,
+        center_lat,
+        radius_meters
       }
     )
 
@@ -78,50 +40,50 @@ serve(async (req) => {
       throw statusError
     }
 
-    // Get total count
-    const { count, error: countError } = await supabaseClient
-      .from('applications')
-      .select('*', { count: 'exact', head: true })
-      .filter('geom', 'not.is.null')
-      .filter(
-        'geom',
-        'st_dwithin',
-        `SRID=4326;POINT(${center_lng} ${center_lat})`,
-        radius_meters
-      )
-
-    if (countError) {
-      throw countError
+    // Format status counts
+    const formattedStatusCounts = {
+      'Under Review': 0,
+      'Approved': 0, 
+      'Declined': 0,
+      'Other': 0
     }
 
-    // Return the response
+    if (statusCounts) {
+      formattedStatusCounts['Under Review'] = statusCounts.under_review || 0
+      formattedStatusCounts['Approved'] = statusCounts.approved || 0
+      formattedStatusCounts['Declined'] = statusCounts.declined || 0
+      formattedStatusCounts['Other'] = statusCounts.other || 0
+    }
+
     return new Response(
       JSON.stringify({
         applications,
-        statusCounts: statusCounts?.[0] || {
-          'Under Review': 0,
-          'Approved': 0,
-          'Declined': 0,
-          'Other': 0
-        },
-        total: count
+        statusCounts: formattedStatusCounts
       }),
-      {
+      { 
         headers: {
-          ...corsHeaders,
           'Content-Type': 'application/json',
-        },
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST',
+          'Access-Control-Expose-Headers': 'Content-Length, X-JSON',
+          'Access-Control-Allow-Headers': 'apikey,X-Client-Info,Content-Type,Authorization'
+        }
       }
     )
 
   } catch (error) {
-    console.error('Error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/json'
-      },
-      status: 400
-    })
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 400,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST',
+          'Access-Control-Expose-Headers': 'Content-Length, X-JSON',
+          'Access-Control-Allow-Headers': 'apikey,X-Client-Info,Content-Type,Authorization'
+        }
+      }
+    )
   }
 })
