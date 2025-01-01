@@ -26,9 +26,13 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
     setShowEmailDialog(true)
   }
 
-  // When auth dialog is closed after successful login, show the email dialog
+  // When auth dialog is closed after successful login
   const handleAuthDialogClose = (open: boolean) => {
     setShowAuthDialog(open)
+    // Only show email dialog if auth dialog was closed (meaning user logged in)
+    if (!open) {
+      setShowEmailDialog(true)
+    }
   }
 
   if (isSubscribed) {
