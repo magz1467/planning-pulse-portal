@@ -1,6 +1,6 @@
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
-import Image from "@/components/ui/image";
+import Image from "@/components/ui/Image";
 import GetInTouch from "@/components/GetInTouch";
 
 const About = () => {

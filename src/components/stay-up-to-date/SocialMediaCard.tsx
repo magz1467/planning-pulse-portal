@@ -1,5 +1,5 @@
 import { Facebook, Mail } from "lucide-react";
-import Image from "@/components/ui/image";
+import Image from "@/components/ui/Image";
 
 export const SocialMediaCard = () => {
   return (

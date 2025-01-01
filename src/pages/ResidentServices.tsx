@@ -2,7 +2,7 @@ import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import Image from "@/components/ui/image";
+import Image from "@/components/ui/Image";
 import { NewsletterCard } from "@/components/stay-up-to-date/NewsletterCard";
 
 const ResidentServices = () => {
