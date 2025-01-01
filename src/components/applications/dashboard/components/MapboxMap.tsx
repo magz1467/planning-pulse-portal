@@ -34,66 +34,77 @@ export const MapboxMap = ({
     if (initializedRef.current || !mapContainer.current) return;
 
     const initializeMap = async () => {
-      console.log('Initializing map...', {
-        containerExists: !!mapContainer.current,
-        dimensions: mapContainer.current ? {
-          width: mapContainer.current.offsetWidth,
-          height: mapContainer.current.offsetHeight
-        } : null
-      });
-      
-      const newMap = await MapboxInitializer.initialize(
-        mapContainer.current!,
-        initialCenter,
-        (error, debug) => {
-          console.error('Map initialization error:', error, debug);
-          setError(error);
-          setDebugInfo(debug);
-        }
-      );
-
-      if (newMap) {
-        map.current = newMap;
-        markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
+      try {
+        console.log('Initializing map...', {
+          containerExists: !!mapContainer.current,
+          dimensions: mapContainer.current ? {
+            width: mapContainer.current.offsetWidth,
+            height: mapContainer.current.offsetHeight
+          } : null
+        });
         
-        newMap.on('load', () => {
-          console.log('Map loaded successfully');
+        const newMap = await MapboxInitializer.initialize(
+          mapContainer.current!,
+          initialCenter,
+          (error, debug) => {
+            console.error('Map initialization error:', error, debug);
+            setError(error);
+            setDebugInfo(debug);
+          }
+        );
+
+        if (newMap) {
+          map.current = newMap;
+          markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Add markers
-          applications.forEach(application => {
-            markerManager.current?.addMarker(application, application.id === selectedId);
-          });
-
-          // Only fit bounds on initial load if we have applications
-          if (!initialBoundsFitRef.current && applications.length > 0) {
-            const bounds = new mapboxgl.LngLatBounds();
-            let hasValidCoordinates = false;
-
+          newMap.on('load', () => {
+            console.log('Map loaded successfully');
+            
+            // Add markers
             applications.forEach(application => {
-              if (application.coordinates) {
-                bounds.extend([application.coordinates[1], application.coordinates[0]]);
-                hasValidCoordinates = true;
-              }
+              markerManager.current?.addMarker(application, application.id === selectedId);
             });
 
-            if (hasValidCoordinates) {
-              newMap.fitBounds(bounds, {
-                padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                maxZoom: 15
+            // Only fit bounds on initial load if we have applications
+            if (!initialBoundsFitRef.current && applications.length > 0) {
+              const bounds = new mapboxgl.LngLatBounds();
+              let hasValidCoordinates = false;
+
+              applications.forEach(application => {
+                if (application.coordinates) {
+                  bounds.extend([application.coordinates[1], application.coordinates[0]]);
+                  hasValidCoordinates = true;
+                }
               });
-              initialBoundsFitRef.current = true;
+
+              if (hasValidCoordinates) {
+                newMap.fitBounds(bounds, {
+                  padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                  maxZoom: 15
+                });
+                initialBoundsFitRef.current = true;
+              }
             }
-          }
 
-          initializedRef.current = true;
-        });
+            initializedRef.current = true;
+          });
 
-        // Add error handler
-        newMap.on('error', (e) => {
-          console.error('Mapbox error:', e);
-        });
+          // Add error handler
+          newMap.on('error', (e) => {
+            console.error('Mapbox error:', e);
+            setError('Failed to load map resources');
+          });
+        }
+      } catch (err) {
+        console.error('Map initialization failed:', err);
+        setError('Failed to initialize map');
       }
     };
+
+    // Set CORS headers for Mapbox requests
+    if (typeof window !== 'undefined') {
+      mapboxgl.prototypeAccessToken = true;
+    }
 
     initializeMap();
 
@@ -152,8 +163,17 @@ export const MapboxMap = ({
     <div className="w-full h-full relative">
       <div 
         ref={mapContainer} 
-        className="absolute inset-0"
-        style={{ backgroundColor: '#f8f9fa' }} // Add background color to make it visible while loading
+        className="absolute inset-0 bg-gray-100"
+        style={{ 
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1
+        }}
       />
       <MapboxErrorDisplay error={error} debugInfo={debugInfo} />
     </div>
