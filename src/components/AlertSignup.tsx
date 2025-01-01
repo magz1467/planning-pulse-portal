@@ -37,11 +37,15 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
       }
 
       // Check if user already has a record - note the capital E in Email
-      const { data: existingData } = await supabase
+      const { data: existingData, error: selectError } = await supabase
         .from('User_data')
         .select()
         .eq('Email', session.user.email)
         .single()
+
+      if (selectError && selectError.code !== 'PGRST116') {
+        throw selectError
+      }
 
       let dbError
       if (existingData) {
