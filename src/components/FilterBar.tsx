@@ -17,6 +17,12 @@ interface FilterBarProps {
   isMapView?: boolean;
   onToggleView?: () => void;
   applications?: Application[];
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const FilterBar = ({
@@ -26,7 +32,8 @@ export const FilterBar = ({
   activeSort = null,
   isMapView = true,
   onToggleView,
-  applications = []
+  applications = [],
+  statusCounts
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
@@ -38,6 +45,7 @@ export const FilterBar = ({
           activeFilters={activeFilters}
           isMobile={isMobile}
           applications={applications}
+          statusCounts={statusCounts}
         />
 
         <SortDropdown
@@ -61,4 +69,4 @@ export const FilterBar = ({
       )}
     </div>
   );
-};
+}

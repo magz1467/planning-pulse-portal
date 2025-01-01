@@ -15,6 +15,12 @@ interface ApplicationListViewProps {
     type?: string;
   };
   activeSort?: 'closingSoon' | 'newest' | null;
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const ApplicationListView = ({
@@ -26,6 +32,7 @@ export const ApplicationListView = ({
   onSortChange,
   activeFilters = {},
   activeSort = null,
+  statusCounts
 }: ApplicationListViewProps) => {
   return (
     <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
@@ -36,6 +43,7 @@ export const ApplicationListView = ({
             onSortChange={onSortChange}
             activeFilters={activeFilters}
             activeSort={activeSort}
+            statusCounts={statusCounts}
           />
         </div>
         <AlertSection 
@@ -50,4 +58,4 @@ export const ApplicationListView = ({
       </div>
     </div>
   );
-};
+}

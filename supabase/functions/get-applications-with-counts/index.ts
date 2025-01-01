@@ -48,8 +48,8 @@ Deno.serve(async (req) => {
       throw applicationsError
     }
 
-    if (!data || !data.applications || data.applications.length === 0) {
-      console.log('No applications found in radius', RADIUS, 'meters from', center)
+    if (!applications || applications.length === 0) {
+      console.log('No applications found in radius', radius_meters, 'meters from', [center_lat, center_lng])
       return new Response(
         JSON.stringify({
           applications: [],
