@@ -15,6 +15,12 @@ interface SearchSectionProps {
   isMapView?: boolean;
   onToggleView?: () => void;
   applications?: Application[];
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const SearchSection = ({
@@ -25,7 +31,8 @@ export const SearchSection = ({
   activeSort,
   isMapView,
   onToggleView,
-  applications = []
+  applications = [],
+  statusCounts
 }: SearchSectionProps) => {
   const isMobile = useIsMobile();
 
@@ -50,6 +57,7 @@ export const SearchSection = ({
             isMapView={isMapView}
             onToggleView={onToggleView}
             applications={applications}
+            statusCounts={statusCounts}
           />
         </div>
       )}

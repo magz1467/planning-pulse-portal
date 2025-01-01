@@ -48,6 +48,23 @@ Deno.serve(async (req) => {
       throw applicationsError
     }
 
+    if (!data || !data.applications || data.applications.length === 0) {
+      console.log('No applications found in radius', RADIUS, 'meters from', center)
+      return new Response(
+        JSON.stringify({
+          applications: [],
+          statusCounts: {
+            'Under Review': 0,
+            'Approved': 0,
+            'Declined': 0,
+            'Other': 0
+          },
+          total: 0
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Calculate status counts
     const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || ''

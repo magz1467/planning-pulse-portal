@@ -18,6 +18,12 @@ interface DesktopSidebarProps {
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number | null) => void;
   onClose: () => void;
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const DesktopSidebar = ({
@@ -30,6 +36,7 @@ export const DesktopSidebar = ({
   onSortChange,
   onSelectApplication,
   onClose,
+  statusCounts
 }: DesktopSidebarProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
@@ -63,6 +70,7 @@ export const DesktopSidebar = ({
           onSortChange={onSortChange}
           activeFilters={activeFilters}
           activeSort={activeSort}
+          statusCounts={statusCounts}
         />
       ) : selectedApplicationData && (
         <ApplicationDetailView
