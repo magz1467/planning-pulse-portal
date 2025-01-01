@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useApplicationsData } from "@/components/applications/dashboard/hooks/useApplicationsData";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
@@ -7,16 +7,21 @@ import { SortType } from "./use-application-sorting";
 
 export const useDashboardState = () => {
   const location = useLocation();
-  const searchPostcode = location.state?.postcode;
+  const [searchParams, setSearchParams] = useSearchParams();
   
+  // Get initial values from URL params or location state
+  const initialPostcode = searchParams.get('postcode') || location.state?.postcode || 'SW1A 0AA';
+  const initialTab = (searchParams.get('tab') || location.state?.tab || 'recent') as 'recent' | 'completed';
+  const initialFilter = searchParams.get('filter') || location.state?.initialFilter || (initialTab === 'completed' ? 'Approved' : 'Under Review');
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
     type?: string;
-  }>({});
+  }>({ status: initialFilter });
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
-  const [postcode, setPostcode] = useState(searchPostcode || 'SW1A 0AA');
+  const [postcode, setPostcode] = useState(initialPostcode);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
@@ -29,8 +34,16 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
-  console.log('DashboardState - Active sort:', activeSort);
-  console.log('DashboardState - Raw applications:', applications?.length);
+  // Update URL params when search parameters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set('postcode', postcode);
+    params.set('tab', initialTab);
+    if (activeFilters.status) {
+      params.set('filter', activeFilters.status);
+    }
+    setSearchParams(params, { replace: true });
+  }, [postcode, initialTab, activeFilters.status, setSearchParams]);
 
   const handleMarkerClick = (id: number) => {
     setSelectedId(id === selectedId ? null : id);
@@ -73,14 +86,11 @@ export const useDashboardState = () => {
 
   const safeApplications = applications || [];
   
-  // Get filtered and sorted applications
   const filteredApplications = useFilteredApplications(
     safeApplications,
     activeFilters,
     activeSort
   );
-
-  console.log('DashboardState - Filtered applications:', filteredApplications?.length);
 
   return {
     selectedId,
