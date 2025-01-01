@@ -17,16 +17,27 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
     setShowEmailDialog(true)
   }
 
-  const handleEmailSubmit = (email: string, radius: string) => {
-    setIsSubscribed(true)
-    setShowEmailDialog(false)
-    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
-    
-    toast({
-      title: "Subscription pending",
-      description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
-      duration: 5000,
-    })
+  const handleEmailSubmit = async (email: string, radius: string) => {
+    try {
+      setIsSubscribed(true)
+      setShowEmailDialog(false)
+      const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+      
+      toast({
+        title: "Subscription pending",
+        description: `We've sent a confirmation email to ${email}. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
+        duration: 5000,
+      })
+    } catch (error) {
+      setIsSubscribed(false)
+      toast({
+        title: "Error setting up alerts",
+        description: "There was a problem setting up your planning alerts. Please try again later.",
+        variant: "destructive",
+        duration: 5000,
+      })
+      console.error("Error in handleEmailSubmit:", error)
+    }
   }
 
   if (isSubscribed) {
