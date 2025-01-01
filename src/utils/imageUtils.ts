@@ -1,4 +1,4 @@
-export const FALLBACK_IMAGE = "https://jposqxdboetyioymfswd.supabase.co/storage/v1/object/public/images/coming-soon.jpg";
+export const FALLBACK_IMAGE = "https://jposqxdboetyioymfswd.supabase.co/storage/v1/object/public/images/placeholder.svg";
 
 export const getImageUrl = (path: string | undefined): string => {
   if (!path || path.trim() === '' || path === 'undefined' || path === 'null') {
