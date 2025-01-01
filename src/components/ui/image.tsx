@@ -8,6 +8,8 @@ interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 const Image = ({ src, alt, className, width, height, loading = "lazy", ...props }: ImageProps) => {
   const [error, setError] = useState(false);
   
+  console.log("Image component rendering with src:", src); // Debug log
+  
   return (
     <img
       src={error || !src ? '/placeholder.svg' : src}

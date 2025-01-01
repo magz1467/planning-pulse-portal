@@ -1,7 +1,6 @@
 import { Application } from "@/types/planning";
 import { MapPin } from "lucide-react";
 import Image from "@/components/ui/image";
-import { getImageUrl } from "@/utils/imageUtils";
 
 interface MiniCardProps {
   application: Application;
@@ -22,6 +21,8 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     }
   };
 
+  console.log("MiniCard rendering with image:", application.image); // Debug log
+
   return (
     <div 
       className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
@@ -31,7 +32,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-4 items-center">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
           <Image
-            src={getImageUrl(application.image)}
+            src={application.image}
             alt={application.title}
             width={80}
             height={80}
