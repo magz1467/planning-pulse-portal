@@ -28,7 +28,7 @@ export const useFilteredApplications = (
       applications: filteredApplications
     });
 
-    console.log('useFilteredApplications - Filtered applications:', sortedApplications?.length);
+    console.log('useFilteredApplications - Filtered and sorted applications:', sortedApplications?.length);
     return sortedApplications;
   }, [applications, activeFilters, activeSort]);
 };

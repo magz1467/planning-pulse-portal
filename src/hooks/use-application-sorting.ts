@@ -49,22 +49,33 @@ const sortByNewest = (applications: Application[]) => {
     const dateA = a.valid_date ? new Date(a.valid_date) : null;
     const dateB = b.valid_date ? new Date(b.valid_date) : null;
 
+    // Invalid dates go to the end
     if (!dateA || isNaN(dateA.getTime())) return 1;
     if (!dateB || isNaN(dateB.getTime())) return -1;
 
+    // Sort by date descending (newest first)
     return dateB.getTime() - dateA.getTime();
   });
 };
 
 export const useApplicationSorting = ({ type, applications }: SortConfig) => {
   if (!applications?.length) return [];
+  
+  console.log('Sorting applications with type:', type);
+  console.log('Number of applications before sort:', applications.length);
 
+  let sorted;
   switch (type) {
     case 'closingSoon':
-      return sortByClosingDate(applications);
+      sorted = sortByClosingDate(applications);
+      break;
     case 'newest':
-      return sortByNewest(applications);
+      sorted = sortByNewest(applications);
+      break;
     default:
-      return applications;
+      sorted = applications;
   }
+
+  console.log('Number of applications after sort:', sorted.length);
+  return sorted;
 };
