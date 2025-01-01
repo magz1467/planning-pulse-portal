@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
 
@@ -41,7 +41,7 @@ export const MobileApplicationCards = ({
 
   if (showFullDetails && selectedApp) {
     return (
-      <div className="fixed inset-0 bg-white z-[2000] animate-in slide-in-from-bottom duration-300">
+      <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {

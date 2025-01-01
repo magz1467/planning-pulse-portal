@@ -2,6 +2,8 @@ import { Application } from "@/types/planning";
 import { MapPin, Timer } from "lucide-react";
 import Image from "@/components/ui/image";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { getStatusColor, getStatusText } from "@/utils/statusColors";
 
 interface MiniCardProps {
   application: Application;
@@ -9,21 +11,6 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'declined':
-        return 'bg-[#ea384c]/10 text-[#ea384c]';
-      case 'under review':
-        return 'bg-[#F97316]/10 text-[#F97316]';
-      case 'approved':
-        return 'bg-primary/10 text-primary';
-      default:
-        return 'bg-primary/10 text-primary';
-    }
-  };
-
-  console.log("MiniCard rendering with image:", application.image);
-
   const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
 
   return (
@@ -44,7 +31,10 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-primary truncate">{application.title}</h3>
+            <ApplicationTitle 
+              title={application.ai_title || application.description || ''} 
+              className="line-clamp-2 text-sm font-semibold text-primary"
+            />
             {isClosingSoon && (
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                 <Timer className="w-3 h-3 mr-1" />
@@ -58,7 +48,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           </div>
           <div className="flex items-center justify-between mt-2">
             <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-              {application.status}
+              {getStatusText(application.status)}
             </span>
             <span className="text-xs text-gray-500">
               {application.distance}
