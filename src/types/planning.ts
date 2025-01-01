@@ -3,7 +3,7 @@ export interface Application {
   title: string;
   address: string;
   status: string;
-  distance: string;
+  distance?: string;
   reference: string;
   description: string;
   applicant: string;
@@ -13,16 +13,7 @@ export interface Application {
   ward: string;
   officer: string;
   consultationEnd: string;
-  image: string;
+  image?: string;
   coordinates: [number, number];
-  ai_title?: string;
-  last_date_consultation_comments?: string;
-  valid_date?: string;
-}
-
-export interface Comment {
-  id: number;
-  content: string;
-  author: string;
-  timestamp: string;
+  postcode: string;
 }
