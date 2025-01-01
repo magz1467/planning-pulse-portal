@@ -9,10 +9,12 @@ interface ApplicationImageProps {
 export const ApplicationImage = ({ application }: ApplicationImageProps) => {
   if (!application?.image) return null;
 
+  const imageUrl = getImageUrl(application.image);
+
   return (
     <div className="aspect-video relative overflow-hidden rounded-lg">
       <Image
-        src={getImageUrl(application.image)}
+        src={imageUrl}
         alt={application.title}
         className="object-cover w-full h-full"
       />
