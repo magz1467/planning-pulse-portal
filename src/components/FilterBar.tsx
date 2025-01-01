@@ -4,7 +4,7 @@ import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Filter, ArrowUpDown, Map, List } from "lucide-react";
 import { Application } from "@/types/planning";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -29,31 +29,19 @@ export const FilterBar = ({
   applications = []
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
-  const [statusCounts, setStatusCounts] = useState({
-    "Under Review": 0,
-    "Approved": 0,
-    "Declined": 0,
-    "Other": 0
-  });
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!applications?.length) {
-      setStatusCounts({
-        "Under Review": 0,
-        "Approved": 0,
-        "Declined": 0,
-        "Other": 0
-      });
-      return;
-    }
-
+  // Use useMemo instead of useState + useEffect to compute statusCounts
+  const statusCounts = useMemo(() => {
     const counts = {
       "Under Review": 0,
       "Approved": 0,
       "Declined": 0,
       "Other": 0
     };
+
+    if (!applications?.length) {
+      return counts;
+    }
 
     applications.forEach(app => {
       if (!app?.status) {
@@ -73,7 +61,7 @@ export const FilterBar = ({
       }
     });
 
-    setStatusCounts(counts);
+    return counts;
   }, [applications]);
 
   return (
@@ -85,7 +73,6 @@ export const FilterBar = ({
           isMobile={isMobile}
           applications={applications}
           statusCounts={statusCounts}
-          isLoading={isLoading}
         >
           <Button 
             variant="outline" 
