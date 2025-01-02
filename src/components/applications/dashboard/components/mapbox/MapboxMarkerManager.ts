@@ -33,10 +33,10 @@ export class MapboxMarkerManager {
     try {
       const el = document.createElement('div');
       el.className = 'marker';
-      el.style.width = '25px';
-      el.style.height = '25px';
+      el.style.width = isSelected ? '30px' : '25px';
+      el.style.height = isSelected ? '30px' : '25px';
       el.style.borderRadius = '50%';
-      el.style.backgroundColor = isSelected ? '#065F46' : this.getStatusColor(application.status);
+      el.style.backgroundColor = this.getStatusColor(application.status);
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
 
@@ -58,7 +58,9 @@ export class MapboxMarkerManager {
     const markerData = this.markers[id];
     if (markerData) {
       const el = markerData.marker.getElement();
-      el.style.backgroundColor = isSelected ? '#065F46' : this.getStatusColor(markerData.application.status);
+      el.style.width = isSelected ? '30px' : '25px';
+      el.style.height = isSelected ? '30px' : '25px';
+      el.style.backgroundColor = this.getStatusColor(markerData.application.status);
     }
   }
 
