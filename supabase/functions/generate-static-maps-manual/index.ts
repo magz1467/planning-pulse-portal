@@ -41,14 +41,13 @@ async function processApplication(
       return { status: 'error', reason: 'no_mapbox_token' };
     }
 
-    // Generate static map URL with satellite view
+    // Generate static map URL using the Mapbox Static Images API format
     const width = 800;
     const height = 600;
     const zoom = 17;
-    const pitch = 60;
-    const bearing = 45;
-
-    const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/${coordinates.lon},${coordinates.lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
+    
+    // Construct the static map URL using the correct format
+    const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${coordinates.lon},${coordinates.lat},${zoom},0/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
 
     console.log(`Generated URL for application ${app.application_id}: ${staticMapUrl}`);
 
