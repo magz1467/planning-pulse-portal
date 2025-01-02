@@ -37,7 +37,7 @@ export const SearchSection = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col border-b shadow-sm">
       <div className="container mx-auto pl-4 pr-8 py-4">
         <PostcodeSearch 
           onSelect={onPostcodeSelect}
