@@ -36,7 +36,7 @@ async function processApplication(
 
     console.log(`Coordinates for application ${app.application_id}:`, coordinates);
 
-    // Generate static map URL with 3D effect
+    // Generate static map URL with satellite view
     const width = 800;
     const height = 600;
     const zoom = 17;
