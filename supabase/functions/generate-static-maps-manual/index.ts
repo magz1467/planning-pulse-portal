@@ -21,6 +21,8 @@ async function processApplication(
   retryCount = 0
 ): Promise<{ status: 'success' | 'error', reason?: string }> {
   try {
+    console.log(`Processing application ${app.application_id}`);
+    
     if (!app.centroid) {
       console.log(`Skipping application ${app.application_id} - no coordinates`);
       return { status: 'error', reason: 'no_coordinates' };
@@ -31,6 +33,8 @@ async function processApplication(
       console.log(`Invalid coordinates for application ${app.application_id}`);
       return { status: 'error', reason: 'invalid_coordinates' };
     }
+
+    console.log(`Coordinates for application ${app.application_id}:`, coordinates);
 
     // Generate static map URL with 3D effect
     const width = 800;
@@ -84,8 +88,12 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting manual map generation process');
+    
     const { batch_size = 100 } = await req.json();
     const limit = Math.min(Math.max(1, batch_size), 500); // Cap at 500, minimum 1
+    
+    console.log(`Requested batch size: ${batch_size}, adjusted limit: ${limit}`);
     
     const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN');
     if (!mapboxToken) {
