@@ -6,9 +6,11 @@ import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useEffect } from "react";
 import { MapContent } from "./components/MapContent";
 import { SidebarContent } from "./components/SidebarContent";
+import { useSearchPoint } from "@/hooks/use-search-point";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
+  const { searchPoint, setSearchPoint } = useSearchPoint();
   const {
     selectedId,
     activeFilters,
