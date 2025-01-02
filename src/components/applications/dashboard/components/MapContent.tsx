@@ -13,6 +13,7 @@ interface MapContentProps {
   isMobile: boolean;
   isMapView: boolean;
   onMarkerClick: (id: number | null) => void;
+  onCenterChange?: (newCenter: [number, number]) => void;  // Add this prop
 }
 
 export const MapContent = ({
@@ -22,6 +23,7 @@ export const MapContent = ({
   isMobile,
   isMapView,
   onMarkerClick,
+  onCenterChange,  // Add this prop
 }: MapContentProps) => {
   const { toast } = useToast();
   const [showRedoSearch, setShowRedoSearch] = useState(false);
@@ -42,10 +44,10 @@ export const MapContent = ({
   };
 
   const handleRedoSearch = () => {
-    if (!newCenter) return;
+    if (!newCenter || !onCenterChange) return;
     
-    // Update coordinates which will trigger a new search
-    coordinates = newCenter;
+    // Call the parent's handler to update coordinates
+    onCenterChange(newCenter);
     
     toast({
       title: "Searching new area",

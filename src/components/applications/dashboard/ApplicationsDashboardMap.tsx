@@ -39,6 +39,13 @@ export const ApplicationsDashboardMap = () => {
     handleMarkerClick(null);
   };
 
+  const handleCenterChange = (newCenter: [number, number]) => {
+    if (coordinates) {
+      setSearchPoint(newCenter);
+      handlePostcodeSelect('');  // Clear postcode since we're searching by coordinates
+    }
+  };
+
   return (
     <div className="h-screen w-full flex flex-col relative">
       <DashboardHeader />
@@ -87,6 +94,7 @@ export const ApplicationsDashboardMap = () => {
               isMobile={isMobile}
               isMapView={isMapView}
               onMarkerClick={handleMarkerClick}
+              onCenterChange={handleCenterChange}
             />
           )}
         </div>
