@@ -14,7 +14,7 @@ interface ApplicationCommentsProps {
 
 export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
@@ -125,7 +125,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
       )}
 
       <div className="space-y-4 mt-6">
-        {isLoading ? (
+        {isLoading && comments.length > 0 ? (
           <p className="text-center text-gray-500">Loading comments...</p>
         ) : comments.length === 0 ? (
           <p className="text-center text-gray-500">No comments yet. Be the first to comment!</p>
