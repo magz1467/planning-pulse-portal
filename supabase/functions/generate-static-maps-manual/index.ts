@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createMapboxClient } from 'https://esm.sh/@mapbox/mapbox-sdk@0.15.3'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -41,14 +42,27 @@ async function processApplication(
       return { status: 'error', reason: 'no_mapbox_token' };
     }
 
-    // Generate static map URL using the Mapbox Static Images API format
+    // Initialize Mapbox client
+    const mapboxClient = createMapboxClient({ accessToken: mapboxToken });
+
+    // Generate static map URL using the Mapbox SDK
     const width = 800;
     const height = 600;
     const zoom = 17;
-    
-    // Construct the static map URL using the correct format
-    const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${coordinates.lon},${coordinates.lat},${zoom},0/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
 
+    const request = mapboxClient.static.getStaticImage({
+      ownerId: 'mapbox',
+      styleId: 'satellite-v9',
+      width,
+      height,
+      position: {
+        coordinates: [coordinates.lon, coordinates.lat],
+        zoom
+      },
+      highRes: true
+    });
+
+    const staticMapUrl = request.url();
     console.log(`Generated URL for application ${app.application_id}: ${staticMapUrl}`);
 
     // Test the URL before updating
