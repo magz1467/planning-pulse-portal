@@ -22,6 +22,8 @@ export const ManualProcessing = ({
   const handleGenerateMaps = async () => {
     try {
       setIsGeneratingMaps(true);
+      console.log('Starting map generation process...');
+      
       toast({
         title: "Generating static maps",
         description: `This may take a few minutes for up to ${mapBatchSize} applications`,
@@ -36,7 +38,16 @@ export const ManualProcessing = ({
         body: JSON.stringify({ batch_size: mapBatchSize })
       });
 
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to generate maps: ${errorText}`);
+      }
+
       const data = await response.json();
+      console.log('Generation result:', data);
       
       toast({
         title: "Success!",
@@ -47,7 +58,7 @@ export const ManualProcessing = ({
       console.error('Error generating maps:', error);
       toast({
         title: "Error",
-        description: "Failed to generate static maps. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate static maps. Please try again.",
         variant: "destructive",
       });
     } finally {
