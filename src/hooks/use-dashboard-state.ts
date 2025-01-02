@@ -13,8 +13,9 @@ export const useDashboardState = () => {
   const initialPostcode = searchParams.get('postcode') || location.state?.postcode || 'SW1A 0AA';
   const initialTab = (searchParams.get('tab') || location.state?.tab || 'recent') as 'recent' | 'completed';
   const initialFilter = searchParams.get('filter') || location.state?.initialFilter;
+  const initialApplicationId = searchParams.get('application') ? parseInt(searchParams.get('application')!) : null;
 
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(initialApplicationId);
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
     type?: string;
@@ -38,16 +39,21 @@ export const useDashboardState = () => {
 
   // Update URL params when search parameters change
   useEffect(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams);
     params.set('postcode', postcode);
     params.set('tab', initialTab);
     if (activeFilters.status) {
       params.set('filter', activeFilters.status);
     }
+    if (selectedId) {
+      params.set('application', selectedId.toString());
+    } else {
+      params.delete('application');
+    }
     setSearchParams(params, { replace: true });
-  }, [postcode, initialTab, activeFilters.status, setSearchParams]);
+  }, [postcode, initialTab, activeFilters.status, selectedId, setSearchParams]);
 
-  const handleMarkerClick = (id: number) => {
+  const handleMarkerClick = (id: number | null) => {
     setSelectedId(id === selectedId ? null : id);
   };
 
