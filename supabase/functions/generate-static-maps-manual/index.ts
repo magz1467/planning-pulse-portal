@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { createMapboxClient } from 'https://esm.sh/@mapbox/mapbox-sdk@0.15.3'
+import { generateStaticMapUrl, validateMapUrl } from './mapbox.ts'
+import { getApplicationsWithoutImages, updateApplicationImage } from './database.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,7 +10,7 @@ const corsHeaders = {
 
 const BATCH_SIZE = 10;
 const MAX_RETRIES = 3;
-const DELAY_BETWEEN_RETRIES = 1000; // 1 second
+const DELAY_BETWEEN_RETRIES = 1000;
 
 async function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -42,49 +43,19 @@ async function processApplication(
       return { status: 'error', reason: 'no_mapbox_token' };
     }
 
-    // Initialize Mapbox client
-    const mapboxClient = createMapboxClient({ accessToken: mapboxToken });
-
-    // Generate static map URL using the Mapbox SDK
-    const width = 800;
-    const height = 600;
-    const zoom = 17;
-
-    const request = mapboxClient.static.getStaticImage({
-      ownerId: 'mapbox',
-      styleId: 'satellite-v9',
-      width,
-      height,
-      position: {
-        coordinates: [coordinates.lon, coordinates.lat],
-        zoom
-      },
-      highRes: true
-    });
-
-    const staticMapUrl = request.url();
+    // Generate the static map URL
+    const staticMapUrl = await generateStaticMapUrl(coordinates, mapboxToken);
     console.log(`Generated URL for application ${app.application_id}: ${staticMapUrl}`);
 
-    // Test the URL before updating
-    const mapResponse = await fetch(staticMapUrl);
-    if (!mapResponse.ok) {
-      console.error(`Failed to fetch map image for application ${app.application_id}:`, await mapResponse.text());
+    // Validate the URL works
+    const isValid = await validateMapUrl(staticMapUrl);
+    if (!isValid) {
+      console.error(`Failed to fetch map image for application ${app.application_id}`);
       return { status: 'error', reason: 'map_fetch_failed' };
     }
 
     // Update the application with the new image URL
-    const { error: updateError } = await supabase
-      .from('applications')
-      .update({ 
-        image_map_url: staticMapUrl,
-        last_updated: new Date().toISOString()
-      })
-      .eq('application_id', app.application_id);
-
-    if (updateError) {
-      console.error(`Error updating application ${app.application_id}:`, updateError);
-      throw updateError;
-    }
+    await updateApplicationImage(supabase, app.application_id, staticMapUrl);
 
     console.log(`Successfully processed application ${app.application_id}`);
     return { status: 'success' };
@@ -92,7 +63,6 @@ async function processApplication(
   } catch (error) {
     console.error(`Error processing application ${app.application_id}:`, error);
     
-    // Retry logic
     if (retryCount < MAX_RETRIES) {
       console.log(`Retrying application ${app.application_id} (attempt ${retryCount + 1})`);
       await sleep(DELAY_BETWEEN_RETRIES);
@@ -101,8 +71,7 @@ async function processApplication(
     
     return { 
       status: 'error', 
-      reason: 'processing_failed', 
-      error 
+      reason: 'processing_failed'
     };
   }
 }
@@ -116,7 +85,7 @@ serve(async (req) => {
     console.log('Starting manual map generation process');
     
     const { batch_size = 100 } = await req.json();
-    const limit = Math.min(Math.max(1, batch_size), 500); // Cap at 500, minimum 1
+    const limit = Math.min(Math.max(1, batch_size), 500);
     
     console.log(`Requested batch size: ${batch_size}, adjusted limit: ${limit}`);
     
@@ -133,19 +102,8 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get applications without images, using the new index
-    const { data: applications, error: fetchError } = await supabase
-      .from('applications')
-      .select('application_id, centroid')
-      .is('image_map_url', null)
-      .order('application_id')
-      .limit(limit);
-
-    if (fetchError) {
-      console.error('Error fetching applications:', fetchError);
-      throw fetchError;
-    }
-
+    // Get applications without images
+    const applications = await getApplicationsWithoutImages(supabase, limit);
     console.log(`Processing ${applications?.length || 0} applications`);
 
     // Process in smaller batches to avoid rate limits
@@ -168,7 +126,6 @@ serve(async (req) => {
       successCount += results.filter(r => r.status === 'success').length;
       errorCount += results.filter(r => r.status === 'error').length;
 
-      // Add a small delay between chunks to respect rate limits
       if (chunks.length > 1 && currentChunk < chunks.length) {
         await sleep(1000);
       }
