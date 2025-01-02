@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -29,24 +30,16 @@ export const ManualProcessing = ({
         description: `This may take a few minutes for up to ${mapBatchSize} applications`,
       });
 
-      const response = await fetch('https://jposqxdboetyioymfswd.supabase.co/functions/v1/generate-static-maps-manual', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({ batch_size: mapBatchSize })
+      // Use supabase client to invoke the function instead of raw fetch
+      const { data, error } = await supabase.functions.invoke('generate-static-maps-manual', {
+        body: { batch_size: mapBatchSize }
       });
 
-      console.log('Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`Failed to generate maps: ${errorText}`);
+      if (error) {
+        console.error('Error response:', error);
+        throw new Error(`Failed to generate maps: ${error.message}`);
       }
 
-      const data = await response.json();
       console.log('Generation result:', data);
       
       toast({
