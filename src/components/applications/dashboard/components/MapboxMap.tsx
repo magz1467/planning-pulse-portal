@@ -12,6 +12,7 @@ interface MapboxMapProps {
   selectedId: number | null;
   onMarkerClick: (id: number) => void;
   initialCenter: LatLngTuple;
+  onMapMoved?: (center: [number, number], bounds: [[number, number], [number, number]]) => void;
 }
 
 export const MapboxMap = ({
@@ -19,6 +20,7 @@ export const MapboxMap = ({
   selectedId,
   onMarkerClick,
   initialCenter,
+  onMapMoved
 }: MapboxMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -85,6 +87,22 @@ export const MapboxMap = ({
                 initialBoundsFitRef.current = true;
               }
             }
+
+            // Add moveend event listener for map movement
+            newMap.on('moveend', () => {
+              if (onMapMoved && map.current) {
+                const center = map.current.getCenter();
+                const bounds = map.current.getBounds();
+                
+                onMapMoved(
+                  [center.lat, center.lng],
+                  [
+                    [bounds.getSouthWest().lat, bounds.getSouthWest().lng],
+                    [bounds.getNorthEast().lat, bounds.getNorthEast().lng]
+                  ]
+                );
+              }
+            });
 
             initializedRef.current = true;
           });

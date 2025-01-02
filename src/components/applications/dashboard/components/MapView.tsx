@@ -8,13 +8,15 @@ interface MapViewProps {
   selectedId: number | null;
   onMarkerClick: (id: number) => void;
   initialCenter: LatLngTuple;
+  onMapMoved?: (center: [number, number], bounds: [[number, number], [number, number]]) => void;
 }
 
 export const MapView = ({
   applications,
   selectedId,
   onMarkerClick,
-  initialCenter
+  initialCenter,
+  onMapMoved
 }: MapViewProps) => {
   // Log the number of visible applications for debugging
   useEffect(() => {
@@ -28,6 +30,7 @@ export const MapView = ({
         selectedId={selectedId}
         onMarkerClick={onMarkerClick}
         initialCenter={initialCenter}
+        onMapMoved={onMapMoved}
       />
     </div>
   );
