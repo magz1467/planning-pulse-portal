@@ -31,7 +31,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setComments(data || []);
+        setComments(data as Comment[] || []);
       } catch (error) {
         console.error('Error fetching comments:', error);
         toast({
@@ -83,7 +83,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
 
       if (fetchError) throw fetchError;
       
-      setComments(data || []);
+      setComments(data as Comment[] || []);
       
       toast({
         title: "Success",

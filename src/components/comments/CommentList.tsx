@@ -14,12 +14,12 @@ export const CommentList = ({ comments }: CommentListProps) => {
       {comments.map((comment) => (
         <div key={comment.id} className="border-b pb-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="font-semibold">{comment.author}</span>
+            <span className="font-semibold">{(comment.user as any)?.email || 'Anonymous'}</span>
             <span className="text-sm text-gray-500">
-              {formatDate(comment.timestamp)}
+              {formatDate(comment.created_at)}
             </span>
           </div>
-          <p>{comment.content}</p>
+          <p>{comment.comment}</p>
         </div>
       ))}
     </div>
