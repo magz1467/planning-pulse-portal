@@ -297,21 +297,35 @@ export type Database = {
       }
       Comments: {
         Row: {
+          application_id: number | null
           comment: string | null
           created_at: string
           id: number
+          user_id: string | null
         }
         Insert: {
+          application_id?: number | null
           comment?: string | null
           created_at?: string
           id?: number
+          user_id?: string | null
         }
         Update: {
+          application_id?: number | null
           comment?: string | null
           created_at?: string
           id?: number
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "Comments_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["application_id"]
+          },
+        ]
       }
       contact_requests: {
         Row: {

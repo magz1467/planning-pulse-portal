@@ -24,7 +24,11 @@ export interface Application {
 
 export interface Comment {
   id: number;
-  content: string;
-  author: string;
-  timestamp: string;
+  created_at: string;
+  comment: string;
+  user_id: string;
+  application_id: number;
+  user?: {
+    email: string;
+  };
 }
