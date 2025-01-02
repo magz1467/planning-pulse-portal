@@ -1,27 +1,23 @@
 import { useState, useEffect } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
 import { useApplicationsData } from "@/components/applications/dashboard/hooks/useApplicationsData";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
 import { SortType } from "./use-application-sorting";
+import { useURLState } from "./use-url-state";
+import { useSelectionState } from "./use-selection-state";
+import { useFilterState } from "./use-filter-state";
 
 export const useDashboardState = () => {
-  const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  
-  // Get initial values from URL params or location state
-  const initialPostcode = searchParams.get('postcode') || location.state?.postcode || 'SW1A 0AA';
-  const initialTab = (searchParams.get('tab') || location.state?.tab || 'recent') as 'recent' | 'completed';
-  const initialFilter = searchParams.get('filter') || location.state?.initialFilter;
-  const initialApplicationId = searchParams.get('application') ? parseInt(searchParams.get('application')!) : null;
+  const { 
+    initialPostcode, 
+    initialTab, 
+    initialFilter,
+    initialApplicationId,
+    updateURLParams 
+  } = useURLState();
 
-  const [selectedId, setSelectedId] = useState<number | null>(initialApplicationId);
-  const [activeFilters, setActiveFilters] = useState<{
-    status?: string;
-    type?: string;
-  }>({
-    status: initialFilter || undefined
-  });
+  const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
+  const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode);
@@ -37,39 +33,15 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
-  // Update URL params when search parameters change
+  // Update URL when relevant state changes
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    params.set('postcode', postcode);
-    params.set('tab', initialTab);
-    if (activeFilters.status) {
-      params.set('filter', activeFilters.status);
-    }
-    if (selectedId) {
-      params.set('application', selectedId.toString());
-    } else {
-      params.delete('application');
-    }
-    setSearchParams(params, { replace: true });
-  }, [postcode, initialTab, activeFilters.status, selectedId, setSearchParams]);
-
-  const handleMarkerClick = (id: number | null) => {
-    setSelectedId(id === selectedId ? null : id);
-  };
-
-  const handleFilterChange = (filterType: string, value: string) => {
-    console.log('Applying filter:', filterType, value);
-    setActiveFilters(prev => {
-      const newFilters = {
-        ...prev,
-        [filterType]: value
-      };
-      if (searchPoint) {
-        fetchApplicationsInRadius(searchPoint, newFilters);
-      }
-      return newFilters;
+    updateURLParams({
+      postcode,
+      tab: initialTab,
+      filter: activeFilters.status,
+      applicationId: selectedId
     });
-  };
+  }, [postcode, initialTab, activeFilters.status, selectedId]);
 
   const handlePostcodeSelect = async (newPostcode: string) => {
     setPostcode(newPostcode);
