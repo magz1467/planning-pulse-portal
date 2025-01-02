@@ -4,10 +4,9 @@ import { Comment } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { format } from "date-fns";
 
 interface ApplicationCommentsProps {
   applicationId?: number;
@@ -24,6 +23,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
       if (!applicationId) return;
       
       try {
+        setIsLoading(true);
         const { data, error } = await supabase
           .from('Comments')
           .select('*, user:user_id(email)')
@@ -31,7 +31,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
-        setComments(data as Comment[] || []);
+        setComments(data as unknown as Comment[] || []);
       } catch (error) {
         console.error('Error fetching comments:', error);
         toast({
@@ -83,7 +83,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
 
       if (fetchError) throw fetchError;
       
-      setComments(data as Comment[] || []);
+      setComments(data as unknown as Comment[] || []);
       
       toast({
         title: "Success",
@@ -137,7 +137,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
                   {(comment.user as any)?.email || 'Anonymous'}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {format(new Date(comment.created_at), 'MMM d, yyyy h:mm a')}
+                  {new Date(comment.created_at).toLocaleString()}
                 </span>
               </div>
               <p className="text-sm">{comment.comment}</p>
