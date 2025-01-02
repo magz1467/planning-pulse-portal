@@ -2,6 +2,7 @@ export const getStatusColor = (status: string) => {
   const statusLower = status.toLowerCase();
   switch (statusLower) {
     case 'declined':
+    case 'refused':
     case 'withdrawn':
       return 'bg-[#ea384c]/10 text-[#ea384c]';
     case 'under review':
