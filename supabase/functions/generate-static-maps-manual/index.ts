@@ -36,6 +36,11 @@ async function processApplication(
 
     console.log(`Coordinates for application ${app.application_id}:`, coordinates);
 
+    if (!mapboxToken) {
+      console.error('MAPBOX_PUBLIC_TOKEN is not set');
+      return { status: 'error', reason: 'no_mapbox_token' };
+    }
+
     // Generate static map URL with satellite view
     const width = 800;
     const height = 600;
@@ -46,6 +51,13 @@ async function processApplication(
     const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v12/static/${coordinates.lon},${coordinates.lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
 
     console.log(`Generated URL for application ${app.application_id}: ${staticMapUrl}`);
+
+    // Test the URL before updating
+    const mapResponse = await fetch(staticMapUrl);
+    if (!mapResponse.ok) {
+      console.error(`Failed to fetch map image for application ${app.application_id}:`, await mapResponse.text());
+      return { status: 'error', reason: 'map_fetch_failed' };
+    }
 
     // Update the application with the new image URL
     const { error: updateError } = await supabase

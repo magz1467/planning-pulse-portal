@@ -295,6 +295,24 @@ export type Database = {
         }
         Relationships: []
       }
+      Comments: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       contact_requests: {
         Row: {
           created_at: string
