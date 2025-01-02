@@ -4,6 +4,7 @@ import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicatio
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 interface MapContentProps {
   applications: Application[];
