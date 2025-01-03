@@ -41,12 +41,12 @@ export const ApplicationsDashboardMap = () => {
     handleMarkerClick(null);
   };
 
-  const handleCenterChange = (newCenter: [number, number]) => {
+  // Update searchPoint when coordinates change
+  useEffect(() => {
     if (coordinates) {
-      setSearchPoint(newCenter);
-      handlePostcodeSelect('');  // Clear postcode since we're searching by coordinates
+      setSearchPoint(coordinates);
     }
-  };
+  }, [coordinates, setSearchPoint]);
 
   return (
     <div className="h-screen w-full flex flex-col relative">
@@ -96,7 +96,6 @@ export const ApplicationsDashboardMap = () => {
               isMobile={isMobile}
               isMapView={isMapView}
               onMarkerClick={handleMarkerClick}
-              onCenterChange={handleCenterChange}
             />
           )}
         </div>
