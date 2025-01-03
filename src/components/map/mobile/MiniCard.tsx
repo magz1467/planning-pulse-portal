@@ -13,9 +13,9 @@ interface MiniCardProps {
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
   
-  // Use image_map_url first, fallback to image, then placeholder
+  // Fallback chain: image_map_url -> image -> placeholder
   const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
-  console.log('MiniCard image URL:', imageUrl);
+  console.log('MiniCard image URL:', imageUrl, 'for application:', application.id);
 
   return (
     <div 
@@ -31,6 +31,10 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             width={80}
             height={80}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.log('Image load error in MiniCard for application:', application.id, e);
+              e.currentTarget.src = "/placeholder.svg";
+            }}
           />
         </div>
         <div className="flex-1 min-w-0">

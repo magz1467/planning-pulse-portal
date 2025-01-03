@@ -20,10 +20,6 @@ export const PlanningApplicationList = ({
   activeSort
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
-  console.log('Applications with images:', applications.map(app => ({ 
-    id: app.id, 
-    image: app.image_map_url || app.image 
-  })));
 
   return (
     <div className="divide-y">
@@ -31,8 +27,9 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
-        // Use image_map_url first, fallback to image, then placeholder
+        // Fallback chain: image_map_url -> image -> placeholder
         const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
+        console.log('Application card image URL:', imageUrl, 'for application:', application.id);
 
         return (
           <div
@@ -48,6 +45,10 @@ export const PlanningApplicationList = ({
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log('Image load error for application:', application.id, e);
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
                 />
               </div>
               <div className="flex-1 min-w-0">
