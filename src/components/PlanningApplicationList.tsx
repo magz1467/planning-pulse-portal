@@ -59,7 +59,7 @@ export const PlanningApplicationList = ({
               <div className="flex-1 min-w-0">
                 <ApplicationTitle 
                   title={application.ai_title || application.description || ''} 
-                  className="mb-1"
+                  className="mb-1 line-clamp-3"
                 />
                 <div className="flex items-center gap-1 mt-1 text-gray-600">
                   <MapPin className="w-3 h-3" />
