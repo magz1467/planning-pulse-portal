@@ -50,8 +50,8 @@ export const ApplicationDocuments = () => {
               {mockDocuments.length} documents attached to this application
             </p>
           </div>
-          <CollapsibleTrigger className="hover:bg-gray-100 p-2 rounded-full transition-colors">
-            <Button variant="ghost" size="sm" className="w-full justify-start">
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm">
               {isOpen ? "Hide" : "Show"} documents
             </Button>
           </CollapsibleTrigger>
