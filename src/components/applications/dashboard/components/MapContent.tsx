@@ -1,10 +1,6 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
 
 interface MapContentProps {
   applications: Application[];
@@ -13,7 +9,6 @@ interface MapContentProps {
   isMobile: boolean;
   isMapView: boolean;
   onMarkerClick: (id: number | null) => void;
-  onCenterChange?: (newCenter: [number, number]) => void;  // Add this prop
 }
 
 export const MapContent = ({
@@ -23,40 +18,7 @@ export const MapContent = ({
   isMobile,
   isMapView,
   onMarkerClick,
-  onCenterChange,  // Add this prop
 }: MapContentProps) => {
-  const { toast } = useToast();
-  const [showRedoSearch, setShowRedoSearch] = useState(false);
-  const [newCenter, setNewCenter] = useState<[number, number] | null>(null);
-
-  const handleMapMoved = (center: [number, number], bounds: [[number, number], [number, number]]) => {
-    // Check if any applications are within current bounds
-    const hasApplicationsInView = applications.some(app => {
-      if (!app.coordinates) return false;
-      return app.coordinates[0] >= bounds[0][0] && 
-             app.coordinates[0] <= bounds[1][0] && 
-             app.coordinates[1] >= bounds[0][1] && 
-             app.coordinates[1] <= bounds[1][1];
-    });
-
-    setShowRedoSearch(!hasApplicationsInView);
-    setNewCenter(center);
-  };
-
-  const handleRedoSearch = () => {
-    if (!newCenter || !onCenterChange) return;
-    
-    // Call the parent's handler to update coordinates
-    onCenterChange(newCenter);
-    
-    toast({
-      title: "Searching new area",
-      description: "Updating results for the current map view",
-    });
-
-    setShowRedoSearch(false);
-  };
-
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   return (
@@ -74,7 +36,6 @@ export const MapContent = ({
           selectedId={selectedId}
           onMarkerClick={onMarkerClick}
           initialCenter={coordinates}
-          onMapMoved={handleMapMoved}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards
@@ -82,17 +43,6 @@ export const MapContent = ({
             selectedId={selectedId}
             onSelectApplication={onMarkerClick}
           />
-        )}
-        {showRedoSearch && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-            <Button 
-              onClick={handleRedoSearch}
-              className="bg-primary text-white shadow-lg hover:bg-primary/90"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              Search this area
-            </Button>
-          </div>
         )}
       </div>
     </div>
