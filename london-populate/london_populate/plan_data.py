@@ -44,7 +44,7 @@ def fetch_planning_data_paginated(size: int = 499) -> Generator[Any, Any, Any]:
                         # must have centroid new schema location value
                         {"exists": {"field": "centroid"}},
                         # set valid_date for a little filter
-                        {"range": {"valid_date": {"gte": "01/01/2024"}}},
+                        {"range": {"valid_date": {"gte": "01/01/2023"}}},
                     ]
                 }
             },
