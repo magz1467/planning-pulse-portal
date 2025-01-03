@@ -26,6 +26,8 @@ serve(async (req) => {
       throw new Error('Missing required parameters: center_lng and center_lat')
     }
 
+    console.log('Processing request with parameters:', { center_lng, center_lat, radius_meters, page_size, page_number });
+
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -66,7 +68,6 @@ serve(async (req) => {
 
     // Process applications to ensure image_map_url is set
     const processedApplications = await Promise.all(applications.map(async (app: any) => {
-      // If image_map_url is not set, generate it using Mapbox
       if (!app.image_map_url && app.centroid) {
         try {
           const coordinates = typeof app.centroid === 'string' ? JSON.parse(app.centroid) : app.centroid;
@@ -80,10 +81,8 @@ serve(async (req) => {
             const pitch = 60;
             const bearing = 45;
             
-            // Generate satellite view with 3D buildings
             const imageUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lon},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
             
-            // Update the application in the database with the new image URL
             const { error: updateError } = await supabaseClient
               .from('applications')
               .update({ image_map_url: imageUrl })
@@ -119,7 +118,10 @@ serve(async (req) => {
       return acc;
     }, {});
 
-    console.log('Status counts:', statusCounts);
+    console.log('Successfully processed request:', {
+      totalApplications: processedApplications.length,
+      statusCounts
+    });
 
     const response: ApplicationResponse = {
       applications: processedApplications,
@@ -139,7 +141,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in edge function:', error)
     
     return new Response(
       JSON.stringify({
