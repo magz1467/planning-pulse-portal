@@ -28,25 +28,36 @@ Deno.serve(async (req) => {
 
     console.log('Query parameters:', { center_lng, center_lat, radius_meters, page_size, page_number });
 
-    // Create Supabase client
+    // Create Supabase client with increased timeout
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        db: {
+          schema: 'public'
+        },
+        global: {
+          headers: { 'x-my-custom-header': 'planning-application-service' },
+        },
+        auth: {
+          persistSession: false
+        }
+      }
     )
 
     console.log('Fetching applications...');
     
-    // Get applications with pagination
+    // Get applications with pagination using optimized function
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
       {
         center_lng,
         center_lat,
         radius_meters,
-        page_size: Math.min(page_size, 500), // Limit max page size
+        page_size: Math.min(page_size, 500),
         page_number
       }
-    )
+    ).timeout(30000) // 30 second timeout
 
     if (applicationsError) {
       console.error('Error fetching applications:', applicationsError)
@@ -72,7 +83,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Calculate status counts
+    // Calculate status counts with better error handling
     const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || ''
       
@@ -100,7 +111,7 @@ Deno.serve(async (req) => {
 
     console.log('Status counts:', statusCounts);
 
-    // Get total count
+    // Get total count with timeout
     const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
@@ -108,7 +119,7 @@ Deno.serve(async (req) => {
         center_lat,
         radius_meters
       }
-    )
+    ).timeout(20000) // 20 second timeout
 
     if (countError) {
       console.error('Error fetching count:', countError)
@@ -129,9 +140,17 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
+    
+    // Enhanced error response
+    const errorResponse = {
+      error: error.message || 'An unexpected error occurred',
+      details: error.details || null,
+      hint: 'Try reducing the radius or refreshing the page'
+    }
+    
+    return new Response(JSON.stringify(errorResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: error.status || 400,
     })
   }
 })
