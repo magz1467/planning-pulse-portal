@@ -3,12 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
-import { calculateDistance } from '@/utils/distance';
 
 const PAGE_SIZE = 100;
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
-const RADIUS = 1000;
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -17,32 +13,19 @@ export const useApplicationsFetch = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const { toast } = useToast();
 
-  const fetchWithRetry = async (fn: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
-    try {
-      return await fn();
-    } catch (error: any) {
-      if (retries > 0 && error?.status === 500) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-        return fetchWithRetry(fn, retries - 1);
-      }
-      throw error;
-    }
-  };
-
   const fetchApplicationsInRadius = async (
     center: LatLngTuple,
     filters?: { status?: string; type?: string }
   ) => {
     setIsLoading(true);
     console.log('Fetching applications with center:', center);
-    console.log('Current filters:', filters);
     
     try {
       const { data, error } = await supabase.functions.invoke('get-applications-with-counts', {
         body: {
           center_lng: center[1],
           center_lat: center[0],
-          radius_meters: RADIUS,
+          radius_meters: 1000,
           page_size: PAGE_SIZE,
           page_number: currentPage
         }
@@ -54,7 +37,7 @@ export const useApplicationsFetch = () => {
       }
 
       if (!data || !data.applications || data.applications.length === 0) {
-        console.log('No applications found in radius', RADIUS, 'meters from', center);
+        console.log('No applications found in radius', 1000, 'meters from', center);
         setApplications([]);
         setTotalCount(0);
         return;
@@ -79,17 +62,12 @@ export const useApplicationsFetch = () => {
           return null;
         }
 
-        // Calculate distance in miles
-        const distanceInKm = calculateDistance(center, coordinates);
-        const distanceInMiles = distanceInKm * 0.621371;
-        const formattedDistance = `${distanceInMiles.toFixed(1)} mi`;
-
         let imageUrl = '/placeholder.svg';
         if (app.application_details && typeof app.application_details === 'object') {
           const details = app.application_details as any;
           if (details.images && Array.isArray(details.images) && details.images.length > 0) {
             const imgUrl = details.images[0];
-            imageUrl = imgUrl.startsWith('http') ? imgUrl : `${process.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${imgUrl}`;
+            imageUrl = imgUrl.startsWith('http') ? imgUrl : `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${imgUrl}`;
           }
         }
 
@@ -98,7 +76,6 @@ export const useApplicationsFetch = () => {
           title: app.description || '',
           address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
           status: app.status || '',
-          distance: formattedDistance,
           reference: app.lpa_app_no || '',
           description: app.description || '',
           applicant: typeof app.application_details === 'object' ? 
@@ -111,6 +88,7 @@ export const useApplicationsFetch = () => {
             (app.application_details as any)?.officer || '' : '',
           consultationEnd: app.last_date_consultation_comments || '',
           image: imageUrl,
+          image_map_url: app.image_map_url,
           coordinates,
           ai_title: app.ai_title
         };
@@ -121,6 +99,7 @@ export const useApplicationsFetch = () => {
       console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
       setTotalCount(data.total || 0);
+
     } catch (error: any) {
       console.error('Error in fetchApplicationsInRadius:', error);
       toast({
