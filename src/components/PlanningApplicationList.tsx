@@ -6,6 +6,7 @@ import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -27,13 +28,14 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
-        // Fallback chain: image_map_url -> image -> placeholder
-        const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
-        console.log('Application image details:', {
+        // Get image URL using the utility function
+        const imageUrl = getImageUrl(application.image_map_url || application.image);
+        
+        console.log('Application image processing:', {
           id: application.id,
           image_map_url: application.image_map_url,
           image: application.image,
-          final_url: imageUrl
+          processed_url: imageUrl
         });
 
         return (
@@ -51,8 +53,11 @@ export const PlanningApplicationList = ({
                   height={80}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.log('Image load error for application:', application.id, e);
-                    e.currentTarget.src = "/placeholder.svg";
+                    console.error('Image load error for application:', {
+                      id: application.id,
+                      attempted_url: imageUrl,
+                      error: e
+                    });
                   }}
                 />
               </div>
