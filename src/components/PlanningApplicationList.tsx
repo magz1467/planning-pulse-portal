@@ -20,13 +20,19 @@ export const PlanningApplicationList = ({
   activeSort
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
-  console.log('Applications with images:', applications.map(app => ({ id: app.id, image: app.image_map_url }))); // Debug log
+  console.log('Applications with images:', applications.map(app => ({ 
+    id: app.id, 
+    image: app.image_map_url || app.image 
+  })));
 
   return (
     <div className="divide-y">
       {sortedApplications.map((application) => {
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
+
+        // Use image_map_url first, fallback to image, then placeholder
+        const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
 
         return (
           <div
@@ -37,7 +43,7 @@ export const PlanningApplicationList = ({
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <Image
-                  src={application.image_map_url || "/placeholder.svg"}
+                  src={imageUrl}
                   alt={application.description || ''}
                   width={80}
                   height={80}

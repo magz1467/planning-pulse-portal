@@ -12,7 +12,10 @@ interface MiniCardProps {
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
-  console.log('MiniCard image URL:', application.image_map_url); // Debug log
+  
+  // Use image_map_url first, fallback to image, then placeholder
+  const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
+  console.log('MiniCard image URL:', imageUrl);
 
   return (
     <div 
@@ -23,7 +26,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-4 items-center">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
           <Image
-            src={application.image_map_url || "/placeholder.svg"}
+            src={imageUrl}
             alt={application.description || ''}
             width={80}
             height={80}
