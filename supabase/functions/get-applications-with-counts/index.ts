@@ -34,12 +34,6 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Set statement timeout to 15 seconds
-    await supabaseClient.rpc('set_config', {
-      parameter: 'statement_timeout',
-      value: '15000'
-    });
-
     console.log('Fetching applications...');
     
     // Get applications with pagination
