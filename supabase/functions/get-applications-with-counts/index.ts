@@ -59,7 +59,7 @@ serve(async (req) => {
 
     if (applicationsError) {
       console.error('Error fetching applications:', applicationsError)
-      throw new Error(`Failed to fetch applications: ${applicationsError.message}`)
+      throw applicationsError
     }
 
     if (!applications) {
@@ -87,7 +87,7 @@ serve(async (req) => {
           const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN');
           const width = 800;
           const height = 600;
-          const zoom = 17;
+          const zoom = 18; // Changed from 17 to 18 as requested
           const pitch = 60;
           const bearing = 45;
           
@@ -110,7 +110,7 @@ serve(async (req) => {
       return app;
     }));
 
-    // Calculate status counts with better error handling
+    // Calculate status counts
     const statusCounts = processedApplications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || '';
       
@@ -141,7 +141,7 @@ serve(async (req) => {
 
     if (countError) {
       console.error('Error fetching count:', countError)
-      throw new Error(`Failed to fetch count: ${countError.message}`)
+      throw countError
     }
 
     const response: ApplicationResponse = {
@@ -161,16 +161,16 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error)
     
-    // Enhanced error response
-    const errorResponse = {
-      error: error.message || 'An unexpected error occurred',
-      details: error.details || null,
-      hint: 'Try reducing the radius or refreshing the page'
-    }
-    
-    return new Response(JSON.stringify(errorResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: error.status || 400,
-    })
+    return new Response(
+      JSON.stringify({
+        error: error.message || 'An unexpected error occurred',
+        details: error.details || null,
+        hint: 'Try reducing the radius or refreshing the page'
+      }), 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200, // Changed from error status to 200 to prevent client-side rejection
+      }
+    )
   }
 })
