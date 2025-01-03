@@ -32,8 +32,6 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Fetching applications with params:', { center_lng, center_lat, radius_meters, page_size, page_number });
-
     // Get applications
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
@@ -67,8 +65,6 @@ Deno.serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
-
-    console.log('Found applications:', applications.length);
 
     // Calculate status counts
     const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
@@ -110,9 +106,6 @@ Deno.serve(async (req) => {
       console.error('Error fetching count:', countError)
       throw countError
     }
-
-    console.log('Total count:', totalCount);
-    console.log('Status counts:', statusCounts);
 
     const response: ApplicationsResponse = {
       applications,
