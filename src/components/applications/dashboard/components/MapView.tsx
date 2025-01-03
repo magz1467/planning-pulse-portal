@@ -14,7 +14,7 @@ export const MapView = ({
   applications,
   selectedId,
   onMarkerClick,
-  initialCenter,
+  initialCenter
 }: MapViewProps) => {
   // Log the number of visible applications for debugging
   useEffect(() => {

@@ -27,15 +27,6 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
-        // Fallback chain: image_map_url -> image -> placeholder
-        const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
-        console.log('Application image details:', {
-          id: application.id,
-          image_map_url: application.image_map_url,
-          image: application.image,
-          final_url: imageUrl
-        });
-
         return (
           <div
             key={application.id}
@@ -45,21 +36,17 @@ export const PlanningApplicationList = ({
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <Image
-                  src={imageUrl}
+                  src={application.image_map_url || "/placeholder.svg"}
                   alt={application.description || ''}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    console.log('Image load error for application:', application.id, e);
-                    e.currentTarget.src = "/placeholder.svg";
-                  }}
                 />
               </div>
               <div className="flex-1 min-w-0">
                 <ApplicationTitle 
                   title={application.ai_title || application.description || ''} 
-                  className="mb-1 line-clamp-3 text-primary"
+                  className="mb-1"
                 />
                 <div className="flex items-center gap-1 mt-1 text-gray-600">
                   <MapPin className="w-3 h-3" />

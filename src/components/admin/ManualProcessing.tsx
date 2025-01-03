@@ -3,7 +3,6 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MapPin } from "lucide-react";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -18,29 +17,27 @@ export const ManualProcessing = ({
 }: ManualProcessingProps) => {
   const { toast } = useToast();
   const [isGeneratingMaps, setIsGeneratingMaps] = useState(false);
+  const [mapBatchSize, setMapBatchSize] = useState(100);
   const batchSizes = [50, 100, 250, 500];
 
-  const handleGenerateMaps = async (batchSize: number) => {
+  const handleGenerateMaps = async () => {
     try {
       setIsGeneratingMaps(true);
       console.log('Starting map generation process...');
       
       toast({
         title: "Generating static maps",
-        description: `This may take a few minutes for up to ${batchSize} applications`,
+        description: `This may take a few minutes for up to ${mapBatchSize} applications`,
       });
 
+      // Use supabase client to invoke the function instead of raw fetch
       const { data, error } = await supabase.functions.invoke('generate-static-maps-manual', {
-        body: { batch_size: batchSize }
+        body: { batch_size: mapBatchSize }
       });
 
       if (error) {
         console.error('Error response:', error);
         throw new Error(`Failed to generate maps: ${error.message}`);
-      }
-
-      if (!data) {
-        throw new Error('No response data received from the server');
       }
 
       console.log('Generation result:', data);
@@ -87,22 +84,26 @@ export const ManualProcessing = ({
       <div className="space-y-4">
         <div className="flex gap-4">
           <Button
-            onClick={() => handleGenerateMaps(100)}
+            onClick={() => {
+              setMapBatchSize(100);
+              handleGenerateMaps();
+            }}
             className="flex-1 md:flex-none"
             disabled={isGeneratingMaps}
           >
-            <MapPin className="mr-2 h-4 w-4" />
-            {isGeneratingMaps ? "Generating Maps..." : "Generate 100 Maps"}
+            {isGeneratingMaps && mapBatchSize === 100 ? "Generating Maps..." : "Generate 100 Maps"}
           </Button>
 
           <Button
-            onClick={() => handleGenerateMaps(500)}
+            onClick={() => {
+              setMapBatchSize(500);
+              handleGenerateMaps();
+            }}
             className="flex-1 md:flex-none"
             disabled={isGeneratingMaps}
             variant="secondary"
           >
-            <MapPin className="mr-2 h-4 w-4" />
-            {isGeneratingMaps ? "Generating Maps..." : "Generate 500 Maps"}
+            {isGeneratingMaps && mapBatchSize === 500 ? "Generating Maps..." : "Generate 500 Maps"}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">

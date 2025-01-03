@@ -1,68 +1,64 @@
 import { Application } from "@/types/planning";
-import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
-import { MapPin } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { getStatusColor } from "@/utils/statusColors";
+import { PlanningApplicationList } from "@/components/PlanningApplicationList";
+import { AlertSection } from "./AlertSection";
+import { FilterBar } from "@/components/FilterBar";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface ApplicationListViewProps {
   applications: Application[];
-  selectedApplication: number | null;
   postcode: string;
-  onSelectApplication: (id: number) => void;
+  onSelectApplication: (id: number | null) => void;
+  onShowEmailDialog: () => void;
+  onFilterChange?: (filterType: string, value: string) => void;
+  onSortChange?: (sortType: SortType) => void;
+  activeFilters?: {
+    status?: string;
+    type?: string;
+  };
+  activeSort?: SortType;
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const ApplicationListView = ({
   applications,
-  selectedApplication,
   postcode,
   onSelectApplication,
+  onShowEmailDialog,
+  onFilterChange,
+  activeFilters = {},
+  onSortChange,
+  activeSort,
+  statusCounts
 }: ApplicationListViewProps) => {
-  if (!applications.length) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-4 text-center text-gray-500">
-        No planning applications found near {postcode}
-      </div>
-    );
-  }
-
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-4 space-y-4">
-        {applications.map((application) => (
-          <div
-            key={application.id}
-            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-              selectedApplication === application.id
-                ? "border-primary bg-primary/5"
-                : "hover:border-gray-400"
-            }`}
-            onClick={() => onSelectApplication(application.id)}
-          >
-            <div className="flex-1 min-w-0">
-              <ApplicationTitle 
-                title={application.ai_title || application.description || ''} 
-                className="mb-1 line-clamp-3 text-primary"
-              />
-              <div className="flex items-center gap-1 mt-1 text-gray-600">
-                <MapPin className="w-3 h-3" />
-                <span className="text-sm truncate">{application.address}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge 
-                  variant="outline" 
-                  className={getStatusColor(application.status)}
-                >
-                  {application.status}
-                </Badge>
-                {application.distance && (
-                  <Badge variant="secondary">{application.distance}</Badge>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+    <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        <div className="sticky top-0 z-10 bg-white">
+          <FilterBar 
+            onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            applications={applications}
+            statusCounts={statusCounts}
+          />
+        </div>
+        <AlertSection 
+          postcode={postcode}
+          onShowEmailDialog={onShowEmailDialog}
+        />
+        <PlanningApplicationList
+          applications={applications}
+          postcode={postcode}
+          onSelectApplication={onSelectApplication}
+          activeSort={activeSort}
+        />
       </div>
-    </ScrollArea>
+    </div>
   );
 };

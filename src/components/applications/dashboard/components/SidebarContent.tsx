@@ -1,80 +1,78 @@
 import { Application } from "@/types/planning";
-import { LatLngTuple } from "leaflet";
-import { ApplicationDetails } from "./ApplicationDetails";
-import { FilterBar } from "@/components/FilterBar";
-import { SortType } from "@/hooks/use-application-sorting";
-import { ApplicationListView } from "@/components/map/sidebar/ApplicationListView";
+import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
 
 interface SidebarContentProps {
   isMobile: boolean;
+  isMapView: boolean;
   applications: Application[];
   selectedId: number | null;
   postcode: string;
-  coordinates: LatLngTuple;
+  coordinates: [number, number];
   activeFilters: {
     status?: string;
     type?: string;
   };
-  activeSort: SortType;
-  onFilterChange: (filterType: string, value: string) => void;
-  onSortChange: (sortType: SortType) => void;
-  onSelectApplication: (id: number | null) => void;
-  onClose: () => void;
+  activeSort: 'closingSoon' | 'newest' | null;
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
     'Declined': number;
     'Other': number;
   };
-  isMapView?: boolean;
+  onFilterChange: (filterType: string, value: string) => void;
+  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
+  onSelectApplication: (id: number | null) => void;
+  onClose: () => void;
 }
 
 export const SidebarContent = ({
   isMobile,
+  isMapView,
   applications,
   selectedId,
   postcode,
   coordinates,
   activeFilters,
   activeSort,
+  statusCounts,
   onFilterChange,
   onSortChange,
   onSelectApplication,
   onClose,
-  statusCounts,
-  isMapView
 }: SidebarContentProps) => {
-  const selectedApplication = applications.find(app => app.id === selectedId);
+  if (!coordinates) return null;
 
-  if (!isMobile && selectedApplication) {
+  if (!isMobile) {
     return (
-      <ApplicationDetails
-        application={selectedApplication}
+      <DesktopSidebar
+        applications={applications}
+        selectedApplication={selectedId}
+        postcode={postcode}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+        onFilterChange={onFilterChange}
+        onSortChange={onSortChange}
+        onSelectApplication={onSelectApplication}
+        onClose={onClose}
+        statusCounts={statusCounts}
+      />
+    );
+  }
+
+  if (!isMapView) {
+    return (
+      <MobileListContainer
+        applications={applications}
+        selectedApplication={selectedId}
+        postcode={postcode}
+        onSelectApplication={onSelectApplication}
+        onShowEmailDialog={() => {}}
+        hideFilterBar={true}
         onClose={onClose}
       />
     );
   }
 
-  return (
-    <div className="w-full h-full bg-white overflow-hidden flex flex-col">
-      {!isMobile && (
-        <div className="p-4 border-b">
-          <FilterBar
-            onFilterChange={onFilterChange}
-            onSortChange={onSortChange}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            statusCounts={statusCounts}
-            isMapView={isMapView}
-          />
-        </div>
-      )}
-      <ApplicationListView
-        applications={applications}
-        selectedApplication={selectedId}
-        postcode={postcode}
-        onSelectApplication={onSelectApplication}
-      />
-    </div>
-  );
+  return null;
 };

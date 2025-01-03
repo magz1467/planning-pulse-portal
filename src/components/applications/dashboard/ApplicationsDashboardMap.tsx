@@ -6,11 +6,9 @@ import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useEffect } from "react";
 import { MapContent } from "./components/MapContent";
 import { SidebarContent } from "./components/SidebarContent";
-import { useSearchPoint } from "@/hooks/use-search-point";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
-  const { searchPoint, setSearchPoint } = useSearchPoint();
   const {
     selectedId,
     activeFilters,
@@ -40,13 +38,6 @@ export const ApplicationsDashboardMap = () => {
     console.log("Closing application details");  // Debug log
     handleMarkerClick(null);
   };
-
-  // Update searchPoint when coordinates change
-  useEffect(() => {
-    if (coordinates) {
-      setSearchPoint(coordinates);
-    }
-  }, [coordinates, setSearchPoint]);
 
   return (
     <div className="h-screen w-full flex flex-col relative">
