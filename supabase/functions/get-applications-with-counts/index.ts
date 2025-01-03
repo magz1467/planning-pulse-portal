@@ -1,30 +1,28 @@
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { corsHeaders } from '../_shared/cors.ts'
 
-interface StatusCount {
-  status: string;
-  count: number;
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface ApplicationsResponse {
+interface ApplicationResponse {
   applications: any[];
-  statusCounts: {
-    'Under Review': number;
-    'Approved': number;
-    'Declined': number;
-    'Other': number;
-  };
   total: number;
+  statusCounts: Record<string, number>;
 }
 
-Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { center_lng, center_lat, radius_meters = 1000, page_size = 100, page_number = 0 } = await req.json()
+    const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0 } = await req.json()
+
+    if (!center_lng || !center_lat || !radius_meters) {
+      throw new Error('Missing required parameters')
+    }
 
     console.log('Query parameters:', { center_lng, center_lat, radius_meters, page_size, page_number });
 
@@ -61,53 +59,73 @@ Deno.serve(async (req) => {
 
     if (applicationsError) {
       console.error('Error fetching applications:', applicationsError)
-      throw applicationsError
+      throw new Error(`Failed to fetch applications: ${applicationsError.message}`)
     }
 
-    console.log(`Retrieved ${applications?.length || 0} applications`);
-
-    if (!applications || applications.length === 0) {
-      console.log('No applications found in radius', radius_meters, 'meters from', [center_lat, center_lng])
+    if (!applications) {
+      console.log('No applications found')
       return new Response(
         JSON.stringify({
           applications: [],
-          statusCounts: {
-            'Under Review': 0,
-            'Approved': 0,
-            'Declined': 0,
-            'Other': 0
-          },
-          total: 0
+          total: 0,
+          statusCounts: {}
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
       )
     }
 
+    // Process applications to ensure image_map_url is set
+    const processedApplications = await Promise.all(applications.map(async (app: any) => {
+      // If image_map_url is not set, generate it using Mapbox
+      if (!app.image_map_url && app.centroid) {
+        const coordinates = typeof app.centroid === 'string' ? JSON.parse(app.centroid) : app.centroid;
+        
+        if (coordinates && coordinates.lon && coordinates.lat) {
+          const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN');
+          const width = 800;
+          const height = 600;
+          const zoom = 17;
+          const pitch = 60;
+          const bearing = 45;
+          
+          // Generate satellite view with 3D buildings
+          const imageUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${coordinates.lon},${coordinates.lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
+          
+          // Update the application in the database with the new image URL
+          const { error: updateError } = await supabaseClient
+            .from('applications')
+            .update({ image_map_url: imageUrl })
+            .eq('application_id', app.application_id);
+            
+          if (updateError) {
+            console.error(`Error updating image URL for application ${app.application_id}:`, updateError);
+          } else {
+            app.image_map_url = imageUrl;
+          }
+        }
+      }
+      return app;
+    }));
+
     // Calculate status counts with better error handling
-    const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
+    const statusCounts = processedApplications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || ''
       
-      if (status.includes('under review') || 
-          status.includes('under consideration') ||
-          status.includes('pending')) {
+      if (status === 'under review') {
         acc['Under Review'] = (acc['Under Review'] || 0) + 1
-      } else if (status.includes('approved') || 
-                 status.includes('granted')) {
+      } else if (status === 'approved' || status === 'granted') {
         acc['Approved'] = (acc['Approved'] || 0) + 1
-      } else if (status.includes('declined') || 
-                 status.includes('refused') || 
-                 status.includes('rejected')) {
+      } else if (status === 'declined' || status === 'refused') {
         acc['Declined'] = (acc['Declined'] || 0) + 1
       } else {
         acc['Other'] = (acc['Other'] || 0) + 1
       }
+      
       return acc
-    }, {
-      'Under Review': 0,
-      'Approved': 0,
-      'Declined': 0,
-      'Other': 0
-    })
+    }, {})
 
     console.log('Status counts:', statusCounts);
 
@@ -123,20 +141,22 @@ Deno.serve(async (req) => {
 
     if (countError) {
       console.error('Error fetching count:', countError)
-      throw countError
+      throw new Error(`Failed to fetch count: ${countError.message}`)
     }
 
-    console.log('Total count:', totalCount);
-
-    const response: ApplicationsResponse = {
-      applications,
-      statusCounts,
-      total: totalCount
+    const response: ApplicationResponse = {
+      applications: processedApplications,
+      total: totalCount || 0,
+      statusCounts
     }
 
-    return new Response(JSON.stringify(response), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify(response),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
 
   } catch (error) {
     console.error('Error:', error)
