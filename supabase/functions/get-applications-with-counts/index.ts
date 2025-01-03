@@ -6,13 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface ApplicationResponse {
-  applications: any[];
-  total: number;
-  statusCounts: Record<string, number>;
-}
-
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -77,41 +72,23 @@ serve(async (req) => {
       )
     }
 
-    // Process applications to ensure image_map_url is set
-    const processedApplications = await Promise.all(applications.map(async (app: any) => {
-      // If image_map_url is not set, generate it using Mapbox
-      if (!app.image_map_url && app.centroid) {
-        const coordinates = typeof app.centroid === 'string' ? JSON.parse(app.centroid) : app.centroid;
-        
-        if (coordinates && coordinates.lon && coordinates.lat) {
-          const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN');
-          const width = 800;
-          const height = 600;
-          const zoom = 18; // Changed from 17 to 18 as requested
-          const pitch = 60;
-          const bearing = 45;
-          
-          // Generate satellite view with 3D buildings
-          const imageUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${coordinates.lon},${coordinates.lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
-          
-          // Update the application in the database with the new image URL
-          const { error: updateError } = await supabaseClient
-            .from('applications')
-            .update({ image_map_url: imageUrl })
-            .eq('application_id', app.application_id);
-            
-          if (updateError) {
-            console.error(`Error updating image URL for application ${app.application_id}:`, updateError);
-          } else {
-            app.image_map_url = imageUrl;
-          }
-        }
+    // Get total count
+    const { data: totalCount, error: countError } = await supabaseClient.rpc(
+      'get_applications_count_within_radius',
+      {
+        center_lng,
+        center_lat,
+        radius_meters
       }
-      return app;
-    }));
+    )
+
+    if (countError) {
+      console.error('Error fetching count:', countError)
+      throw countError
+    }
 
     // Calculate status counts
-    const statusCounts = processedApplications.reduce((acc: Record<string, number>, app: any) => {
+    const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || '';
       
       if (status === 'under review') {
@@ -129,23 +106,8 @@ serve(async (req) => {
 
     console.log('Status counts:', statusCounts);
 
-    // Get total count
-    const { data: totalCount, error: countError } = await supabaseClient.rpc(
-      'get_applications_count_within_radius',
-      {
-        center_lng,
-        center_lat,
-        radius_meters
-      }
-    )
-
-    if (countError) {
-      console.error('Error fetching count:', countError)
-      throw countError
-    }
-
     const response: ApplicationResponse = {
-      applications: processedApplications,
+      applications,
       total: totalCount || 0,
       statusCounts
     }
@@ -174,3 +136,9 @@ serve(async (req) => {
     )
   }
 })
+
+interface ApplicationResponse {
+  applications: any[];
+  total: number;
+  statusCounts: Record<string, number>;
+}
