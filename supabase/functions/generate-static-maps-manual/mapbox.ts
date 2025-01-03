@@ -1,5 +1,3 @@
-import { createMapboxClient } from 'https://esm.sh/@mapbox/mapbox-sdk@0.15.3'
-
 export interface Coordinates {
   lon: number;
   lat: number;
