@@ -29,7 +29,12 @@ export const PlanningApplicationList = ({
 
         // Fallback chain: image_map_url -> image -> placeholder
         const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
-        console.log('Application card image URL:', imageUrl, 'for application:', application.id);
+        console.log('Application image details:', {
+          id: application.id,
+          image_map_url: application.image_map_url,
+          image: application.image,
+          final_url: imageUrl
+        });
 
         return (
           <div
