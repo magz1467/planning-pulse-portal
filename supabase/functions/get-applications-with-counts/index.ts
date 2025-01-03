@@ -26,20 +26,28 @@ Deno.serve(async (req) => {
   try {
     const { center_lng, center_lat, radius_meters = 1000, page_size = 100, page_number = 0 } = await req.json()
 
+    console.log('Query parameters:', { center_lng, center_lat, radius_meters, page_size, page_number });
+
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get applications
+    // Set statement timeout to 15 seconds
+    await supabaseClient.rpc('set_config', {
+      parameter: 'statement_timeout',
+      value: '15000'
+    });
+
+    // Get applications with pagination
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
       {
         center_lng,
         center_lat,
         radius_meters,
-        page_size,
+        page_size: Math.min(page_size, 500), // Limit max page size
         page_number
       }
     )
@@ -48,6 +56,8 @@ Deno.serve(async (req) => {
       console.error('Error fetching applications:', applicationsError)
       throw applicationsError
     }
+
+    console.log(`Retrieved ${applications?.length || 0} applications`);
 
     if (!applications || applications.length === 0) {
       console.log('No applications found in radius', radius_meters, 'meters from', [center_lat, center_lng])
@@ -92,7 +102,9 @@ Deno.serve(async (req) => {
       'Other': 0
     })
 
-    // Get total count
+    console.log('Status counts:', statusCounts);
+
+    // Get total count with timeout
     const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
@@ -106,6 +118,8 @@ Deno.serve(async (req) => {
       console.error('Error fetching count:', countError)
       throw countError
     }
+
+    console.log('Total count:', totalCount);
 
     const response: ApplicationsResponse = {
       applications,
