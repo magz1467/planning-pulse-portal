@@ -1,11 +1,12 @@
 import { Application } from "@/types/planning";
-import { Card } from "@/components/ui/card";
-import { MapPin, Timer } from "lucide-react";
-import Image from "@/components/ui/image";
-import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
+import { ApplicationCardImage } from "./applications/cards/ApplicationCardImage";
+import { ApplicationCardLocation } from "./applications/cards/ApplicationCardLocation";
+import { ApplicationCardStatus } from "./applications/cards/ApplicationCardStatus";
+import { ApplicationCardDistance } from "./applications/cards/ApplicationCardDistance";
+import { ApplicationCardClosingSoon } from "./applications/cards/ApplicationCardClosingSoon";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -34,37 +35,25 @@ export const PlanningApplicationList = ({
             onClick={() => onSelectApplication(application.id)}
           >
             <div className="flex gap-3">
-              <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                <Image
-                  src={application.image_map_url || "/placeholder.svg"}
-                  alt={application.description || ''}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <ApplicationCardImage 
+                imageUrl={application.image_map_url || "/placeholder.svg"}
+                alt={application.description || ''}
+              />
+              
               <div className="flex-1 min-w-0">
                 <ApplicationTitle 
                   title={application.ai_title || application.description || ''} 
                   className="mb-1"
                 />
-                <div className="flex items-center gap-1 mt-1 text-gray-600">
-                  <MapPin className="w-3 h-3" />
-                  <p className="text-sm truncate">{application.address}</p>
-                </div>
+                
+                <ApplicationCardLocation address={application.address} />
+                
                 <div className="flex justify-between items-center mt-2">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-                      {getStatusText(application.status)}
-                    </span>
-                    {isClosingSoon && (
-                      <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
-                        <Timer className="w-3 h-3" />
-                        Closing soon
-                      </span>
-                    )}
+                    <ApplicationCardStatus status={application.status} />
+                    <ApplicationCardClosingSoon isClosingSoon={isClosingSoon} />
                   </div>
-                  <span className="text-xs text-gray-500">{application.distance}</span>
+                  <ApplicationCardDistance distance={application.distance} />
                 </div>
               </div>
             </div>
@@ -73,4 +62,4 @@ export const PlanningApplicationList = ({
       })}
     </div>
   );
-}
+};
