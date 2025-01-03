@@ -77,7 +77,7 @@ serve(async (req) => {
 
         const coordinates = app.centroid;
         if (!coordinates.lon || !coordinates.lat) {
-          console.log(`Invalid coordinates for application ${app.application_id}`);
+          console.log(`Invalid coordinates for application ${app.application_id}:`, coordinates);
           errorCount++;
           continue;
         }
