@@ -27,14 +27,15 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
+        // Ensure placeholder.svg has a leading slash
+        const placeholderImage = "/placeholder.svg";
+        
         // Fallback chain: image_map_url -> image -> placeholder
-        const imageUrl = application.image_map_url || application.image || "/placeholder.svg";
-        console.log('Application image details:', {
-          id: application.id,
-          image_map_url: application.image_map_url,
-          image: application.image,
-          final_url: imageUrl
-        });
+        const imageUrl = (application.image_map_url && application.image_map_url !== 'undefined') 
+          ? application.image_map_url 
+          : (application.image && application.image !== 'undefined')
+            ? application.image
+            : placeholderImage;
 
         return (
           <div
@@ -46,13 +47,13 @@ export const PlanningApplicationList = ({
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <Image
                   src={imageUrl}
-                  alt={application.description || ''}
+                  alt={application.description || 'Planning application image'}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.log('Image load error for application:', application.id, e);
-                    e.currentTarget.src = "/placeholder.svg";
+                    console.log('Image load error for application:', application.id);
+                    e.currentTarget.src = placeholderImage;
                   }}
                 />
               </div>
