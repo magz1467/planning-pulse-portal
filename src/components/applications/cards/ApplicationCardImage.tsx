@@ -9,7 +9,7 @@ export const ApplicationCardImage = ({ imageUrl, alt }: ApplicationCardImageProp
   return (
     <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
       <Image
-        src={imageUrl || "/placeholder.svg"}
+        src={imageUrl}
         alt={alt}
         width={80}
         height={80}
