@@ -39,6 +39,10 @@ export const ManualProcessing = ({
         throw new Error(`Failed to generate maps: ${error.message}`);
       }
 
+      if (!data) {
+        throw new Error('No response data received from the server');
+      }
+
       console.log('Generation result:', data);
       
       toast({
