@@ -11,7 +11,7 @@ export async function generateStaticMapUrl(coordinates: Coordinates, mapboxToken
 
   const width = 800;
   const height = 600;
-  const zoom = 17; // Increased from default to get a much closer view
+  const zoom = 22; // Maximum zoom level in Mapbox
 
   // Log the coordinates being used
   console.log('Generating map URL with coordinates:', coordinates);
