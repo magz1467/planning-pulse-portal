@@ -44,9 +44,21 @@ export const ApplicationsDashboardMap = () => {
   // Update searchPoint when coordinates change
   useEffect(() => {
     if (coordinates) {
+      console.log("Updating search point with new coordinates:", coordinates);
       setSearchPoint(coordinates);
     }
   }, [coordinates, setSearchPoint]);
+
+  // Debug logs for search state
+  useEffect(() => {
+    console.log("Search state:", {
+      postcode,
+      coordinates,
+      searchPoint,
+      applicationsCount: applications?.length,
+      filteredCount: filteredApplications?.length
+    });
+  }, [postcode, coordinates, searchPoint, applications, filteredApplications]);
 
   return (
     <div className="h-screen w-full flex flex-col relative">

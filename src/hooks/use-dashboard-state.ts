@@ -41,9 +41,10 @@ export const useDashboardState = () => {
       filter: activeFilters.status,
       applicationId: selectedId
     });
-  }, [postcode, initialTab, activeFilters.status, selectedId]);
+  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams]);
 
   const handlePostcodeSelect = async (newPostcode: string) => {
+    console.log("New postcode selected:", newPostcode);
     setPostcode(newPostcode);
   };
 
@@ -52,14 +53,13 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  const isInitialSearch = !searchPoint && coordinates;
-  const isNewSearch = searchPoint && coordinates && 
-    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
-
-  if ((isInitialSearch || isNewSearch) && coordinates) {
-    setSearchPoint(coordinates);
-    fetchApplicationsInRadius(coordinates, activeFilters);
-  }
+  // Fetch applications when coordinates change
+  useEffect(() => {
+    if (coordinates) {
+      console.log("Fetching applications for coordinates:", coordinates);
+      fetchApplicationsInRadius(coordinates, activeFilters);
+    }
+  }, [coordinates, activeFilters, fetchApplicationsInRadius]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
