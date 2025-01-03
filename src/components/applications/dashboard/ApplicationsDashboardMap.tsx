@@ -31,34 +31,24 @@ export const ApplicationsDashboardMap = () => {
 
   // Select first application by default when applications are loaded, but only on mobile and in map view
   useEffect(() => {
-    if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
+    if (isMobile && filteredApplications?.length > 0 && !selectedId && isMapView) {
       handleMarkerClick(filteredApplications[0].id);
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
   const handleClose = () => {
-    console.log("Closing application details");  // Debug log
     handleMarkerClick(null);
   };
 
   // Update searchPoint when coordinates change
   useEffect(() => {
     if (coordinates) {
-      console.log("Updating search point with new coordinates:", coordinates);
       setSearchPoint(coordinates);
     }
   }, [coordinates, setSearchPoint]);
 
-  // Debug logs for search state
-  useEffect(() => {
-    console.log("Search state:", {
-      postcode,
-      coordinates,
-      searchPoint,
-      applicationsCount: applications?.length,
-      filteredCount: filteredApplications?.length
-    });
-  }, [postcode, coordinates, searchPoint, applications, filteredApplications]);
+  // Show loading only when loading and no applications
+  const showLoading = isLoading && (!applications || applications.length === 0);
 
   return (
     <div className="h-screen w-full flex flex-col relative">
@@ -87,7 +77,7 @@ export const ApplicationsDashboardMap = () => {
           <SidebarContent
             isMobile={isMobile}
             isMapView={isMapView}
-            applications={filteredApplications}
+            applications={filteredApplications || []}
             selectedId={selectedId}
             postcode={postcode}
             coordinates={coordinates as [number, number]}
@@ -100,9 +90,9 @@ export const ApplicationsDashboardMap = () => {
             onClose={handleClose}
           />
 
-          {(!isMobile || isMapView) && (
+          {(!isMobile || isMapView) && coordinates && (
             <MapContent
-              applications={filteredApplications}
+              applications={filteredApplications || []}
               selectedId={selectedId}
               coordinates={coordinates as [number, number]}
               isMobile={isMobile}
@@ -113,7 +103,7 @@ export const ApplicationsDashboardMap = () => {
         </div>
       </div>
 
-      {isLoading && <LoadingOverlay />}
+      {showLoading && <LoadingOverlay />}
     </div>
   );
 };
