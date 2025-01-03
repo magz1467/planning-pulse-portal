@@ -26,7 +26,7 @@ serve(async (req) => {
 
     console.log('Query parameters:', { center_lng, center_lat, radius_meters, page_size, page_number });
 
-    // Create Supabase client with increased timeout
+    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -55,7 +55,7 @@ serve(async (req) => {
         page_size: Math.min(page_size, 500),
         page_number
       }
-    ).timeout(30000) // 30 second timeout
+    )
 
     if (applicationsError) {
       console.error('Error fetching applications:', applicationsError)
@@ -112,24 +112,24 @@ serve(async (req) => {
 
     // Calculate status counts with better error handling
     const statusCounts = processedApplications.reduce((acc: Record<string, number>, app: any) => {
-      const status = app.status?.trim().toLowerCase() || ''
+      const status = app.status?.trim().toLowerCase() || '';
       
       if (status === 'under review') {
-        acc['Under Review'] = (acc['Under Review'] || 0) + 1
+        acc['Under Review'] = (acc['Under Review'] || 0) + 1;
       } else if (status === 'approved' || status === 'granted') {
-        acc['Approved'] = (acc['Approved'] || 0) + 1
+        acc['Approved'] = (acc['Approved'] || 0) + 1;
       } else if (status === 'declined' || status === 'refused') {
-        acc['Declined'] = (acc['Declined'] || 0) + 1
+        acc['Declined'] = (acc['Declined'] || 0) + 1;
       } else {
-        acc['Other'] = (acc['Other'] || 0) + 1
+        acc['Other'] = (acc['Other'] || 0) + 1;
       }
       
-      return acc
-    }, {})
+      return acc;
+    }, {});
 
     console.log('Status counts:', statusCounts);
 
-    // Get total count with timeout
+    // Get total count
     const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
@@ -137,7 +137,7 @@ serve(async (req) => {
         center_lat,
         radius_meters
       }
-    ).timeout(20000) // 20 second timeout
+    )
 
     if (countError) {
       console.error('Error fetching count:', countError)
