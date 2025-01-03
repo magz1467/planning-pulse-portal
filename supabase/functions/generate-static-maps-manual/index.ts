@@ -75,9 +75,15 @@ serve(async (req) => {
           continue;
         }
 
-        const coordinates = app.centroid;
-        if (!coordinates.lon || !coordinates.lat) {
-          console.log(`Invalid coordinates for application ${app.application_id}:`, coordinates);
+        // Log the raw centroid data to see its structure
+        console.log(`Raw centroid data for application ${app.application_id}:`, app.centroid);
+
+        // Ensure centroid is properly parsed if it's a string
+        const coordinates = typeof app.centroid === 'string' ? JSON.parse(app.centroid) : app.centroid;
+        
+        // Validate coordinates structure
+        if (!coordinates || typeof coordinates.lon !== 'number' || typeof coordinates.lat !== 'number') {
+          console.log(`Invalid coordinates structure for application ${app.application_id}:`, coordinates);
           errorCount++;
           continue;
         }
