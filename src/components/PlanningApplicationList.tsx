@@ -20,6 +20,7 @@ export const PlanningApplicationList = ({
   activeSort
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
+  console.log('Applications with images:', applications.map(app => ({ id: app.id, image: app.image_map_url }))); // Debug log
 
   return (
     <div className="divide-y">
