@@ -26,6 +26,7 @@ interface SidebarContentProps {
     'Declined': number;
     'Other': number;
   };
+  isMapView?: boolean;
 }
 
 export const SidebarContent = ({
@@ -40,7 +41,8 @@ export const SidebarContent = ({
   onSortChange,
   onSelectApplication,
   onClose,
-  statusCounts
+  statusCounts,
+  isMapView
 }: SidebarContentProps) => {
   const selectedApplication = applications.find(app => app.id === selectedId);
 
@@ -63,6 +65,7 @@ export const SidebarContent = ({
             activeFilters={activeFilters}
             activeSort={activeSort}
             statusCounts={statusCounts}
+            isMapView={isMapView}
           />
         </div>
       )}
