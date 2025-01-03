@@ -38,29 +38,27 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <ApplicationTitle 
-              title={application.ai_title || application.description || ''} 
-              className="line-clamp-2 text-sm font-semibold text-primary"
-            />
-            {isClosingSoon && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                <Timer className="w-3 h-3 mr-1" />
-                Closing soon
-              </span>
-            )}
-          </div>
+          <ApplicationTitle 
+            title={application.ai_title || application.description || ''} 
+            className="line-clamp-2 mb-1"
+          />
           <div className="flex items-center gap-1 mt-1 text-gray-600">
             <MapPin className="w-3 h-3" />
             <p className="text-sm truncate">{application.address}</p>
           </div>
-          <div className="flex items-center justify-between mt-2">
-            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-              {getStatusText(application.status)}
-            </span>
-            <span className="text-xs text-gray-500">
-              {application.distance}
-            </span>
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex items-center gap-2">
+              <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
+                {getStatusText(application.status)}
+              </span>
+              {isClosingSoon && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  <Timer className="w-3 h-3 mr-1" />
+                  Closing soon
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-gray-500">{application.distance}</span>
           </div>
         </div>
       </div>
