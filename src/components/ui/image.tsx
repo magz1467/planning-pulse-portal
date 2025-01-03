@@ -8,7 +8,7 @@ interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 const Image = ({ src, alt, className, width, height, loading = "lazy", onError, ...props }: ImageProps) => {
   const [error, setError] = useState(false);
   
-  const fallbackImage = "./placeholder.svg";
+  const fallbackImage = "/placeholder.svg";
   
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.log('Image load error:', src);
@@ -18,7 +18,8 @@ const Image = ({ src, alt, className, width, height, loading = "lazy", onError, 
     }
   };
   
-  const imageSrc = error || !src ? fallbackImage : src;
+  // If src is undefined, empty string, or error occurred, use fallback
+  const imageSrc = (!src || src === '' || error) ? fallbackImage : src;
   
   return (
     <img
