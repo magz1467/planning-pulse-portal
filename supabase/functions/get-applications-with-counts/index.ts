@@ -3,7 +3,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+interface ApplicationResponse {
+  applications: any[];
+  total: number;
+  statusCounts: Record<string, number>;
 }
 
 serve(async (req) => {
@@ -13,66 +20,36 @@ serve(async (req) => {
   }
 
   try {
-    const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0 } = await req.json()
+    const { center_lng, center_lat, radius_meters = 1000, page_size = 100, page_number = 0 } = await req.json()
 
-    if (!center_lng || !center_lat || !radius_meters) {
-      throw new Error('Missing required parameters')
+    if (!center_lng || !center_lat) {
+      throw new Error('Missing required parameters: center_lng and center_lat')
     }
-
-    console.log('Query parameters:', { center_lng, center_lat, radius_meters, page_size, page_number });
 
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        db: {
-          schema: 'public'
-        },
-        global: {
-          headers: { 'x-my-custom-header': 'planning-application-service' },
-        },
-        auth: {
-          persistSession: false
-        }
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Fetching applications...');
-    
-    // Get applications with pagination using optimized function
-    const { data: applications, error: applicationsError } = await supabaseClient.rpc(
+    // Get applications within radius
+    const { data: applications, error } = await supabaseClient.rpc(
       'get_applications_within_radius',
       {
         center_lng,
         center_lat,
         radius_meters,
-        page_size: Math.min(page_size, 500),
+        page_size,
         page_number
       }
     )
 
-    if (applicationsError) {
-      console.error('Error fetching applications:', applicationsError)
-      throw applicationsError
+    if (error) {
+      console.error('Error fetching applications:', error)
+      throw error
     }
 
-    if (!applications) {
-      console.log('No applications found')
-      return new Response(
-        JSON.stringify({
-          applications: [],
-          total: 0,
-          statusCounts: {}
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
-    }
-
-    // Get total count
+    // Get total count first
     const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
@@ -87,8 +64,46 @@ serve(async (req) => {
       throw countError
     }
 
+    // Process applications to ensure image_map_url is set
+    const processedApplications = await Promise.all(applications.map(async (app: any) => {
+      // If image_map_url is not set, generate it using Mapbox
+      if (!app.image_map_url && app.centroid) {
+        try {
+          const coordinates = typeof app.centroid === 'string' ? JSON.parse(app.centroid) : app.centroid;
+          
+          if (coordinates && coordinates.coordinates) {
+            const [lon, lat] = coordinates.coordinates;
+            const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN');
+            const width = 800;
+            const height = 600;
+            const zoom = 18;
+            const pitch = 60;
+            const bearing = 45;
+            
+            // Generate satellite view with 3D buildings
+            const imageUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lon},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`;
+            
+            // Update the application in the database with the new image URL
+            const { error: updateError } = await supabaseClient
+              .from('applications')
+              .update({ image_map_url: imageUrl })
+              .eq('application_id', app.application_id);
+              
+            if (updateError) {
+              console.error(`Error updating image URL for application ${app.application_id}:`, updateError);
+            } else {
+              app.image_map_url = imageUrl;
+            }
+          }
+        } catch (err) {
+          console.error(`Error processing application ${app.application_id}:`, err);
+        }
+      }
+      return app;
+    }));
+
     // Calculate status counts
-    const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
+    const statusCounts = processedApplications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || '';
       
       if (status === 'under review') {
@@ -107,17 +122,20 @@ serve(async (req) => {
     console.log('Status counts:', statusCounts);
 
     const response: ApplicationResponse = {
-      applications,
+      applications: processedApplications,
       total: totalCount || 0,
       statusCounts
     }
 
     return new Response(
       JSON.stringify(response),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      { 
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
         status: 200,
-      }
+      },
     )
 
   } catch (error) {
@@ -126,19 +144,14 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: error.message || 'An unexpected error occurred',
-        details: error.details || null,
-        hint: 'Try reducing the radius or refreshing the page'
-      }), 
+      }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200, // Changed from error status to 200 to prevent client-side rejection
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: 200, // Return 200 even for errors to prevent CORS issues
       }
     )
   }
 })
-
-interface ApplicationResponse {
-  applications: any[];
-  total: number;
-  statusCounts: Record<string, number>;
-}
