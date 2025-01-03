@@ -3,7 +3,7 @@ import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { statusColors } from "@/utils/statusColors";
+import { getStatusColor } from "@/utils/statusColors";
 
 interface ApplicationListViewProps {
   applications: Application[];
@@ -51,7 +51,7 @@ export const ApplicationListView = ({
               <div className="flex items-center gap-2 mt-2">
                 <Badge 
                   variant="outline" 
-                  className={`${statusColors[application.status] || statusColors.default}`}
+                  className={getStatusColor(application.status)}
                 >
                   {application.status}
                 </Badge>
