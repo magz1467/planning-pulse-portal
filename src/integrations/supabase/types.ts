@@ -1533,8 +1533,8 @@ export type Database = {
           center_lng: number
           center_lat: number
           radius_meters: number
-          page_size?: number
-          page_number?: number
+          page_size: number
+          page_number: number
         }
         Returns: {
           actual_commencement_date: string | null
