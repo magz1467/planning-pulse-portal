@@ -18,9 +18,11 @@ const Image = ({ src, alt, className, width, height, loading = "lazy", onError, 
     }
   };
   
+  const imageSrc = error || !src ? fallbackImage : src;
+  
   return (
     <img
-      src={error || !src ? fallbackImage : src}
+      src={imageSrc}
       alt={alt || ''}
       className={className || ''}
       onError={handleError}
