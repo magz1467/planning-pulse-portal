@@ -40,6 +40,8 @@ Deno.serve(async (req) => {
       value: '15000'
     });
 
+    console.log('Fetching applications...');
+    
     // Get applications with pagination
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
@@ -104,7 +106,7 @@ Deno.serve(async (req) => {
 
     console.log('Status counts:', statusCounts);
 
-    // Get total count with timeout
+    // Get total count
     const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
