@@ -1,3 +1,1 @@
 project_id = "jposqxdboetyioymfswd"
-[functions.generate-static-maps-manual]
-verify_jwt = false
