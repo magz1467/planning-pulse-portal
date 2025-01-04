@@ -6,7 +6,6 @@ import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { cn } from "@/lib/utils";
-import { FALLBACK_IMAGE } from "@/utils/imageUtils";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -21,6 +20,9 @@ export const PlanningApplicationList = ({
   activeSort
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
+
+  // Hardcoded test image URL - a simple house image
+  const testImageUrl = "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60";
 
   return (
     <div className="divide-y">
@@ -37,17 +39,9 @@ export const PlanningApplicationList = ({
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <img
-                  src={application.image_map_url || "/placeholder.svg"}
-                  alt={application.description || ''}
-                  className={cn(
-                    "w-full h-full object-cover",
-                    "transition-opacity duration-300",
-                    "hover:opacity-90"
-                  )}
-                  onError={(e) => {
-                    e.currentTarget.src = "/placeholder.svg";
-                  }}
-                  loading="lazy"
+                  src={testImageUrl}
+                  alt="Test house image"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
