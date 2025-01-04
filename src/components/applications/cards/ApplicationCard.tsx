@@ -16,6 +16,9 @@ export const ApplicationCard = ({ application, onSelect }: ApplicationCardProps)
   const isClosingSoon = application.last_date_consultation_comments ? 
     isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
+  // Get image URL from application details if available
+  const imageUrl = application.application_details?.images?.[0] || application.image_map_url || null;
+
   return (
     <div
       className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -23,7 +26,7 @@ export const ApplicationCard = ({ application, onSelect }: ApplicationCardProps)
     >
       <div className="flex gap-3">
         <ApplicationCardImage 
-          imageUrl={application.image_map_url || "/placeholder.svg"}
+          imageUrl={imageUrl || "/placeholder.svg"}
           alt={application.description || ''}
         />
         
