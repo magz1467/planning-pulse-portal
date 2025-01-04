@@ -21,8 +21,20 @@ export const PlanningApplicationList = ({
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
 
-  // Hardcoded test image URL - a simple house image
-  const testImageUrl = "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60";
+  // Array of diverse house images from Unsplash
+  const houseImages = [
+    "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60", // Modern house
+    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop&q=60", // Traditional house
+    "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&auto=format&fit=crop&q=60", // Suburban house
+    "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60", // Luxury house
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60"  // Contemporary house
+  ];
+
+  // Function to get a random image based on application id
+  const getRandomImage = (id: number) => {
+    // Use the application id to consistently get the same image for the same application
+    return houseImages[id % houseImages.length];
+  };
 
   return (
     <div className="divide-y">
@@ -39,8 +51,8 @@ export const PlanningApplicationList = ({
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <img
-                  src={testImageUrl}
-                  alt="Test house image"
+                  src={getRandomImage(application.id)}
+                  alt="Property image"
                   className="w-full h-full object-cover"
                 />
               </div>
