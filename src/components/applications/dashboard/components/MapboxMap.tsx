@@ -25,7 +25,6 @@ export const MapboxMap = ({
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
-  const prevIdsRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
 
   // Initialize map only once
@@ -57,9 +56,7 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Add zoom and navigation controls
           newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-          newMap.scrollZoom.enable();
           
           newMap.on('load', () => {
             console.log('Map loaded successfully');
@@ -79,8 +76,7 @@ export const MapboxMap = ({
               if (hasValidCoordinates) {
                 newMap.fitBounds(bounds, {
                   padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                  maxZoom: 15,
-                  duration: 0
+                  maxZoom: 15
                 });
               } else {
                 newMap.setCenter([initialCenter[1], initialCenter[0]]);
@@ -125,29 +121,16 @@ export const MapboxMap = ({
   useEffect(() => {
     if (!markerManager.current || !map.current || !applications.length) return;
 
-    const currentIds = new Set(applications.map(app => app.id));
-    const prevIds = prevIdsRef.current;
+    // Remove all existing markers
+    markerManager.current.removeAllMarkers();
 
     // Add new markers
-    applications.forEach(application => {
-      if (!prevIds.has(application.id) && application.coordinates) {
-        markerManager.current?.addMarker(application, application.id === selectedId);
-      }
-    });
-
-    // Remove old markers
-    prevIds.forEach(id => {
-      if (!currentIds.has(id)) {
-        markerManager.current?.removeMarker(id);
-      }
-    });
-
-    // Update bounds if needed
     const bounds = new mapboxgl.LngLatBounds();
     let hasValidCoordinates = false;
 
     applications.forEach(application => {
       if (application.coordinates) {
+        markerManager.current?.addMarker(application, application.id === selectedId);
         bounds.extend([application.coordinates[1], application.coordinates[0]]);
         hasValidCoordinates = true;
       }
@@ -156,13 +139,9 @@ export const MapboxMap = ({
     if (hasValidCoordinates && applications.length > 0) {
       map.current.fitBounds(bounds, {
         padding: { top: 50, bottom: 50, left: 50, right: 50 },
-        maxZoom: 15,
-        duration: 1000
+        maxZoom: 15
       });
     }
-
-    // Update reference
-    prevIdsRef.current = currentIds;
   }, [applications, selectedId]);
 
   // Only update marker styles when selection changes
