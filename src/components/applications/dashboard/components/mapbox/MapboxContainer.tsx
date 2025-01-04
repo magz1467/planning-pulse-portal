@@ -4,6 +4,8 @@ import { LatLngTuple } from 'leaflet';
 import { useMapboxInitialization } from '@/hooks/use-mapbox-initialization';
 import { MapboxMarkerManager } from './MapboxMarkerManager';
 import { MapboxErrorDisplay } from './MapboxErrorDisplay';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapboxContainerProps {
   applications: Application[];
@@ -25,6 +27,7 @@ export const MapboxContainer = ({
   const initialBoundsFitRef = useRef(false);
 
   const handleMapLoaded = (map: mapboxgl.Map, markerManager: MapboxMarkerManager) => {
+    console.log('Map loaded, adding markers...');
     // Add markers
     applications.forEach(application => {
       markerManager.addMarker(application, application.id === selectedId);
