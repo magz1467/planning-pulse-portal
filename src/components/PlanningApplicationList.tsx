@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin, Timer } from "lucide-react";
-import Image from "@/components/ui/image";
+import Image from "next/image"; // Changed this import
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
@@ -46,18 +46,18 @@ export const PlanningApplicationList = ({
             onClick={() => onSelectApplication(application.id)}
           >
             <div className="flex gap-3">
-              <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+              <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 relative">
                 {loadingImages[application.id] && (
-                  <div className="w-full h-full flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                   </div>
                 )}
                 <Image
                   src={imageUrl}
                   alt={application.description || ''}
-                  width={80}
-                  height={80}
-                  className={`w-full h-full object-cover ${loadingImages[application.id] ? 'hidden' : ''}`}
+                  fill
+                  sizes="80px"
+                  className={`object-cover ${loadingImages[application.id] ? 'opacity-0' : 'opacity-100'}`}
                   onError={(e) => {
                     console.error('Image load error:', e);
                     (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
