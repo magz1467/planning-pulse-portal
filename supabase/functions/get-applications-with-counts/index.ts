@@ -28,7 +28,9 @@ serve(async (req) => {
       )
     }
 
-    // Get applications within radius
+    const startTime = Date.now()
+
+    // Get applications within radius with timeout handling
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
       {
@@ -38,14 +40,23 @@ serve(async (req) => {
         page_size,
         page_number
       }
-    )
+    ).timeout(30000) // 30 second timeout
 
     if (applicationsError) {
       console.error('Error fetching applications:', applicationsError)
-      throw applicationsError
+      return new Response(
+        JSON.stringify({ 
+          error: applicationsError.message,
+          details: 'Error fetching applications'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500 
+        }
+      )
     }
 
-    // Get total count
+    // Get total count with timeout handling
     const { data: totalCount, error: countError } = await supabaseClient.rpc(
       'get_applications_count_within_radius',
       {
@@ -53,13 +64,24 @@ serve(async (req) => {
         center_lng,
         radius_meters
       }
-    )
+    ).timeout(15000) // 15 second timeout
 
     if (countError) {
       console.error('Error getting count:', countError)
-      throw countError
+      return new Response(
+        JSON.stringify({ 
+          error: countError.message,
+          details: 'Error getting total count'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500 
+        }
+      )
     }
 
+    const endTime = Date.now()
+    console.log(`Query execution time: ${endTime - startTime}ms`)
     console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
 
     return new Response(
@@ -68,7 +90,8 @@ serve(async (req) => {
         total: totalCount || 0,
         page: page_number,
         pageSize: page_size,
-        hasMore: (page_number + 1) * page_size < (totalCount || 0)
+        hasMore: (page_number + 1) * page_size < (totalCount || 0),
+        executionTime: endTime - startTime
       }),
       { 
         headers: { 
@@ -83,8 +106,9 @@ serve(async (req) => {
     console.error('Error:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: 'An error occurred while processing your request'
+        error: error.message || 'Unknown error occurred',
+        details: 'An error occurred while processing your request',
+        timestamp: new Date().toISOString()
       }),
       { 
         headers: { 
