@@ -13,6 +13,18 @@ interface MiniCardProps {
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
 
+  // Array of diverse house images from Unsplash
+  const houseImages = [
+    "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60", // Modern house
+    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop&q=60", // Traditional house
+    "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&auto=format&fit=crop&q=60", // Suburban house
+    "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60", // Luxury house
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60"  // Contemporary house
+  ];
+
+  // Use image_map_url if available, otherwise fallback to image or random house image
+  const imageUrl = application.image_map_url || application.image || houseImages[application.id % houseImages.length];
+
   return (
     <div 
       className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
@@ -22,7 +34,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-4 items-center">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
           <Image
-            src={application.image_map_url || "/placeholder.svg"}
+            src={imageUrl}
             alt={application.title || application.description || ''}
             width={80}
             height={80}
