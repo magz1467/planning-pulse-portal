@@ -1,9 +1,7 @@
 import { Application } from "@/types/planning";
-import { MapPin, Timer } from "lucide-react";
-import Image from "@/components/ui/image";
-import { isWithinNextSevenDays } from "@/utils/dateUtils";
-import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { MapPin } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 
 interface MiniCardProps {
   application: Application;
@@ -11,7 +9,8 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
-  const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
+  const statusColor = getStatusColor(application.status);
+  const statusText = getStatusText(application.status);
 
   return (
     <div 
@@ -19,40 +18,33 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       onClick={onClick}
       style={{ zIndex: 1500 }}
     >
-      <div className="flex gap-4 items-center">
-        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
-          <Image
-            src={application.image_map_url || "/placeholder.svg"}
-            alt={application.title}
-            width={80}
-            height={80}
+      <div className="flex gap-4 items-start">
+        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+          <img
+            src={application.image_map_url || application.image || "/placeholder.svg"}
+            alt={application.description || ''}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/placeholder.svg";
+            }}
           />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-start justify-between gap-2 mb-1">
             <ApplicationTitle 
               title={application.ai_title || application.description || ''} 
-              className="line-clamp-2 text-sm font-semibold text-primary"
+              className="text-sm font-medium line-clamp-2"
             />
-            {isClosingSoon && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                <Timer className="w-3 h-3 mr-1" />
-                Closing soon
-              </span>
-            )}
+            <div className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${statusColor}`}>
+              {statusText}
+            </div>
           </div>
-          <div className="flex items-center gap-1 mt-1 text-gray-600">
-            <MapPin className="w-3 h-3" />
-            <p className="text-sm truncate">{application.address}</p>
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <MapPin className="h-3 w-3 flex-shrink-0" />
+            <p className="truncate">{application.address}</p>
           </div>
-          <div className="flex items-center justify-between mt-2">
-            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-              {getStatusText(application.status)}
-            </span>
-            <span className="text-xs text-gray-500">
-              {application.distance}
-            </span>
+          <div className="mt-1 text-xs text-gray-500">
+            Reference: {application.reference}
           </div>
         </div>
       </div>
