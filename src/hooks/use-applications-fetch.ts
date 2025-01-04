@@ -21,35 +21,50 @@ export const useApplicationsFetch = () => {
   ) => {
     setIsLoading(true);
     console.log('Fetching applications with center:', center);
-    console.log('Current filters:', filters);
     
     try {
-      const { data, error } = await supabase.functions.invoke('get-applications-with-counts', {
-        body: {
+      // Fetch applications using the database function
+      const { data: apps, error } = await supabase.rpc(
+        'get_applications_within_radius',
+        {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: RADIUS,
           page_size: PAGE_SIZE,
           page_number: currentPage
         }
-      });
+      );
 
       if (error) {
         console.error('Data fetch error:', error);
         throw error;
       }
 
-      if (!data || !data.applications || data.applications.length === 0) {
+      // Get total count
+      const { data: count, error: countError } = await supabase.rpc(
+        'get_applications_count_within_radius',
+        {
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: RADIUS
+        }
+      );
+
+      if (countError) {
+        console.error('Count fetch error:', countError);
+        throw countError;
+      }
+
+      if (!apps || apps.length === 0) {
         console.log('No applications found in radius', RADIUS, 'meters from', center);
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log('Raw applications data:', data);
-      console.log('Status counts:', data.statusCounts);
+      console.log('Raw applications data:', apps);
 
-      const transformedData = data.applications?.map((app: any) => {
+      const transformedData = apps?.map((app: any) => {
         const geomObj = app.geom;
         let coordinates: [number, number] | null = null;
 
@@ -105,7 +120,7 @@ export const useApplicationsFetch = () => {
       
       console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
-      setTotalCount(data.total || 0);
+      setTotalCount(count || 0);
     } catch (error: any) {
       console.error('Error in fetchApplicationsInRadius:', error);
       toast({
