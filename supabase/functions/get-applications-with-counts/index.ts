@@ -31,11 +31,8 @@ serve(async (req) => {
     const limitedPageSize = Math.min(page_size, 50)
     const offset = page_number * limitedPageSize
 
-    // Use abortSignal for timeout
-    const abortController = new AbortController()
-    const timeout = setTimeout(() => abortController.abort(), 15000) // 15 second timeout
-
     try {
+      // Get applications within radius
       const { data: applications, error: applicationsError } = await supabaseClient
         .rpc('get_applications_within_radius', {
           center_lat,
@@ -43,8 +40,6 @@ serve(async (req) => {
           radius_meters,
           page_size: limitedPageSize,
           page_number: offset
-        }, {
-          count: 'exact'
         })
 
       if (applicationsError) {
@@ -52,7 +47,7 @@ serve(async (req) => {
         throw applicationsError
       }
 
-      // Separate count query
+      // Get total count
       const { data: totalCount, error: countError } = await supabaseClient
         .rpc('get_applications_count_within_radius', {
           center_lat,
@@ -66,16 +61,14 @@ serve(async (req) => {
         console.log('Count query failed, continuing without total count')
         const count = applications?.length || 0
         
-        const response = {
-          applications: applications || [],
-          total: count,
-          page: page_number,
-          pageSize: limitedPageSize,
-          hasMore: false // Cannot determine if there are more without total count
-        }
-
         return new Response(
-          JSON.stringify(response),
+          JSON.stringify({
+            applications: applications || [],
+            total: count,
+            page: page_number,
+            pageSize: limitedPageSize,
+            hasMore: false // Cannot determine if there are more without total count
+          }),
           { 
             headers: { 
               ...corsHeaders,
@@ -88,16 +81,14 @@ serve(async (req) => {
 
       console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
 
-      const response = {
-        applications: applications || [],
-        total: totalCount || 0,
-        page: page_number,
-        pageSize: limitedPageSize,
-        hasMore: (page_number + 1) * limitedPageSize < (totalCount || 0)
-      }
-
       return new Response(
-        JSON.stringify(response),
+        JSON.stringify({
+          applications: applications || [],
+          total: totalCount || 0,
+          page: page_number,
+          pageSize: limitedPageSize,
+          hasMore: (page_number + 1) * limitedPageSize < (totalCount || 0)
+        }),
         { 
           headers: { 
             ...corsHeaders,
@@ -106,8 +97,10 @@ serve(async (req) => {
           status: 200,
         },
       )
-    } finally {
-      clearTimeout(timeout)
+
+    } catch (error) {
+      console.error('Error:', error.message)
+      throw error
     }
 
   } catch (error) {
