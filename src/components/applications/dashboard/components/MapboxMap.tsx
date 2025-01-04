@@ -62,18 +62,24 @@ export const MapboxMap = ({
             // Add markers and fit bounds
             if (applications.length > 0) {
               const bounds = new mapboxgl.LngLatBounds();
+              let hasValidCoordinates = false;
+
               applications.forEach(application => {
                 if (application.coordinates) {
                   markerManager.current?.addMarker(application, application.id === selectedId);
                   bounds.extend([application.coordinates[1], application.coordinates[0]]);
+                  hasValidCoordinates = true;
                 }
               });
 
-              // Fit bounds with padding
-              newMap.fitBounds(bounds, {
-                padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                maxZoom: 15
-              });
+              if (hasValidCoordinates) {
+                // Fit bounds with padding and disable animation for initial fit
+                newMap.fitBounds(bounds, {
+                  padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                  maxZoom: 15,
+                  duration: 0 // Disable animation for initial fit
+                });
+              }
             }
 
             initializedRef.current = true;
@@ -107,7 +113,7 @@ export const MapboxMap = ({
       }
       initializedRef.current = false;
     };
-  }, [initialCenter, applications]); // Added applications to dependencies
+  }, [initialCenter, applications, selectedId, onMarkerClick]);
 
   // Update markers when applications array changes
   useEffect(() => {
@@ -123,18 +129,24 @@ export const MapboxMap = ({
     // Add new markers
     if (addedApplications.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
+      let hasValidCoordinates = false;
+
       addedApplications.forEach(application => {
         if (application.coordinates) {
           markerManager.current?.addMarker(application, application.id === selectedId);
           bounds.extend([application.coordinates[1], application.coordinates[0]]);
+          hasValidCoordinates = true;
         }
       });
 
-      // Fit bounds to include new markers
-      map.current.fitBounds(bounds, {
-        padding: { top: 50, bottom: 50, left: 50, right: 50 },
-        maxZoom: 15
-      });
+      if (hasValidCoordinates) {
+        // Fit bounds with padding and smooth animation for updates
+        map.current.fitBounds(bounds, {
+          padding: { top: 50, bottom: 50, left: 50, right: 50 },
+          maxZoom: 15,
+          duration: 1000 // Smooth animation for updates
+        });
+      }
     }
 
     // Remove old markers
