@@ -59,31 +59,16 @@ export const MapboxMap = ({
           newMap.on('load', () => {
             console.log('Map loaded successfully');
             
-            if (applications.length > 0) {
-              const bounds = new mapboxgl.LngLatBounds();
-              let hasValidCoordinates = false;
+            // Set initial view without trying to fit bounds
+            newMap.setCenter([initialCenter[1], initialCenter[0]]);
+            newMap.setZoom(12);
 
-              applications.forEach(application => {
-                if (application.coordinates) {
-                  markerManager.current?.addMarker(application, application.id === selectedId);
-                  bounds.extend([application.coordinates[1], application.coordinates[0]]);
-                  hasValidCoordinates = true;
-                }
-              });
-
-              if (hasValidCoordinates) {
-                newMap.fitBounds(bounds, {
-                  padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                  maxZoom: 15
-                });
-              } else {
-                newMap.setCenter([initialCenter[1], initialCenter[0]]);
-                newMap.setZoom(12);
+            // Add markers without moving the map
+            applications.forEach(application => {
+              if (application.coordinates) {
+                markerManager.current?.addMarker(application, application.id === selectedId);
               }
-            } else {
-              newMap.setCenter([initialCenter[1], initialCenter[0]]);
-              newMap.setZoom(12);
-            }
+            });
 
             initializedRef.current = true;
           });
@@ -122,24 +107,12 @@ export const MapboxMap = ({
     // Remove all existing markers
     markerManager.current.removeAllMarkers();
 
-    // Add new markers
-    const bounds = new mapboxgl.LngLatBounds();
-    let hasValidCoordinates = false;
-
+    // Add new markers without moving the map
     applications.forEach(application => {
       if (application.coordinates) {
         markerManager.current?.addMarker(application, application.id === selectedId);
-        bounds.extend([application.coordinates[1], application.coordinates[0]]);
-        hasValidCoordinates = true;
       }
     });
-
-    if (hasValidCoordinates && applications.length > 0) {
-      map.current.fitBounds(bounds, {
-        padding: { top: 50, bottom: 50, left: 50, right: 50 },
-        maxZoom: 15
-      });
-    }
   }, [applications, selectedId]);
 
   // Only update marker styles when selection changes
