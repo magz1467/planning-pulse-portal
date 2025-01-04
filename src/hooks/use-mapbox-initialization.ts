@@ -11,23 +11,13 @@ interface UseMapboxInitializationProps {
   onMapLoaded: (map: mapboxgl.Map, markerManager: MapboxMarkerManager) => void;
 }
 
-interface MapboxInitializationResult {
-  isLoading: boolean;
-  error: string | null;
-  debugInfo: string;
-  map: mapboxgl.Map | null;
-  markerManager: MapboxMarkerManager | null;
-}
-
 export const useMapboxInitialization = ({
   container,
   initialCenter,
   onError,
   onMapLoaded
-}: UseMapboxInitializationProps): MapboxInitializationResult => {
+}: UseMapboxInitializationProps) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>('');
   const map = useRef<mapboxgl.Map | null>(null);
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const initializedRef = useRef(false);
@@ -53,8 +43,7 @@ export const useMapboxInitialization = ({
             error: tokenError,
             context: 'Token fetch failed'
           });
-          setError(msg);
-          setDebugInfo(JSON.stringify(tokenError, null, 2));
+          onError(msg, JSON.stringify(tokenError, null, 2));
           return;
         }
 
@@ -64,8 +53,7 @@ export const useMapboxInitialization = ({
             data,
             context: 'Invalid token response'
           });
-          setError('Failed to initialize map: No access token available');
-          setDebugInfo(msg);
+          onError('Failed to initialize map: No access token available', msg);
           return;
         }
 
@@ -101,15 +89,11 @@ export const useMapboxInitialization = ({
         // Add error handler
         newMap.on('error', (e) => {
           console.error('Mapbox error:', e);
-          setError('Failed to load map resources');
-          setDebugInfo(JSON.stringify(e.error, null, 2));
           onError('Failed to load map resources', JSON.stringify(e.error, null, 2));
         });
 
       } catch (err) {
         console.error('Map initialization failed:', err);
-        setError('Failed to initialize map');
-        setDebugInfo(JSON.stringify(err, null, 2));
         onError('Failed to initialize map', JSON.stringify(err, null, 2));
       }
     };
@@ -131,11 +115,5 @@ export const useMapboxInitialization = ({
     };
   }, [container, initialCenter, onError, onMapLoaded]);
 
-  return { 
-    isLoading, 
-    error, 
-    debugInfo, 
-    map: map.current, 
-    markerManager: markerManager.current 
-  };
+  return { isLoading, map: map.current, markerManager: markerManager.current };
 };

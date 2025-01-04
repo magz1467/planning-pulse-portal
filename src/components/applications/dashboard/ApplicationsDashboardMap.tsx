@@ -6,7 +6,6 @@ import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useEffect } from "react";
 import { MapContent } from "./components/MapContent";
 import { SidebarContent } from "./components/SidebarContent";
-import { MapErrorBoundary } from "./components/mapbox/MapErrorBoundary";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -36,7 +35,7 @@ export const ApplicationsDashboardMap = () => {
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
   const handleClose = () => {
-    console.log("Closing application details");
+    console.log("Closing application details");  // Debug log
     handleMarkerClick(null);
   };
 
@@ -81,16 +80,14 @@ export const ApplicationsDashboardMap = () => {
           />
 
           {(!isMobile || isMapView) && (
-            <MapErrorBoundary>
-              <MapContent
-                applications={filteredApplications}
-                selectedId={selectedId}
-                coordinates={coordinates as [number, number]}
-                isMobile={isMobile}
-                isMapView={isMapView}
-                onMarkerClick={handleMarkerClick}
-              />
-            </MapErrorBoundary>
+            <MapContent
+              applications={filteredApplications}
+              selectedId={selectedId}
+              coordinates={coordinates as [number, number]}
+              isMobile={isMobile}
+              isMapView={isMapView}
+              onMarkerClick={handleMarkerClick}
+            />
           )}
         </div>
       </div>
