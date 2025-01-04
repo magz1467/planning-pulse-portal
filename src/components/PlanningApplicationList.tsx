@@ -42,7 +42,7 @@ export const PlanningApplicationList = ({
             }`}
             onClick={() => onSelectApplication(application.id)}
           >
-            <div className="flex gap-3">
+            <div className="flex gap-3 p-4">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 relative">
                 {loadingImages[application.id] && (
                   <div className="absolute inset-0 flex items-center justify-center">

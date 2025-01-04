@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import Image from "@/components/ui/image";
+import { FALLBACK_IMAGE } from "@/utils/imageUtils";
 
 interface MiniCardProps {
   application: Application;
@@ -13,6 +14,12 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   const statusColor = getStatusColor(application.status);
   const statusText = getStatusText(application.status);
 
+  const getImageUrl = (url?: string) => {
+    if (!url) return FALLBACK_IMAGE;
+    if (url.startsWith('http')) return url;
+    return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${url}`;
+  };
+
   return (
     <div 
       className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-slide-up"
@@ -22,11 +29,12 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-4 items-start">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <Image
-            src={application.image_map_url || application.image || "/placeholder.svg"}
+            src={getImageUrl(application.image_map_url || application.image)}
             alt={application.description || ''}
             className="w-full h-full object-cover"
             width={80}
             height={80}
+            fallback={FALLBACK_IMAGE}
           />
         </div>
         <div className="flex-1 min-w-0">
