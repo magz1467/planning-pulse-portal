@@ -25,7 +25,7 @@ export const MapboxMap = ({
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
-  const prevApplicationsRef = useRef<Application[]>([]);
+  const prevIdsRef = useRef<Set<number>>(new Set());
   const initializedRef = useRef(false);
 
   // Initialize map only once
@@ -73,11 +73,10 @@ export const MapboxMap = ({
               });
 
               if (hasValidCoordinates) {
-                // Fit bounds with padding and disable animation for initial fit
                 newMap.fitBounds(bounds, {
                   padding: { top: 50, bottom: 50, left: 50, right: 50 },
                   maxZoom: 15,
-                  duration: 0 // Disable animation for initial fit
+                  duration: 0
                 });
               }
             }
@@ -85,7 +84,6 @@ export const MapboxMap = ({
             initializedRef.current = true;
           });
 
-          // Add error handler
           newMap.on('error', (e) => {
             console.error('Mapbox error:', e);
             setError('Failed to load map resources');
@@ -99,9 +97,7 @@ export const MapboxMap = ({
 
     initializeMap();
 
-    // Cleanup function
     return () => {
-      console.log('Cleaning up map...');
       if (markerManager.current) {
         markerManager.current.removeAllMarkers();
         markerManager.current = null;
@@ -113,53 +109,50 @@ export const MapboxMap = ({
       }
       initializedRef.current = false;
     };
-  }, [initialCenter, onMarkerClick]); // Remove applications and selectedId from dependencies
+  }, [initialCenter, onMarkerClick]);
 
   // Update markers when applications array changes
   useEffect(() => {
     if (!markerManager.current || !map.current || !applications.length) return;
 
-    // Create a simple array of IDs for comparison
-    const prevIds = new Set(prevApplicationsRef.current.map(app => app.id));
     const currentIds = new Set(applications.map(app => app.id));
-
-    // Determine added and removed applications
-    const addedApplications = applications.filter(app => !prevIds.has(app.id));
-    const removedApplications = prevApplicationsRef.current.filter(app => !currentIds.has(app.id));
+    const prevIds = prevIdsRef.current;
 
     // Add new markers
-    if (addedApplications.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      let hasValidCoordinates = false;
-
-      addedApplications.forEach(application => {
-        if (application.coordinates) {
-          markerManager.current?.addMarker(application, application.id === selectedId);
-          bounds.extend([application.coordinates[1], application.coordinates[0]]);
-          hasValidCoordinates = true;
-        }
-      });
-
-      if (hasValidCoordinates) {
-        // Fit bounds with padding and smooth animation for updates
-        map.current.fitBounds(bounds, {
-          padding: { top: 50, bottom: 50, left: 50, right: 50 },
-          maxZoom: 15,
-          duration: 1000 // Smooth animation for updates
-        });
+    applications.forEach(application => {
+      if (!prevIds.has(application.id) && application.coordinates) {
+        markerManager.current?.addMarker(application, application.id === selectedId);
       }
-    }
-
-    // Remove old markers
-    removedApplications.forEach(application => {
-      markerManager.current?.removeMarker(application.id);
     });
 
-    // Update reference using only necessary data
-    prevApplicationsRef.current = applications.map(app => ({
-      id: app.id,
-      coordinates: app.coordinates
-    })) as Application[];
+    // Remove old markers
+    prevIds.forEach(id => {
+      if (!currentIds.has(id)) {
+        markerManager.current?.removeMarker(id);
+      }
+    });
+
+    // Update bounds if needed
+    const bounds = new mapboxgl.LngLatBounds();
+    let hasValidCoordinates = false;
+
+    applications.forEach(application => {
+      if (application.coordinates) {
+        bounds.extend([application.coordinates[1], application.coordinates[0]]);
+        hasValidCoordinates = true;
+      }
+    });
+
+    if (hasValidCoordinates) {
+      map.current.fitBounds(bounds, {
+        padding: { top: 50, bottom: 50, left: 50, right: 50 },
+        maxZoom: 15,
+        duration: 1000
+      });
+    }
+
+    // Update reference
+    prevIdsRef.current = currentIds;
   }, [applications, selectedId]);
 
   // Only update marker styles when selection changes
