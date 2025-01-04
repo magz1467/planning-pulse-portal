@@ -39,7 +39,8 @@ export const MapboxMap = ({
           dimensions: mapContainer.current ? {
             width: mapContainer.current.offsetWidth,
             height: mapContainer.current.offsetHeight
-          } : null
+          } : null,
+          initialCenter
         });
         
         const newMap = await MapboxInitializer.initialize(
@@ -67,18 +68,28 @@ export const MapboxMap = ({
               applications.forEach(application => {
                 if (application.coordinates) {
                   markerManager.current?.addMarker(application, application.id === selectedId);
+                  // Note: Mapbox expects coordinates in [longitude, latitude] order
                   bounds.extend([application.coordinates[1], application.coordinates[0]]);
                   hasValidCoordinates = true;
                 }
               });
 
               if (hasValidCoordinates) {
+                // Set initial view to the bounds of all markers
                 newMap.fitBounds(bounds, {
                   padding: { top: 50, bottom: 50, left: 50, right: 50 },
                   maxZoom: 15,
                   duration: 0
                 });
+              } else {
+                // If no valid coordinates, center on initialCenter
+                newMap.setCenter([initialCenter[1], initialCenter[0]]);
+                newMap.setZoom(12);
               }
+            } else {
+              // If no applications, center on initialCenter
+              newMap.setCenter([initialCenter[1], initialCenter[0]]);
+              newMap.setZoom(12);
             }
 
             initializedRef.current = true;
@@ -138,12 +149,13 @@ export const MapboxMap = ({
 
     applications.forEach(application => {
       if (application.coordinates) {
+        // Note: Mapbox expects coordinates in [longitude, latitude] order
         bounds.extend([application.coordinates[1], application.coordinates[0]]);
         hasValidCoordinates = true;
       }
     });
 
-    if (hasValidCoordinates) {
+    if (hasValidCoordinates && applications.length > 0) {
       map.current.fitBounds(bounds, {
         padding: { top: 50, bottom: 50, left: 50, right: 50 },
         maxZoom: 15,
