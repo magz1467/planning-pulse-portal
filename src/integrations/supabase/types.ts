@@ -1456,7 +1456,7 @@ export type Database = {
         Args: {
           center_lng: number
           center_lat: number
-          radius_meters?: number
+          radius_meters: number
         }
         Returns: number
       }
@@ -1532,9 +1532,9 @@ export type Database = {
         Args: {
           center_lng: number
           center_lat: number
-          radius_meters?: number
-          page_size?: number
-          page_number?: number
+          radius_meters: number
+          page_size: number
+          page_number: number
         }
         Returns: {
           actual_commencement_date: string | null

@@ -6,8 +6,6 @@ import { LatLngTuple } from 'leaflet';
 import { calculateDistance } from '@/utils/distance';
 
 const PAGE_SIZE = 100;
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000;
 const RADIUS = 1000;
 
 export const useApplicationsFetch = () => {
@@ -16,18 +14,6 @@ export const useApplicationsFetch = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const { toast } = useToast();
-
-  const fetchWithRetry = async (fn: () => Promise<any>, retries = MAX_RETRIES): Promise<any> => {
-    try {
-      return await fn();
-    } catch (error: any) {
-      if (retries > 0 && error?.status === 500) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-        return fetchWithRetry(fn, retries - 1);
-      }
-      throw error;
-    }
-  };
 
   const fetchApplicationsInRadius = async (
     center: LatLngTuple,
@@ -79,7 +65,6 @@ export const useApplicationsFetch = () => {
           return null;
         }
 
-        // Calculate distance in miles
         const distanceInKm = calculateDistance(center, coordinates);
         const distanceInMiles = distanceInKm * 0.621371;
         const formattedDistance = `${distanceInMiles.toFixed(1)} mi`;
