@@ -13,7 +13,7 @@ import { ApplicationFeedback } from "./planning-details/ApplicationFeedback";
 import { Card } from "@/components/ui/card";
 import { Bell, Heart, BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
@@ -37,6 +37,16 @@ export const PlanningApplicationDetails = ({
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
+
+  // Cleanup function to handle modal states
+  useEffect(() => {
+    return () => {
+      setShowEmailDialog(false);
+      setShowFeedbackDialog(false);
+      setShowAuthDialog(false);
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   if (!application) return null;
 
