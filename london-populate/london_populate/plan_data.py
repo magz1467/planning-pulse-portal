@@ -18,7 +18,7 @@ HEADERS = {"X-API-AllowRequest": "be2rmRnt&",
            "Content-Type": "application/json"}
 
 
-def fetch_planning_data_paginated(size: int = 499) -> Generator[Any, Any, Any]:
+def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
     """
     Fetch all planning data using pagination.
     Args:
@@ -44,7 +44,7 @@ def fetch_planning_data_paginated(size: int = 499) -> Generator[Any, Any, Any]:
                         # must have centroid new schema location value
                         {"exists": {"field": "centroid"}},
                         # set valid_date for a little filter
-                        {"range": {"valid_date": {"gte": "01/01/2024"}}},
+                        {"range": {"valid_date": {"gte": "01/01/2023"}}},
                     ]
                 }
             },
@@ -55,15 +55,19 @@ def fetch_planning_data_paginated(size: int = 499) -> Generator[Any, Any, Any]:
             payload["search_after"] = search_after
 
         try:
+            print(f"Making request to {URL} with payload: {payload}")
             response = requests.post(URL, headers=HEADERS, json=payload)
             response.raise_for_status()
             data = response.json()
+            print(f"Response status: {response.status_code}")
+            print(f"Response data: {data}")
 
             # Get the hits from the response
             hits = data.get("hits", {}).get("hits", [])
 
             # If no more hits, break the loop
             if not hits:
+                print("No more hits found, breaking loop")
                 break
 
             # yield records
@@ -77,6 +81,9 @@ def fetch_planning_data_paginated(size: int = 499) -> Generator[Any, Any, Any]:
             search_after = hits[-1]["sort"]
         except requests.exceptions.RequestException as e:
             print(f"Error making request: {e}")
+            break
+        except Exception as e:
+            print(f"Unexpected error: {e}")
             break
 
     print(f"Completed fetching {total_fetched} total records")
