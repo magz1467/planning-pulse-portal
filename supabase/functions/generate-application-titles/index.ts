@@ -49,7 +49,7 @@ serve(async (req) => {
             messages: [
               {
                 role: 'system',
-                content: 'You are a planning application expert. Create a concise 6-12 word header that captures the essence of the planning application description. Focus on the key changes or developments proposed.'
+                content: 'You are a planning application expert. Create a very concise 5-8 word header that captures the key changes proposed in the planning application description. Focus only on the main development or change.'
               },
               {
                 role: 'user',
