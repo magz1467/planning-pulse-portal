@@ -4,8 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { StatusDisplay } from '@/components/admin/StatusDisplay';
 import { AutomationControl } from '@/components/admin/AutomationControl';
 import { ManualProcessing } from '@/components/admin/ManualProcessing';
-import { testEdgeFunction } from "@/utils/debugUtils";
-import { Button } from "@/components/ui/button";
 
 export default function Admin2() {
   const { toast } = useToast();
@@ -79,46 +77,11 @@ export default function Admin2() {
     }
   };
 
-  const handleTestEdgeFunction = async () => {
-    console.log('Testing edge function connection...');
-    const result = await testEdgeFunction();
-    
-    if (result.error) {
-      toast({
-        title: "Edge Function Test Failed",
-        description: "Check console for details",
-        variant: "destructive"
-      });
-    } else {
-      toast({
-        title: "Edge Function Test Successful",
-        description: "Check console for response details"
-      });
-    }
-  };
-
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
       
       <div className="space-y-8">
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Debug Tools</h2>
-          <div>
-            <Button 
-              onClick={handleTestEdgeFunction}
-              variant="outline"
-              size="sm"
-              className="mb-4"
-            >
-              Test Edge Function
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              Tests the connection to edge functions. Check console for detailed output.
-            </p>
-          </div>
-        </div>
-
         <StatusDisplay totalAITitles={totalAITitles} />
         <AutomationControl isGenerating={isGenerating} />
         <ManualProcessing 

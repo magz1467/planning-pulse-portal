@@ -1,12 +1,13 @@
 import { Application } from "@/types/planning";
-import { ApplicationListView } from "./ApplicationListView";
-import { ApplicationDetails } from "./ApplicationDetails";
+import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
 
 interface SidebarContentProps {
   isMobile: boolean;
   isMapView: boolean;
   applications: Application[];
   selectedId: number | null;
+  postcode: string;
   coordinates: [number, number];
   activeFilters: {
     status?: string;
@@ -30,6 +31,7 @@ export const SidebarContent = ({
   isMapView,
   applications,
   selectedId,
+  postcode,
   coordinates,
   activeFilters,
   activeSort,
@@ -39,33 +41,38 @@ export const SidebarContent = ({
   onSelectApplication,
   onClose,
 }: SidebarContentProps) => {
-  if (!isMobile && !isMapView) return null;
+  if (!coordinates) return null;
 
-  if (selectedId) {
-    const selectedApplication = applications.find(app => app.id === selectedId);
-    if (selectedApplication) {
-      return (
-        <div className="w-full md:w-[400px] bg-white h-full overflow-y-auto">
-          <ApplicationDetails
-            application={selectedApplication}
-            onClose={onClose}
-          />
-        </div>
-      );
-    }
-  }
-
-  return (
-    <div className="w-full md:w-[400px] bg-white h-full overflow-y-auto">
-      <ApplicationListView
+  if (!isMobile) {
+    return (
+      <DesktopSidebar
         applications={applications}
-        onSelectApplication={onSelectApplication}
+        selectedApplication={selectedId}
+        postcode={postcode}
         activeFilters={activeFilters}
         activeSort={activeSort}
-        statusCounts={statusCounts}
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}
+        onSelectApplication={onSelectApplication}
+        onClose={onClose}
+        statusCounts={statusCounts}
       />
-    </div>
-  );
+    );
+  }
+
+  if (!isMapView) {
+    return (
+      <MobileListContainer
+        applications={applications}
+        selectedApplication={selectedId}
+        postcode={postcode}
+        onSelectApplication={onSelectApplication}
+        onShowEmailDialog={() => {}}
+        hideFilterBar={true}
+        onClose={onClose}
+      />
+    );
+  }
+
+  return null;
 };

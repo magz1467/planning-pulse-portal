@@ -23,7 +23,6 @@ serve(async (req) => {
 
     const offset = page_number * page_size
 
-    // First get the applications
     const { data: applications, error: applicationsError } = await supabaseClient
       .rpc('get_applications_within_radius', {
         center_lat,
@@ -34,11 +33,9 @@ serve(async (req) => {
       })
 
     if (applicationsError) {
-      console.error('Error fetching applications:', applicationsError)
       throw applicationsError
     }
 
-    // Then get the total count
     const { data: totalCount, error: countError } = await supabaseClient
       .rpc('get_applications_count_within_radius', {
         center_lat,
@@ -47,40 +44,16 @@ serve(async (req) => {
       })
 
     if (countError) {
-      console.error('Error getting count:', countError)
       throw countError
     }
 
-    // Calculate status counts
-    const statusCounts = {
-      'Under Review': 0,
-      'Approved': 0,
-      'Declined': 0,
-      'Other': 0
-    }
-
-    applications?.forEach((app: any) => {
-      const status = app.status?.toLowerCase() || '';
-      if (status.includes('pending') || status.includes('review')) {
-        statusCounts['Under Review']++;
-      } else if (status.includes('approved') || status.includes('granted')) {
-        statusCounts['Approved']++;
-      } else if (status.includes('refused') || status.includes('rejected') || status.includes('declined')) {
-        statusCounts['Declined']++;
-      } else {
-        statusCounts['Other']++;
-      }
-    })
-
-    console.log(`Found ${applications?.length} applications`)
-    console.log('Status counts:', statusCounts)
+    console.log(`Found ${applications.length} applications`)
 
     const response = {
-      applications: applications || [],
+      applications,
       total: totalCount,
       page: page_number,
-      pageSize: page_size,
-      statusCounts
+      pageSize: page_size
     }
 
     return new Response(
@@ -103,7 +76,7 @@ serve(async (req) => {
           ...corsHeaders,
           'Content-Type': 'application/json'
         },
-        status: 200, // Changed from 400 to 200 to avoid the non-2xx error
+        status: 400,
       },
     )
   }

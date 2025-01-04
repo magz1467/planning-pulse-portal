@@ -1,9 +1,9 @@
 import { Application } from "@/types/planning";
-import { MapPin } from "lucide-react";
-import { getStatusColor, getStatusText } from "@/utils/statusColors";
-import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { MapPin, Timer } from "lucide-react";
 import Image from "@/components/ui/image";
-import { FALLBACK_IMAGE } from "@/utils/imageUtils";
+import { isWithinNextSevenDays } from "@/utils/dateUtils";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { getStatusColor, getStatusText } from "@/utils/statusColors";
 
 interface MiniCardProps {
   application: Application;
@@ -11,48 +11,48 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
-  const statusColor = getStatusColor(application.status);
-  const statusText = getStatusText(application.status);
-
-  const getImageUrl = (url?: string) => {
-    if (!url) return FALLBACK_IMAGE;
-    if (url.startsWith('http')) return url;
-    return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${url}`;
-  };
+  const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
 
   return (
     <div 
-      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-slide-up"
+      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
       onClick={onClick}
       style={{ zIndex: 1500 }}
     >
-      <div className="flex gap-4 items-start">
-        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+      <div className="flex gap-4 items-center">
+        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
           <Image
-            src={getImageUrl(application.image_map_url || application.image)}
-            alt={application.description || ''}
-            className="w-full h-full object-cover"
+            src={application.image_map_url || "/placeholder.svg"}
+            alt={application.title}
             width={80}
             height={80}
-            fallback={FALLBACK_IMAGE}
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
+          <div className="flex items-center gap-2">
             <ApplicationTitle 
               title={application.ai_title || application.description || ''} 
-              className="text-sm font-medium line-clamp-2"
+              className="line-clamp-2 text-sm font-semibold text-primary"
             />
-            <div className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${statusColor}`}>
-              {statusText}
-            </div>
+            {isClosingSoon && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                <Timer className="w-3 h-3 mr-1" />
+                Closing soon
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-1 text-sm text-gray-600">
-            <MapPin className="h-3 w-3 flex-shrink-0" />
-            <p className="truncate">{application.address}</p>
+          <div className="flex items-center gap-1 mt-1 text-gray-600">
+            <MapPin className="w-3 h-3" />
+            <p className="text-sm truncate">{application.address}</p>
           </div>
-          <div className="mt-1 text-xs text-gray-500">
-            Reference: {application.reference}
+          <div className="flex items-center justify-between mt-2">
+            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
+              {getStatusText(application.status)}
+            </span>
+            <span className="text-xs text-gray-500">
+              {application.distance}
+            </span>
           </div>
         </div>
       </div>

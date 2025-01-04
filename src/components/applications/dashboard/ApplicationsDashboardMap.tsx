@@ -38,7 +38,7 @@ export const ApplicationsDashboardMap = () => {
       isMapView={isMapView}
       setIsMapView={setIsMapView}
       postcode={postcode}
-      coordinates={coordinates as [number, number]}
+      coordinates={coordinates}
       isLoading={isLoading}
       applications={applications}
       filteredApplications={filteredApplications}
