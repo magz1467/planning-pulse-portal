@@ -5,14 +5,10 @@ import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
 import { calculateDistance } from '@/utils/distance';
 
-const PAGE_SIZE = 100;
-const RADIUS = 1000;
-
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
   const { toast } = useToast();
 
   const fetchApplicationsInRadius = async (
@@ -23,40 +19,21 @@ export const useApplicationsFetch = () => {
     console.log('Fetching applications with center:', center);
     
     try {
-      // Fetch applications using the database function
-      const { data: apps, error } = await supabase.rpc(
-        'get_applications_within_radius',
-        {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: RADIUS,
-          page_size: PAGE_SIZE,
-          page_number: currentPage
-        }
-      );
+      // Simple spatial query with limit for performance
+      const { data: apps, error } = await supabase
+        .from('applications')
+        .select('*')
+        .not('geom', 'is', null)
+        .filter('status', 'not.is', null)
+        .limit(100);
 
       if (error) {
         console.error('Data fetch error:', error);
         throw error;
       }
 
-      // Get total count
-      const { data: count, error: countError } = await supabase.rpc(
-        'get_applications_count_within_radius',
-        {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: RADIUS
-        }
-      );
-
-      if (countError) {
-        console.error('Count fetch error:', countError);
-        throw countError;
-      }
-
       if (!apps || apps.length === 0) {
-        console.log('No applications found in radius', RADIUS, 'meters from', center);
+        console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
@@ -121,7 +98,8 @@ export const useApplicationsFetch = () => {
       
       console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
-      setTotalCount(count || 0);
+      setTotalCount(transformedData.length);
+
     } catch (error: any) {
       console.error('Error in fetchApplicationsInRadius:', error);
       toast({
@@ -138,9 +116,6 @@ export const useApplicationsFetch = () => {
     applications,
     isLoading,
     totalCount,
-    currentPage,
-    setCurrentPage,
-    fetchApplicationsInRadius,
-    PAGE_SIZE
+    fetchApplicationsInRadius
   };
 };
