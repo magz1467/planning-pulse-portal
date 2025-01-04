@@ -8,6 +8,8 @@ import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { getImageUrl, FALLBACK_IMAGE } from "@/utils/imageUtils";
 import { useState } from "react";
+import { testEdgeFunction } from "@/utils/debugUtils";
+import { Button } from "./ui/button";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -24,8 +26,18 @@ export const PlanningApplicationList = ({
   const sortedApplications = useSortApplications(applications, activeSort);
   const [loadingImages, setLoadingImages] = useState<{[key: number]: boolean}>({});
 
+  const handleTestClick = async () => {
+    console.log('Testing edge function connection...');
+    await testEdgeFunction();
+  };
+
   return (
     <div className="divide-y">
+      <div className="p-4">
+        <Button onClick={handleTestClick} variant="outline" size="sm">
+          Test Edge Function
+        </Button>
+      </div>
       {sortedApplications.map((application) => {
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
