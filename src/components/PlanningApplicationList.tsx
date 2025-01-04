@@ -1,11 +1,12 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin, Timer } from "lucide-react";
-import Image from "@/components/ui/image";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
+import { cn } from "@/lib/utils";
+import { FALLBACK_IMAGE } from "@/utils/imageUtils";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -35,12 +36,17 @@ export const PlanningApplicationList = ({
           >
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                <Image
+                <img
                   src={application.image_map_url || "/placeholder.svg"}
                   alt={application.description || ''}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
+                  className={cn(
+                    "w-full h-full object-cover",
+                    "transition-opacity duration-300",
+                    "hover:opacity-90"
+                  )}
+                  onError={(e) => {
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
                 />
               </div>
               <div className="flex-1 min-w-0">
