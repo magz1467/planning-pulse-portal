@@ -6,7 +6,8 @@ import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
-import { getImageUrl } from "@/utils/imageUtils";
+import { getImageUrl, FALLBACK_IMAGE } from "@/utils/imageUtils";
+import { useState } from "react";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -21,6 +22,7 @@ export const PlanningApplicationList = ({
   activeSort
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
+  const [loadingImages, setLoadingImages] = useState<{[key: number]: boolean}>({});
 
   return (
     <div className="divide-y">
@@ -45,16 +47,23 @@ export const PlanningApplicationList = ({
           >
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                {loadingImages[application.id] && (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                  </div>
+                )}
                 <Image
                   src={imageUrl}
                   alt={application.description || ''}
                   width={80}
                   height={80}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover ${loadingImages[application.id] ? 'hidden' : ''}`}
                   onError={(e) => {
                     console.error('Image load error:', e);
                     (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
                   }}
+                  onLoadStart={() => setLoadingImages(prev => ({ ...prev, [application.id]: true }))}
+                  onLoad={() => setLoadingImages(prev => ({ ...prev, [application.id]: false }))}
                 />
               </div>
               <div className="flex-1 min-w-0">
