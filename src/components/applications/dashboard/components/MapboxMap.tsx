@@ -25,7 +25,7 @@ export const MapboxMap = ({
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
-  const prevApplicationsRef = useRef(applications);
+  const prevApplicationsRef = useRef<Application[]>([]);
   const initializedRef = useRef(false);
 
   // Initialize map only once
@@ -113,18 +113,19 @@ export const MapboxMap = ({
       }
       initializedRef.current = false;
     };
-  }, [initialCenter, applications, selectedId, onMarkerClick]);
+  }, [initialCenter, onMarkerClick]); // Remove applications and selectedId from dependencies
 
   // Update markers when applications array changes
   useEffect(() => {
     if (!markerManager.current || !map.current || !applications.length) return;
 
-    const addedApplications = applications.filter(
-      app => !prevApplicationsRef.current.find(prevApp => prevApp.id === app.id)
-    );
-    const removedApplications = prevApplicationsRef.current.filter(
-      prevApp => !applications.find(app => app.id === prevApp.id)
-    );
+    // Create a simple array of IDs for comparison
+    const prevIds = new Set(prevApplicationsRef.current.map(app => app.id));
+    const currentIds = new Set(applications.map(app => app.id));
+
+    // Determine added and removed applications
+    const addedApplications = applications.filter(app => !prevIds.has(app.id));
+    const removedApplications = prevApplicationsRef.current.filter(app => !currentIds.has(app.id));
 
     // Add new markers
     if (addedApplications.length > 0) {
@@ -154,7 +155,11 @@ export const MapboxMap = ({
       markerManager.current?.removeMarker(application.id);
     });
 
-    prevApplicationsRef.current = applications;
+    // Update reference using only necessary data
+    prevApplicationsRef.current = applications.map(app => ({
+      id: app.id,
+      coordinates: app.coordinates
+    })) as Application[];
   }, [applications, selectedId]);
 
   // Only update marker styles when selection changes
