@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -28,56 +29,45 @@ serve(async (req) => {
     }
 
     // Limit page size to prevent timeouts
-    const limitedPageSize = Math.min(page_size, 50)
+    const limitedPageSize = Math.min(page_size, 25)
     const offset = page_number * limitedPageSize
 
     try {
-      // Get applications within radius
-      const { data: applications, error: applicationsError } = await supabaseClient
-        .rpc('get_applications_within_radius', {
-          center_lat,
-          center_lng,
-          radius_meters,
-          page_size: limitedPageSize,
-          page_number: offset
-        })
+      // Get applications within radius with timeout
+      const applicationsPromise = supabaseClient.rpc('get_applications_within_radius', {
+        center_lat,
+        center_lng,
+        radius_meters,
+        page_size: limitedPageSize,
+        page_number: offset
+      })
+
+      // Set timeout for the query
+      const timeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout')), 8000)
+      )
+
+      const { data: applications, error: applicationsError } = await Promise.race([
+        applicationsPromise,
+        timeout
+      ])
 
       if (applicationsError) {
         console.error('Error fetching applications:', applicationsError)
         throw applicationsError
       }
 
-      // Get total count
-      const { data: totalCount, error: countError } = await supabaseClient
-        .rpc('get_applications_count_within_radius', {
-          center_lat,
-          center_lng,
-          radius_meters
-        })
+      // Get total count with timeout
+      const countPromise = supabaseClient.rpc('get_applications_count_within_radius', {
+        center_lat,
+        center_lng,
+        radius_meters
+      })
 
-      if (countError) {
-        console.error('Error getting count:', countError)
-        // Continue with applications but without total count
-        console.log('Count query failed, continuing without total count')
-        const count = applications?.length || 0
-        
-        return new Response(
-          JSON.stringify({
-            applications: applications || [],
-            total: count,
-            page: page_number,
-            pageSize: limitedPageSize,
-            hasMore: false // Cannot determine if there are more without total count
-          }),
-          { 
-            headers: { 
-              ...corsHeaders,
-              'Content-Type': 'application/json',
-            },
-            status: 200,
-          },
-        )
-      }
+      const { data: totalCount, error: countError } = await Promise.race([
+        countPromise,
+        timeout
+      ])
 
       console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
 
@@ -99,12 +89,24 @@ serve(async (req) => {
       )
 
     } catch (error) {
-      console.error('Error:', error.message)
-      throw error
+      console.error('Database query error:', error.message)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Database query timeout or error',
+          details: error.message
+        }),
+        { 
+          headers: { 
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          },
+          status: 503,
+        },
+      )
     }
 
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('General error:', error.message)
     return new Response(
       JSON.stringify({ 
         error: error.message,
