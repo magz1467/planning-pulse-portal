@@ -28,12 +28,10 @@ export const MapboxContainer = ({
 
   const handleMapLoaded = (map: mapboxgl.Map, markerManager: MapboxMarkerManager) => {
     console.log('Map loaded, adding markers...');
-    // Add markers
     applications.forEach(application => {
       markerManager.addMarker(application, application.id === selectedId);
     });
 
-    // Only fit bounds on initial load if we have applications
     if (!initialBoundsFitRef.current && applications.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       let hasValidCoordinates = false;
@@ -66,7 +64,6 @@ export const MapboxContainer = ({
     onMapLoaded: handleMapLoaded
   });
 
-  // Update markers when applications array changes
   useEffect(() => {
     if (!markerManager || !map) return;
 
@@ -77,12 +74,10 @@ export const MapboxContainer = ({
       prevApp => !applications.find(app => app.id === prevApp.id)
     );
 
-    // Add new markers
     addedApplications.forEach(application => {
       markerManager.addMarker(application, application.id === selectedId);
     });
 
-    // Remove old markers
     removedApplications.forEach(application => {
       markerManager.removeMarker(application.id);
     });
@@ -90,7 +85,6 @@ export const MapboxContainer = ({
     prevApplicationsRef.current = applications;
   }, [applications, selectedId, map, markerManager]);
 
-  // Only update marker styles when selection changes
   useEffect(() => {
     if (markerManager) {
       const markers = markerManager.getMarkers();

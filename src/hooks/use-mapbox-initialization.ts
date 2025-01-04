@@ -74,7 +74,6 @@ export const useMapboxInitialization = ({
           antialias: true
         });
 
-        // Add navigation control
         newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
         newMap.on('load', () => {
@@ -86,7 +85,6 @@ export const useMapboxInitialization = ({
           setIsLoading(false);
         });
 
-        // Add error handler
         newMap.on('error', (e) => {
           console.error('Mapbox error:', e);
           onError('Failed to load map resources', JSON.stringify(e.error, null, 2));
