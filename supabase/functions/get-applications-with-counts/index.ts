@@ -55,6 +55,11 @@ serve(async (req) => {
       }
     )
 
+    if (countError) {
+      console.error('Error getting count:', countError)
+      throw countError
+    }
+
     console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
 
     return new Response(
@@ -75,7 +80,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', error)
     return new Response(
       JSON.stringify({ 
         error: error.message,
