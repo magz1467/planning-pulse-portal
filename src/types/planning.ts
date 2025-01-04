@@ -20,10 +20,6 @@ export interface Application {
   ai_title?: string;
   last_date_consultation_comments?: string;
   valid_date?: string;
-  application_details?: {
-    images?: string[];
-    [key: string]: any;
-  };
 }
 
 export interface Comment {

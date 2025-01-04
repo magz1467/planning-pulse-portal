@@ -85,8 +85,12 @@ export const useApplicationsFetch = () => {
         const formattedDistance = `${distanceInMiles.toFixed(1)} mi`;
 
         let imageUrl = '/placeholder.svg';
-        if (app.image_map_url) {
-          imageUrl = app.image_map_url;
+        if (app.application_details && typeof app.application_details === 'object') {
+          const details = app.application_details as any;
+          if (details.images && Array.isArray(details.images) && details.images.length > 0) {
+            const imgUrl = details.images[0];
+            imageUrl = imgUrl.startsWith('http') ? imgUrl : `${process.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${imgUrl}`;
+          }
         }
 
         return {
@@ -108,8 +112,7 @@ export const useApplicationsFetch = () => {
           consultationEnd: app.last_date_consultation_comments || '',
           image: imageUrl,
           coordinates,
-          ai_title: app.ai_title,
-          postcode: app.postcode || ''
+          ai_title: app.ai_title
         };
       }).filter((app): app is Application & { coordinates: [number, number] } => 
         app !== null && app.coordinates !== null
