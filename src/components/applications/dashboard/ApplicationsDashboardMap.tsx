@@ -1,11 +1,7 @@
-import { useIsMobile } from "@/hooks/use-mobile";
-import { DashboardHeader } from "./components/DashboardHeader";
-import { SearchSection } from "./components/SearchSection";
-import { LoadingOverlay } from "./components/LoadingOverlay";
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useEffect } from "react";
-import { MapContent } from "./components/MapContent";
-import { SidebarContent } from "./components/SidebarContent";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { DashboardLayout } from "./components/DashboardLayout";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -34,65 +30,23 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
-  const handleClose = () => {
-    console.log("Closing application details");  // Debug log
-    handleMarkerClick(null);
-  };
-
   return (
-    <div className="h-screen w-full flex flex-col relative">
-      <DashboardHeader />
-
-      <SearchSection 
-        onPostcodeSelect={handlePostcodeSelect}
-        onFilterChange={coordinates ? handleFilterChange : undefined}
-        onSortChange={handleSortChange}
-        activeFilters={activeFilters}
-        activeSort={activeSort}
-        isMapView={isMapView}
-        onToggleView={isMobile ? () => {
-          setIsMapView(!isMapView);
-          // Clear selection when switching to list view
-          if (isMapView) {
-            handleMarkerClick(null);
-          }
-        } : undefined}
-        applications={applications}
-        statusCounts={statusCounts}
-      />
-
-      <div className="flex-1 relative w-full">
-        <div className="absolute inset-0 flex" style={{ zIndex: 10 }}>
-          <SidebarContent
-            isMobile={isMobile}
-            isMapView={isMapView}
-            applications={filteredApplications}
-            selectedId={selectedId}
-            postcode={postcode}
-            coordinates={coordinates as [number, number]}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            statusCounts={statusCounts}
-            onFilterChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            onSelectApplication={handleMarkerClick}
-            onClose={handleClose}
-          />
-
-          {(!isMobile || isMapView) && (
-            <MapContent
-              applications={filteredApplications}
-              selectedId={selectedId}
-              coordinates={coordinates as [number, number]}
-              isMobile={isMobile}
-              isMapView={isMapView}
-              onMarkerClick={handleMarkerClick}
-            />
-          )}
-        </div>
-      </div>
-
-      {isLoading && <LoadingOverlay />}
-    </div>
+    <DashboardLayout
+      selectedId={selectedId}
+      activeFilters={activeFilters}
+      activeSort={activeSort}
+      isMapView={isMapView}
+      setIsMapView={setIsMapView}
+      postcode={postcode}
+      coordinates={coordinates}
+      isLoading={isLoading}
+      applications={applications}
+      filteredApplications={filteredApplications}
+      statusCounts={statusCounts}
+      handleMarkerClick={handleMarkerClick}
+      handleFilterChange={handleFilterChange}
+      handlePostcodeSelect={handlePostcodeSelect}
+      handleSortChange={handleSortChange}
+    />
   );
 };
