@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { MapPin } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import Image from "@/components/ui/image";
 
 interface MiniCardProps {
   application: Application;
@@ -14,19 +15,18 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
 
   return (
     <div 
-      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
+      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-slide-up"
       onClick={onClick}
       style={{ zIndex: 1500 }}
     >
       <div className="flex gap-4 items-start">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-          <img
+          <Image
             src={application.image_map_url || application.image || "/placeholder.svg"}
             alt={application.description || ''}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = "/placeholder.svg";
-            }}
+            width={80}
+            height={80}
           />
         </div>
         <div className="flex-1 min-w-0">

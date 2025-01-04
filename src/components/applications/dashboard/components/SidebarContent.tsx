@@ -1,13 +1,12 @@
 import { Application } from "@/types/planning";
-import { DesktopSidebar } from "@/components/map/DesktopSidebar";
-import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
+import { ApplicationListView } from "./ApplicationListView";
+import { ApplicationDetails } from "./ApplicationDetails";
 
 interface SidebarContentProps {
   isMobile: boolean;
   isMapView: boolean;
   applications: Application[];
   selectedId: number | null;
-  postcode: string;
   coordinates: [number, number];
   activeFilters: {
     status?: string;
@@ -31,7 +30,6 @@ export const SidebarContent = ({
   isMapView,
   applications,
   selectedId,
-  postcode,
   coordinates,
   activeFilters,
   activeSort,
@@ -41,38 +39,33 @@ export const SidebarContent = ({
   onSelectApplication,
   onClose,
 }: SidebarContentProps) => {
-  if (!coordinates) return null;
+  if (!isMobile && !isMapView) return null;
 
-  if (!isMobile) {
-    return (
-      <DesktopSidebar
+  if (selectedId) {
+    const selectedApplication = applications.find(app => app.id === selectedId);
+    if (selectedApplication) {
+      return (
+        <div className="w-full md:w-[400px] bg-white h-full overflow-y-auto">
+          <ApplicationDetails
+            application={selectedApplication}
+            onClose={onClose}
+          />
+        </div>
+      );
+    }
+  }
+
+  return (
+    <div className="w-full md:w-[400px] bg-white h-full overflow-y-auto">
+      <ApplicationListView
         applications={applications}
-        selectedApplication={selectedId}
-        postcode={postcode}
+        onSelectApplication={onSelectApplication}
         activeFilters={activeFilters}
         activeSort={activeSort}
+        statusCounts={statusCounts}
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}
-        onSelectApplication={onSelectApplication}
-        onClose={onClose}
-        statusCounts={statusCounts}
       />
-    );
-  }
-
-  if (!isMapView) {
-    return (
-      <MobileListContainer
-        applications={applications}
-        selectedApplication={selectedId}
-        postcode={postcode}
-        onSelectApplication={onSelectApplication}
-        onShowEmailDialog={() => {}}
-        hideFilterBar={true}
-        onClose={onClose}
-      />
-    );
-  }
-
-  return null;
+    </div>
+  );
 };
