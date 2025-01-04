@@ -4,8 +4,21 @@ export const getImageUrl = (path: string | undefined): string => {
   if (!path || path.trim() === '' || path === 'undefined' || path === 'null') {
     return FALLBACK_IMAGE;
   }
-  if (!path.startsWith('/') && !path.startsWith('http')) {
-    return FALLBACK_IMAGE;
+
+  // Handle already complete URLs (like static map images)
+  if (path.startsWith('http')) {
+    return path;
   }
-  return path;
+
+  // Handle storage bucket paths
+  if (path.startsWith('images/')) {
+    return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${path}`;
+  }
+
+  // Handle absolute paths
+  if (path.startsWith('/')) {
+    return path;
+  }
+
+  return FALLBACK_IMAGE;
 };

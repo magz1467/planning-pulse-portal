@@ -6,6 +6,7 @@ import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
+import { getImageUrl } from "@/utils/imageUtils";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -27,6 +28,9 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
+        // Use image_map_url if available, otherwise try to get image from storage
+        const imageUrl = getImageUrl(application.image_map_url || application.image);
+
         return (
           <div
             key={application.id}
@@ -36,7 +40,7 @@ export const PlanningApplicationList = ({
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <Image
-                  src={application.image_map_url || "/placeholder.svg"}
+                  src={imageUrl}
                   alt={application.description || ''}
                   width={80}
                   height={80}
