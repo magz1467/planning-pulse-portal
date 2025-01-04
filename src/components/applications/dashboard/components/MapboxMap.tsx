@@ -27,7 +27,6 @@ export const MapboxMap = ({
   const [debugInfo, setDebugInfo] = useState<string>('');
   const prevApplicationsRef = useRef(applications);
   const initializedRef = useRef(false);
-  const initialBoundsFitRef = useRef(false);
 
   // Initialize map only once
   useEffect(() => {
@@ -60,30 +59,21 @@ export const MapboxMap = ({
           newMap.on('load', () => {
             console.log('Map loaded successfully');
             
-            // Add markers
-            applications.forEach(application => {
-              markerManager.current?.addMarker(application, application.id === selectedId);
-            });
-
-            // Fit bounds to include all markers
-            if (!initialBoundsFitRef.current && applications.length > 0) {
+            // Add markers and fit bounds
+            if (applications.length > 0) {
               const bounds = new mapboxgl.LngLatBounds();
-              let hasValidCoordinates = false;
-
               applications.forEach(application => {
                 if (application.coordinates) {
+                  markerManager.current?.addMarker(application, application.id === selectedId);
                   bounds.extend([application.coordinates[1], application.coordinates[0]]);
-                  hasValidCoordinates = true;
                 }
               });
 
-              if (hasValidCoordinates) {
-                newMap.fitBounds(bounds, {
-                  padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                  maxZoom: 15
-                });
-                initialBoundsFitRef.current = true;
-              }
+              // Fit bounds with padding
+              newMap.fitBounds(bounds, {
+                padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                maxZoom: 15
+              });
             }
 
             initializedRef.current = true;
@@ -116,13 +106,12 @@ export const MapboxMap = ({
         map.current = null;
       }
       initializedRef.current = false;
-      initialBoundsFitRef.current = false;
     };
-  }, [initialCenter]); // Only depend on initialCenter
+  }, [initialCenter, applications]); // Added applications to dependencies
 
   // Update markers when applications array changes
   useEffect(() => {
-    if (!markerManager.current || !map.current) return;
+    if (!markerManager.current || !map.current || !applications.length) return;
 
     const addedApplications = applications.filter(
       app => !prevApplicationsRef.current.find(prevApp => prevApp.id === app.id)
@@ -132,9 +121,21 @@ export const MapboxMap = ({
     );
 
     // Add new markers
-    addedApplications.forEach(application => {
-      markerManager.current?.addMarker(application, application.id === selectedId);
-    });
+    if (addedApplications.length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      addedApplications.forEach(application => {
+        if (application.coordinates) {
+          markerManager.current?.addMarker(application, application.id === selectedId);
+          bounds.extend([application.coordinates[1], application.coordinates[0]]);
+        }
+      });
+
+      // Fit bounds to include new markers
+      map.current.fitBounds(bounds, {
+        padding: { top: 50, bottom: 50, left: 50, right: 50 },
+        maxZoom: 15
+      });
+    }
 
     // Remove old markers
     removedApplications.forEach(application => {
