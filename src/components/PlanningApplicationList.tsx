@@ -30,6 +30,12 @@ export const PlanningApplicationList = ({
 
         // Use image_map_url if available, otherwise try to get image from storage
         const imageUrl = getImageUrl(application.image_map_url || application.image);
+        console.log('Application image data:', {
+          id: application.id,
+          image_map_url: application.image_map_url,
+          image: application.image,
+          resolved_url: imageUrl
+        });
 
         return (
           <div
@@ -45,6 +51,10 @@ export const PlanningApplicationList = ({
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Image load error:', e);
+                    (e.target as HTMLImageElement).src = FALLBACK_IMAGE;
+                  }}
                 />
               </div>
               <div className="flex-1 min-w-0">
