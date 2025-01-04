@@ -18,13 +18,15 @@ serve(async (req) => {
   try {
     const { center_lng, center_lat, radius_meters, page_size = 100, page_number = 0 } = await req.json()
 
+    console.log('Request parameters:', { center_lng, center_lat, radius_meters, page_size, page_number })
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // First get total count
-    const { count: total } = await supabase.rpc(
+    const { data: countResult, error: countError } = await supabase.rpc(
       'get_applications_count_within_radius',
       { 
         center_lng,
@@ -33,7 +35,16 @@ serve(async (req) => {
       }
     ).single()
 
+    if (countError) {
+      console.error('Error getting count:', countError)
+      throw countError
+    }
+
+    const total = countResult?.count || 0
+    console.log('Total applications found:', total)
+
     if (!total) {
+      console.log('No applications found, returning empty result')
       return new Response(
         JSON.stringify({ 
           applications: [],
@@ -70,6 +81,8 @@ serve(async (req) => {
       console.error('Error fetching applications:', error)
       throw error
     }
+
+    console.log('Applications fetched:', applications?.length)
 
     // Process applications to include proper image URLs
     const processedApplications = applications.map(app => {
@@ -117,6 +130,8 @@ serve(async (req) => {
       'Declined': 0,
       'Other': 0
     })
+
+    console.log('Status counts:', statusCounts)
 
     return new Response(
       JSON.stringify({
