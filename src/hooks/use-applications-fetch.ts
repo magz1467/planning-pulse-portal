@@ -23,37 +23,24 @@ export const useApplicationsFetch = () => {
     console.log('Fetching applications with center:', center);
     
     try {
-      // Fetch applications using the database function
-      const { data: apps, error } = await supabase.rpc(
-        'get_applications_within_radius',
-        {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: RADIUS,
-          page_size: PAGE_SIZE,
-          page_number: currentPage
-        }
-      );
+      // First get the count
+      const { count, error: countError } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .not('geom', 'is', null)
+        .filter('geom', 'not.is', null);
 
-      if (error) {
-        console.error('Data fetch error:', error);
-        throw error;
-      }
+      if (countError) throw countError;
+      
+      // Then fetch the actual data
+      const { data: apps, error } = await supabase
+        .from('applications')
+        .select('*')
+        .not('geom', 'is', null)
+        .limit(PAGE_SIZE)
+        .range(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE - 1);
 
-      // Get total count
-      const { data: count, error: countError } = await supabase.rpc(
-        'get_applications_count_within_radius',
-        {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: RADIUS
-        }
-      );
-
-      if (countError) {
-        console.error('Count fetch error:', countError);
-        throw countError;
-      }
+      if (error) throw error;
 
       if (!apps || apps.length === 0) {
         console.log('No applications found in radius', RADIUS, 'meters from', center);
