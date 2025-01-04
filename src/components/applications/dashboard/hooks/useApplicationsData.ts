@@ -10,10 +10,7 @@ export const useApplicationsData = () => {
     applications, 
     isLoading, 
     totalCount,
-    currentPage,
-    setCurrentPage,
     fetchApplicationsInRadius,
-    PAGE_SIZE
   } = useApplicationsFetch();
   const { searchPoint, setSearchPoint } = useSearchPoint();
 
@@ -21,12 +18,9 @@ export const useApplicationsData = () => {
     applications,
     isLoading,
     totalCount,
-    currentPage,
-    setCurrentPage,
     fetchApplicationsInRadius,
     searchPoint,
     setSearchPoint,
     statusCounts,
-    PAGE_SIZE
   };
 };
