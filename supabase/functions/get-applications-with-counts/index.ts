@@ -27,41 +27,68 @@ serve(async (req) => {
       )
     }
 
-    const offset = page_number * page_size
+    // Limit page size to prevent timeouts
+    const limitedPageSize = Math.min(page_size, 50)
+    const offset = page_number * limitedPageSize
 
+    // Add timeout and limit to query
     const { data: applications, error: applicationsError } = await supabaseClient
       .rpc('get_applications_within_radius', {
         center_lat,
         center_lng,
         radius_meters,
-        page_size,
+        page_size: limitedPageSize,
         page_number: offset
+      }, {
+        count: 'exact'
       })
+      .timeout(15000) // 15 second timeout
 
     if (applicationsError) {
       console.error('Error fetching applications:', applicationsError)
+      if (applicationsError.message?.includes('timeout')) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Query timeout - try reducing radius or page size',
+            details: applicationsError.message 
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 408 // Request Timeout
+          }
+        )
+      }
       throw applicationsError
     }
 
+    // Separate count query with timeout
     const { data: totalCount, error: countError } = await supabaseClient
       .rpc('get_applications_count_within_radius', {
         center_lat,
         center_lng,
         radius_meters
       })
+      .timeout(5000) // 5 second timeout for count query
 
     if (countError) {
       console.error('Error getting count:', countError)
-      throw countError
+      if (countError.message?.includes('timeout')) {
+        // Continue with applications but without total count
+        console.log('Count query timed out, continuing without total count')
+        totalCount = applications?.length || 0
+      } else {
+        throw countError
+      }
     }
 
-    console.log(`Found ${applications?.length} applications`)
+    console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
 
     const response = {
       applications: applications || [],
       total: totalCount || 0,
       page: page_number,
-      pageSize: page_size
+      pageSize: limitedPageSize,
+      hasMore: (page_number + 1) * limitedPageSize < (totalCount || 0)
     }
 
     return new Response(
@@ -78,7 +105,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error.message)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: 'An unexpected error occurred while processing your request'
+      }),
       { 
         headers: { 
           ...corsHeaders,
