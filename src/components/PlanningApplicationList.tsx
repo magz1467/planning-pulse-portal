@@ -47,6 +47,7 @@ export const PlanningApplicationList = ({
                   onError={(e) => {
                     e.currentTarget.src = "/placeholder.svg";
                   }}
+                  loading="lazy"
                 />
               </div>
               <div className="flex-1 min-w-0">
