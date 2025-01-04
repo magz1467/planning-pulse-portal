@@ -56,8 +56,6 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          newMap.addControl(new mapboxgl.NavigationControl(), 'top-right');
-          
           newMap.on('load', () => {
             console.log('Map loaded successfully');
             
