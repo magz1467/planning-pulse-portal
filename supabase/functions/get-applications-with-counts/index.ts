@@ -18,7 +18,13 @@ serve(async (req) => {
     console.log('Received request with params:', { center_lat, center_lng, radius_meters, page_size, page_number })
 
     if (!center_lat || !center_lng || !radius_meters) {
-      throw new Error('Missing required parameters')
+      return new Response(
+        JSON.stringify({ error: 'Missing required parameters' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      )
     }
 
     const offset = page_number * page_size
@@ -33,6 +39,7 @@ serve(async (req) => {
       })
 
     if (applicationsError) {
+      console.error('Error fetching applications:', applicationsError)
       throw applicationsError
     }
 
@@ -44,14 +51,15 @@ serve(async (req) => {
       })
 
     if (countError) {
+      console.error('Error getting count:', countError)
       throw countError
     }
 
-    console.log(`Found ${applications.length} applications`)
+    console.log(`Found ${applications?.length} applications`)
 
     const response = {
-      applications,
-      total: totalCount,
+      applications: applications || [],
+      total: totalCount || 0,
       page: page_number,
       pageSize: page_size
     }
@@ -76,7 +84,7 @@ serve(async (req) => {
           ...corsHeaders,
           'Content-Type': 'application/json'
         },
-        status: 400,
+        status: 500,
       },
     )
   }
