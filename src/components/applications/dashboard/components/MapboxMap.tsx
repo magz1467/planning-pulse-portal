@@ -65,7 +65,7 @@ export const MapboxMap = ({
               markerManager.current?.addMarker(application, application.id === selectedId);
             });
 
-            // Only fit bounds on initial load if we have applications
+            // Fit bounds to include all markers
             if (!initialBoundsFitRef.current && applications.length > 0) {
               const bounds = new mapboxgl.LngLatBounds();
               let hasValidCoordinates = false;
