@@ -93,7 +93,7 @@ export const useApplicationsFetch = () => {
           }
         }
 
-        return {
+        const application: Application = {
           id: app.application_id,
           title: app.description || '',
           address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
@@ -112,11 +112,12 @@ export const useApplicationsFetch = () => {
           consultationEnd: app.last_date_consultation_comments || '',
           image: imageUrl,
           coordinates,
-          ai_title: app.ai_title
+          ai_title: app.ai_title,
+          postcode: app.postcode || ''
         };
-      }).filter((app): app is Application & { coordinates: [number, number] } => 
-        app !== null && app.coordinates !== null
-      );
+
+        return application;
+      }).filter((app): app is Application => app !== null);
       
       console.log('Transformed applications:', transformedData);
       setApplications(transformedData || []);
