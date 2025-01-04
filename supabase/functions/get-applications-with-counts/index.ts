@@ -32,39 +32,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // First get the total count using a simpler query
-    const { data: totalCount, error: countError } = await supabaseClient.rpc(
-      'get_applications_count_within_radius',
-      {
-        center_lng,
-        center_lat,
-        radius_meters
-      }
-    )
-
-    if (countError) {
-      console.error('Error fetching count:', countError)
-      throw countError
-    }
-
-    // If no results, return early
-    if (totalCount === 0) {
-      return new Response(
-        JSON.stringify({
-          applications: [],
-          statusCounts: {
-            'Under Review': 0,
-            'Approved': 0,
-            'Declined': 0,
-            'Other': 0
-          },
-          total: 0
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Get paginated applications with optimized query
+    // Get applications
     const { data: applications, error: applicationsError } = await supabaseClient.rpc(
       'get_applications_within_radius',
       {
@@ -81,7 +49,24 @@ Deno.serve(async (req) => {
       throw applicationsError
     }
 
-    // Calculate status counts from the current page results
+    if (!applications || applications.length === 0) {
+      console.log('No applications found in radius', radius_meters, 'meters from', [center_lat, center_lng])
+      return new Response(
+        JSON.stringify({
+          applications: [],
+          statusCounts: {
+            'Under Review': 0,
+            'Approved': 0,
+            'Declined': 0,
+            'Other': 0
+          },
+          total: 0
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Calculate status counts
     const statusCounts = applications.reduce((acc: Record<string, number>, app: any) => {
       const status = app.status?.trim().toLowerCase() || ''
       
@@ -106,6 +91,21 @@ Deno.serve(async (req) => {
       'Declined': 0,
       'Other': 0
     })
+
+    // Get total count
+    const { data: totalCount, error: countError } = await supabaseClient.rpc(
+      'get_applications_count_within_radius',
+      {
+        center_lng,
+        center_lat,
+        radius_meters
+      }
+    )
+
+    if (countError) {
+      console.error('Error fetching count:', countError)
+      throw countError
+    }
 
     const response: ApplicationsResponse = {
       applications,
