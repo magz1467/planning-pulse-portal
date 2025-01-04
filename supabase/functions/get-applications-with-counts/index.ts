@@ -31,76 +31,84 @@ serve(async (req) => {
     const limitedPageSize = Math.min(page_size, 50)
     const offset = page_number * limitedPageSize
 
-    // Add timeout and limit to query
-    const { data: applications, error: applicationsError } = await supabaseClient
-      .rpc('get_applications_within_radius', {
-        center_lat,
-        center_lng,
-        radius_meters,
-        page_size: limitedPageSize,
-        page_number: offset
-      }, {
-        count: 'exact'
-      })
-      .timeout(15000) // 15 second timeout
+    // Use abortSignal for timeout
+    const abortController = new AbortController()
+    const timeout = setTimeout(() => abortController.abort(), 15000) // 15 second timeout
 
-    if (applicationsError) {
-      console.error('Error fetching applications:', applicationsError)
-      if (applicationsError.message?.includes('timeout')) {
+    try {
+      const { data: applications, error: applicationsError } = await supabaseClient
+        .rpc('get_applications_within_radius', {
+          center_lat,
+          center_lng,
+          radius_meters,
+          page_size: limitedPageSize,
+          page_number: offset
+        }, {
+          count: 'exact'
+        })
+
+      if (applicationsError) {
+        console.error('Error fetching applications:', applicationsError)
+        throw applicationsError
+      }
+
+      // Separate count query
+      const { data: totalCount, error: countError } = await supabaseClient
+        .rpc('get_applications_count_within_radius', {
+          center_lat,
+          center_lng,
+          radius_meters
+        })
+
+      if (countError) {
+        console.error('Error getting count:', countError)
+        // Continue with applications but without total count
+        console.log('Count query failed, continuing without total count')
+        const count = applications?.length || 0
+        
+        const response = {
+          applications: applications || [],
+          total: count,
+          page: page_number,
+          pageSize: limitedPageSize,
+          hasMore: false // Cannot determine if there are more without total count
+        }
+
         return new Response(
-          JSON.stringify({ 
-            error: 'Query timeout - try reducing radius or page size',
-            details: applicationsError.message 
-          }),
+          JSON.stringify(response),
           { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 408 // Request Timeout
-          }
+            headers: { 
+              ...corsHeaders,
+              'Content-Type': 'application/json',
+            },
+            status: 200,
+          },
         )
       }
-      throw applicationsError
-    }
 
-    // Separate count query with timeout
-    const { data: totalCount, error: countError } = await supabaseClient
-      .rpc('get_applications_count_within_radius', {
-        center_lat,
-        center_lng,
-        radius_meters
-      })
-      .timeout(5000) // 5 second timeout for count query
+      console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
 
-    if (countError) {
-      console.error('Error getting count:', countError)
-      if (countError.message?.includes('timeout')) {
-        // Continue with applications but without total count
-        console.log('Count query timed out, continuing without total count')
-        totalCount = applications?.length || 0
-      } else {
-        throw countError
+      const response = {
+        applications: applications || [],
+        total: totalCount || 0,
+        page: page_number,
+        pageSize: limitedPageSize,
+        hasMore: (page_number + 1) * limitedPageSize < (totalCount || 0)
       }
-    }
 
-    console.log(`Found ${applications?.length} applications out of ${totalCount} total`)
-
-    const response = {
-      applications: applications || [],
-      total: totalCount || 0,
-      page: page_number,
-      pageSize: limitedPageSize,
-      hasMore: (page_number + 1) * limitedPageSize < (totalCount || 0)
-    }
-
-    return new Response(
-      JSON.stringify(response),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify(response),
+        { 
+          headers: { 
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+          },
+          status: 200,
         },
-        status: 200,
-      },
-    )
+      )
+    } finally {
+      clearTimeout(timeout)
+    }
 
   } catch (error) {
     console.error('Error:', error.message)
