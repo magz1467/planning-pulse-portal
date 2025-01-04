@@ -10,11 +10,13 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
   const imageUrl = application.image_map_url || application.image || "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60";
   
   return (
-    <div className="w-full aspect-video relative overflow-hidden rounded-lg">
+    <div className="w-full aspect-video relative overflow-hidden rounded-lg bg-gray-100">
       <Image
         src={imageUrl}
         alt={application.description || 'Planning application image'}
         className="object-cover w-full h-full"
+        loading="eager"
+        priority={true}
       />
     </div>
   );
