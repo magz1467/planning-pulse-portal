@@ -56,27 +56,17 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          newMap.on('load', () => {
-            console.log('Map loaded successfully');
-            
-            // Set initial view without trying to fit bounds
-            newMap.setCenter([initialCenter[1], initialCenter[0]]);
-            newMap.setZoom(12);
-
-            // Add markers without moving the map
-            applications.forEach(application => {
-              if (application.coordinates) {
-                markerManager.current?.addMarker(application, application.id === selectedId);
-              }
-            });
-
-            initializedRef.current = true;
+          // Set initial view and add markers immediately
+          newMap.setCenter([initialCenter[1], initialCenter[0]]);
+          newMap.setZoom(12);
+          
+          applications.forEach(application => {
+            if (application.coordinates) {
+              markerManager.current?.addMarker(application, application.id === selectedId);
+            }
           });
 
-          newMap.on('error', (e) => {
-            console.error('Mapbox error:', e);
-            setError('Failed to load map resources');
-          });
+          initializedRef.current = true;
         }
       } catch (err) {
         console.error('Map initialization failed:', err);
