@@ -119,34 +119,37 @@ export const MapboxMap = ({
       }
     });
 
-    // Fit bounds after adding markers
-    const bounds = new mapboxgl.LngLatBounds();
-    let hasValidCoordinates = false;
+    // Only fit bounds on initial load or when applications change significantly
+    // Not when a marker is clicked
+    if (!selectedId) {
+      const bounds = new mapboxgl.LngLatBounds();
+      let hasValidCoordinates = false;
 
-    applications.forEach(app => {
-      if (app.coordinates) {
-        const [lat, lng] = app.coordinates;
-        // Only include coordinates within London area
-        const isValidLondonCoordinate = (
-          lat >= 51.2 &&
-          lat <= 51.8 &&
-          lng >= -0.5 &&
-          lng <= 0.3
-        );
+      applications.forEach(app => {
+        if (app.coordinates) {
+          const [lat, lng] = app.coordinates;
+          // Only include coordinates within London area
+          const isValidLondonCoordinate = (
+            lat >= 51.2 &&
+            lat <= 51.8 &&
+            lng >= -0.5 &&
+            lng <= 0.3
+          );
 
-        if (isValidLondonCoordinate) {
-          bounds.extend([lng, lat]);
-          hasValidCoordinates = true;
+          if (isValidLondonCoordinate) {
+            bounds.extend([lng, lat]);
+            hasValidCoordinates = true;
+          }
         }
-      }
-    });
-
-    if (hasValidCoordinates && map.current) {
-      map.current.fitBounds(bounds, {
-        padding: { top: 100, bottom: 100, left: 100, right: 100 },
-        maxZoom: 15,
-        duration: 1000
       });
+
+      if (hasValidCoordinates && map.current) {
+        map.current.fitBounds(bounds, {
+          padding: { top: 100, bottom: 100, left: 100, right: 100 },
+          maxZoom: 15,
+          duration: 1000
+        });
+      }
     }
   }, [applications, selectedId, isMapReady]);
 
