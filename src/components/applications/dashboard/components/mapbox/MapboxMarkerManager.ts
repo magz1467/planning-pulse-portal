@@ -12,6 +12,7 @@ export class MapboxMarkerManager {
   private onMarkerClick: (id: number) => void;
 
   constructor(map: mapboxgl.Map, onMarkerClick: (id: number) => void) {
+    console.log('Initializing MapboxMarkerManager');
     this.map = map;
     this.onMarkerClick = onMarkerClick;
   }
@@ -21,6 +22,7 @@ export class MapboxMarkerManager {
   }
 
   public removeAllMarkers() {
+    console.log('Removing all markers');
     Object.values(this.markers).forEach(({ marker }) => {
       marker.remove();
     });
@@ -29,15 +31,17 @@ export class MapboxMarkerManager {
 
   public addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
-      console.warn('Attempted to add marker for application without coordinates');
+      console.warn('Attempted to add marker for application without coordinates:', application.id);
       return;
     }
 
     try {
       const [lat, lng] = application.coordinates;
+      console.log(`Adding marker for application ${application.id} at [${lat}, ${lng}]`);
       
       // Remove existing marker if it exists
       if (this.markers[application.id]) {
+        console.log(`Removing existing marker for application ${application.id}`);
         this.markers[application.id].marker.remove();
       }
 
@@ -56,6 +60,7 @@ export class MapboxMarkerManager {
 
       // Add click handler
       el.addEventListener('click', () => {
+        console.log(`Marker clicked for application ${application.id}`);
         this.onMarkerClick(application.id);
       });
 
@@ -66,7 +71,10 @@ export class MapboxMarkerManager {
 
   public updateMarkerStyle(applicationId: number, isSelected: boolean) {
     const markerInfo = this.markers[applicationId];
-    if (!markerInfo) return;
+    if (!markerInfo) {
+      console.warn(`Attempted to update style for non-existent marker: ${applicationId}`);
+      return;
+    }
 
     const el = markerInfo.marker.getElement();
     this.updateMarkerElement(el, isSelected);

@@ -34,6 +34,8 @@ export const MapboxMap = ({
   useEffect(() => {
     if (initializedRef.current || !mapContainer.current) return;
 
+    console.log('Initializing map with center:', initialCenter);
+
     const initializeMap = async () => {
       try {
         const newMap = await MapboxInitializer.initialize(
@@ -52,6 +54,7 @@ export const MapboxMap = ({
           
           // Set initial view
           const [lat, lng] = initialCenter;
+          console.log(`Setting initial center to [${lat}, ${lng}]`);
           newMap.setCenter([lng, lat]);
           newMap.setZoom(MAP_DEFAULTS.initialZoom);
 
@@ -86,7 +89,12 @@ export const MapboxMap = ({
   // Handle applications updates
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) {
-      console.log('Skipping marker update - conditions not met');
+      console.log('Skipping marker update - conditions not met:', {
+        isMapReady,
+        hasMarkerManager: !!markerManager.current,
+        hasMap: !!map.current,
+        applicationsLength: applications.length
+      });
       return;
     }
 
@@ -130,6 +138,7 @@ export const MapboxMap = ({
       });
       
       hasSetInitialBounds.current = true;
+      console.log('Initial bounds set');
     }
   }, [applications, isMapReady, selectedId]);
 
@@ -137,6 +146,7 @@ export const MapboxMap = ({
   useEffect(() => {
     if (!isMapReady || !markerManager.current) return;
     
+    console.log('Updating marker styles for selected ID:', selectedId);
     const markers = markerManager.current.getMarkers();
     Object.keys(markers).forEach(id => {
       markerManager.current?.updateMarkerStyle(Number(id), Number(id) === selectedId);

@@ -17,11 +17,12 @@ export const useApplicationsFetch = () => {
     filters?: { status?: string; type?: string }
   ) => {
     setIsLoading(true);
-    console.log('Fetching applications with center:', center);
+    console.log('Starting fetchApplicationsInRadius with center:', center);
     
     try {
       // Convert kilometers to meters for the database query
       const radiusInMeters = MAP_DEFAULTS.searchRadius * 1000;
+      console.log('Querying with radius (meters):', radiusInMeters);
       
       const { data: apps, error } = await supabase.rpc(
         'get_applications_within_radius',
@@ -47,6 +48,7 @@ export const useApplicationsFetch = () => {
       }
 
       console.log('Raw applications data:', apps);
+      console.log('Number of applications returned:', apps.length);
 
       const transformedData = apps?.map((app: any) => {
         const geomObj = app.geom;
@@ -57,10 +59,11 @@ export const useApplicationsFetch = () => {
             geomObj.coordinates[1] as number,
             geomObj.coordinates[0] as number
           ];
+          console.log(`Application ${app.application_id} coordinates:`, coordinates);
         }
 
         if (!coordinates) {
-          console.log('Missing coordinates for application:', app.application_id);
+          console.warn('Missing coordinates for application:', app.application_id);
           return null;
         }
 
@@ -104,6 +107,8 @@ export const useApplicationsFetch = () => {
       }).filter((app): app is Application => app !== null);
       
       console.log('Transformed applications:', transformedData);
+      console.log('Number of valid applications after transform:', transformedData.length);
+      
       setApplications(transformedData || []);
       setTotalCount(transformedData.length);
 
