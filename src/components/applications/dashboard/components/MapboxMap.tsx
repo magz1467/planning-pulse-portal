@@ -28,7 +28,7 @@ export const MapboxMap = ({
   const [debugInfo, setDebugInfo] = useState<string>('');
   const initializedRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
-  const prevApplicationsRef = useRef<Application[]>([]);
+  const hasSetInitialBounds = useRef(false);
 
   // Initialize map only once
   useEffect(() => {
@@ -75,7 +75,6 @@ export const MapboxMap = ({
 
     initializeMap();
 
-    // Cleanup function
     return () => {
       if (markerManager.current) {
         markerManager.current.removeAllMarkers();
@@ -91,24 +90,19 @@ export const MapboxMap = ({
     };
   }, [initialCenter, onMarkerClick]);
 
-  // Update markers only when applications array actually changes
+  // Handle applications updates
   useEffect(() => {
-    if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
-
-    // Check if applications array has actually changed
-    const applicationIdsMatch = applications.length === prevApplicationsRef.current.length &&
-      applications.every((app, index) => app.id === prevApplicationsRef.current[index]?.id);
-
-    if (applicationIdsMatch) {
-      return; // Skip if applications haven't changed
+    if (!isMapReady || !markerManager.current || !map.current || !applications.length) {
+      console.log('Skipping marker update - conditions not met');
+      return;
     }
 
-    console.log('Adding markers for applications:', applications.length);
-    prevApplicationsRef.current = applications;
+    console.log('Processing applications update:', applications.length);
 
-    // Remove all existing markers before adding new ones
+    // Clear existing markers
     markerManager.current.removeAllMarkers();
     
+    // Filter out applications without coordinates
     const validApplications = applications.filter(application => {
       if (!application.coordinates) {
         console.warn(`Application ${application.id} has no coordinates - skipping`);
@@ -117,7 +111,7 @@ export const MapboxMap = ({
       return true;
     });
 
-    // Add new markers for valid applications
+    // Add markers for valid applications
     validApplications.forEach(application => {
       if (application.coordinates) {
         const [lat, lng] = application.coordinates;
@@ -126,8 +120,8 @@ export const MapboxMap = ({
       }
     });
 
-    // Only fit bounds on initial load or when applications change significantly
-    if (!selectedId && validApplications.length > 0) {
+    // Set bounds only on initial load
+    if (!hasSetInitialBounds.current && validApplications.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       validApplications.forEach(app => {
         if (app.coordinates) {
@@ -141,10 +135,12 @@ export const MapboxMap = ({
         maxZoom: MAP_DEFAULTS.maxZoom,
         duration: 1000
       });
+      
+      hasSetInitialBounds.current = true;
     }
-  }, [applications, selectedId, isMapReady]);
+  }, [applications, isMapReady]);
 
-  // Update marker styles when selection changes, without re-adding markers
+  // Handle selection changes
   useEffect(() => {
     if (!isMapReady || !markerManager.current) return;
     
