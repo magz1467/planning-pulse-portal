@@ -1530,11 +1530,11 @@ export type Database = {
       }
       get_applications_within_radius: {
         Args: {
-          center_lng: number
-          center_lat: number
+          center_longitude: number
+          center_latitude: number
           radius_meters: number
-          page_size: number
-          page_number: number
+          page_size?: number
+          page_number?: number
         }
         Returns: {
           actual_commencement_date: string | null

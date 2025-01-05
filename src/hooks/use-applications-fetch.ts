@@ -39,7 +39,7 @@ export const useApplicationsFetch = () => {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radiusInMeters,
-          page_size: 100,
+          page_size: 100,  // Updated to fetch 100 results
           page_number: 0
         }
       );
