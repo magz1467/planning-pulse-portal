@@ -105,6 +105,18 @@ export const MapboxMap = ({
     );
   };
 
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   // Update markers and fit bounds when applications change
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
@@ -114,14 +126,28 @@ export const MapboxMap = ({
     // Remove all existing markers before adding new ones
     markerManager.current.removeAllMarkers();
 
+    const [centerLat, centerLng] = initialCenter;
+    
     const validApplications = applications.filter(application => {
       if (!application.coordinates) return false;
       const [lat, lng] = application.coordinates;
+      
+      // Check if coordinates are valid and within London bounds
       const isValid = isValidLondonCoordinate(lat, lng);
       if (!isValid) {
         console.warn(`Application ${application.id} coordinates [${lat}, ${lng}] outside London bounds - skipping`);
+        return false;
       }
-      return isValid;
+
+      // Check if application is within 1km of search center
+      const distance = calculateDistance(centerLat, centerLng, lat, lng);
+      const isWithinRadius = distance <= 1; // 1km radius
+      if (!isWithinRadius) {
+        console.warn(`Application ${application.id} is ${distance.toFixed(2)}km from search center - skipping`);
+        return false;
+      }
+
+      return true;
     });
 
     // Add new markers for valid applications
@@ -150,7 +176,7 @@ export const MapboxMap = ({
         duration: 1000
       });
     }
-  }, [applications, selectedId, isMapReady]);
+  }, [applications, selectedId, isMapReady, initialCenter]);
 
   // Update marker styles when selection changes
   useEffect(() => {
