@@ -98,7 +98,7 @@ export const MapboxMap = ({
       return;
     }
 
-    console.log('Processing applications update:', applications.length);
+    console.log(`Processing ${applications.length} applications`);
 
     // Filter out applications without coordinates
     const validApplications = applications.filter(application => {
@@ -115,8 +115,6 @@ export const MapboxMap = ({
     // Add markers for valid applications
     validApplications.forEach(application => {
       if (application.coordinates) {
-        const [lat, lng] = application.coordinates;
-        console.log('Adding marker for application:', application.id, [lat, lng]);
         markerManager.current?.addMarker(application, application.id === selectedId);
       }
     });
@@ -141,17 +139,6 @@ export const MapboxMap = ({
       console.log('Initial bounds set');
     }
   }, [applications, isMapReady, selectedId]);
-
-  // Handle selection changes
-  useEffect(() => {
-    if (!isMapReady || !markerManager.current) return;
-    
-    console.log('Updating marker styles for selected ID:', selectedId);
-    const markers = markerManager.current.getMarkers();
-    Object.keys(markers).forEach(id => {
-      markerManager.current?.updateMarkerStyle(Number(id), Number(id) === selectedId);
-    });
-  }, [selectedId, isMapReady]);
 
   return (
     <div className="w-full h-full relative">

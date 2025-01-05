@@ -22,7 +22,7 @@ export class MapboxMarkerManager {
   }
 
   public removeAllMarkers() {
-    console.log('Removing all markers');
+    console.log(`Removing ${Object.keys(this.markers).length} markers`);
     Object.values(this.markers).forEach(({ marker }) => {
       marker.remove();
     });
@@ -31,17 +31,16 @@ export class MapboxMarkerManager {
 
   public addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
-      console.warn('Attempted to add marker for application without coordinates:', application.id);
+      console.warn(`Application ${application.id} has no coordinates - skipping`);
       return;
     }
 
     try {
       const [lat, lng] = application.coordinates;
-      console.log(`Adding marker for application ${application.id} at [${lat}, ${lng}]`);
+      console.log(`Adding marker for application ${application.id} [${lat}, ${lng}]`);
       
       // Remove existing marker if it exists
       if (this.markers[application.id]) {
-        console.log(`Removing existing marker for application ${application.id}`);
         this.markers[application.id].marker.remove();
       }
 
@@ -65,7 +64,7 @@ export class MapboxMarkerManager {
       });
 
     } catch (error) {
-      console.error('Error adding marker:', error);
+      console.error(`Error adding marker for application ${application.id}:`, error);
     }
   }
 
