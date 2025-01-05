@@ -13,7 +13,7 @@ export const useApplicationsFetch = () => {
   const { toast } = useToast();
 
   const fetchApplicationsInRadius = async (
-    center: LatLngTuple,
+    center: [number, number],
     filters?: { status?: string; type?: string }
   ) => {
     setIsLoading(true);
@@ -63,7 +63,10 @@ export const useApplicationsFetch = () => {
       }
 
       // Then fetch the applications
-      const apps = await fetchApplicationsFromSupabase(center, radiusInMeters);
+      const apps = await fetchApplicationsFromSupabase({
+        center,
+        radiusInMeters
+      });
 
       console.log('📊 Raw applications data:', {
         count: apps.length,

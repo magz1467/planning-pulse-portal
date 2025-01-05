@@ -2,7 +2,7 @@ import { LatLngTuple } from 'leaflet';
 import { Application } from '@/types/planning';
 
 export interface FetchApplicationsParams {
-  center: LatLngTuple;
+  center: [number, number];
   radiusInMeters: number;
   pageSize?: number;
   pageNumber?: number;

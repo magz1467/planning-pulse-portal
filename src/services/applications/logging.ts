@@ -1,14 +1,14 @@
 import { LatLngTuple } from 'leaflet';
 
 export const logFetchParams = (
-  center: LatLngTuple,
+  center: [number, number],
   radiusInMeters: number,
   pageSize?: number,
   pageNumber?: number
 ) => {
   console.log('Fetching applications with params:', {
-    center_lng: center[1],
     center_lat: center[0],
+    center_lng: center[1],
     radius_meters: radiusInMeters,
     ...(pageSize && { page_size: pageSize }),
     ...(pageNumber && { page_number: pageNumber })

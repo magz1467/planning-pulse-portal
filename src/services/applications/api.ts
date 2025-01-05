@@ -14,8 +14,8 @@ export const fetchApplicationsFromSupabase = async ({
     const { data: apps, error } = await supabase.rpc(
       'get_applications_within_radius',
       {
-        center_lng: center[1],
         center_lat: center[0],
+        center_lng: center[1],
         radius_meters: radiusInMeters,
         page_size: pageSize,
         page_number: pageNumber
@@ -60,8 +60,8 @@ export const fetchApplicationsCountFromSupabase = async (
     const { data: count, error } = await supabase.rpc(
       'get_applications_count_within_radius',
       {
-        center_lng: center[1],
         center_lat: center[0],
+        center_lng: center[1],
         radius_meters: radiusInMeters
       }
     );
