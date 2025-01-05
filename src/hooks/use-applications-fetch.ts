@@ -32,7 +32,7 @@ export const useApplicationsFetch = () => {
           page_size: 100, // Explicitly set to 100 results
           page_number: 0
         }
-      ).timeout(30000) // 30 second timeout
+      );
 
       if (error) {
         console.error('Data fetch error:', error);
