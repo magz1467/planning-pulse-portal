@@ -38,7 +38,20 @@ export class MapboxMarkerManager {
       
       Object.values(this.markers).forEach(({ marker }) => {
         try {
-          marker.remove();
+          // Check if marker element still exists in DOM before removal
+          const el = marker.getElement();
+          if (document.body.contains(el)) {
+            marker.remove();
+            console.log('✅ Successfully removed marker:', {
+              markerId: el.id,
+              timestamp: new Date().toISOString()
+            });
+          } else {
+            console.warn('⚠️ Marker element already removed from DOM:', {
+              markerId: el.id,
+              timestamp: new Date().toISOString()
+            });
+          }
         } catch (error) {
           console.error('❌ Error removing individual marker:', {
             error,
@@ -111,10 +124,20 @@ export class MapboxMarkerManager {
       this.markers[application.id] = { marker, application };
 
       // Add click handler with error boundary
-      el.addEventListener('click', (e) => {
+      const handleClick = (e: Event) => {
         try {
           e.preventDefault();
           e.stopPropagation();
+          
+          // Verify marker still exists before handling click
+          if (!document.body.contains(el)) {
+            console.error('❌ Marker element not in DOM during click:', {
+              applicationId: application.id,
+              markerId: el.id,
+              timestamp: new Date().toISOString()
+            });
+            return;
+          }
           
           console.log('🖱️ Marker clicked:', {
             applicationId: application.id,
@@ -132,7 +155,9 @@ export class MapboxMarkerManager {
             timestamp: new Date().toISOString()
           });
         }
-      });
+      };
+
+      el.addEventListener('click', handleClick);
 
       console.log('✅ Marker successfully added');
       console.groupEnd();
@@ -159,8 +184,8 @@ export class MapboxMarkerManager {
       }
 
       const el = markerInfo.marker.getElement();
-      if (!el) {
-        console.error('❌ Marker element not found:', {
+      if (!el || !document.body.contains(el)) {
+        console.error('❌ Marker element not found or not in DOM:', {
           applicationId,
           markerId: `marker-${applicationId}`,
           timestamp: new Date().toISOString()
