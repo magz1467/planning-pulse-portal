@@ -33,7 +33,6 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
-  // Update URL when relevant state changes
   useEffect(() => {
     updateURLParams({
       postcode,
@@ -48,7 +47,6 @@ export const useDashboardState = () => {
   };
 
   const handleSortChange = (sortType: SortType) => {
-    console.log('Changing sort to:', sortType);
     setActiveSort(sortType);
   };
 
@@ -56,10 +54,12 @@ export const useDashboardState = () => {
   const isNewSearch = searchPoint && coordinates && 
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
 
-  if ((isInitialSearch || isNewSearch) && coordinates) {
-    setSearchPoint(coordinates);
-    fetchApplicationsInRadius(coordinates, activeFilters);
-  }
+  useEffect(() => {
+    if ((isInitialSearch || isNewSearch) && coordinates) {
+      setSearchPoint(coordinates);
+      fetchApplicationsInRadius(coordinates as [number, number], activeFilters);
+    }
+  }, [coordinates, isInitialSearch, isNewSearch, activeFilters]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
