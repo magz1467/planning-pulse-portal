@@ -28,18 +28,18 @@ export const useApplicationsFetch = () => {
       const radiusInMeters = MAP_DEFAULTS.searchRadius * 1000;
       console.log('📏 Query parameters:', {
         radiusInMeters,
-        center_lng: center[1],
-        center_lat: center[0]
+        center_longitude: center[1],
+        center_latitude: center[0]
       });
       
       console.time('🕒 Database query execution');
       const { data: apps, error } = await supabase.rpc(
         'get_applications_within_radius',
         { 
-          center_lng: center[1],
-          center_lat: center[0],
+          center_longitude: center[1],
+          center_latitude: center[0],
           radius_meters: radiusInMeters,
-          page_size: 100,  // Updated to fetch 100 results
+          page_size: 100,
           page_number: 0
         }
       );
