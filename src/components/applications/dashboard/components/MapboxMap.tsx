@@ -101,7 +101,7 @@ export const MapboxMap = ({
       return true;
     });
 
-    // Clear existing markers
+    // Clear existing markers before adding new ones
     markerManager.current.removeAllMarkers();
 
     // Add markers for valid applications

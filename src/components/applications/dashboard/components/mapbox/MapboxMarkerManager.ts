@@ -1,52 +1,35 @@
 import mapboxgl from 'mapbox-gl';
 import { Application } from '@/types/planning';
 
+interface MarkerInfo {
+  marker: mapboxgl.Marker;
+  application: Application;
+}
+
 export class MapboxMarkerManager {
-  private markers: { [key: number]: { marker: mapboxgl.Marker, application: Application } } = {};
-  
-  constructor(private map: mapboxgl.Map, private onMarkerClick: (id: number) => void) {}
+  private map: mapboxgl.Map;
+  private markers: { [key: number]: MarkerInfo } = {};
+  private onMarkerClick: (id: number) => void;
 
-  private getStatusColor(status: string): string {
-    const statusLower = status.toLowerCase();
-    switch (statusLower) {
-      case 'declined':
-      case 'refused':
-        return '#ea384c';
-      case 'under review':
-      case 'pending':
-      case 'under consideration':
-      case 'application under consideration':
-        return '#F97316';
-      case 'approved':
-        return '#16a34a';
-      default:
-        return '#10B981';
-    }
+  constructor(map: mapboxgl.Map, onMarkerClick: (id: number) => void) {
+    this.map = map;
+    this.onMarkerClick = onMarkerClick;
   }
 
-  private createMarkerElement(application: Application, isSelected: boolean): HTMLDivElement {
-    const el = document.createElement('div');
-    el.className = 'marker';
-    el.style.width = isSelected ? '30px' : '25px';
-    el.style.height = isSelected ? '30px' : '25px';
-    el.style.borderRadius = '50%';
-    el.style.backgroundColor = this.getStatusColor(application.status);
-    el.style.border = '2px solid white';
-    el.style.cursor = 'pointer';
-    el.style.position = 'relative';
+  public getMarkers() {
+    return this.markers;
+  }
 
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.onMarkerClick(application.id);
+  public removeAllMarkers() {
+    Object.values(this.markers).forEach(({ marker }) => {
+      marker.remove();
     });
-
-    return el;
+    this.markers = {};
   }
 
-  addMarker(application: Application, isSelected: boolean) {
+  public addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
-      console.warn(`Application ${application.id} has no coordinates`);
+      console.warn('Attempted to add marker for application without coordinates');
       return;
     }
 
@@ -58,50 +41,49 @@ export class MapboxMarkerManager {
         this.markers[application.id].marker.remove();
       }
 
-      const el = this.createMarkerElement(application, isSelected);
+      // Create marker element
+      const el = this.createMarkerElement(isSelected);
+
+      // Create and add marker
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center'
       })
-        .setLngLat([lng, lat]) // Mapbox expects [lng, lat]
+        .setLngLat([lng, lat])
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };
-      
+
+      // Add click handler
+      el.addEventListener('click', () => {
+        this.onMarkerClick(application.id);
+      });
+
     } catch (error) {
-      console.error(`Error adding marker for application ${application.id}:`, error);
+      console.error('Error adding marker:', error);
     }
   }
 
-  updateMarkerStyle(id: number, isSelected: boolean) {
-    const markerData = this.markers[id];
-    if (markerData) {
-      const el = markerData.marker.getElement();
-      el.style.width = isSelected ? '30px' : '25px';
-      el.style.height = isSelected ? '30px' : '25px';
-      el.style.backgroundColor = this.getStatusColor(markerData.application.status);
-    }
+  public updateMarkerStyle(applicationId: number, isSelected: boolean) {
+    const markerInfo = this.markers[applicationId];
+    if (!markerInfo) return;
+
+    const el = markerInfo.marker.getElement();
+    this.updateMarkerElement(el, isSelected);
   }
 
-  removeMarker(id: number) {
-    if (this.markers[id]) {
-      this.markers[id].marker.remove();
-      delete this.markers[id];
-    }
+  private createMarkerElement(isSelected: boolean): HTMLDivElement {
+    const el = document.createElement('div');
+    this.updateMarkerElement(el, isSelected);
+    return el;
   }
 
-  removeAllMarkers() {
-    Object.values(this.markers).forEach(({ marker }) => {
-      try {
-        marker.remove();
-      } catch (err) {
-        console.warn('Error removing marker:', err);
-      }
-    });
-    this.markers = {};
-  }
-
-  getMarkers() {
-    return this.markers;
+  private updateMarkerElement(el: HTMLElement, isSelected: boolean) {
+    el.className = 'marker';
+    el.style.width = '24px';
+    el.style.height = '24px';
+    el.style.backgroundImage = `url(${isSelected ? '/marker-selected.svg' : '/marker.svg'})`;
+    el.style.backgroundSize = 'cover';
+    el.style.cursor = 'pointer';
   }
 }

@@ -29,10 +29,10 @@ export const useApplicationsFetch = () => {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radiusInMeters,
-          page_size: 100,
+          page_size: 100, // Explicitly set to 100 results
           page_number: 0
         }
-      );
+      ).timeout(30000) // 30 second timeout
 
       if (error) {
         console.error('Data fetch error:', error);
@@ -40,7 +40,7 @@ export const useApplicationsFetch = () => {
       }
 
       if (!apps || apps.length === 0) {
-        console.log('No applications found within 1km radius');
+        console.log('No applications found within radius');
         setApplications([]);
         setTotalCount(0);
         return;
