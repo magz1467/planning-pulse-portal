@@ -45,7 +45,9 @@ export class MapboxMarkerManager {
         .setLngLat([lng, lat])
         .addTo(this.map);
 
-      el.addEventListener('click', () => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         this.onMarkerClick(application.id);
       });
 
