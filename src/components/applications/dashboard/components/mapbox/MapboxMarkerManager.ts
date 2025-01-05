@@ -40,6 +40,7 @@ export class MapboxMarkerManager {
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
 
+      // Convert coordinates from [lat, lng] to [lng, lat] for Mapbox
       const marker = new mapboxgl.Marker(el)
         .setLngLat([application.coordinates[1], application.coordinates[0]])
         .addTo(this.map);

@@ -48,8 +48,8 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          console.log('Setting initial center to:', initialCenter);
-          // Set initial view
+          // Set initial view - Note: Mapbox uses [lng, lat] order
+          console.log('Setting initial center to [lng, lat]:', [initialCenter[1], initialCenter[0]]);
           newMap.setCenter([initialCenter[1], initialCenter[0]]);
           newMap.setZoom(12);
 
@@ -101,6 +101,7 @@ export const MapboxMap = ({
     applications.forEach(application => {
       if (application.coordinates) {
         // Validate coordinates are within London area (roughly)
+        // Note: application.coordinates are in [lat, lng] format
         const isValidLondonCoordinate = (
           application.coordinates[0] >= 51.2 && // South boundary
           application.coordinates[0] <= 51.8 && // North boundary
@@ -110,6 +111,7 @@ export const MapboxMap = ({
 
         if (isValidLondonCoordinate) {
           console.log('Adding valid London marker for application:', application.id, application.coordinates);
+          // Convert to [lng, lat] for Mapbox
           markerManager.current?.addMarker(application, application.id === selectedId);
         } else {
           console.warn('Skipping invalid coordinate for application:', application.id, application.coordinates);
@@ -132,6 +134,7 @@ export const MapboxMap = ({
         );
 
         if (isValidLondonCoordinate) {
+          // Convert to [lng, lat] for Mapbox bounds
           bounds.extend([app.coordinates[1], app.coordinates[0]]);
           hasValidCoordinates = true;
         }
