@@ -29,15 +29,30 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     return houseImages[id % houseImages.length];
   };
 
-  // Get the appropriate image URL
-  const imageUrl = application.image_map_url || application.image || getRandomImage(application.id);
+  // Get the appropriate image URL with detailed logging
+  console.log('MiniCard - Starting image URL resolution for application:', application.id);
+  
+  const imageUrl = (() => {
+    if (application.image_map_url) {
+      console.log('MiniCard - Using image_map_url:', application.image_map_url);
+      return application.image_map_url;
+    }
+    if (application.image) {
+      console.log('MiniCard - Using application.image:', application.image);
+      return application.image;
+    }
+    const fallbackImage = getRandomImage(application.id);
+    console.log('MiniCard - Using fallback image:', fallbackImage);
+    return fallbackImage;
+  })();
 
-  console.log('MiniCard - Image URL:', {
+  console.log('MiniCard - Final image URL resolution:', {
     applicationId: application.id,
     imageMapUrl: application.image_map_url,
     image: application.image,
     fallbackImage: getRandomImage(application.id),
-    finalImageUrl: imageUrl
+    finalImageUrl: imageUrl,
+    applicationDetails: application
   });
 
   return (
@@ -54,8 +69,12 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             width={80}
             height={80}
             className="w-full h-full object-cover"
-            onError={() => {
-              console.error('MiniCard - Image failed to load:', imageUrl);
+            onError={(e) => {
+              console.error('MiniCard - Image failed to load:', {
+                attemptedUrl: imageUrl,
+                error: e,
+                application: application
+              });
               toast({
                 title: "Image failed to load",
                 description: "Using fallback image instead",
