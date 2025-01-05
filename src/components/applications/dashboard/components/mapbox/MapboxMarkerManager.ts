@@ -40,14 +40,11 @@ export class MapboxMarkerManager {
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
       el.style.transition = 'all 0.2s ease-in-out';
-      el.style.position = 'absolute'; // Changed from relative to absolute
       el.style.zIndex = isSelected ? '1000' : '1';
-      el.style.transform = 'translate(-50%, -50%)'; // Center the marker
 
       const [lat, lng] = application.coordinates;
       const marker = new mapboxgl.Marker({
-        element: el,
-        anchor: 'center' // Changed from bottom to center for better positioning
+        element: el
       })
         .setLngLat([lng, lat])
         .addTo(this.map);
