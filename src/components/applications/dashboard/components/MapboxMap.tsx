@@ -29,6 +29,7 @@ export const MapboxMap = ({
   const initializedRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const hasSetInitialBounds = useRef(false);
+  const lastApplicationsRef = useRef<Application[]>([]);
 
   // Initialize map only once
   useEffect(() => {
@@ -52,7 +53,6 @@ export const MapboxMap = ({
           
           // Set initial view
           const [lat, lng] = initialCenter;
-          console.log('Setting map center to:', [lng, lat]);
           newMap.setCenter([lng, lat]);
           newMap.setZoom(MAP_DEFAULTS.initialZoom);
 
@@ -60,11 +60,6 @@ export const MapboxMap = ({
             console.log('Map style loaded successfully');
             setIsMapReady(true);
             initializedRef.current = true;
-          });
-
-          newMap.on('error', (e) => {
-            console.error('Mapbox error:', e);
-            setError('Failed to load map resources');
           });
         }
       } catch (err) {
@@ -80,7 +75,6 @@ export const MapboxMap = ({
         markerManager.current.removeAllMarkers();
         markerManager.current = null;
       }
-      
       if (map.current) {
         map.current.remove();
         map.current = null;
@@ -97,11 +91,17 @@ export const MapboxMap = ({
       return;
     }
 
-    console.log('Processing applications update:', applications.length);
-
-    // Clear existing markers
-    markerManager.current.removeAllMarkers();
+    // Check if applications have actually changed
+    const applicationsChanged = JSON.stringify(applications) !== JSON.stringify(lastApplicationsRef.current);
     
+    if (!applicationsChanged) {
+      console.log('Applications unchanged, skipping update');
+      return;
+    }
+
+    console.log('Processing applications update:', applications.length);
+    lastApplicationsRef.current = applications;
+
     // Filter out applications without coordinates
     const validApplications = applications.filter(application => {
       if (!application.coordinates) {
@@ -138,7 +138,7 @@ export const MapboxMap = ({
       
       hasSetInitialBounds.current = true;
     }
-  }, [applications, isMapReady]);
+  }, [applications, isMapReady, selectedId]);
 
   // Handle selection changes
   useEffect(() => {

@@ -11,16 +11,16 @@ export class MapboxMarkerManager {
     switch (statusLower) {
       case 'declined':
       case 'refused':
-        return '#ea384c'; // Red for declined/refused
+        return '#ea384c';
       case 'under review':
       case 'pending':
       case 'under consideration':
       case 'application under consideration':
-        return '#F97316'; // Orange for in-progress
+        return '#F97316';
       case 'approved':
-        return '#16a34a'; // Green for approved
+        return '#16a34a';
       default:
-        return '#10B981'; // Default color
+        return '#10B981';
     }
   }
 
@@ -33,8 +33,6 @@ export class MapboxMarkerManager {
     el.style.backgroundColor = this.getStatusColor(application.status);
     el.style.border = '2px solid white';
     el.style.cursor = 'pointer';
-
-    // Remove transition to prevent unwanted movement
     el.style.position = 'relative';
 
     el.addEventListener('click', (e) => {
@@ -46,21 +44,6 @@ export class MapboxMarkerManager {
     return el;
   }
 
-  private createMapboxMarker(application: Application, element: HTMLDivElement): mapboxgl.Marker | null {
-    try {
-      const [lat, lng] = application.coordinates;
-      return new mapboxgl.Marker({
-        element: element,
-        anchor: 'center' // Ensure marker is centered on coordinates
-      })
-        .setLngLat([lng, lat])
-        .addTo(this.map);
-    } catch (error) {
-      console.error(`Error creating marker for application ${application.id}:`, error);
-      return null;
-    }
-  }
-
   addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
       console.warn(`Application ${application.id} has no coordinates`);
@@ -68,12 +51,24 @@ export class MapboxMarkerManager {
     }
 
     try {
-      const el = this.createMarkerElement(application, isSelected);
-      const marker = this.createMapboxMarker(application, el);
+      // Important: Mapbox uses [lng, lat] order
+      const [lat, lng] = application.coordinates;
       
-      if (marker) {
-        this.markers[application.id] = { marker, application };
+      // Remove existing marker if it exists
+      if (this.markers[application.id]) {
+        this.markers[application.id].marker.remove();
       }
+
+      const el = this.createMarkerElement(application, isSelected);
+      const marker = new mapboxgl.Marker({
+        element: el,
+        anchor: 'center'
+      })
+        .setLngLat([lng, lat])
+        .addTo(this.map);
+
+      this.markers[application.id] = { marker, application };
+      
     } catch (error) {
       console.error(`Error adding marker for application ${application.id}:`, error);
     }
@@ -90,9 +85,8 @@ export class MapboxMarkerManager {
   }
 
   removeMarker(id: number) {
-    const markerData = this.markers[id];
-    if (markerData) {
-      markerData.marker.remove();
+    if (this.markers[id]) {
+      this.markers[id].marker.remove();
       delete this.markers[id];
     }
   }
@@ -100,9 +94,7 @@ export class MapboxMarkerManager {
   removeAllMarkers() {
     Object.values(this.markers).forEach(({ marker }) => {
       try {
-        if (marker) {
-          marker.remove();
-        }
+        marker.remove();
       } catch (err) {
         console.warn('Error removing marker:', err);
       }
