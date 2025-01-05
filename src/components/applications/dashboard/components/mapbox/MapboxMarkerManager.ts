@@ -81,9 +81,22 @@ export class MapboxMarkerManager {
         e.preventDefault();
         e.stopPropagation();
         
+        // Prevent map movement
+        if (e && e.stopPropagation) {
+          e.stopPropagation();
+        }
+        
         console.log('🖱️ Marker clicked:', {
           applicationId: application.id,
           timestamp: new Date().toISOString()
+        });
+        
+        // Call click handler without moving map
+        this.map.once('movestart', (e) => {
+          e.preventDefault();
+          if (e && e.stopPropagation) {
+            e.stopPropagation();
+          }
         });
         
         this.onMarkerClick(application.id);
