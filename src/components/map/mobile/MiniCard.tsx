@@ -39,7 +39,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     if (application.image && application.image !== '/placeholder.svg') {
       // Check if it's a Supabase storage URL
       if (application.image.startsWith('/storage/')) {
-        const supabaseUrl = process.env.VITE_SUPABASE_URL;
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         const fullUrl = `${supabaseUrl}${application.image}`;
         console.log('MiniCard - Constructed Supabase storage URL:', fullUrl);
         return fullUrl;
