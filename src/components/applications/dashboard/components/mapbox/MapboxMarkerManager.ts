@@ -33,8 +33,9 @@ export class MapboxMarkerManager {
     el.style.backgroundColor = this.getStatusColor(application.status);
     el.style.border = '2px solid white';
     el.style.cursor = 'pointer';
-    el.style.transition = 'all 0.2s ease-in-out';
-    el.style.zIndex = isSelected ? '1000' : '1';
+
+    // Remove transition to prevent unwanted movement
+    el.style.position = 'relative';
 
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -49,7 +50,8 @@ export class MapboxMarkerManager {
     try {
       const [lat, lng] = application.coordinates;
       return new mapboxgl.Marker({
-        element: element
+        element: element,
+        anchor: 'center' // Ensure marker is centered on coordinates
       })
         .setLngLat([lng, lat])
         .addTo(this.map);
@@ -84,7 +86,6 @@ export class MapboxMarkerManager {
       el.style.width = isSelected ? '30px' : '25px';
       el.style.height = isSelected ? '30px' : '25px';
       el.style.backgroundColor = this.getStatusColor(markerData.application.status);
-      el.style.zIndex = isSelected ? '1000' : '1';
     }
   }
 
