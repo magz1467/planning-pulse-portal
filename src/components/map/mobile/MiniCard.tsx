@@ -1,54 +1,61 @@
 import { Application } from "@/types/planning";
-import { getRandomImage } from "@/utils/imageUtils";
-import { Badge } from "@/components/ui/badge";
-import { getStatusColor } from "@/utils/statusColors";
+import { Card } from "@/components/ui/card";
+import { MapPin, Timer } from "lucide-react";
+import { getStatusColor, getStatusText } from "@/utils/statusColors";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
 interface MiniCardProps {
   application: Application;
-  isSelected?: boolean;
-  onClick?: () => void;
+  onClick: () => void;
 }
 
-export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) => {
+export const MiniCard = ({ application, onClick }: MiniCardProps) => {
+  const isClosingSoon = application.last_date_consultation_comments ? 
+    isWithinNextSevenDays(application.last_date_consultation_comments) : false;
+
   return (
-    <div
-      className={`p-3 bg-white border rounded-lg shadow-sm cursor-pointer transition-all ${
-        isSelected ? "border-primary" : "border-gray-200"
-      }`}
+    <Card
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-xl shadow-lg p-4 cursor-pointer"
       onClick={onClick}
     >
       <div className="flex gap-3">
-        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+        <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
           <img
-            src={application.image_map_url || getRandomImage(application.id)}
-            alt="Property"
+            src={application.image_map_url || '/placeholder.svg'}
+            alt={application.description}
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = getRandomImage(application.id);
+              target.src = '/placeholder.svg';
             }}
           />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <Badge
-              className="mb-2"
-              style={{
-                backgroundColor: getStatusColor(application.status),
-                color: "white",
-              }}
-            >
-              {application.status}
-            </Badge>
+          <ApplicationTitle 
+            title={application.ai_title || application.description || ''} 
+            className="mb-1"
+          />
+          <div className="flex items-center gap-1 mt-1 text-gray-600">
+            <MapPin className="w-3 h-3" />
+            <p className="text-sm truncate">{application.address}</p>
           </div>
-          <h3 className="text-sm font-medium text-gray-900 truncate">
-            {application.description}
-          </h3>
-          <p className="mt-1 text-sm text-gray-500 truncate">
-            {application.site_name || application.site_number} {application.street_name}
-          </p>
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex items-center gap-2">
+              <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
+                {getStatusText(application.status)}
+              </span>
+              {isClosingSoon && (
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
+                  <Timer className="w-3 h-3" />
+                  Closing soon
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-gray-500">{application.distance}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
