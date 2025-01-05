@@ -36,9 +36,13 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-3">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <img
-            src={getRandomImage(application.id)}
+            src={application.image_map_url || getRandomImage(application.id)}
             alt="Property"
             className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = getRandomImage(application.id);
+            }}
           />
         </div>
         <div className="flex-1 min-w-0">
