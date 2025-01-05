@@ -6,6 +6,7 @@ import { LatLngTuple } from 'leaflet';
 import { MapboxMarkerManager } from './mapbox/MapboxMarkerManager';
 import { MapboxInitializer } from './mapbox/MapboxInitializer';
 import { MapboxErrorDisplay } from './mapbox/MapboxErrorDisplay';
+import { calculateDistance } from '@/utils/distance';
 
 interface MapboxMapProps {
   applications: Application[];
@@ -105,18 +106,6 @@ export const MapboxMap = ({
     );
   };
 
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
-
   // Update markers and fit bounds when applications change
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
@@ -139,9 +128,9 @@ export const MapboxMap = ({
         return false;
       }
 
-      // Check if application is within 1km of search center
-      const distance = calculateDistance(centerLat, centerLng, lat, lng);
-      const isWithinRadius = distance <= 1; // 1km radius
+      // Check if application is within 5km of search center (increased from 1km)
+      const distance = calculateDistance([centerLat, centerLng], [lat, lng]);
+      const isWithinRadius = distance <= 5; // 5km radius
       if (!isWithinRadius) {
         console.warn(`Application ${application.id} is ${distance.toFixed(2)}km from search center - skipping`);
         return false;
