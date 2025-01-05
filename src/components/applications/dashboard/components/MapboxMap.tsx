@@ -28,6 +28,7 @@ export const MapboxMap = ({
   const [debugInfo, setDebugInfo] = useState<string>('');
   const initializedRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
+  const prevApplicationsRef = useRef<Application[]>([]);
 
   // Initialize map only once
   useEffect(() => {
@@ -90,11 +91,20 @@ export const MapboxMap = ({
     };
   }, [initialCenter, onMarkerClick]);
 
-  // Update markers and fit bounds when applications change
+  // Update markers only when applications array actually changes
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
 
+    // Check if applications array has actually changed
+    const applicationIdsMatch = applications.length === prevApplicationsRef.current.length &&
+      applications.every((app, index) => app.id === prevApplicationsRef.current[index]?.id);
+
+    if (applicationIdsMatch) {
+      return; // Skip if applications haven't changed
+    }
+
     console.log('Adding markers for applications:', applications.length);
+    prevApplicationsRef.current = applications;
 
     // Remove all existing markers before adding new ones
     markerManager.current.removeAllMarkers();
@@ -117,7 +127,6 @@ export const MapboxMap = ({
     });
 
     // Only fit bounds on initial load or when applications change significantly
-    // Not when a marker is clicked
     if (!selectedId && validApplications.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
       validApplications.forEach(app => {
@@ -133,9 +142,9 @@ export const MapboxMap = ({
         duration: 1000
       });
     }
-  }, [applications, selectedId, isMapReady, initialCenter]);
+  }, [applications, selectedId, isMapReady]);
 
-  // Update marker styles when selection changes
+  // Update marker styles when selection changes, without re-adding markers
   useEffect(() => {
     if (!isMapReady || !markerManager.current) return;
     
