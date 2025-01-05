@@ -23,6 +23,8 @@ export const MapView = ({
     window.dispatchEvent(new Event('resize'));
   }, []);
 
+  console.log('MapView render', { applications: applications.length, selectedId, initialCenter });
+
   return (
     <div className="w-full h-full relative">
       <MapContainer
@@ -32,9 +34,10 @@ export const MapView = ({
         style={{ height: "100%", width: "100%" }}
         attributionControl={false}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        <TileLayer 
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          maxZoom={19}
         />
         <ApplicationMarkers
           applications={applications}
