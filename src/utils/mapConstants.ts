@@ -6,8 +6,8 @@ export const LONDON_BOUNDS = {
 };
 
 export const MAP_DEFAULTS = {
-  initialZoom: 12,
+  initialZoom: 14,
   maxZoom: 18,
   minZoom: 9,
-  searchRadius: 5 // in kilometers
+  searchRadius: 1 // in kilometers - restored to 1km radius
 };

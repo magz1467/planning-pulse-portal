@@ -40,9 +40,14 @@ export class MapboxMarkerManager {
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
       el.style.transition = 'all 0.2s ease-in-out';
+      el.style.position = 'relative'; // Added to fix floating
+      el.style.zIndex = isSelected ? '1000' : '1';
 
       const [lat, lng] = application.coordinates;
-      const marker = new mapboxgl.Marker(el)
+      const marker = new mapboxgl.Marker({
+        element: el,
+        anchor: 'bottom' // Added to fix floating - pin bottom at location
+      })
         .setLngLat([lng, lat])
         .addTo(this.map);
 
