@@ -24,6 +24,41 @@ export class MapboxMarkerManager {
     }
   }
 
+  private createMarkerElement(application: Application, isSelected: boolean): HTMLDivElement {
+    const el = document.createElement('div');
+    el.className = 'marker';
+    el.style.width = isSelected ? '30px' : '25px';
+    el.style.height = isSelected ? '30px' : '25px';
+    el.style.borderRadius = '50%';
+    el.style.backgroundColor = this.getStatusColor(application.status);
+    el.style.border = '2px solid white';
+    el.style.cursor = 'pointer';
+    el.style.transition = 'all 0.2s ease-in-out';
+    el.style.zIndex = isSelected ? '1000' : '1';
+
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.onMarkerClick(application.id);
+    });
+
+    return el;
+  }
+
+  private createMapboxMarker(application: Application, element: HTMLDivElement): mapboxgl.Marker | null {
+    try {
+      const [lat, lng] = application.coordinates;
+      return new mapboxgl.Marker({
+        element: element
+      })
+        .setLngLat([lng, lat])
+        .addTo(this.map);
+    } catch (error) {
+      console.error(`Error creating marker for application ${application.id}:`, error);
+      return null;
+    }
+  }
+
   addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
       console.warn(`Application ${application.id} has no coordinates`);
@@ -31,31 +66,12 @@ export class MapboxMarkerManager {
     }
 
     try {
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.style.width = isSelected ? '30px' : '25px';
-      el.style.height = isSelected ? '30px' : '25px';
-      el.style.borderRadius = '50%';
-      el.style.backgroundColor = this.getStatusColor(application.status);
-      el.style.border = '2px solid white';
-      el.style.cursor = 'pointer';
-      el.style.transition = 'all 0.2s ease-in-out';
-      el.style.zIndex = isSelected ? '1000' : '1';
-
-      const [lat, lng] = application.coordinates;
-      const marker = new mapboxgl.Marker({
-        element: el
-      })
-        .setLngLat([lng, lat])
-        .addTo(this.map);
-
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.onMarkerClick(application.id);
-      });
-
-      this.markers[application.id] = { marker, application };
+      const el = this.createMarkerElement(application, isSelected);
+      const marker = this.createMapboxMarker(application, el);
+      
+      if (marker) {
+        this.markers[application.id] = { marker, application };
+      }
     } catch (error) {
       console.error(`Error adding marker for application ${application.id}:`, error);
     }
