@@ -1,6 +1,5 @@
 import { Application } from "@/types/planning";
 import { MapPin, Timer } from "lucide-react";
-import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
@@ -12,7 +11,7 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
-  const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
+  const isClosingSoon = application.last_date_consultation_comments;
   const { toast } = useToast();
 
   // Array of diverse house images from Unsplash
@@ -38,6 +37,13 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       return application.image_map_url;
     }
     if (application.image && application.image !== '/placeholder.svg') {
+      // Check if it's a Supabase storage URL
+      if (application.image.startsWith('/storage/')) {
+        const supabaseUrl = process.env.VITE_SUPABASE_URL;
+        const fullUrl = `${supabaseUrl}${application.image}`;
+        console.log('MiniCard - Constructed Supabase storage URL:', fullUrl);
+        return fullUrl;
+      }
       console.log('MiniCard - Using application.image:', application.image);
       return application.image;
     }
