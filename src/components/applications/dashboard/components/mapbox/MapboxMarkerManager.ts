@@ -65,19 +65,17 @@ export class MapboxMarkerManager {
       // Create marker element
       const el = this.createMarkerElement(isSelected);
 
-      // Create and add marker with options to prevent jumping
+      // Create and add marker
       const marker = new mapboxgl.Marker({
         element: el,
-        anchor: 'center',
-        // Add this option to prevent map movement on click
-        clickTolerance: 3
+        anchor: 'center'
       })
         .setLngLat([lng, lat])
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };
 
-      // Add click handler with preventDefault
+      // Add click handler
       el.addEventListener('click', (e) => {
         e.preventDefault(); // Prevent default marker click behavior
         e.stopPropagation(); // Stop event from bubbling to map
