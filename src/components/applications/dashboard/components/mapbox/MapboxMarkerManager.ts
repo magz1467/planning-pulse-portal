@@ -51,7 +51,6 @@ export class MapboxMarkerManager {
     }
 
     try {
-      // Important: Mapbox uses [lng, lat] order
       const [lat, lng] = application.coordinates;
       
       // Remove existing marker if it exists
@@ -64,7 +63,7 @@ export class MapboxMarkerManager {
         element: el,
         anchor: 'center'
       })
-        .setLngLat([lng, lat])
+        .setLngLat([lng, lat]) // Mapbox expects [lng, lat]
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };

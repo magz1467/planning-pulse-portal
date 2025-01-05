@@ -29,7 +29,6 @@ export const MapboxMap = ({
   const initializedRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const hasSetInitialBounds = useRef(false);
-  const lastApplicationsRef = useRef<Application[]>([]);
 
   // Initialize map only once
   useEffect(() => {
@@ -91,16 +90,7 @@ export const MapboxMap = ({
       return;
     }
 
-    // Check if applications have actually changed
-    const applicationsChanged = JSON.stringify(applications) !== JSON.stringify(lastApplicationsRef.current);
-    
-    if (!applicationsChanged) {
-      console.log('Applications unchanged, skipping update');
-      return;
-    }
-
     console.log('Processing applications update:', applications.length);
-    lastApplicationsRef.current = applications;
 
     // Filter out applications without coordinates
     const validApplications = applications.filter(application => {
@@ -110,6 +100,9 @@ export const MapboxMap = ({
       }
       return true;
     });
+
+    // Clear existing markers
+    markerManager.current.removeAllMarkers();
 
     // Add markers for valid applications
     validApplications.forEach(application => {
