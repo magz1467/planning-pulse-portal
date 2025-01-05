@@ -48,9 +48,9 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Set initial view immediately
+          // Set initial view immediately after map creation
           newMap.setCenter([initialCenter[1], initialCenter[0]]);
-          newMap.setZoom(13); // Default zoom level
+          newMap.setZoom(12);
 
           // Wait for the style to load before adding markers
           newMap.once('style.load', () => {
