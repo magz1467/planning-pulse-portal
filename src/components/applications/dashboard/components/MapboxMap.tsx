@@ -50,6 +50,9 @@ export const MapboxMap = ({
         );
 
         if (newMap) {
+          // Disable map movement on marker click
+          newMap.scrollZoom.disable();
+          
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
