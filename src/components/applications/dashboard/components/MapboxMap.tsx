@@ -26,6 +26,7 @@ export const MapboxMap = ({
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
   const initializedRef = useRef(false);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   // Initialize map only once
   useEffect(() => {
@@ -33,15 +34,6 @@ export const MapboxMap = ({
 
     const initializeMap = async () => {
       try {
-        console.log('Initializing map...', {
-          containerExists: !!mapContainer.current,
-          dimensions: mapContainer.current ? {
-            width: mapContainer.current.offsetWidth,
-            height: mapContainer.current.offsetHeight
-          } : null,
-          initialCenter
-        });
-        
         const newMap = await MapboxInitializer.initialize(
           mapContainer.current!,
           initialCenter,
@@ -56,21 +48,14 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Wait for the map to load before setting view and adding markers
-          newMap.on('load', () => {
-            console.log('Map loaded successfully');
-            
-            // Set initial view
-            newMap.setCenter([initialCenter[1], initialCenter[0]]);
-            newMap.setZoom(12);
+          // Set initial view immediately
+          newMap.setCenter([initialCenter[1], initialCenter[0]]);
+          newMap.setZoom(12);
 
-            // Add markers
-            applications.forEach(application => {
-              if (application.coordinates) {
-                markerManager.current?.addMarker(application, application.id === selectedId);
-              }
-            });
-
+          // Wait for the style to load before adding markers
+          newMap.once('style.load', () => {
+            console.log('Map style loaded successfully');
+            setIsMapReady(true);
             initializedRef.current = true;
           });
 
@@ -99,33 +84,34 @@ export const MapboxMap = ({
         map.current = null;
       }
       initializedRef.current = false;
+      setIsMapReady(false);
     };
   }, [initialCenter, onMarkerClick]);
 
-  // Update markers when applications array changes
+  // Update markers only when map is ready and applications change
   useEffect(() => {
-    if (!markerManager.current || !map.current || !applications.length) return;
+    if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
 
     // Remove all existing markers
     markerManager.current.removeAllMarkers();
 
-    // Add new markers without moving the map
+    // Add new markers
     applications.forEach(application => {
       if (application.coordinates) {
         markerManager.current?.addMarker(application, application.id === selectedId);
       }
     });
-  }, [applications, selectedId]);
+  }, [applications, selectedId, isMapReady]);
 
-  // Only update marker styles when selection changes
+  // Update marker styles when selection changes
   useEffect(() => {
-    if (markerManager.current) {
-      const markers = markerManager.current.getMarkers();
-      Object.keys(markers).forEach(id => {
-        markerManager.current?.updateMarkerStyle(Number(id), Number(id) === selectedId);
-      });
-    }
-  }, [selectedId]);
+    if (!isMapReady || !markerManager.current) return;
+    
+    const markers = markerManager.current.getMarkers();
+    Object.keys(markers).forEach(id => {
+      markerManager.current?.updateMarkerStyle(Number(id), Number(id) === selectedId);
+    });
+  }, [selectedId, isMapReady]);
 
   return (
     <div className="w-full h-full relative">
