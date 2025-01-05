@@ -33,9 +33,8 @@ export const MapView = ({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer 
-          url="https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicGxhbm5pbmdwdWxzZSIsImEiOiJjbHJxOGFvYmkwMXZvMmpxcjRhOWNqZWd2In0.ED6Yu4K5VzgyuDtXVQ_YNg"
-          attribution='&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          maxZoom={19}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <SearchLocationPin position={initialCenter as [number, number]} />
         <ApplicationMarkers
