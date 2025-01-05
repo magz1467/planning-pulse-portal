@@ -1,5 +1,8 @@
 import mapboxgl from 'mapbox-gl';
 import { Application } from '@/types/planning';
+import { MarkerCreator } from './utils/MarkerCreator';
+import { MarkerEventHandler } from './utils/MarkerEventHandler';
+import { MarkerStyleManager } from './utils/MarkerStyleManager';
 
 interface MarkerInfo {
   marker: mapboxgl.Marker;
@@ -38,7 +41,6 @@ export class MapboxMarkerManager {
       
       Object.values(this.markers).forEach(({ marker }) => {
         try {
-          // Check if marker element still exists in DOM before removal
           const el = marker.getElement();
           if (document.body.contains(el)) {
             marker.remove();
@@ -46,14 +48,9 @@ export class MapboxMarkerManager {
               markerId: el.id,
               timestamp: new Date().toISOString()
             });
-          } else {
-            console.warn('⚠️ Marker element already removed from DOM:', {
-              markerId: el.id,
-              timestamp: new Date().toISOString()
-            });
           }
         } catch (error) {
-          console.error('❌ Error removing individual marker:', {
+          console.error('❌ Error removing marker:', {
             error,
             markerId: marker.getElement().id,
             timestamp: new Date().toISOString()
@@ -85,14 +82,8 @@ export class MapboxMarkerManager {
     try {
       console.group(`📍 Adding/updating marker for application ${application.id}`);
       const [lat, lng] = application.coordinates;
-      console.log('📌 Marker position:', {
-        lat,
-        lng,
-        isSelected,
-        applicationExists: !!application
-      });
       
-      // If marker already exists, just update its style
+      // If marker exists, just update its style
       if (this.markers[application.id]) {
         this.updateMarkerStyle(application.id, isSelected);
         console.log('🔄 Updated existing marker style');
@@ -100,73 +91,13 @@ export class MapboxMarkerManager {
         return;
       }
 
-      // Create marker element with circle styling
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.id = `marker-${application.id}`; // Add ID for better debugging
-      el.style.width = isSelected ? '24px' : '16px';
-      el.style.height = isSelected ? '24px' : '16px';
-      el.style.borderRadius = '50%';
-      el.style.backgroundColor = isSelected ? '#dc2626' : '#2563eb';
-      el.style.border = '2px solid white';
-      el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-      el.style.transition = 'all 0.2s ease-in-out';
-
-      // Create and add marker
-      const marker = new mapboxgl.Marker({
-        element: el,
-        anchor: 'center',
-        clickTolerance: 3 // Reduce click tolerance to prevent unwanted map movements
-      })
-        .setLngLat([lng, lat])
+      const el = MarkerCreator.createMarkerElement(application, isSelected);
+      const marker = MarkerCreator.createMarker(application, [lng, lat], isSelected, this.map)
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };
 
-      // Add click handler with error boundary and proper event handling
-      const handleClick = (e: Event) => {
-        try {
-          // Prevent event from bubbling to map
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          
-          // Verify marker still exists before handling click
-          if (!document.body.contains(el)) {
-            console.error('❌ Marker element not in DOM during click:', {
-              applicationId: application.id,
-              markerId: el.id,
-              timestamp: new Date().toISOString()
-            });
-            return;
-          }
-          
-          console.log('🖱️ Marker clicked:', {
-            applicationId: application.id,
-            timestamp: new Date().toISOString(),
-            elementExists: !!el,
-            markerExists: !!this.markers[application.id]
-          });
-          
-          // Prevent map movement on marker click
-          this.map.dragPan.disable();
-          setTimeout(() => this.map.dragPan.enable(), 300);
-          
-          this.onMarkerClick(application.id);
-        } catch (error) {
-          console.error('❌ Error in marker click handler:', {
-            error,
-            applicationId: application.id,
-            elementId: el.id,
-            timestamp: new Date().toISOString()
-          });
-        }
-      };
-
-      el.addEventListener('click', handleClick, { capture: true });
-      el.addEventListener('mousedown', (e) => e.stopPropagation(), { capture: true });
-      el.addEventListener('touchstart', (e) => e.stopPropagation(), { capture: true });
+      MarkerEventHandler.attachEvents(el, this.map, application, this.onMarkerClick);
 
       console.log('✅ Marker successfully added');
       console.groupEnd();
@@ -203,9 +134,7 @@ export class MapboxMarkerManager {
         return;
       }
 
-      el.style.width = isSelected ? '24px' : '16px';
-      el.style.height = isSelected ? '24px' : '16px';
-      el.style.backgroundColor = isSelected ? '#dc2626' : '#2563eb';
+      MarkerStyleManager.updateMarkerStyle(el, isSelected);
       
       console.log('✅ Marker style updated:', {
         applicationId,
