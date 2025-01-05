@@ -42,39 +42,26 @@ export const ApplicationMarkers = ({
   // Log the number of applications being processed
   console.log('ApplicationMarkers - Processing applications:', applications.length);
 
-  const generateRandomCoordinates = (index: number): LatLngTuple => {
-    // Increase the spread of markers by adjusting these multipliers
-    const angle = (index * Math.PI * 0.2) % (2 * Math.PI); // More spread in the circle
-    const distance = 0.002 + (index % 10) * 0.001; // Larger radius steps
-    
-    const latOffset = distance * Math.cos(angle);
-    const lngOffset = distance * Math.sin(angle);
-
-    return [
-      baseCoordinates[0] + latOffset,
-      baseCoordinates[1] + lngOffset
-    ];
-  };
-
-  const applicationCoordinates = useMemo(() => {
-    return applications.map((_, index) => generateRandomCoordinates(index));
-  }, [applications.length, baseCoordinates]);
-
   return (
     <>
-      {applications.map((app, index) => {
+      {applications.map((app) => {
         const color = getStatusColor(app.status);
         const isSelected = app.id === selectedId;
-        return (
-          <Marker
-            key={app.id}
-            position={applicationCoordinates[index]}
-            eventHandlers={{
-              click: () => onMarkerClick(app.id),
-            }}
-            icon={createIcon(color, isSelected)}
-          />
-        );
+        
+        // Only create marker if application has coordinates
+        if (app.coordinates) {
+          return (
+            <Marker
+              key={app.id}
+              position={app.coordinates}
+              eventHandlers={{
+                click: () => onMarkerClick(app.id),
+              }}
+              icon={createIcon(color, isSelected)}
+            />
+          );
+        }
+        return null;
       })}
     </>
   );
