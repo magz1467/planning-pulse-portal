@@ -48,6 +48,7 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
+          console.log('Setting initial center to:', initialCenter);
           // Set initial view
           newMap.setCenter([initialCenter[1], initialCenter[0]]);
           newMap.setZoom(12);
@@ -99,8 +100,20 @@ export const MapboxMap = ({
     // Add new markers
     applications.forEach(application => {
       if (application.coordinates) {
-        console.log('Adding marker for application:', application.id, application.coordinates);
-        markerManager.current?.addMarker(application, application.id === selectedId);
+        // Validate coordinates are within London area (roughly)
+        const isValidLondonCoordinate = (
+          application.coordinates[0] >= 51.2 && // South boundary
+          application.coordinates[0] <= 51.8 && // North boundary
+          application.coordinates[1] >= -0.5 && // West boundary
+          application.coordinates[1] <= 0.3     // East boundary
+        );
+
+        if (isValidLondonCoordinate) {
+          console.log('Adding valid London marker for application:', application.id, application.coordinates);
+          markerManager.current?.addMarker(application, application.id === selectedId);
+        } else {
+          console.warn('Skipping invalid coordinate for application:', application.id, application.coordinates);
+        }
       }
     });
 
@@ -110,8 +123,18 @@ export const MapboxMap = ({
 
     applications.forEach(app => {
       if (app.coordinates) {
-        bounds.extend([app.coordinates[1], app.coordinates[0]]);
-        hasValidCoordinates = true;
+        // Only include coordinates within London area
+        const isValidLondonCoordinate = (
+          app.coordinates[0] >= 51.2 &&
+          app.coordinates[0] <= 51.8 &&
+          app.coordinates[1] >= -0.5 &&
+          app.coordinates[1] <= 0.3
+        );
+
+        if (isValidLondonCoordinate) {
+          bounds.extend([app.coordinates[1], app.coordinates[0]]);
+          hasValidCoordinates = true;
+        }
       }
     });
 
