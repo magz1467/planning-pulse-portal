@@ -8,8 +8,8 @@ export const fetchApplicationsFromSupabase = async (
   pageNumber = 0
 ) => {
   console.log('Fetching applications with params:', {
-    center_longitude: center[1],
-    center_latitude: center[0],
+    center_lng: center[1],
+    center_lat: center[0],
     radius_meters: radiusInMeters,
     page_size: pageSize,
     page_number: pageNumber
@@ -73,8 +73,8 @@ export const fetchApplicationsCountFromSupabase = async (
   radiusInMeters: number
 ) => {
   console.log('Fetching applications count with params:', {
-    center_longitude: center[1],
-    center_latitude: center[0],
+    center_lng: center[1],
+    center_lat: center[0],
     radius_meters: radiusInMeters
   });
 

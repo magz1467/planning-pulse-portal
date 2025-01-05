@@ -28,8 +28,8 @@ export const useApplicationsFetch = () => {
       const radiusInMeters = MAP_DEFAULTS.searchRadius * 1000;
       console.log('📏 Query parameters:', {
         radiusInMeters,
-        center_longitude: center[1],
-        center_latitude: center[0]
+        center_lng: center[1],
+        center_lat: center[0]
       });
       
       if (!center || !Array.isArray(center) || center.length !== 2) {
