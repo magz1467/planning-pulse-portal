@@ -2,7 +2,6 @@ import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
-import { SearchLocationPin } from "@/components/map/SearchLocationPin";
 import { useEffect } from 'react';
 import "leaflet/dist/leaflet.css";
 
@@ -33,11 +32,10 @@ export const MapView = ({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer 
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           maxZoom={19}
         />
-        <SearchLocationPin position={initialCenter as [number, number]} />
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={initialCenter}

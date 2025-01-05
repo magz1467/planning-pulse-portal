@@ -2,28 +2,27 @@ import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
-import { useEffect } from "react";
+import { SearchLocationPin } from "@/components/map/SearchLocationPin";
+import { useEffect } from 'react';
 import "leaflet/dist/leaflet.css";
 
 interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
-  initialCenter: LatLngTuple;
   onMarkerClick: (id: number) => void;
+  initialCenter: LatLngTuple;
 }
 
 export const MapView = ({
   applications,
   selectedId,
-  initialCenter,
   onMarkerClick,
+  initialCenter
 }: MapViewProps) => {
+  // Log the number of visible applications for debugging
   useEffect(() => {
-    // Force map to update its size when container size changes
-    window.dispatchEvent(new Event('resize'));
-  }, []);
-
-  console.log('MapView render', { applications: applications.length, selectedId, initialCenter });
+    console.log('MapView - Number of applications:', applications.length);
+  }, [applications]);
 
   return (
     <div className="w-full h-full relative">
@@ -32,13 +31,16 @@ export const MapView = ({
         zoom={15}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
-        attributionControl={false}
+        zoomControl={true}
+        minZoom={12}
+        maxZoom={18}
       >
         <TileLayer 
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           maxZoom={19}
         />
+        <SearchLocationPin position={initialCenter} />
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={initialCenter}

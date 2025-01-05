@@ -16,14 +16,11 @@ export const MobileApplicationCards = ({
   selectedId,
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
-  console.log("MobileApplicationCards render", { applications, selectedId });
-  
   const [showFullDetails, setShowFullDetails] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (selectedId === null) {
-      console.log("Selected ID is null, hiding full details");
       setShowFullDetails(false);
     }
   }, [selectedId]);
@@ -37,21 +34,17 @@ export const MobileApplicationCards = ({
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
-  console.log("Selected application:", selectedApp);
 
   if (!applications.length) {
-    console.log("No applications available");
     return <EmptyState />;
   }
 
   if (showFullDetails && selectedApp) {
-    console.log("Showing full details view");
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {
-            console.log("Closing full details");
             setShowFullDetails(false);
             onSelectApplication(null);
           }}
@@ -62,18 +55,13 @@ export const MobileApplicationCards = ({
   }
 
   if (selectedApp && !showFullDetails) {
-    console.log("Showing mini card");
     return (
       <MiniCard
         application={selectedApp}
-        onClick={() => {
-          console.log("Mini card clicked, showing full details");
-          setShowFullDetails(true);
-        }}
+        onClick={() => setShowFullDetails(true)}
       />
     );
   }
 
-  console.log("No content to display");
   return null;
 };
