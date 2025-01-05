@@ -11,13 +11,18 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
+  console.log("MiniCard render", { applicationId: application.id });
+  
   const isClosingSoon = application.last_date_consultation_comments ? 
     isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
   return (
     <Card
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-xl shadow-lg p-4 cursor-pointer"
-      onClick={onClick}
+      className="fixed bottom-0 left-0 right-0 z-[2000] bg-white rounded-t-xl shadow-lg p-4 cursor-pointer"
+      onClick={() => {
+        console.log("MiniCard clicked");
+        onClick();
+      }}
     >
       <div className="flex gap-3">
         <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
@@ -26,6 +31,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             alt={application.description}
             className="w-full h-full object-cover"
             onError={(e) => {
+              console.log("Image load error, using placeholder");
               const target = e.target as HTMLImageElement;
               target.src = '/placeholder.svg';
             }}
