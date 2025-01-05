@@ -32,6 +32,18 @@ export const useApplicationsFetch = () => {
         center_latitude: center[0]
       });
       
+      if (!center || !Array.isArray(center) || center.length !== 2) {
+        console.error('❌ Invalid center coordinates:', center);
+        toast({
+          title: "Invalid location",
+          description: "Could not determine the search location. Please try again.",
+          variant: "destructive",
+        });
+        setApplications([]);
+        setTotalCount(0);
+        return;
+      }
+
       console.time('🕒 Database query execution');
       const { data: apps, error } = await supabase.rpc(
         'get_applications_within_radius',
@@ -49,15 +61,38 @@ export const useApplicationsFetch = () => {
         console.error('❌ Database query error:', {
           error,
           message: error.message,
-          details: error.details
+          details: error.details,
+          hint: error.hint
+        });
+        toast({
+          title: "Error loading applications",
+          description: "There was a problem loading the planning applications. Please try again.",
+          variant: "destructive",
         });
         throw error;
       }
 
-      if (!apps || apps.length === 0) {
+      if (!apps || !Array.isArray(apps)) {
+        console.error('❌ Invalid response format:', apps);
+        toast({
+          title: "Data format error",
+          description: "The server returned an unexpected data format. Please try again.",
+          variant: "destructive",
+        });
+        setApplications([]);
+        setTotalCount(0);
+        return;
+      }
+
+      if (apps.length === 0) {
         console.log('ℹ️ No applications found within radius', {
           center,
           radiusInMeters
+        });
+        toast({
+          title: "No results found",
+          description: "No planning applications were found in this area. Try searching a different location or increasing the search radius.",
+          variant: "default",
         });
         setApplications([]);
         setTotalCount(0);
