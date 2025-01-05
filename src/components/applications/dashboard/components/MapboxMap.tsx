@@ -50,29 +50,13 @@ export const MapboxMap = ({
           
           // Set initial view immediately
           newMap.setCenter([initialCenter[1], initialCenter[0]]);
-          newMap.setZoom(14); // Start with a closer zoom
+          newMap.setZoom(13); // Default zoom level
 
           // Wait for the style to load before adding markers
           newMap.once('style.load', () => {
             console.log('Map style loaded successfully');
             setIsMapReady(true);
             initializedRef.current = true;
-
-            // Fit bounds to markers after they're added
-            if (applications.length > 0) {
-              const bounds = new mapboxgl.LngLatBounds();
-              applications.forEach(app => {
-                if (app.coordinates) {
-                  bounds.extend([app.coordinates[1], app.coordinates[0]]);
-                }
-              });
-              
-              // Add some padding around the bounds
-              newMap.fitBounds(bounds, {
-                padding: 50,
-                maxZoom: 16
-              });
-            }
           });
 
           // Handle map errors
@@ -102,9 +86,9 @@ export const MapboxMap = ({
       initializedRef.current = false;
       setIsMapReady(false);
     };
-  }, [initialCenter, onMarkerClick, applications]);
+  }, [initialCenter, onMarkerClick]);
 
-  // Update markers only when map is ready and applications change
+  // Update markers and fit bounds when applications change
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
 
@@ -120,6 +104,25 @@ export const MapboxMap = ({
         markerManager.current?.addMarker(application, application.id === selectedId);
       }
     });
+
+    // Fit bounds after adding markers
+    const bounds = new mapboxgl.LngLatBounds();
+    let hasValidCoordinates = false;
+
+    applications.forEach(app => {
+      if (app.coordinates) {
+        bounds.extend([app.coordinates[1], app.coordinates[0]]);
+        hasValidCoordinates = true;
+      }
+    });
+
+    if (hasValidCoordinates) {
+      map.current.fitBounds(bounds, {
+        padding: { top: 50, bottom: 50, left: 50, right: 50 },
+        maxZoom: 15,
+        duration: 1000
+      });
+    }
   }, [applications, selectedId, isMapReady]);
 
   // Update marker styles when selection changes
