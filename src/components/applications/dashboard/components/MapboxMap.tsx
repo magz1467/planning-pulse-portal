@@ -48,18 +48,16 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Set initial view immediately after map creation
+          // Set initial view
           newMap.setCenter([initialCenter[1], initialCenter[0]]);
           newMap.setZoom(12);
 
-          // Wait for the style to load before adding markers
           newMap.once('style.load', () => {
             console.log('Map style loaded successfully');
             setIsMapReady(true);
             initializedRef.current = true;
           });
 
-          // Handle map errors
           newMap.on('error', (e) => {
             console.error('Mapbox error:', e);
             setError('Failed to load map resources');
@@ -119,7 +117,7 @@ export const MapboxMap = ({
 
     if (hasValidCoordinates && map.current) {
       map.current.fitBounds(bounds, {
-        padding: { top: 50, bottom: 50, left: 50, right: 50 },
+        padding: { top: 100, bottom: 100, left: 100, right: 100 },
         maxZoom: 15,
         duration: 1000
       });
