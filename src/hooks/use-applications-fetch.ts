@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
 import { calculateDistance } from '@/utils/distance';
+import { MAP_DEFAULTS } from '@/utils/mapConstants';
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -19,13 +20,19 @@ export const useApplicationsFetch = () => {
     console.log('Fetching applications with center:', center);
     
     try {
-      // Simple spatial query with limit for performance
-      const { data: apps, error } = await supabase
-        .from('applications')
-        .select('*')
-        .not('geom', 'is', null)
-        .filter('status', 'not.is', null)
-        .limit(100);
+      // Convert kilometers to meters for the database query
+      const radiusInMeters = MAP_DEFAULTS.searchRadius * 1000;
+      
+      const { data: apps, error } = await supabase.rpc(
+        'get_applications_within_radius',
+        { 
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: radiusInMeters,
+          page_size: 100,
+          page_number: 0
+        }
+      );
 
       if (error) {
         console.error('Data fetch error:', error);
@@ -33,7 +40,7 @@ export const useApplicationsFetch = () => {
       }
 
       if (!apps || apps.length === 0) {
-        console.log('No applications found');
+        console.log('No applications found within 1km radius');
         setApplications([]);
         setTotalCount(0);
         return;
