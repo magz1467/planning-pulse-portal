@@ -34,7 +34,8 @@ export const MapboxMap = ({
   useEffect(() => {
     if (initializedRef.current || !mapContainer.current) return;
 
-    console.log('Initializing map with center:', initialCenter);
+    console.group('🗺️ Map Initialization');
+    console.log('📍 Initial center:', initialCenter);
 
     const initializeMap = async () => {
       try {
@@ -42,7 +43,7 @@ export const MapboxMap = ({
           mapContainer.current!,
           initialCenter,
           (error, debug) => {
-            console.error('Map initialization error:', error, debug);
+            console.error('❌ Map initialization error:', { error, debug });
             setError(error);
             setDebugInfo(debug);
           }
@@ -52,27 +53,28 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Set initial view
           const [lat, lng] = initialCenter;
-          console.log(`Setting initial center to [${lat}, ${lng}]`);
+          console.log('🎯 Setting initial view:', { lat, lng, zoom: MAP_DEFAULTS.initialZoom });
           newMap.setCenter([lng, lat]);
           newMap.setZoom(MAP_DEFAULTS.initialZoom);
 
           newMap.once('style.load', () => {
-            console.log('Map style loaded successfully');
+            console.log('✨ Map style loaded successfully');
             setIsMapReady(true);
             initializedRef.current = true;
           });
         }
       } catch (err) {
-        console.error('Map initialization failed:', err);
+        console.error('❌ Map initialization failed:', err);
         setError('Failed to initialize map');
       }
     };
 
     initializeMap();
+    console.groupEnd();
 
     return () => {
+      console.log('🧹 Cleaning up map resources');
       if (markerManager.current) {
         markerManager.current.removeAllMarkers();
         markerManager.current = null;
@@ -88,8 +90,8 @@ export const MapboxMap = ({
 
   // Handle applications updates
   useEffect(() => {
-    if (!isMapReady || !markerManager.current || !map.current || !applications.length) {
-      console.log('Skipping marker update - conditions not met:', {
+    if (!isMapReady || !markerManager.current || !map.current) {
+      console.log('⏳ Skipping marker update - conditions not met:', {
         isMapReady,
         hasMarkerManager: !!markerManager.current,
         hasMap: !!map.current,
@@ -98,15 +100,22 @@ export const MapboxMap = ({
       return;
     }
 
-    console.log(`Processing ${applications.length} applications`);
+    console.group('🔄 Processing Applications Update');
+    console.log(`📊 Processing ${applications.length} applications`);
 
     // Filter out applications without coordinates
     const validApplications = applications.filter(application => {
       if (!application.coordinates) {
-        console.warn(`Application ${application.id} has no coordinates - skipping`);
+        console.warn(`⚠️ Application ${application.id} has no coordinates - skipping`);
         return false;
       }
       return true;
+    });
+
+    console.log('📍 Valid applications:', {
+      total: applications.length,
+      valid: validApplications.length,
+      invalid: applications.length - validApplications.length
     });
 
     // Clear existing markers before adding new ones
@@ -121,6 +130,7 @@ export const MapboxMap = ({
 
     // Set bounds only on initial load
     if (!hasSetInitialBounds.current && validApplications.length > 0) {
+      console.log('🎯 Setting initial bounds');
       const bounds = new mapboxgl.LngLatBounds();
       validApplications.forEach(app => {
         if (app.coordinates) {
@@ -136,8 +146,10 @@ export const MapboxMap = ({
       });
       
       hasSetInitialBounds.current = true;
-      console.log('Initial bounds set');
+      console.log('✅ Initial bounds set');
     }
+
+    console.groupEnd();
   }, [applications, isMapReady, selectedId]);
 
   return (

@@ -12,7 +12,9 @@ export class MapboxMarkerManager {
   private onMarkerClick: (id: number) => void;
 
   constructor(map: mapboxgl.Map, onMarkerClick: (id: number) => void) {
-    console.log('Initializing MapboxMarkerManager');
+    console.log('🎯 Initializing MapboxMarkerManager', {
+      timestamp: new Date().toISOString()
+    });
     this.map = map;
     this.onMarkerClick = onMarkerClick;
   }
@@ -22,7 +24,11 @@ export class MapboxMarkerManager {
   }
 
   public removeAllMarkers() {
-    console.log(`Removing ${Object.keys(this.markers).length} markers`);
+    console.log('🧹 Removing markers:', {
+      count: Object.keys(this.markers).length,
+      markerIds: Object.keys(this.markers),
+      timestamp: new Date().toISOString()
+    });
     Object.values(this.markers).forEach(({ marker }) => {
       marker.remove();
     });
@@ -31,16 +37,24 @@ export class MapboxMarkerManager {
 
   public addMarker(application: Application, isSelected: boolean) {
     if (!application.coordinates) {
-      console.warn(`Application ${application.id} has no coordinates - skipping`);
+      console.warn('⚠️ Cannot add marker - missing coordinates:', {
+        applicationId: application.id,
+        timestamp: new Date().toISOString()
+      });
       return;
     }
 
     try {
+      console.group(`📍 Adding marker for application ${application.id}`);
       const [lat, lng] = application.coordinates;
-      console.log(`Adding marker for application ${application.id} [${lat}, ${lng}]`);
+      console.log('📌 Marker position:', {
+        lat,
+        lng,
+        isSelected
+      });
       
-      // Remove existing marker if it exists
       if (this.markers[application.id]) {
+        console.log('🔄 Removing existing marker before update');
         this.markers[application.id].marker.remove();
       }
 
@@ -59,24 +73,41 @@ export class MapboxMarkerManager {
 
       // Add click handler
       el.addEventListener('click', () => {
-        console.log(`Marker clicked for application ${application.id}`);
+        console.log('🖱️ Marker clicked:', {
+          applicationId: application.id,
+          timestamp: new Date().toISOString()
+        });
         this.onMarkerClick(application.id);
       });
 
+      console.log('✅ Marker successfully added');
+      console.groupEnd();
+
     } catch (error) {
-      console.error(`Error adding marker for application ${application.id}:`, error);
+      console.error('❌ Error adding marker:', {
+        applicationId: application.id,
+        error,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
   public updateMarkerStyle(applicationId: number, isSelected: boolean) {
+    console.group(`🎨 Updating marker style for ${applicationId}`);
     const markerInfo = this.markers[applicationId];
     if (!markerInfo) {
-      console.warn(`Attempted to update style for non-existent marker: ${applicationId}`);
+      console.warn('⚠️ Attempted to update style for non-existent marker:', applicationId);
+      console.groupEnd();
       return;
     }
 
     const el = markerInfo.marker.getElement();
     this.updateMarkerElement(el, isSelected);
+    console.log('✅ Marker style updated:', {
+      applicationId,
+      isSelected
+    });
+    console.groupEnd();
   }
 
   private createMarkerElement(isSelected: boolean): HTMLDivElement {

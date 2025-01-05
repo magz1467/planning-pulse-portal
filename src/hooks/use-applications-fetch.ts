@@ -17,40 +17,61 @@ export const useApplicationsFetch = () => {
     filters?: { status?: string; type?: string }
   ) => {
     setIsLoading(true);
-    console.log('Starting fetchApplicationsInRadius with center:', center);
+    console.log('🔍 Starting fetchApplicationsInRadius:', {
+      center,
+      filters,
+      timestamp: new Date().toISOString()
+    });
     
     try {
       // Convert kilometers to meters for the database query
       const radiusInMeters = MAP_DEFAULTS.searchRadius * 1000;
-      console.log('Querying with radius (meters):', radiusInMeters);
+      console.log('📏 Query parameters:', {
+        radiusInMeters,
+        center_lng: center[1],
+        center_lat: center[0]
+      });
       
+      console.time('🕒 Database query execution');
       const { data: apps, error } = await supabase.rpc(
         'get_applications_within_radius',
         { 
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radiusInMeters,
-          page_size: 100, // Explicitly set to 100 results
+          page_size: 100,
           page_number: 0
         }
       );
+      console.timeEnd('🕒 Database query execution');
 
       if (error) {
-        console.error('Data fetch error:', error);
+        console.error('❌ Database query error:', {
+          error,
+          message: error.message,
+          details: error.details
+        });
         throw error;
       }
 
       if (!apps || apps.length === 0) {
-        console.log('No applications found within radius');
+        console.log('ℹ️ No applications found within radius', {
+          center,
+          radiusInMeters
+        });
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log('Raw applications data:', apps);
-      console.log('Number of applications returned:', apps.length);
+      console.log('📊 Raw applications data:', {
+        count: apps.length,
+        firstApp: apps[0],
+        lastApp: apps[apps.length - 1]
+      });
 
       const transformedData = apps?.map((app: any) => {
+        console.group(`🔄 Transforming application ${app.application_id}`);
         const geomObj = app.geom;
         let coordinates: [number, number] | null = null;
 
@@ -59,11 +80,14 @@ export const useApplicationsFetch = () => {
             geomObj.coordinates[1] as number,
             geomObj.coordinates[0] as number
           ];
-          console.log(`Application ${app.application_id} coordinates:`, coordinates);
+          console.log('📍 Coordinates extracted:', coordinates);
+        } else {
+          console.warn('⚠️ Missing or invalid geometry for application:', app.application_id);
         }
 
         if (!coordinates) {
-          console.warn('Missing coordinates for application:', app.application_id);
+          console.warn('⚠️ No valid coordinates for application:', app.application_id);
+          console.groupEnd();
           return null;
         }
 
@@ -77,6 +101,7 @@ export const useApplicationsFetch = () => {
           if (details.images && Array.isArray(details.images) && details.images.length > 0) {
             const imgUrl = details.images[0];
             imageUrl = imgUrl.startsWith('http') ? imgUrl : `${process.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${imgUrl}`;
+            console.log('🖼️ Image URL processed:', imageUrl);
           }
         }
 
@@ -103,17 +128,31 @@ export const useApplicationsFetch = () => {
           postcode: app.postcode || ''
         };
 
+        console.log('✅ Transformed application:', {
+          id: application.id,
+          coordinates: application.coordinates,
+          distance: application.distance
+        });
+        console.groupEnd();
         return application;
       }).filter((app): app is Application => app !== null);
       
-      console.log('Transformed applications:', transformedData);
-      console.log('Number of valid applications after transform:', transformedData.length);
+      console.log('📊 Final transformed data:', {
+        totalApplications: transformedData.length,
+        withCoordinates: transformedData.filter(app => app.coordinates).length,
+        timestamp: new Date().toISOString()
+      });
       
       setApplications(transformedData || []);
       setTotalCount(transformedData.length);
 
     } catch (error: any) {
-      console.error('Error in fetchApplicationsInRadius:', error);
+      console.error('❌ Error in fetchApplicationsInRadius:', {
+        error,
+        message: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
       toast({
         title: "Error fetching applications",
         description: error.message,
@@ -121,6 +160,9 @@ export const useApplicationsFetch = () => {
       });
     } finally {
       setIsLoading(false);
+      console.log('🏁 Fetch operation completed', {
+        timestamp: new Date().toISOString()
+      });
     }
   };
 
