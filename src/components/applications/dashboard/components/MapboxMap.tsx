@@ -6,8 +6,7 @@ import { LatLngTuple } from 'leaflet';
 import { MapboxMarkerManager } from './mapbox/MapboxMarkerManager';
 import { MapboxInitializer } from './mapbox/MapboxInitializer';
 import { MapboxErrorDisplay } from './mapbox/MapboxErrorDisplay';
-import { calculateDistance } from '@/utils/distance';
-import { LONDON_BOUNDS, MAP_DEFAULTS } from '@/utils/mapConstants';
+import { MAP_DEFAULTS } from '@/utils/mapConstants';
 
 interface MapboxMapProps {
   applications: Application[];
@@ -91,15 +90,6 @@ export const MapboxMap = ({
     };
   }, [initialCenter, onMarkerClick]);
 
-  const isValidLondonCoordinate = (lat: number, lng: number): boolean => {
-    return (
-      lat >= LONDON_BOUNDS.south &&
-      lat <= LONDON_BOUNDS.north &&
-      lng >= LONDON_BOUNDS.west &&
-      lng <= LONDON_BOUNDS.east
-    );
-  };
-
   // Update markers and fit bounds when applications change
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
@@ -108,24 +98,12 @@ export const MapboxMap = ({
 
     // Remove all existing markers before adding new ones
     markerManager.current.removeAllMarkers();
-
-    const [centerLat, centerLng] = initialCenter;
     
     const validApplications = applications.filter(application => {
       if (!application.coordinates) {
         console.warn(`Application ${application.id} has no coordinates - skipping`);
         return false;
       }
-      
-      const [lat, lng] = application.coordinates;
-      
-      // Check if coordinates are valid and within London bounds
-      const isValid = isValidLondonCoordinate(lat, lng);
-      if (!isValid) {
-        console.warn(`Application ${application.id} coordinates [${lat}, ${lng}] outside London bounds - skipping`);
-        return false;
-      }
-
       return true;
     });
 
