@@ -33,33 +33,29 @@ export class MapboxMarkerManager {
   public removeAllMarkers() {
     console.group('🧹 Removing markers');
     try {
-      console.log('📊 Marker stats:', {
-        count: Object.keys(this.markers).length,
+      const markerCount = Object.keys(this.markers).length;
+      console.log('📊 Current markers:', {
+        count: markerCount,
         markerIds: Object.keys(this.markers),
         timestamp: new Date().toISOString()
       });
       
-      Object.values(this.markers).forEach(({ marker }) => {
-        try {
-          const el = marker.getElement();
-          if (document.body.contains(el)) {
+      // Only proceed if we actually have markers to remove
+      if (markerCount > 0) {
+        Object.values(this.markers).forEach(({ marker }) => {
+          try {
             marker.remove();
-            console.log('✅ Successfully removed marker:', {
-              markerId: el.id,
-              timestamp: new Date().toISOString()
-            });
+            console.log('✅ Successfully removed marker');
+          } catch (error) {
+            console.error('❌ Error removing individual marker:', error);
           }
-        } catch (error) {
-          console.error('❌ Error removing marker:', {
-            error,
-            markerId: marker.getElement().id,
-            timestamp: new Date().toISOString()
-          });
-        }
-      });
-      
-      this.markers = {};
-      console.log('✅ All markers successfully removed');
+        });
+        
+        this.markers = {};
+        console.log('✅ All markers successfully cleared');
+      } else {
+        console.log('ℹ️ No markers to remove');
+      }
     } catch (error) {
       console.error('❌ Critical error during marker removal:', {
         error,
@@ -97,9 +93,14 @@ export class MapboxMarkerManager {
 
       this.markers[application.id] = { marker, application };
 
+      // Attach events after marker is added to the map
       MarkerEventHandler.attachEvents(el, this.map, application, this.onMarkerClick);
 
-      console.log('✅ Marker successfully added');
+      console.log('✅ Marker successfully added:', {
+        applicationId: application.id,
+        coordinates: [lng, lat],
+        isSelected
+      });
       console.groupEnd();
 
     } catch (error) {
@@ -124,16 +125,6 @@ export class MapboxMarkerManager {
       }
 
       const el = markerInfo.marker.getElement();
-      if (!el || !document.body.contains(el)) {
-        console.error('❌ Marker element not found or not in DOM:', {
-          applicationId,
-          markerId: `marker-${applicationId}`,
-          timestamp: new Date().toISOString()
-        });
-        console.groupEnd();
-        return;
-      }
-
       MarkerStyleManager.updateMarkerStyle(el, isSelected);
       
       console.log('✅ Marker style updated:', {
