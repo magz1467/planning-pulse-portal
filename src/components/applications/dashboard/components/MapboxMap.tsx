@@ -50,13 +50,29 @@ export const MapboxMap = ({
           
           // Set initial view immediately
           newMap.setCenter([initialCenter[1], initialCenter[0]]);
-          newMap.setZoom(12);
+          newMap.setZoom(14); // Start with a closer zoom
 
           // Wait for the style to load before adding markers
           newMap.once('style.load', () => {
             console.log('Map style loaded successfully');
             setIsMapReady(true);
             initializedRef.current = true;
+
+            // Fit bounds to markers after they're added
+            if (applications.length > 0) {
+              const bounds = new mapboxgl.LngLatBounds();
+              applications.forEach(app => {
+                if (app.coordinates) {
+                  bounds.extend([app.coordinates[1], app.coordinates[0]]);
+                }
+              });
+              
+              // Add some padding around the bounds
+              newMap.fitBounds(bounds, {
+                padding: 50,
+                maxZoom: 16
+              });
+            }
           });
 
           // Handle map errors
@@ -86,11 +102,13 @@ export const MapboxMap = ({
       initializedRef.current = false;
       setIsMapReady(false);
     };
-  }, [initialCenter, onMarkerClick]);
+  }, [initialCenter, onMarkerClick, applications]);
 
   // Update markers only when map is ready and applications change
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
+
+    console.log('Adding markers for applications:', applications.length);
 
     // Remove all existing markers
     markerManager.current.removeAllMarkers();
@@ -98,6 +116,7 @@ export const MapboxMap = ({
     // Add new markers
     applications.forEach(application => {
       if (application.coordinates) {
+        console.log('Adding marker for application:', application.id, application.coordinates);
         markerManager.current?.addMarker(application, application.id === selectedId);
       }
     });
