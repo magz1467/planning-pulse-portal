@@ -26,13 +26,12 @@ export const MapboxMap = ({
   const markerManager = useRef<MapboxMarkerManager | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string>('');
-  const initializedRef = useRef(false);
   const [isMapReady, setIsMapReady] = useState(false);
   const hasSetInitialBounds = useRef(false);
 
   // Initialize map only once
   useEffect(() => {
-    if (initializedRef.current || !mapContainer.current) return;
+    if (!mapContainer.current || map.current) return;
 
     console.group('🗺️ Map Initialization');
     console.log('📍 Initial center:', initialCenter);
@@ -64,7 +63,6 @@ export const MapboxMap = ({
           newMap.once('style.load', () => {
             console.log('✨ Map style loaded successfully');
             setIsMapReady(true);
-            initializedRef.current = true;
           });
         }
       } catch (err) {
@@ -76,6 +74,7 @@ export const MapboxMap = ({
     initializeMap();
     console.groupEnd();
 
+    // Cleanup function
     return () => {
       console.log('🧹 Cleaning up map resources');
       if (markerManager.current) {
@@ -86,10 +85,10 @@ export const MapboxMap = ({
         map.current.remove();
         map.current = null;
       }
-      initializedRef.current = false;
       setIsMapReady(false);
+      hasSetInitialBounds.current = false;
     };
-  }, [initialCenter, onMarkerClick]);
+  }, []); // Empty dependency array for single initialization
 
   // Handle applications updates
   useEffect(() => {
