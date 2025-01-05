@@ -1,4 +1,3 @@
-import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
@@ -7,27 +6,26 @@ import { useEffect } from 'react';
 import "leaflet/dist/leaflet.css";
 
 interface MapViewProps {
-  applications: Application[];
-  selectedId: number | null;
+  applications: any[];
+  initialCenter: [number, number];
+  baseCoordinates?: [number, number];
   onMarkerClick: (id: number) => void;
-  initialCenter: LatLngTuple;
 }
 
 export const MapView = ({
   applications,
-  selectedId,
+  initialCenter,
   onMarkerClick,
-  initialCenter
 }: MapViewProps) => {
-  // Log the number of visible applications for debugging
   useEffect(() => {
-    console.log('MapView - Number of applications:', applications.length);
-  }, [applications]);
+    // Force map to update its size when container size changes
+    window.dispatchEvent(new Event('resize'));
+  }, []);
 
   return (
     <div className="w-full h-full relative">
       <MapContainer
-        center={initialCenter}
+        center={initialCenter as LatLngTuple}
         zoom={15}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
@@ -45,7 +43,6 @@ export const MapView = ({
           applications={applications}
           baseCoordinates={initialCenter}
           onMarkerClick={onMarkerClick}
-          selectedId={selectedId}
         />
       </MapContainer>
     </div>
