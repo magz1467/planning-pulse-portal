@@ -62,41 +62,36 @@ export class MapboxMarkerManager {
         this.markers[application.id].marker.remove();
       }
 
-      // Create marker element
-      const el = this.createMarkerElement(isSelected);
+      // Create marker element with circle styling
+      const el = document.createElement('div');
+      el.className = 'marker';
+      el.style.width = isSelected ? '24px' : '16px';
+      el.style.height = isSelected ? '24px' : '16px';
+      el.style.borderRadius = '50%';
+      el.style.backgroundColor = isSelected ? '#dc2626' : '#2563eb';
+      el.style.border = '2px solid white';
+      el.style.cursor = 'pointer';
+      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+      el.style.transition = 'all 0.2s ease-in-out';
 
       // Create and add marker
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
-        draggable: false
       })
         .setLngLat([lng, lat])
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };
 
-      // Add click handler with proper event handling
+      // Add click handler
       el.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         
-        // Prevent map movement
-        if (e && e.stopPropagation) {
-          e.stopPropagation();
-        }
-        
         console.log('🖱️ Marker clicked:', {
           applicationId: application.id,
           timestamp: new Date().toISOString()
-        });
-        
-        // Call click handler without moving map
-        this.map.once('movestart', (e) => {
-          e.preventDefault();
-          if (e && e.stopPropagation) {
-            e.stopPropagation();
-          }
         });
         
         this.onMarkerClick(application.id);
@@ -124,26 +119,14 @@ export class MapboxMarkerManager {
     }
 
     const el = markerInfo.marker.getElement();
-    this.updateMarkerElement(el, isSelected);
+    el.style.width = isSelected ? '24px' : '16px';
+    el.style.height = isSelected ? '24px' : '16px';
+    el.style.backgroundColor = isSelected ? '#dc2626' : '#2563eb';
+    
     console.log('✅ Marker style updated:', {
       applicationId,
       isSelected
     });
     console.groupEnd();
-  }
-
-  private createMarkerElement(isSelected: boolean): HTMLDivElement {
-    const el = document.createElement('div');
-    this.updateMarkerElement(el, isSelected);
-    return el;
-  }
-
-  private updateMarkerElement(el: HTMLElement, isSelected: boolean) {
-    el.className = 'marker';
-    el.style.width = '24px';
-    el.style.height = '24px';
-    el.style.backgroundImage = `url(${isSelected ? '/marker-selected.svg' : '/marker.svg'})`;
-    el.style.backgroundSize = 'cover';
-    el.style.cursor = 'pointer';
   }
 }
