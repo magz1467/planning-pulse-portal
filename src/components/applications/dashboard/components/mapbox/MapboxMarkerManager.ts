@@ -78,20 +78,14 @@ export class MapboxMarkerManager {
 
       // Add click handler with proper event handling
       el.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default marker click behavior
-        e.stopPropagation(); // Stop event from bubbling to map
-        
-        // Prevent map movement
-        if (e && e.originalEvent) {
-          e.originalEvent.stopPropagation();
-        }
+        e.preventDefault();
+        e.stopPropagation();
         
         console.log('🖱️ Marker clicked:', {
           applicationId: application.id,
           timestamp: new Date().toISOString()
         });
         
-        // Call the click handler
         this.onMarkerClick(application.id);
       });
 
