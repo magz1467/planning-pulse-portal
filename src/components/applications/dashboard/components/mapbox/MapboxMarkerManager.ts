@@ -57,9 +57,12 @@ export class MapboxMarkerManager {
         isSelected
       });
       
+      // If marker already exists, just update its style
       if (this.markers[application.id]) {
-        console.log('🔄 Removing existing marker before update');
-        this.markers[application.id].marker.remove();
+        this.updateMarkerStyle(application.id, isSelected);
+        console.log('🔄 Updated existing marker');
+        console.groupEnd();
+        return;
       }
 
       // Create marker element with circle styling
