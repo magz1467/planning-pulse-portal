@@ -126,14 +126,6 @@ export const MapboxMap = ({
         return false;
       }
 
-      // Check if application is within search radius of center
-      const distance = calculateDistance([centerLat, centerLng], [lat, lng]);
-      const isWithinRadius = distance <= MAP_DEFAULTS.searchRadius;
-      if (!isWithinRadius) {
-        console.warn(`Application ${application.id} is ${distance.toFixed(2)}km from search center - skipping`);
-        return false;
-      }
-
       return true;
     });
 
