@@ -4,7 +4,7 @@ import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
 import { MAP_DEFAULTS } from '@/utils/mapConstants';
 import { transformApplicationData } from '@/utils/applicationTransforms';
-import { fetchApplicationsFromSupabase } from '@/services/applicationsService';
+import { fetchApplicationsFromSupabase, fetchApplicationsCountFromSupabase } from '@/services/applicationsService';
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -44,9 +44,11 @@ export const useApplicationsFetch = () => {
         return;
       }
 
-      const apps = await fetchApplicationsFromSupabase(center, radiusInMeters);
+      // First get the count
+      const count = await fetchApplicationsCountFromSupabase(center, radiusInMeters);
+      setTotalCount(count || 0);
 
-      if (apps.length === 0) {
+      if (count === 0) {
         console.log('ℹ️ No applications found within radius', {
           center,
           radiusInMeters
@@ -57,9 +59,11 @@ export const useApplicationsFetch = () => {
           variant: "default",
         });
         setApplications([]);
-        setTotalCount(0);
         return;
       }
+
+      // Then fetch the applications
+      const apps = await fetchApplicationsFromSupabase(center, radiusInMeters);
 
       console.log('📊 Raw applications data:', {
         count: apps.length,
@@ -78,7 +82,6 @@ export const useApplicationsFetch = () => {
       });
       
       setApplications(transformedData);
-      setTotalCount(transformedData.length);
 
     } catch (error: any) {
       console.error('❌ Error in fetchApplicationsInRadius:', {

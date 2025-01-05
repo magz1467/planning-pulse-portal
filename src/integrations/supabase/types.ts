@@ -1530,8 +1530,8 @@ export type Database = {
       }
       get_applications_within_radius: {
         Args: {
-          center_longitude: number
-          center_latitude: number
+          center_lng: number
+          center_lat: number
           radius_meters: number
           page_size?: number
           page_number?: number

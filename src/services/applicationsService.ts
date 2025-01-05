@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { LatLngTuple } from 'leaflet';
-import { MAP_DEFAULTS } from '@/utils/mapConstants';
 
 export const fetchApplicationsFromSupabase = async (
   center: LatLngTuple,
@@ -8,35 +7,110 @@ export const fetchApplicationsFromSupabase = async (
   pageSize = 100,
   pageNumber = 0
 ) => {
-  console.time('🕒 Database query execution');
-  
-  const { data: apps, error } = await supabase.rpc(
-    'get_applications_within_radius',
-    { 
-      center_longitude: center[1],
-      center_latitude: center[0],
-      radius_meters: radiusInMeters,
-      page_size: pageSize,
-      page_number: pageNumber
-    }
-  );
-  
-  console.timeEnd('🕒 Database query execution');
+  console.log('Fetching applications with params:', {
+    center_longitude: center[1],
+    center_latitude: center[0],
+    radius_meters: radiusInMeters,
+    page_size: pageSize,
+    page_number: pageNumber
+  });
 
-  if (error) {
-    console.error('❌ Database query error:', {
+  try {
+    const { data: apps, error } = await supabase.rpc(
+      'get_applications_within_radius',
+      {
+        center_lng: center[1],
+        center_lat: center[0],
+        radius_meters: radiusInMeters,
+        page_size: pageSize,
+        page_number: pageNumber
+      }
+    );
+
+    if (error) {
+      console.error('Supabase RPC error:', {
+        error,
+        params: {
+          center,
+          radiusInMeters,
+          pageSize,
+          pageNumber
+        }
+      });
+      throw error;
+    }
+
+    if (!apps || !Array.isArray(apps)) {
+      console.error('Invalid response format:', apps);
+      throw new Error('Invalid response format from database');
+    }
+
+    console.log('Successfully fetched applications:', {
+      count: apps.length,
+      firstApp: apps[0],
+      lastApp: apps[apps.length - 1]
+    });
+
+    return apps;
+
+  } catch (error: any) {
+    console.error('Error fetching applications:', {
       error,
       message: error.message,
-      details: error.details,
-      hint: error.hint
+      params: {
+        center,
+        radiusInMeters,
+        pageSize,
+        pageNumber
+      }
     });
     throw error;
   }
+};
 
-  if (!apps || !Array.isArray(apps)) {
-    console.error('❌ Invalid response format:', apps);
-    throw new Error('Invalid response format from database');
+export const fetchApplicationsCountFromSupabase = async (
+  center: LatLngTuple,
+  radiusInMeters: number
+) => {
+  console.log('Fetching applications count with params:', {
+    center_longitude: center[1],
+    center_latitude: center[0],
+    radius_meters: radiusInMeters
+  });
+
+  try {
+    const { data: count, error } = await supabase.rpc(
+      'get_applications_count_within_radius',
+      {
+        center_lng: center[1],
+        center_lat: center[0],
+        radius_meters: radiusInMeters
+      }
+    );
+
+    if (error) {
+      console.error('Supabase RPC count error:', {
+        error,
+        params: {
+          center,
+          radiusInMeters
+        }
+      });
+      throw error;
+    }
+
+    console.log('Successfully fetched applications count:', count);
+    return count;
+
+  } catch (error: any) {
+    console.error('Error fetching applications count:', {
+      error,
+      message: error.message,
+      params: {
+        center,
+        radiusInMeters
+      }
+    });
+    throw error;
   }
-
-  return apps;
 };
