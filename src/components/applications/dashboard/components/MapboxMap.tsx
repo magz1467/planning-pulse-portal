@@ -7,6 +7,7 @@ import { MapboxMarkerManager } from './mapbox/MapboxMarkerManager';
 import { MapboxInitializer } from './mapbox/MapboxInitializer';
 import { MapboxErrorDisplay } from './mapbox/MapboxErrorDisplay';
 import { calculateDistance } from '@/utils/distance';
+import { LONDON_BOUNDS, MAP_DEFAULTS } from '@/utils/mapConstants';
 
 interface MapboxMapProps {
   applications: Application[];
@@ -14,13 +15,6 @@ interface MapboxMapProps {
   onMarkerClick: (id: number) => void;
   initialCenter: LatLngTuple;
 }
-
-const LONDON_BOUNDS = {
-  north: 51.7223,
-  south: 51.2867,
-  east: 0.3340,
-  west: -0.5103
-};
 
 export const MapboxMap = ({
   applications,
@@ -60,7 +54,7 @@ export const MapboxMap = ({
           const [lat, lng] = initialCenter;
           console.log('Setting map center to:', [lng, lat]);
           newMap.setCenter([lng, lat]);
-          newMap.setZoom(12);
+          newMap.setZoom(MAP_DEFAULTS.initialZoom);
 
           newMap.once('style.load', () => {
             console.log('Map style loaded successfully');
@@ -118,7 +112,11 @@ export const MapboxMap = ({
     const [centerLat, centerLng] = initialCenter;
     
     const validApplications = applications.filter(application => {
-      if (!application.coordinates) return false;
+      if (!application.coordinates) {
+        console.warn(`Application ${application.id} has no coordinates - skipping`);
+        return false;
+      }
+      
       const [lat, lng] = application.coordinates;
       
       // Check if coordinates are valid and within London bounds
@@ -128,9 +126,9 @@ export const MapboxMap = ({
         return false;
       }
 
-      // Check if application is within 5km of search center (increased from 1km)
+      // Check if application is within search radius of center
       const distance = calculateDistance([centerLat, centerLng], [lat, lng]);
-      const isWithinRadius = distance <= 5; // 5km radius
+      const isWithinRadius = distance <= MAP_DEFAULTS.searchRadius;
       if (!isWithinRadius) {
         console.warn(`Application ${application.id} is ${distance.toFixed(2)}km from search center - skipping`);
         return false;
@@ -161,7 +159,7 @@ export const MapboxMap = ({
 
       map.current.fitBounds(bounds, {
         padding: { top: 100, bottom: 100, left: 100, right: 100 },
-        maxZoom: 15,
+        maxZoom: MAP_DEFAULTS.maxZoom,
         duration: 1000
       });
     }

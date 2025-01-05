@@ -1,6 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import { LatLngTuple } from 'leaflet';
 import { supabase } from "@/integrations/supabase/client";
+import { MAP_DEFAULTS } from '@/utils/mapConstants';
 
 export class MapboxInitializer {
   static async initialize(
@@ -42,9 +43,9 @@ export class MapboxInitializer {
         container,
         style: 'mapbox://styles/mapbox/streets-v12',
         center: [initialCenter[1], initialCenter[0]],
-        zoom: 14,
-        maxZoom: 18,
-        minZoom: 9,
+        zoom: MAP_DEFAULTS.initialZoom,
+        maxZoom: MAP_DEFAULTS.maxZoom,
+        minZoom: MAP_DEFAULTS.minZoom,
         attributionControl: true,
         failIfMajorPerformanceCaveat: true,
         preserveDrawingBuffer: true,

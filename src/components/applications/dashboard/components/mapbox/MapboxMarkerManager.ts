@@ -39,6 +39,7 @@ export class MapboxMarkerManager {
       el.style.backgroundColor = this.getStatusColor(application.status);
       el.style.border = '2px solid white';
       el.style.cursor = 'pointer';
+      el.style.transition = 'all 0.2s ease-in-out';
 
       const [lat, lng] = application.coordinates;
       const marker = new mapboxgl.Marker(el)
@@ -64,6 +65,7 @@ export class MapboxMarkerManager {
       el.style.width = isSelected ? '30px' : '25px';
       el.style.height = isSelected ? '30px' : '25px';
       el.style.backgroundColor = this.getStatusColor(markerData.application.status);
+      el.style.zIndex = isSelected ? '1000' : '1';
     }
   }
 
