@@ -27,9 +27,13 @@ export const MapView = ({
     <div className="w-full h-full relative">
       <MapContainer
         center={initialCenter}
-        zoom={14}
+        zoom={15} // Increased from 14 for closer initial view
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
+        // Add some additional map options for better initial view
+        zoomControl={true}
+        minZoom={12} // Prevent zooming out too far
+        maxZoom={18}
       >
         <TileLayer 
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
