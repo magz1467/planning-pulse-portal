@@ -32,11 +32,12 @@ export class MarkerCreator {
   ): mapboxgl.Marker {
     const el = this.createMarkerElement(application, isSelected);
     
-    return new mapboxgl.Marker({
+    const marker = new mapboxgl.Marker({
       element: el,
       anchor: 'center',
       clickTolerance: 3
-    })
-    .setLngLat(coordinates);
+    });
+
+    return marker.setLngLat(coordinates);
   }
 }
