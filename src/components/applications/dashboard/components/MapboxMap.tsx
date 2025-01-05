@@ -48,9 +48,10 @@ export const MapboxMap = ({
           map.current = newMap;
           markerManager.current = new MapboxMarkerManager(newMap, onMarkerClick);
           
-          // Set initial view - Note: Mapbox uses [lng, lat] order
-          console.log('Setting initial center to [lng, lat]:', [initialCenter[1], initialCenter[0]]);
-          newMap.setCenter([initialCenter[1], initialCenter[0]]);
+          // Set initial view
+          const [lat, lng] = initialCenter;
+          console.log('Setting map center to:', [lng, lat]);
+          newMap.setCenter([lng, lat]);
           newMap.setZoom(12);
 
           newMap.once('style.load', () => {
@@ -100,21 +101,20 @@ export const MapboxMap = ({
     // Add new markers
     applications.forEach(application => {
       if (application.coordinates) {
+        const [lat, lng] = application.coordinates;
         // Validate coordinates are within London area (roughly)
-        // Note: application.coordinates are in [lat, lng] format
         const isValidLondonCoordinate = (
-          application.coordinates[0] >= 51.2 && // South boundary
-          application.coordinates[0] <= 51.8 && // North boundary
-          application.coordinates[1] >= -0.5 && // West boundary
-          application.coordinates[1] <= 0.3     // East boundary
+          lat >= 51.2 && // South boundary
+          lat <= 51.8 && // North boundary
+          lng >= -0.5 && // West boundary
+          lng <= 0.3     // East boundary
         );
 
         if (isValidLondonCoordinate) {
-          console.log('Adding valid London marker for application:', application.id, application.coordinates);
-          // Convert to [lng, lat] for Mapbox
+          console.log('Adding marker for application:', application.id, [lat, lng]);
           markerManager.current?.addMarker(application, application.id === selectedId);
         } else {
-          console.warn('Skipping invalid coordinate for application:', application.id, application.coordinates);
+          console.warn('Invalid coordinates for application:', application.id, [lat, lng]);
         }
       }
     });
@@ -125,17 +125,17 @@ export const MapboxMap = ({
 
     applications.forEach(app => {
       if (app.coordinates) {
+        const [lat, lng] = app.coordinates;
         // Only include coordinates within London area
         const isValidLondonCoordinate = (
-          app.coordinates[0] >= 51.2 &&
-          app.coordinates[0] <= 51.8 &&
-          app.coordinates[1] >= -0.5 &&
-          app.coordinates[1] <= 0.3
+          lat >= 51.2 &&
+          lat <= 51.8 &&
+          lng >= -0.5 &&
+          lng <= 0.3
         );
 
         if (isValidLondonCoordinate) {
-          // Convert to [lng, lat] for Mapbox bounds
-          bounds.extend([app.coordinates[1], app.coordinates[0]]);
+          bounds.extend([lng, lat]);
           hasValidCoordinates = true;
         }
       }
