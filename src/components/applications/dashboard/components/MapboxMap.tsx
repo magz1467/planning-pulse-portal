@@ -14,6 +14,13 @@ interface MapboxMapProps {
   initialCenter: LatLngTuple;
 }
 
+const LONDON_BOUNDS = {
+  north: 51.7223,
+  south: 51.2867,
+  east: 0.3340,
+  west: -0.5103
+};
+
 export const MapboxMap = ({
   applications,
   selectedId,
@@ -89,6 +96,15 @@ export const MapboxMap = ({
     };
   }, [initialCenter, onMarkerClick]);
 
+  const isValidLondonCoordinate = (lat: number, lng: number): boolean => {
+    return (
+      lat >= LONDON_BOUNDS.south &&
+      lat <= LONDON_BOUNDS.north &&
+      lng >= LONDON_BOUNDS.west &&
+      lng <= LONDON_BOUNDS.east
+    );
+  };
+
   // Update markers and fit bounds when applications change
   useEffect(() => {
     if (!isMapReady || !markerManager.current || !map.current || !applications.length) return;
@@ -98,58 +114,41 @@ export const MapboxMap = ({
     // Remove all existing markers
     markerManager.current.removeAllMarkers();
 
-    // Add new markers
-    applications.forEach(application => {
+    const validApplications = applications.filter(application => {
+      if (!application.coordinates) return false;
+      const [lat, lng] = application.coordinates;
+      const isValid = isValidLondonCoordinate(lat, lng);
+      if (!isValid) {
+        console.warn(`Application ${application.id} coordinates [${lat}, ${lng}] outside London bounds - skipping`);
+      }
+      return isValid;
+    });
+
+    // Add new markers for valid applications
+    validApplications.forEach(application => {
       if (application.coordinates) {
         const [lat, lng] = application.coordinates;
-        // Validate coordinates are within London area (roughly)
-        const isValidLondonCoordinate = (
-          lat >= 51.2 && // South boundary
-          lat <= 51.8 && // North boundary
-          lng >= -0.5 && // West boundary
-          lng <= 0.3     // East boundary
-        );
-
-        if (isValidLondonCoordinate) {
-          console.log('Adding marker for application:', application.id, [lat, lng]);
-          markerManager.current?.addMarker(application, application.id === selectedId);
-        } else {
-          console.warn('Invalid coordinates for application:', application.id, [lat, lng]);
-        }
+        console.log('Adding marker for application:', application.id, [lat, lng]);
+        markerManager.current?.addMarker(application, application.id === selectedId);
       }
     });
 
     // Only fit bounds on initial load or when applications change significantly
     // Not when a marker is clicked
-    if (!selectedId) {
+    if (!selectedId && validApplications.length > 0) {
       const bounds = new mapboxgl.LngLatBounds();
-      let hasValidCoordinates = false;
-
-      applications.forEach(app => {
+      validApplications.forEach(app => {
         if (app.coordinates) {
           const [lat, lng] = app.coordinates;
-          // Only include coordinates within London area
-          const isValidLondonCoordinate = (
-            lat >= 51.2 &&
-            lat <= 51.8 &&
-            lng >= -0.5 &&
-            lng <= 0.3
-          );
-
-          if (isValidLondonCoordinate) {
-            bounds.extend([lng, lat]);
-            hasValidCoordinates = true;
-          }
+          bounds.extend([lng, lat]);
         }
       });
 
-      if (hasValidCoordinates && map.current) {
-        map.current.fitBounds(bounds, {
-          padding: { top: 100, bottom: 100, left: 100, right: 100 },
-          maxZoom: 15,
-          duration: 1000
-        });
-      }
+      map.current.fitBounds(bounds, {
+        padding: { top: 100, bottom: 100, left: 100, right: 100 },
+        maxZoom: 15,
+        duration: 1000
+      });
     }
   }, [applications, selectedId, isMapReady]);
 
