@@ -117,17 +117,20 @@ export class MapboxMarkerManager {
       const marker = new mapboxgl.Marker({
         element: el,
         anchor: 'center',
+        clickTolerance: 3 // Reduce click tolerance to prevent unwanted map movements
       })
         .setLngLat([lng, lat])
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };
 
-      // Add click handler with error boundary
+      // Add click handler with error boundary and proper event handling
       const handleClick = (e: Event) => {
         try {
+          // Prevent event from bubbling to map
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           
           // Verify marker still exists before handling click
           if (!document.body.contains(el)) {
@@ -146,6 +149,10 @@ export class MapboxMarkerManager {
             markerExists: !!this.markers[application.id]
           });
           
+          // Prevent map movement on marker click
+          this.map.dragPan.disable();
+          setTimeout(() => this.map.dragPan.enable(), 300);
+          
           this.onMarkerClick(application.id);
         } catch (error) {
           console.error('❌ Error in marker click handler:', {
@@ -157,7 +164,9 @@ export class MapboxMarkerManager {
         }
       };
 
-      el.addEventListener('click', handleClick);
+      el.addEventListener('click', handleClick, { capture: true });
+      el.addEventListener('mousedown', (e) => e.stopPropagation(), { capture: true });
+      el.addEventListener('touchstart', (e) => e.stopPropagation(), { capture: true });
 
       console.log('✅ Marker successfully added');
       console.groupEnd();
