@@ -111,7 +111,7 @@ export const MapboxMap = ({
 
     console.log('Adding markers for applications:', applications.length);
 
-    // Remove all existing markers
+    // Remove all existing markers before adding new ones
     markerManager.current.removeAllMarkers();
 
     const validApplications = applications.filter(application => {
