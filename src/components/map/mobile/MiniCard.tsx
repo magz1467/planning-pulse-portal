@@ -4,7 +4,7 @@ import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface MiniCardProps {
   application: Application;
@@ -37,7 +37,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       console.log('MiniCard - Using image_map_url:', application.image_map_url);
       return application.image_map_url;
     }
-    if (application.image) {
+    if (application.image && application.image !== '/placeholder.svg') {
       console.log('MiniCard - Using application.image:', application.image);
       return application.image;
     }
@@ -69,6 +69,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             width={80}
             height={80}
             className="w-full h-full object-cover"
+            fallbackSrc={getRandomImage(application.id)}
             onError={(e) => {
               console.error('MiniCard - Image failed to load:', {
                 attemptedUrl: imageUrl,
