@@ -27,7 +27,7 @@ export const MapContent = ({
         className="absolute inset-0"
         style={{ 
           height: isMobile ? 'calc(100vh - 120px)' : '100%',
-          position: 'relative', // Changed from fixed to relative
+          position: 'relative',
           zIndex: 1
         }}
       >

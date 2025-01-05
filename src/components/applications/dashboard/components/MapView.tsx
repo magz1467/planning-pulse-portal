@@ -1,7 +1,9 @@
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { MapboxMap } from "./MapboxMap";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
 import { useEffect } from 'react';
+import "leaflet/dist/leaflet.css";
 
 interface MapViewProps {
   applications: Application[];
@@ -23,12 +25,20 @@ export const MapView = ({
 
   return (
     <div className="w-full h-full relative">
-      <MapboxMap
-        applications={applications}
-        selectedId={selectedId}
-        onMarkerClick={onMarkerClick}
-        initialCenter={initialCenter}
-      />
+      <MapContainer
+        center={initialCenter}
+        zoom={14}
+        scrollWheelZoom={true}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <ApplicationMarkers
+          applications={applications}
+          baseCoordinates={initialCenter}
+          onMarkerClick={onMarkerClick}
+          selectedId={selectedId}
+        />
+      </MapContainer>
     </div>
   );
 };
