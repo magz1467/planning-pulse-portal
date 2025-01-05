@@ -39,10 +39,13 @@ export const ApplicationMarkers = ({
   onMarkerClick,
   selectedId,
 }: ApplicationMarkersProps) => {
+  // Log the number of applications being processed
+  console.log('ApplicationMarkers - Processing applications:', applications.length);
+
   const generateRandomCoordinates = (index: number): LatLngTuple => {
-    // Use a seeded random-like approach based on the index
-    const angle = (index * Math.PI * 0.08) % (2 * Math.PI); // Distribute evenly in a circle
-    const distance = (0.005 + (index % 5) * 0.002); // Vary the distance from center in concentric rings
+    // Increase the spread of markers by adjusting these multipliers
+    const angle = (index * Math.PI * 0.2) % (2 * Math.PI); // More spread in the circle
+    const distance = 0.002 + (index % 10) * 0.001; // Larger radius steps
     
     const latOffset = distance * Math.cos(angle);
     const lngOffset = distance * Math.sin(angle);
