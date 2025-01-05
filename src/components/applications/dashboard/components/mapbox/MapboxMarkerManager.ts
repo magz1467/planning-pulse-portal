@@ -12,11 +12,13 @@ export class MapboxMarkerManager {
   private onMarkerClick: (id: number) => void;
 
   constructor(map: mapboxgl.Map, onMarkerClick: (id: number) => void) {
-    console.log('🎯 Initializing MapboxMarkerManager', {
+    console.group('🎯 Initializing MapboxMarkerManager');
+    console.log('📍 Constructor called:', {
       timestamp: new Date().toISOString()
     });
     this.map = map;
     this.onMarkerClick = onMarkerClick;
+    console.groupEnd();
   }
 
   public getMarkers() {
@@ -24,7 +26,8 @@ export class MapboxMarkerManager {
   }
 
   public removeAllMarkers() {
-    console.log('🧹 Removing markers:', {
+    console.group('🧹 Removing markers');
+    console.log('📊 Marker stats:', {
       count: Object.keys(this.markers).length,
       markerIds: Object.keys(this.markers),
       timestamp: new Date().toISOString()
@@ -33,6 +36,7 @@ export class MapboxMarkerManager {
       marker.remove();
     });
     this.markers = {};
+    console.groupEnd();
   }
 
   public addMarker(application: Application, isSelected: boolean) {
@@ -61,18 +65,22 @@ export class MapboxMarkerManager {
       // Create marker element
       const el = this.createMarkerElement(isSelected);
 
-      // Create and add marker
+      // Create and add marker with options to prevent jumping
       const marker = new mapboxgl.Marker({
         element: el,
-        anchor: 'center'
+        anchor: 'center',
+        // Add this option to prevent map movement on click
+        clickTolerance: 3
       })
         .setLngLat([lng, lat])
         .addTo(this.map);
 
       this.markers[application.id] = { marker, application };
 
-      // Add click handler
-      el.addEventListener('click', () => {
+      // Add click handler with preventDefault
+      el.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default marker click behavior
+        e.stopPropagation(); // Stop event from bubbling to map
         console.log('🖱️ Marker clicked:', {
           applicationId: application.id,
           timestamp: new Date().toISOString()
