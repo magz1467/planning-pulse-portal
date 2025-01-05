@@ -14,7 +14,9 @@ export class MapboxMarkerManager {
   constructor(map: mapboxgl.Map, onMarkerClick: (id: number) => void) {
     console.group('🎯 Initializing MapboxMarkerManager');
     console.log('📍 Constructor called:', {
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      mapExists: !!map,
+      hasClickHandler: !!onMarkerClick
     });
     this.map = map;
     this.onMarkerClick = onMarkerClick;
@@ -27,15 +29,34 @@ export class MapboxMarkerManager {
 
   public removeAllMarkers() {
     console.group('🧹 Removing markers');
-    console.log('📊 Marker stats:', {
-      count: Object.keys(this.markers).length,
-      markerIds: Object.keys(this.markers),
-      timestamp: new Date().toISOString()
-    });
-    Object.values(this.markers).forEach(({ marker }) => {
-      marker.remove();
-    });
-    this.markers = {};
+    try {
+      console.log('📊 Marker stats:', {
+        count: Object.keys(this.markers).length,
+        markerIds: Object.keys(this.markers),
+        timestamp: new Date().toISOString()
+      });
+      
+      Object.values(this.markers).forEach(({ marker }) => {
+        try {
+          marker.remove();
+        } catch (error) {
+          console.error('❌ Error removing individual marker:', {
+            error,
+            markerId: marker.getElement().id,
+            timestamp: new Date().toISOString()
+          });
+        }
+      });
+      
+      this.markers = {};
+      console.log('✅ All markers successfully removed');
+    } catch (error) {
+      console.error('❌ Critical error during marker removal:', {
+        error,
+        markersCount: Object.keys(this.markers).length,
+        timestamp: new Date().toISOString()
+      });
+    }
     console.groupEnd();
   }
 
@@ -49,18 +70,19 @@ export class MapboxMarkerManager {
     }
 
     try {
-      console.group(`📍 Adding marker for application ${application.id}`);
+      console.group(`📍 Adding/updating marker for application ${application.id}`);
       const [lat, lng] = application.coordinates;
       console.log('📌 Marker position:', {
         lat,
         lng,
-        isSelected
+        isSelected,
+        applicationExists: !!application
       });
       
       // If marker already exists, just update its style
       if (this.markers[application.id]) {
         this.updateMarkerStyle(application.id, isSelected);
-        console.log('🔄 Updated existing marker');
+        console.log('🔄 Updated existing marker style');
         console.groupEnd();
         return;
       }
@@ -68,6 +90,7 @@ export class MapboxMarkerManager {
       // Create marker element with circle styling
       const el = document.createElement('div');
       el.className = 'marker';
+      el.id = `marker-${application.id}`; // Add ID for better debugging
       el.style.width = isSelected ? '24px' : '16px';
       el.style.height = isSelected ? '24px' : '16px';
       el.style.borderRadius = '50%';
@@ -87,17 +110,28 @@ export class MapboxMarkerManager {
 
       this.markers[application.id] = { marker, application };
 
-      // Add click handler
+      // Add click handler with error boundary
       el.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('🖱️ Marker clicked:', {
-          applicationId: application.id,
-          timestamp: new Date().toISOString()
-        });
-        
-        this.onMarkerClick(application.id);
+        try {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('🖱️ Marker clicked:', {
+            applicationId: application.id,
+            timestamp: new Date().toISOString(),
+            elementExists: !!el,
+            markerExists: !!this.markers[application.id]
+          });
+          
+          this.onMarkerClick(application.id);
+        } catch (error) {
+          console.error('❌ Error in marker click handler:', {
+            error,
+            applicationId: application.id,
+            elementId: el.id,
+            timestamp: new Date().toISOString()
+          });
+        }
       });
 
       console.log('✅ Marker successfully added');
@@ -107,29 +141,50 @@ export class MapboxMarkerManager {
       console.error('❌ Error adding marker:', {
         applicationId: application.id,
         error,
+        coordinates: application.coordinates,
         timestamp: new Date().toISOString()
       });
+      console.groupEnd();
     }
   }
 
   public updateMarkerStyle(applicationId: number, isSelected: boolean) {
     console.group(`🎨 Updating marker style for ${applicationId}`);
-    const markerInfo = this.markers[applicationId];
-    if (!markerInfo) {
-      console.warn('⚠️ Attempted to update style for non-existent marker:', applicationId);
-      console.groupEnd();
-      return;
-    }
+    try {
+      const markerInfo = this.markers[applicationId];
+      if (!markerInfo) {
+        console.warn('⚠️ Attempted to update style for non-existent marker:', applicationId);
+        console.groupEnd();
+        return;
+      }
 
-    const el = markerInfo.marker.getElement();
-    el.style.width = isSelected ? '24px' : '16px';
-    el.style.height = isSelected ? '24px' : '16px';
-    el.style.backgroundColor = isSelected ? '#dc2626' : '#2563eb';
-    
-    console.log('✅ Marker style updated:', {
-      applicationId,
-      isSelected
-    });
+      const el = markerInfo.marker.getElement();
+      if (!el) {
+        console.error('❌ Marker element not found:', {
+          applicationId,
+          markerId: `marker-${applicationId}`,
+          timestamp: new Date().toISOString()
+        });
+        console.groupEnd();
+        return;
+      }
+
+      el.style.width = isSelected ? '24px' : '16px';
+      el.style.height = isSelected ? '24px' : '16px';
+      el.style.backgroundColor = isSelected ? '#dc2626' : '#2563eb';
+      
+      console.log('✅ Marker style updated:', {
+        applicationId,
+        isSelected,
+        elementExists: !!el
+      });
+    } catch (error) {
+      console.error('❌ Error updating marker style:', {
+        error,
+        applicationId,
+        timestamp: new Date().toISOString()
+      });
+    }
     console.groupEnd();
   }
 }
