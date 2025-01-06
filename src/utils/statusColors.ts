@@ -10,6 +10,8 @@ export const getStatusColor = (status: string) => {
     case 'under consideration':
     case 'application under consideration':
       return 'bg-[#FEC6A1]/30 text-[#F97316]';
+    case 'appeal in progress':
+      return 'bg-[#FEC6A1]/30 text-[#F97316]';
     case 'approved':
       return 'bg-[#F2FCE2] text-[#16a34a]';
     default:
