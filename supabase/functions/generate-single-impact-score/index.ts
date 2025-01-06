@@ -15,10 +15,13 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { applicationId } = await req.json()
+    const requestBody = await req.text();
+    console.log('Raw request body:', requestBody);
+    
+    let { applicationId } = JSON.parse(requestBody);
     
     if (!applicationId) {
-      console.error('Missing applicationId in request')
+      console.error('Missing applicationId in request');
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -31,12 +34,14 @@ Deno.serve(async (req) => {
       )
     }
 
+    console.log('Processing applicationId:', applicationId);
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY')!
     
     if (!perplexityKey) {
-      console.error('Missing Perplexity API key in environment')
+      console.error('Missing Perplexity API key in environment');
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -61,7 +66,7 @@ Deno.serve(async (req) => {
       .single()
 
     if (fetchError || !application) {
-      console.error('Error fetching application:', fetchError)
+      console.error('Error fetching application:', fetchError);
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -74,22 +79,22 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('Generating prompt for application')
+    console.log('Generating prompt for application');
     
     // Generate the prompt
     const prompt = `
       Analyze this planning application and provide impact scores for each category. 
       Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
-      Return a valid JSON object with no markdown formatting.
-      Format: {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}}
+      Return only a valid JSON object with numerical scores, no explanations or markdown formatting.
+      Format example: {"Environmental":{"air_quality":3,"noise":2},"Social":{"community":4}}
       
       Application details:
       Description: ${application.description || 'N/A'}
       Type: ${application.development_type || application.application_type || 'N/A'}
       Additional details: ${JSON.stringify(application.application_details || {})}
-    `
+    `;
 
-    console.log('Calling Perplexity API')
+    console.log('Calling Perplexity API');
     
     // Call Perplexity API
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -103,7 +108,7 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores, no explanations or markdown.'
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores, no explanations or markdown formatting.'
           },
           {
             role: 'user',
@@ -113,15 +118,15 @@ Deno.serve(async (req) => {
         temperature: 0.2,
         max_tokens: 1000
       }),
-    })
+    });
 
     if (!response.ok) {
-      const errorText = await response.text()
+      const errorText = await response.text();
       console.error('Perplexity API error:', {
         status: response.status,
         statusText: response.statusText,
         error: errorText
-      })
+      });
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -134,11 +139,11 @@ Deno.serve(async (req) => {
       )
     }
 
-    const data = await response.json()
-    console.log('Received API response:', data)
+    const data = await response.json();
+    console.log('Received API response:', data);
     
     if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid API response format:', data)
+      console.error('Invalid API response format:', data);
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -154,11 +159,12 @@ Deno.serve(async (req) => {
     let scores;
     try {
       // Remove any markdown formatting that might be present
-      const content = data.choices[0].message.content.replace(/```json\n|\n```/g, '');
-      scores = JSON.parse(content)
-      console.log('Parsed impact scores:', scores)
+      const content = data.choices[0].message.content.replace(/```json\n|\n```/g, '').trim();
+      console.log('Cleaned content:', content);
+      scores = JSON.parse(content);
+      console.log('Parsed impact scores:', scores);
     } catch (parseError) {
-      console.error('JSON parse error:', parseError)
+      console.error('JSON parse error:', parseError);
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -172,19 +178,19 @@ Deno.serve(async (req) => {
     }
 
     // Calculate normalized score
-    let totalScore = 0
-    let totalWeights = 0
+    let totalScore = 0;
+    let totalWeights = 0;
 
     for (const [category, subcategories] of Object.entries(scores)) {
       for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
-        const weight = 1
-        totalScore += (score as number) * weight
-        totalWeights += weight
+        const weight = 1;
+        totalScore += (score as number) * weight;
+        totalWeights += weight;
       }
     }
 
-    const normalizedScore = Math.round((totalScore / totalWeights) * 20)
-    console.log('Calculated normalized score:', normalizedScore)
+    const normalizedScore = Math.round((totalScore / totalWeights) * 20);
+    console.log('Calculated normalized score:', normalizedScore);
 
     // Update application with score
     const { error: updateError } = await supabase
@@ -193,10 +199,10 @@ Deno.serve(async (req) => {
         impact_score: normalizedScore,
         impact_score_details: scores
       })
-      .eq('application_id', applicationId)
+      .eq('application_id', applicationId);
 
     if (updateError) {
-      console.error('Failed to update application:', updateError)
+      console.error('Failed to update application:', updateError);
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -209,7 +215,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('Successfully updated application with impact score')
+    console.log('Successfully updated application with impact score');
 
     return new Response(
       JSON.stringify({ 
@@ -227,7 +233,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in generate-single-impact-score:', error)
+    console.error('Error in generate-single-impact-score:', error);
     return new Response(
       JSON.stringify({ 
         success: false, 

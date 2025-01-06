@@ -28,9 +28,13 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
     setHasTriggered(true);
 
     try {
+      console.log('Calling generate-single-impact-score with applicationId:', applicationId);
+      
       const { data, error } = await supabase.functions.invoke('generate-single-impact-score', {
-        body: { applicationId }
+        body: JSON.stringify({ applicationId })
       });
+
+      console.log('Response from generate-single-impact-score:', { data, error });
 
       if (error) {
         console.error('Supabase function error:', error);
