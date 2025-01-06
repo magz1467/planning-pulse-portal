@@ -30,8 +30,6 @@ export const useDashboardState = () => {
     applications, 
     isLoading: isLoadingApps, 
     fetchApplicationsInRadius,
-    searchPoint,
-    setSearchPoint,
     statusCounts
   } = useApplicationsData();
 
@@ -72,15 +70,13 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  // Only fetch applications when coordinates change due to a postcode change
+  // Only fetch applications when coordinates change
   useEffect(() => {
-    // Only fetch if we have coordinates and no existing search point
-    if (coordinates && !searchPoint) {
-      console.log('Initial fetch with coordinates:', coordinates);
-      setSearchPoint(coordinates);
+    if (coordinates) {
+      console.log('Fetching applications with coordinates:', coordinates);
       fetchApplicationsInRadius(coordinates, 1000);
     }
-  }, [coordinates, searchPoint, fetchApplicationsInRadius, setSearchPoint]);
+  }, [coordinates, fetchApplicationsInRadius]);
 
   // Log search performance
   useEffect(() => {
