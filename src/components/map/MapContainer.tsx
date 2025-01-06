@@ -1,4 +1,4 @@
-import { MapContainer as LeafletMapContainer, TileLayer, useMap } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo } from "react";
@@ -11,6 +11,8 @@ export interface MapContainerProps {
   coordinates: [number, number];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
+  onCenterChange?: (center: [number, number]) => void;
+  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapContainerComponent = memo(({
@@ -18,10 +20,13 @@ export const MapContainerComponent = memo(({
   applications,
   selectedId,
   onMarkerClick,
+  onCenterChange,
+  onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
+    console.log('MapContainer - Coordinates changed:', coordinates);
     if (mapRef.current) {
       mapRef.current.setView(coordinates, 14);
       setTimeout(() => {
@@ -29,6 +34,20 @@ export const MapContainerComponent = memo(({
       }, 100);
     }
   }, [coordinates]);
+
+  useEffect(() => {
+    if (mapRef.current && onMapMove) {
+      mapRef.current.on('move', () => {
+        onMapMove(mapRef.current!);
+      });
+    }
+  }, [onMapMove]);
+
+  console.log('MapContainer - Rendering with:', {
+    applicationsCount: applications.length,
+    selectedId,
+    coordinates
+  });
 
   return (
     <div className="w-full h-full relative">

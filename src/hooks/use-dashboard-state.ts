@@ -22,6 +22,7 @@ export const useDashboardState = () => {
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode);
+  const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
@@ -29,10 +30,11 @@ export const useDashboardState = () => {
     applications, 
     isLoading: isLoadingApps, 
     fetchApplicationsInRadius,
+    searchPoint,
+    setSearchPoint,
     statusCounts
   } = useApplicationsData();
 
-  // Update URL params when relevant state changes
   useEffect(() => {
     updateURLParams({
       postcode,
@@ -42,23 +44,27 @@ export const useDashboardState = () => {
     });
   }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams]);
 
-  // Log search analytics
   const logSearch = async (loadTime: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      await supabase.from('Searches').insert({
+      const { error } = await supabase.from('Searches').insert({
         'Post Code': postcode,
         'Status': initialTab,
         'User_logged_in': !!session?.user,
         'load_time': loadTime
       });
+
+      if (error) {
+        console.error('Error logging search:', error);
+      }
     } catch (error) {
       console.error('Error logging search:', error);
     }
   };
 
   const handlePostcodeSelect = async (newPostcode: string) => {
+    setSearchStartTime(Date.now());
     setPostcode(newPostcode);
   };
 
@@ -66,25 +72,28 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  // Only fetch applications when coordinates change and are valid
-  useEffect(() => {
-    const fetchData = async () => {
-      if (coordinates) {
-        console.log('Fetching applications with coordinates:', coordinates);
-        const startTime = performance.now();
-        
-        try {
-          await fetchApplicationsInRadius(coordinates, 1000);
-          const loadTime = performance.now() - startTime;
-          await logSearch(loadTime);
-        } catch (error) {
-          console.error('Error fetching applications:', error);
-        }
-      }
-    };
+  const isInitialSearch = !searchPoint && coordinates;
+  const isNewSearch = searchPoint && coordinates && 
+    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
 
-    fetchData();
-  }, [coordinates, fetchApplicationsInRadius]); // Only depend on coordinates and the fetch function
+  useEffect(() => {
+    if ((isInitialSearch || isNewSearch) && coordinates) {
+      console.log('Fetching applications with coordinates:', coordinates);
+      setSearchPoint(coordinates);
+      // Ensure coordinates are properly typed as [number, number]
+      const [lat, lng] = coordinates;
+      fetchApplicationsInRadius([lat, lng], 1000);
+    }
+  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, setSearchPoint]);
+
+  // Log search performance
+  useEffect(() => {
+    if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
+      const loadTime = (Date.now() - searchStartTime) / 1000; // Convert to seconds
+      logSearch(loadTime);
+      setSearchStartTime(null);
+    }
+  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
