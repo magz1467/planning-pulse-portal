@@ -1,16 +1,18 @@
 import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { FilterBar } from "@/components/FilterBar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Application } from "@/types/planning";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface SearchSectionProps {
   onPostcodeSelect: (postcode: string) => void;
   onFilterChange?: (filterType: string, value: string) => void;
-  onSortChange?: (sortType: 'closingSoon' | 'newest' | null) => void;
+  onSortChange?: (sortType: SortType) => void;
   activeFilters?: {
     status?: string;
     type?: string;
   };
-  activeSort?: 'closingSoon' | 'newest' | null;
+  activeSort?: SortType;
   isMapView?: boolean;
   onToggleView?: () => void;
   applications?: Application[];
@@ -30,18 +32,34 @@ export const SearchSection = ({
   activeSort,
   isMapView,
   onToggleView,
-  applications = [],
+  applications,
   statusCounts
 }: SearchSectionProps) => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="flex flex-col border-b shadow-sm">
-      <div className="container mx-auto pl-4 pr-8 py-4">
+    <div className="bg-white border-b">
+      <div className="p-4">
         <PostcodeSearch 
-          onSelect={onPostcodeSelect}
-          placeholder="Search new location"
+          onPostcodeSelect={onPostcodeSelect}
           className="w-full"
         />
       </div>
+
+      {onFilterChange && isMobile && (
+        <div className="px-4">
+          <FilterBar 
+            onFilterChange={onFilterChange}
+            onSortChange={onSortChange}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            isMapView={isMapView}
+            onToggleView={onToggleView}
+            applications={applications}
+            statusCounts={statusCounts}
+          />
+        </div>
+      )}
     </div>
   );
 };
