@@ -125,6 +125,7 @@ export const PlanningApplicationDetails = ({
       <EnvironmentalImpactDial 
         score={application.impact_score} 
         details={application.impact_score_details}
+        applicationId={application.id}
       />
       <ApplicationDescription application={application} />
       

@@ -1,59 +1,82 @@
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EnvironmentalImpactDialProps {
   score?: number | null;
   details?: Record<string, any>;
+  applicationId: number;
 }
 
-export const EnvironmentalImpactDial = ({ score, details }: EnvironmentalImpactDialProps) => {
+export const EnvironmentalImpactDial = ({ score, details, applicationId }: EnvironmentalImpactDialProps) => {
   const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasTriggered, setHasTriggered] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(score || 0), 100);
     return () => clearTimeout(timer);
   }, [score]);
 
-  if (!score) {
-    return (
-      <Card className="p-4">
-        <div className="space-y-2">
-          <h3 className="font-semibold">Expected impact score</h3>
-          <p className="text-sm text-gray-500">Impact score calculation coming soon for this application</p>
-        </div>
-      </Card>
-    );
-  }
+  const handleGenerateScore = async () => {
+    setIsLoading(true);
+    setHasTriggered(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-single-impact-score', {
+        body: { applicationId }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast({
+          title: "Impact score generated",
+          description: "The application's impact score has been calculated and saved.",
+        });
+        
+        // Reload the page to show the new score
+        window.location.reload();
+      } else {
+        throw new Error(data.error || 'Failed to generate impact score');
+      }
+    } catch (error) {
+      console.error('Error generating impact score:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate impact score. Please try again later.",
+        variant: "destructive",
+      });
+      setHasTriggered(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getColor = (score: number) => {
     if (score < 30) {
-      return '#22c55e'; // Using a more visible green color
+      return '#22c55e';
     } else if (score >= 70) {
-      return '#ea384c'; // Keep existing red for high impact
+      return '#ea384c';
     } else {
-      // For scores between 30-70, calculate the orange intensity
-      const orangeIntensity = (score - 30) / 40; // 40 is the range (70-30)
-      
-      // Start color (lighter orange)
+      const orangeIntensity = (score - 30) / 40;
       const start = {
-        r: parseInt("FE", 16), // From #FEC6A1
+        r: parseInt("FE", 16),
         g: parseInt("C6", 16),
         b: parseInt("A1", 16)
       };
-      
-      // End color (darker orange)
       const end = {
-        r: parseInt("F9", 16), // From #F97316
+        r: parseInt("F9", 16),
         g: parseInt("73", 16),
         b: parseInt("16", 16)
       };
-      
-      // Interpolate between light and dark orange
       const r = Math.round(start.r + (end.r - start.r) * orangeIntensity);
       const g = Math.round(start.g + (end.g - start.g) * orangeIntensity);
       const b = Math.round(start.b + (end.b - start.b) * orangeIntensity);
-      
       return `rgb(${r}, ${g}, ${b})`;
     }
   };
@@ -63,6 +86,25 @@ export const EnvironmentalImpactDial = ({ score, details }: EnvironmentalImpactD
     if (score >= 70) return "High Impact";
     return "Medium Impact";
   };
+
+  if (!score) {
+    return (
+      <Card className="p-4">
+        <div className="space-y-2">
+          <h3 className="font-semibold">Expected impact score</h3>
+          <p className="text-sm text-gray-500">
+            Impact score calculation is available for this application
+          </p>
+          <Button 
+            onClick={handleGenerateScore}
+            disabled={isLoading || hasTriggered}
+          >
+            {isLoading ? "Generating..." : "See impact score"}
+          </Button>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-4">
