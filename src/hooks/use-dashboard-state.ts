@@ -72,24 +72,20 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  const isInitialSearch = !searchPoint && coordinates;
-  const isNewSearch = searchPoint && coordinates && 
-    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
-
+  // Only fetch applications when coordinates change due to a postcode change
   useEffect(() => {
-    if ((isInitialSearch || isNewSearch) && coordinates) {
-      console.log('Fetching applications with coordinates:', coordinates);
+    // Only fetch if we have coordinates and no existing search point
+    if (coordinates && !searchPoint) {
+      console.log('Initial fetch with coordinates:', coordinates);
       setSearchPoint(coordinates);
-      // Ensure coordinates are properly typed as [number, number]
-      const [lat, lng] = coordinates;
-      fetchApplicationsInRadius([lat, lng], 1000);
+      fetchApplicationsInRadius(coordinates, 1000);
     }
-  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, setSearchPoint]);
+  }, [coordinates, searchPoint, fetchApplicationsInRadius, setSearchPoint]);
 
   // Log search performance
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
-      const loadTime = (Date.now() - searchStartTime) / 1000; // Convert to seconds
+      const loadTime = (Date.now() - searchStartTime) / 1000;
       logSearch(loadTime);
       setSearchStartTime(null);
     }
