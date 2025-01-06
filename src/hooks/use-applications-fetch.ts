@@ -26,8 +26,7 @@ export const useApplicationsFetch = () => {
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        })
-        .timeout(30000); // 30 second timeout
+        });
 
       if (error) {
         console.error('Error fetching applications:', error);
@@ -57,8 +56,7 @@ export const useApplicationsFetch = () => {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
-        })
-        .timeout(15000); // 15 second timeout
+        });
 
       if (countError) {
         console.error('Error fetching count:', countError);
