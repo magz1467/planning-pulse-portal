@@ -3,7 +3,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { MAP_DEFAULTS } from '@/utils/mapConstants';
 import { transformApplicationData } from '@/utils/applicationTransforms';
-import { fetchApplicationsFromSupabase, fetchApplicationsCountFromSupabase, fetchStatusCounts } from '@/services/applicationsService';
+import { fetchApplicationsFromSupabase, fetchApplicationsCountFromSupabase } from '@/services/applicationsService';
 import { StatusCounts } from '@/services/applications/types';
 
 export const useApplicationsFetch = () => {
@@ -36,10 +36,6 @@ export const useApplicationsFetch = () => {
       const count = await fetchApplicationsCountFromSupabase(center, radiusInMeters);
       setTotalCount(count || 0);
 
-      // Get status counts
-      const counts = await fetchStatusCounts(center, radiusInMeters);
-      setStatusCounts(counts);
-
       if (count === 0) {
         toast({
           title: "No results found",
@@ -53,14 +49,35 @@ export const useApplicationsFetch = () => {
       // Then fetch the applications
       const apps = await fetchApplicationsFromSupabase({
         center,
-        radiusInMeters,
-        statusFilter: filters?.status
+        radiusInMeters
       });
 
       const transformedData = apps
         .map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
       
+      // Calculate status counts
+      const counts = {
+        'Under Review': 0,
+        'Approved': 0,
+        'Declined': 0,
+        'Other': 0
+      };
+
+      transformedData.forEach(app => {
+        const status = app.status?.trim() || '';
+        if (status.toLowerCase().includes('under consideration')) {
+          counts['Under Review']++;
+        } else if (status.toLowerCase().includes('approved')) {
+          counts['Approved']++;
+        } else if (status.toLowerCase().includes('declined')) {
+          counts['Declined']++;
+        } else {
+          counts['Other']++;
+        }
+      });
+
+      setStatusCounts(counts);
       setApplications(transformedData);
 
       console.log('Fetched applications:', {

@@ -1,10 +1,8 @@
-import { LatLngTuple } from 'leaflet';
-import { Application } from '@/types/planning';
+import { Application } from "@/types/planning";
 
 export interface FetchApplicationsParams {
   center: [number, number];
   radiusInMeters: number;
-  statusFilter?: string;
   pageSize?: number;
   pageNumber?: number;
 }
