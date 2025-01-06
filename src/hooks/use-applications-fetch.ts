@@ -1,99 +1,64 @@
 import { useState } from 'react';
-import { useToast } from "@/components/ui/use-toast";
-import { Application } from "@/types/planning";
-import { MAP_DEFAULTS } from '@/utils/mapConstants';
+import { Application } from '@/types/planning';
+import { supabase } from '@/integrations/supabase/client';
 import { transformApplicationData } from '@/utils/applicationTransforms';
-import { fetchApplicationsFromSupabase, fetchApplicationsCountFromSupabase } from '@/services/applicationsService';
-import { StatusCounts } from '@/services/applications/types';
+import { LatLngTuple } from 'leaflet';
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [statusCounts, setStatusCounts] = useState<StatusCounts>({
-    'Under Review': 0,
-    'Approved': 0,
-    'Declined': 0,
-    'Other': 0
-  });
-  const { toast } = useToast();
 
   const fetchApplicationsInRadius = async (
-    center: [number, number],
-    filters?: { status?: string; type?: string }
+    center: LatLngTuple,
+    radius: number,
+    page = 0,
+    pageSize = 100
   ) => {
     setIsLoading(true);
-    
+    console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
+
     try {
-      // Convert kilometers to meters for the database query
-      const radiusInMeters = MAP_DEFAULTS.searchRadius * 1000;
-      
-      if (!center || !Array.isArray(center) || center.length !== 2) {
-        throw new Error('Invalid coordinates provided');
-      }
-
-      // First get the count
-      const count = await fetchApplicationsCountFromSupabase(center, radiusInMeters);
-      setTotalCount(count || 0);
-
-      if (count === 0) {
-        toast({
-          title: "No results found",
-          description: "No planning applications were found in this area. Try searching a different location.",
-          variant: "default",
+      const { data: applications, error } = await supabase
+        .rpc('get_applications_within_radius', {
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: radius,
+          page_size: pageSize,
+          page_number: page
         });
-        setApplications([]);
-        return;
+
+      if (error) {
+        console.error('Error fetching applications:', error);
+        throw error;
       }
 
-      // Then fetch the applications
-      const apps = await fetchApplicationsFromSupabase({
-        center,
-        radiusInMeters
-      });
+      console.log(`📦 Received ${applications?.length || 0} applications from database`);
 
-      const transformedData = apps
-        .map(app => transformApplicationData(app, center))
+      const transformedApplications = applications
+        ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
-      
-      // Calculate status counts
-      const counts = {
-        'Under Review': 0,
-        'Approved': 0,
-        'Declined': 0,
-        'Other': 0
-      };
 
-      transformedData.forEach(app => {
-        const status = app.status?.trim() || '';
-        if (status.toLowerCase().includes('under consideration')) {
-          counts['Under Review']++;
-        } else if (status.toLowerCase().includes('approved')) {
-          counts['Approved']++;
-        } else if (status.toLowerCase().includes('declined')) {
-          counts['Declined']++;
-        } else {
-          counts['Other']++;
-        }
-      });
+      console.log('✨ Transformed applications:', transformedApplications?.length || 0);
 
-      setStatusCounts(counts);
-      setApplications(transformedData);
+      setApplications(transformedApplications || []);
 
-      console.log('Fetched applications:', {
-        total: count,
-        filtered: transformedData.length,
-        statusCounts: counts
-      });
+      // Get total count
+      const { data: countData, error: countError } = await supabase
+        .rpc('get_applications_count_within_radius', {
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: radius
+        });
 
-    } catch (error: any) {
-      console.error('Error fetching applications:', error);
-      toast({
-        title: "Error fetching applications",
-        description: error.message,
-        variant: "destructive"
-      });
-      setApplications([]);
+      if (countError) {
+        console.error('Error fetching count:', countError);
+      } else {
+        setTotalCount(countData || 0);
+      }
+
+    } catch (error) {
+      console.error('Failed to fetch applications:', error);
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +68,6 @@ export const useApplicationsFetch = () => {
     applications,
     isLoading,
     totalCount,
-    statusCounts,
-    fetchApplicationsInRadius
+    fetchApplicationsInRadius,
   };
 };

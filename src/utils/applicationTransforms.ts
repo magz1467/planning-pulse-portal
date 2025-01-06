@@ -40,6 +40,12 @@ export const transformApplicationData = (
     }
   }
 
+  // Log impact score data for debugging
+  console.log('Impact Score Data:', {
+    score: app.impact_score,
+    details: app.impact_score_details
+  });
+
   const application: Application = {
     id: app.application_id,
     title: app.description || '',
