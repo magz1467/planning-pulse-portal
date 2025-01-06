@@ -3,6 +3,7 @@ import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef } from "react";
 import { Map as LeafletMap } from "leaflet";
+import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
 
 interface MapContainerProps {
@@ -56,6 +57,7 @@ export const MapContainerComponent = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           maxZoom={19}
         />
+        <SearchLocationPin position={coordinates} />
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={coordinates}

@@ -2,7 +2,7 @@ export const getStatusColor = (status: string) => {
   const statusLower = status?.toLowerCase() || '';
 
   if (statusLower.includes('under consideration') || statusLower.includes('pending')) {
-    return 'bg-yellow-100 text-yellow-800';
+    return 'bg-orange-100 text-orange-800'; // Restored to orange
   } else if (statusLower.includes('approved') || statusLower.includes('granted') || statusLower.includes('no objection')) {
     return 'bg-green-100 text-green-800';
   } else if (statusLower.includes('refused') || statusLower.includes('rejected') || statusLower.includes('withdrawn')) {
