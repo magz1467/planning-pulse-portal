@@ -1,6 +1,6 @@
 export { 
   fetchApplicationsFromSupabase,
-  fetchApplicationsCountFromSupabase 
+  fetchStatusCounts 
 } from './applications/api';
 
 export type { 

@@ -1593,6 +1593,17 @@ export type Database = {
           wgs84_polygon: Json | null
         }[]
       }
+      get_applications_status_counts: {
+        Args: {
+          center_lat: number
+          center_lng: number
+          radius_meters: number
+        }
+        Returns: {
+          status: string
+          count: number
+        }[]
+      }
       get_applications_within_radius: {
         Args: {
           center_lng: number
