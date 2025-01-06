@@ -45,7 +45,11 @@ const MapController = ({
     setShowRedoSearch(false);
   };
 
-  return showRedoSearch ? <RedoSearchButton onClick={handleRedoSearch} /> : null;
+  return (
+    <div className="relative w-full h-full">
+      {showRedoSearch && <RedoSearchButton onClick={handleRedoSearch} />}
+    </div>
+  );
 };
 
 export const MapView = ({
