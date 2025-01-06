@@ -1,80 +1,73 @@
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 
-interface PostcodeSuggestion {
+interface AddressSuggestion {
   postcode: string;
-  country: string;
-  nhs_ha: string;
-  admin_district: string;
   address?: string;
+  admin_district: string;
+  country: string;
 }
 
 export const useAddressSuggestions = (search: string) => {
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  
+  const [data, setData] = useState<AddressSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedSearch = useDebounce(search, 300);
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  return useQuery({
-    queryKey: ['address-suggestions', debouncedSearch],
-    queryFn: async () => {
-      if (!debouncedSearch || debouncedSearch.length < 2) return [];
-      
-      try {
-        // If search includes numbers (likely a postcode), try postcode lookup first
-        if (/\d/.test(debouncedSearch)) {
-          const postcodeResponse = await fetch(
-            `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
-          );
-          const postcodeData = await postcodeResponse.json();
-          
-          if (postcodeData.result) {
-            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
-              const detailsResponse = await fetch(
-                `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
-              );
-              const details = await detailsResponse.json();
-              
-              if (details.result) {
-                return {
-                  ...details.result,
-                  postcode: details.result.postcode,
-                  address: `${details.result.admin_ward}, ${details.result.parish || ''} ${details.result.admin_district}, ${details.result.postcode}`.trim()
-                };
-              }
-              return null;
-            });
-            
-            const results = await Promise.all(detailsPromises);
-            return results.filter(Boolean);
-          }
-        }
-
-        // If no postcode results or search doesn't include numbers, try general address search
-        const generalResponse = await fetch(
-          `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
-        );
-        const generalData = await generalResponse.json();
-        
-        if (generalData.result && generalData.result.length > 0) {
-          return generalData.result.map((result: any) => ({
-            ...result,
-            postcode: result.postcode,
-            address: `${result.admin_ward}, ${result.parish || ''} ${result.admin_district}, ${result.postcode}`.trim()
-          }));
-        }
-        
-        return [];
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-        return [];
+    const fetchSuggestions = async () => {
+      if (!debouncedSearch || debouncedSearch.length < 2) {
+        setData([]);
+        return;
       }
-    },
-    enabled: debouncedSearch.length >= 2,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
+
+      setIsLoading(true);
+      try {
+        // Check if the search string contains coordinates
+        const coordsMatch = debouncedSearch.match(/^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/);
+        
+        let url;
+        if (coordsMatch) {
+          // Use reverse geocoding endpoint for coordinates
+          const [_, lat, lon] = coordsMatch;
+          url = `https://api.postcodes.io/postcodes?lon=${lon}&lat=${lat}`;
+        } else {
+          // Use postcode search endpoint
+          url = `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`;
+        }
+
+        const response = await fetch(url);
+        const json = await response.json();
+
+        if (json.status === 200) {
+          if (coordsMatch) {
+            // Handle reverse geocoding response
+            setData(json.result.map((item: any) => ({
+              postcode: item.postcode,
+              address: `${item.admin_district}, ${item.country}`,
+              admin_district: item.admin_district,
+              country: item.country
+            })));
+          } else {
+            // Handle postcode autocomplete response
+            setData(json.result.map((postcode: string) => ({
+              postcode,
+              admin_district: "",
+              country: "United Kingdom"
+            })));
+          }
+        } else {
+          setData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching address suggestions:", error);
+        setData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, [debouncedSearch]);
+
+  return { data, isLoading };
 };
