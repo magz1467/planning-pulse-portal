@@ -27,6 +27,7 @@ export const fetchApplicationsFromSupabase = async ({
     return apps;
 
   } catch (error: any) {
+    console.error('Error fetching applications:', error);
     throw error;
   }
 };
@@ -45,7 +46,11 @@ export const fetchApplicationsCountFromSupabase = async (
       }
     );
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching count:', error);
+      throw error;
+    }
+    
     return data || 0;
   } catch (error) {
     console.error('Error fetching count:', error);

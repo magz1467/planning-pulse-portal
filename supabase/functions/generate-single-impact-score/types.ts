@@ -1,31 +1,23 @@
-export interface PerplexityResponse {
-  success: boolean;
-  data?: {
-    overall_score: number;
-    category_scores: Record<string, number>;
-    key_concerns: string[];
-    recommendations: string[];
-  };
-  error?: string;
+export interface ImpactScoreRequest {
+  applicationId: number;
+  description: string;
 }
 
 export interface ImpactScoreResponse {
-  success: boolean;
-  score?: number;
-  details?: {
-    category_scores: Record<string, number>;
-    key_concerns: string[];
-    recommendations: string[];
+  score: number;
+  details: {
+    [key: string]: any;
   };
-  error?: string;
 }
 
-export interface ApplicationData {
-  application_id: number;
-  description: string;
-  development_type?: string;
-  application_type?: string;
-  status: string;
-  address: string;
-  application_details?: Record<string, any>;
+export interface ImpactScoreError {
+  message: string;
+  details?: string;
+}
+
+export interface PerplexityResponse {
+  id: string;
+  model: string;
+  created: number;
+  response: string;
 }
