@@ -1,25 +1,23 @@
+import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import { Application } from "@/types/planning";
-import { LatLngTuple } from "leaflet";
-import { MapContainer, TileLayer } from "react-leaflet";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef } from "react";
 import { Map as LeafletMap } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-interface MapContainerComponentProps {
-  coordinates: [number, number];
-  postcode: string;
+interface MapContainerProps {
   applications: Application[];
-  selectedApplication: number | null;
+  coordinates: [number, number];
   onMarkerClick: (id: number) => void;
+  onCenterChange?: (center: [number, number]) => void;
 }
 
-export const MapContainerComponent = ({
+export const MapContainer = ({
   coordinates,
   applications,
-  selectedApplication,
   onMarkerClick,
-}: MapContainerComponentProps) => {
+  onCenterChange,
+}: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
@@ -33,21 +31,25 @@ export const MapContainerComponent = ({
 
   return (
     <div className="w-full h-full relative">
-      <MapContainer
+      <LeafletMapContainer
         ref={mapRef}
         center={coordinates}
         zoom={14}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer 
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          maxZoom={19}
+        />
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={coordinates}
           onMarkerClick={onMarkerClick}
-          selectedId={selectedApplication}
+          selectedId={null}
         />
-      </MapContainer>
+      </LeafletMapContainer>
     </div>
   );
 };

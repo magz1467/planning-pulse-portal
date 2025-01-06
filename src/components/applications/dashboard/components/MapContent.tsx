@@ -36,8 +36,8 @@ export const MapContent = ({
         <MapView
           applications={applications}
           selectedId={selectedId}
+          coordinates={coordinates}
           onMarkerClick={onMarkerClick}
-          initialCenter={coordinates}
           onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (

@@ -1,12 +1,11 @@
 import { MapContainer } from "@/components/map/MapContainer";
-import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { Application } from "@/types/planning";
 
 interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
   coordinates: [number, number];
-  onMarkerClick: (id: number | null) => void;
+  onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
 }
 
