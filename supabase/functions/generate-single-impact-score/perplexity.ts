@@ -1,4 +1,10 @@
-import { ImpactScoreResponse } from "./types.ts";
+import { PerplexityResponse, ImpactScoreResponse } from "./types.ts";
+
+const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY');
+
+if (!PERPLEXITY_API_KEY) {
+  throw new Error('Missing PERPLEXITY_API_KEY environment variable');
+}
 
 export async function generateImpactScore(description: string): Promise<ImpactScoreResponse> {
   console.log('Generating impact score for description:', description);
@@ -32,19 +38,19 @@ export async function generateImpactScore(description: string): Promise<ImpactSc
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('PERPLEXITY_API_KEY')}`,
+        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'llama-3.1-sonar-small-128k-online',
         messages: [{
           role: 'system',
-          content: 'You are a planning application impact assessor. Respond with a raw JSON object only, no markdown formatting or additional text.'
+          content: 'You are a planning application impact assessor specialized in evaluating environmental, social, and infrastructure impacts. Always respond with a precise JSON object following the exact structure provided. Maintain consistent scoring criteria where: 0-30 indicates minimal impact, 31-60 moderate impact, 61-90 significant impact, and 91-100 severe impact. Base scores on concrete factors in the application description.'
         }, {
           role: 'user',
           content: prompt
         }],
-        temperature: 0.1,
+        temperature: 0.1, // Lower temperature for more consistent results
         max_tokens: 1000,
         top_p: 0.9,
         presence_penalty: 0.1
@@ -56,7 +62,7 @@ export async function generateImpactScore(description: string): Promise<ImpactSc
       throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as PerplexityResponse;
     console.log('Received response from Perplexity API:', data);
 
     if (!data.choices?.[0]?.message?.content) {
@@ -73,6 +79,11 @@ export async function generateImpactScore(description: string): Promise<ImpactSc
       
       const parsedResponse = JSON.parse(cleanContent);
       console.log('Parsed response:', parsedResponse);
+      
+      // Validate score ranges
+      if (parsedResponse.overall_score < 1 || parsedResponse.overall_score > 100) {
+        throw new Error('Overall score out of valid range (1-100)');
+      }
       
       return {
         success: true,
