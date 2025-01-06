@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Map } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -8,7 +8,6 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error?: Error;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -16,8 +15,8 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false
   };
 
-  public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+  public static getDerivedStateFromError(_: Error): State {
+    return { hasError: true };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -26,27 +25,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      const isMapError = this.state.error?.message?.includes('map') || 
-                        this.state.error?.message?.includes('Mapbox') ||
-                        this.state.error?.stack?.includes('map');
-
       return (
         <div className="flex flex-col items-center justify-center h-screen bg-white">
-          <div className="mb-6">
-            {isMapError ? (
-              <Map className="w-16 h-16 text-gray-400" />
-            ) : (
-              <RefreshCcw className="w-16 h-16 text-gray-400" />
-            )}
-          </div>
-          <h2 className="text-xl font-semibold mb-2">
-            {isMapError ? 'Map failed to load' : 'Something went wrong'}
-          </h2>
-          <p className="text-gray-600 mb-4 text-center max-w-md">
-            {isMapError 
-              ? 'There was an issue loading the map. Please check your internet connection and try again.'
-              : 'An unexpected error occurred. Please try reloading the page.'}
-          </p>
+          <h2 className="text-xl font-semibold mb-4">Something went wrong</h2>
           <Button
             onClick={() => {
               this.setState({ hasError: false });

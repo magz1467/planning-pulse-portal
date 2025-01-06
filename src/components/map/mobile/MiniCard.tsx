@@ -22,11 +22,10 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-4 items-center">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <ImageResolver
-            imageUrl={application.image_map_url}
+            imageMapUrl={application.image_map_url}
             image={application.image}
             title={application.title || application.description || ''}
             applicationId={application.id}
-            coordinates={application.coordinates}
           />
         </div>
         <div className="flex-1 min-w-0">

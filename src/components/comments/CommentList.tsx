@@ -1,30 +1,34 @@
-import { useEffect } from 'react';
-import { Comment } from '@/types/planning';
-import { CommentItem } from './CommentItem';
-import { useComments } from './hooks/useComments';
-import { useRealtimeComments } from './hooks/useRealtimeComments';
+import { useEffect } from "react";
+import { CommentItem } from "./CommentItem";
+import { useComments } from "./hooks/useComments";
+import { useRealtimeComments } from "./hooks/useRealtimeComments";
 
 interface CommentListProps {
   applicationId: number;
 }
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
-  const { comments, currentUserId, setComments } = useComments(applicationId);
-  const { subscribeToComments } = useRealtimeComments(applicationId) || {};
+  const { comments, isLoading, error } = useComments(applicationId);
+  const { subscribeToComments } = useRealtimeComments(applicationId);
 
   useEffect(() => {
-    if (subscribeToComments) {
-      const unsubscribe = subscribeToComments();
-      return () => {
-        if (unsubscribe) {
-          unsubscribe();
-        }
-      };
-    }
-  }, [subscribeToComments]);
+    // Subscribe to real-time updates for this application's comments
+    const unsubscribe = subscribeToComments();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [applicationId, subscribeToComments]);
 
-  if (!comments) {
+  if (isLoading) {
     return <div>Loading comments...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading comments</div>;
+  }
+
+  if (!comments?.length) {
+    return <div>No comments yet</div>;
   }
 
   return (
@@ -32,7 +36,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
       {comments.map((comment) => (
         <CommentItem 
           key={comment.id} 
-          comment={comment} 
+          comment={comment}
           applicationId={applicationId}
         />
       ))}

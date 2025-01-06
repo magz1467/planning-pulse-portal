@@ -30,24 +30,11 @@ export const ApplicationMarker = memo(({
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
-  // Enhanced marker options for better visual feedback
-  const markerOptions = useMemo(() => ({
-    position,
-    clickable: true,
-    cursor: 'pointer',
-    zIndex: isSelected ? 1000 : 1, // Ensure selected marker is always on top
-    icon: {
-      url: isSelected ? '/marker-selected.svg' : '/marker.svg',
-      scaledSize: new google.maps.Size(isSelected ? 40 : 24, isSelected ? 40 : 24),
-      anchor: new google.maps.Point(isSelected ? 20 : 12, isSelected ? 40 : 24),
-      animation: isSelected ? google.maps.Animation.BOUNCE : null
-    }
-  }), [isSelected, position]);
-
   return (
     <Marker
-      {...markerOptions}
+      position={position}
       onClick={handleClick}
+      zIndex={isSelected ? 2 : 1}
     />
   );
 });

@@ -1,12 +1,10 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect, useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
-  const [retryCount, setRetryCount] = useState(0);
   const {
     selectedId,
     activeFilters,
@@ -39,17 +37,6 @@ export const ApplicationsDashboardMap = () => {
     console.log('Selected ID state changed:', selectedId);
   }, [selectedId]);
 
-  // Handle tile loading errors
-  useEffect(() => {
-    if (retryCount > 0) {
-      const timer = setTimeout(() => {
-        console.log('Retrying tile load...');
-        setRetryCount(0);
-      }, 2000); // Wait 2 seconds before retry
-      return () => clearTimeout(timer);
-    }
-  }, [retryCount]);
-
   // Mobile auto-selection effect
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
@@ -57,17 +44,6 @@ export const ApplicationsDashboardMap = () => {
       handleMarkerClick(filteredApplications[0].id);
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
-
-  // Handle map loading errors
-  useEffect(() => {
-    if (!coordinates) {
-      toast({
-        title: "Map Error",
-        description: "Unable to load map coordinates. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [coordinates]);
 
   return (
     <DashboardLayout
