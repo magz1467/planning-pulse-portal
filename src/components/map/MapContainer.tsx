@@ -41,7 +41,14 @@ export const MapContainerComponent = memo(({
         onMapMove(mapRef.current!);
       });
     }
-  }, [onMapMove]);
+
+    if (mapRef.current && onCenterChange) {
+      mapRef.current.on('moveend', () => {
+        const center = mapRef.current!.getCenter();
+        onCenterChange([center.lat, center.lng]);
+      });
+    }
+  }, [onMapMove, onCenterChange]);
 
   console.log('MapContainer - Rendering with:', {
     applicationsCount: applications.length,
