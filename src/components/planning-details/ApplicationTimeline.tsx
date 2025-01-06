@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, Clock, AlertCircle } from "lucide-react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
+import { format, isValid, parse } from "date-fns";
 
 interface ApplicationTimelineProps {
   application: Application;
@@ -15,34 +16,73 @@ interface TimelineStage {
   tooltip: string;
 }
 
+const formatDate = (dateStr: string | null): string => {
+  if (!dateStr) return 'Not available';
+  
+  // Try parsing different date formats
+  const formats = [
+    'dd/MM/yyyy',
+    'yyyy-MM-dd',
+    'MM/dd/yyyy',
+    'dd-MM-yyyy'
+  ];
+
+  for (const formatStr of formats) {
+    const parsedDate = parse(dateStr, formatStr, new Date());
+    if (isValid(parsedDate)) {
+      return format(parsedDate, 'dd MMM yyyy');
+    }
+  }
+
+  console.warn(`Unable to parse date: ${dateStr}`);
+  return 'Invalid date';
+};
+
 export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) => {
   const getStages = (): TimelineStage[] => {
     const today = new Date();
-    const validDate = application.valid_date ? new Date(application.valid_date) : null;
-    const consultationEnd = application.last_date_consultation_comments ? new Date(application.last_date_consultation_comments) : null;
-    const decisionDue = application.decisionDue ? new Date(application.decisionDue) : null;
+    
+    // Parse dates with validation
+    const validDate = application.valid_date ? 
+      parse(application.valid_date, 'dd/MM/yyyy', new Date()) : null;
+    
+    const consultationEnd = application.last_date_consultation_comments ? 
+      parse(application.last_date_consultation_comments, 'dd/MM/yyyy', new Date()) : null;
+    
+    const decisionDue = application.decision_target_date ? 
+      parse(application.decision_target_date, 'dd/MM/yyyy', new Date()) : null;
+
+    // Log date parsing results for debugging
+    console.log('Date parsing results:', {
+      validDate: application.valid_date,
+      parsedValidDate: validDate,
+      consultationEnd: application.last_date_consultation_comments,
+      parsedConsultationEnd: consultationEnd,
+      decisionDue: application.decision_target_date,
+      parsedDecisionDue: decisionDue
+    });
 
     return [
       {
         label: "Submitted",
-        date: application.valid_date || null,
-        status: validDate && validDate < today ? 'completed' : 'upcoming',
-        tooltip: `Application submitted on ${application.valid_date || 'Unknown date'}`
+        date: application.valid_date,
+        status: validDate && isValid(validDate) && validDate < today ? 'completed' : 'upcoming',
+        tooltip: `Application submitted on ${formatDate(application.valid_date)}`
       },
       {
         label: "Consultation",
-        date: application.last_date_consultation_comments || null,
+        date: application.last_date_consultation_comments,
         status: consultationEnd ? 
-          (consultationEnd < today ? 'completed' : 
-           (validDate && validDate < today ? 'current' : 'upcoming')) : 'upcoming',
-        tooltip: `Public consultation ends on ${application.last_date_consultation_comments || 'Unknown date'}`
+          (isValid(consultationEnd) && consultationEnd < today ? 'completed' : 
+           (validDate && isValid(validDate) && validDate < today ? 'current' : 'upcoming')) : 'upcoming',
+        tooltip: `Public consultation ends on ${formatDate(application.last_date_consultation_comments)}`
       },
       {
         label: "Decision Due",
-        date: application.decisionDue || null,
+        date: application.decision_target_date,
         status: decisionDue ? 
-          (decisionDue < today ? 'completed' : 'upcoming') : 'upcoming',
-        tooltip: `Decision due by ${application.decisionDue || 'Unknown date'}`
+          (isValid(decisionDue) && decisionDue < today ? 'completed' : 'upcoming') : 'upcoming',
+        tooltip: `Decision due by ${formatDate(application.decision_target_date)}`
       }
     ];
   };
