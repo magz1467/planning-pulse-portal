@@ -56,6 +56,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     handleMarkerClick(null);
   };
 
+  const handleCenterChange = (newCenter: [number, number]) => {
+    if (handlePostcodeSelect) {
+      // Convert coordinates to postcode using reverse geocoding
+      // For now, we'll just pass the coordinates as a string
+      handlePostcodeSelect(`${newCenter[0]},${newCenter[1]}`);
+    }
+  };
+
   return (
     <div className="h-screen w-full flex flex-col relative">
       <DashboardHeader />
@@ -103,6 +111,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               isMobile={isMobile}
               isMapView={isMapView}
               onMarkerClick={handleMarkerClick}
+              onCenterChange={handleCenterChange}
             />
           )}
         </div>

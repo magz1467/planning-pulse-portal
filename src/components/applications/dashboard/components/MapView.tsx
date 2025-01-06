@@ -1,10 +1,11 @@
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
 import { SearchLocationPin } from "@/components/map/SearchLocationPin";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useIsMobile } from "@/hooks/use-mobile";
+import { RedoSearchButton } from "@/components/map/RedoSearchButton";
 import "leaflet/dist/leaflet.css";
 
 interface MapViewProps {
@@ -12,22 +13,54 @@ interface MapViewProps {
   selectedId: number | null;
   onMarkerClick: (id: number) => void;
   initialCenter: LatLngTuple;
+  onCenterChange?: (center: LatLngTuple) => void;
 }
+
+const MapController = ({ 
+  applications, 
+  onCenterChange 
+}: { 
+  applications: Application[],
+  onCenterChange?: (center: LatLngTuple) => void 
+}) => {
+  const map = useMap();
+  const [showRedoSearch, setShowRedoSearch] = useState(false);
+
+  useMapEvents({
+    moveend: () => {
+      // Check if any markers are visible in the current view
+      const bounds = map.getBounds();
+      const isAnyMarkerVisible = applications.some(app => {
+        if (!app.coordinates) return false;
+        return bounds.contains([app.coordinates[0], app.coordinates[1]]);
+      });
+      
+      setShowRedoSearch(!isAnyMarkerVisible);
+    }
+  });
+
+  const handleRedoSearch = () => {
+    const center = map.getCenter();
+    onCenterChange?.([center.lat, center.lng]);
+    setShowRedoSearch(false);
+  };
+
+  return showRedoSearch ? <RedoSearchButton onClick={handleRedoSearch} /> : null;
+};
 
 export const MapView = ({
   applications,
   selectedId,
   onMarkerClick,
-  initialCenter
+  initialCenter,
+  onCenterChange
 }: MapViewProps) => {
   const isMobile = useIsMobile();
   
-  // Log the number of visible applications for debugging
   useEffect(() => {
     console.log('MapView - Number of applications:', applications.length);
   }, [applications]);
 
-  // Set different zoom levels for mobile and desktop
   const defaultZoom = isMobile ? 13 : 15;
 
   return (
@@ -52,6 +85,10 @@ export const MapView = ({
           baseCoordinates={initialCenter as [number, number]}
           onMarkerClick={onMarkerClick}
           selectedId={selectedId}
+        />
+        <MapController 
+          applications={applications}
+          onCenterChange={onCenterChange}
         />
       </MapContainer>
     </div>
