@@ -55,6 +55,20 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Reco
         
         setScore(data.score);
         setDetails(data.details);
+
+        // Save the score to the database
+        const { error: updateError } = await supabase
+          .from('applications')
+          .update({
+            impact_score: data.score,
+            impact_score_details: data.details
+          })
+          .eq('application_id', applicationId);
+
+        if (updateError) {
+          console.error('Error saving impact score:', updateError);
+          throw updateError;
+        }
       } else {
         console.error('Failed to generate impact score:', data.error);
         throw new Error(data.error || 'Failed to generate impact score');
