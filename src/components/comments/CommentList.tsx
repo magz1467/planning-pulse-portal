@@ -24,18 +24,12 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         const { data, error } = await supabase
           .from('Comments')
           .select(`
-            id,
-            created_at,
-            comment,
-            user_id,
-            application_id,
-            parent_id,
-            upvotes,
-            downvotes,
-            user_email,
-            user:profiles!user_id(
-              email:auth.users!id(email),
-              profile:profiles(username)
+            *,
+            user:user_id (
+              email,
+              profile:profiles (
+                username
+              )
             )
           `)
           .eq('application_id', applicationId)
@@ -48,11 +42,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
             description: "Failed to load comments",
             variant: "destructive"
           });
-          return;
-        }
-
-        if (!data) {
-          setComments([]);
           return;
         }
 
@@ -87,7 +76,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
             const newComment = payload.new as Comment;
             setComments(prevComments => [newComment, ...prevComments]);
             
-            // Show toast notification for new comments
             if (newComment.user_id !== currentUserId) {
               toast({
                 title: "New Comment",
