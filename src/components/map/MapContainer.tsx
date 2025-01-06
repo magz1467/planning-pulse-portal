@@ -28,7 +28,9 @@ export const MapContainerComponent = memo(({
   const mapRef = useRef<LeafletMap | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tileLoadErrors, setTileLoadErrors] = useState(0);
   const { toast } = useToast();
+  const MAX_TILE_LOAD_RETRIES = 3;
 
   useEffect(() => {
     console.log('MapContainer - Component mounted');
@@ -104,6 +106,21 @@ export const MapContainerComponent = memo(({
     error
   });
 
+  const handleTileError = (error: any) => {
+    console.error('Tile loading error:', error);
+    setTileLoadErrors(prev => {
+      const newCount = prev + 1;
+      if (newCount >= MAX_TILE_LOAD_RETRIES) {
+        toast({
+          title: "Map Error",
+          description: "Failed to load map tiles. Trying alternative source.",
+          variant: "destructive",
+        });
+      }
+      return newCount;
+    });
+  };
+
   if (error) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-red-50">
@@ -120,6 +137,10 @@ export const MapContainerComponent = memo(({
     );
   }
 
+  // Primary tile layer with fallback
+  const primaryTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const fallbackTileUrl = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+
   return (
     <div className="w-full h-full relative">
       <LeafletMapContainer
@@ -130,18 +151,11 @@ export const MapContainerComponent = memo(({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer 
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url={tileLoadErrors >= MAX_TILE_LOAD_RETRIES ? fallbackTileUrl : primaryTileUrl}
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           maxZoom={19}
           eventHandlers={{
-            tileerror: (error) => {
-              console.error('Tile loading error:', error);
-              toast({
-                title: "Map Error",
-                description: "Failed to load map tiles",
-                variant: "destructive",
-              });
-            }
+            tileerror: handleTileError
           }}
         />
         <SearchLocationPin position={coordinates} />
