@@ -48,8 +48,8 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
     const consultationEnd = application.last_date_consultation_comments ? 
       parse(application.last_date_consultation_comments, 'dd/MM/yyyy', new Date()) : null;
     
-    const decisionDue = application.decision_due ? 
-      parse(application.decision_due, 'dd/MM/yyyy', new Date()) : null;
+    const decisionDue = application.decisionDue ? 
+      parse(application.decisionDue, 'dd/MM/yyyy', new Date()) : null;
 
     // Log date parsing results for debugging
     console.log('Date parsing results:', {
@@ -57,7 +57,7 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
       parsedValidDate: validDate,
       consultationEnd: application.last_date_consultation_comments,
       parsedConsultationEnd: consultationEnd,
-      decisionDue: application.decision_due,
+      decisionDue: application.decisionDue,
       parsedDecisionDue: decisionDue
     });
 
@@ -78,10 +78,10 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
       },
       {
         label: "Decision Due",
-        date: application.decision_due,
+        date: application.decisionDue,
         status: decisionDue ? 
           (isValid(decisionDue) && decisionDue < today ? 'completed' : 'upcoming') : 'upcoming',
-        tooltip: `Decision due by ${formatDate(application.decision_due)}`
+        tooltip: `Decision due by ${formatDate(application.decisionDue)}`
       }
     ];
   };
@@ -91,11 +91,14 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
   return (
     <div className="flex flex-col space-y-4">
       <div className="relative">
-        <div className="absolute left-[15px] top-[30px] bottom-4 w-0.5 bg-gray-200" />
+        {/* Timeline line - now positioned behind circles */}
+        <div className="absolute left-[15px] top-[30px] bottom-4 w-0.5 bg-gray-200 -z-10" />
+        
         <div className="space-y-8">
           {stages.map((stage, index) => (
-            <div key={index} className="flex items-start">
-              <div className="flex-shrink-0">
+            <div key={index} className="flex items-start relative">
+              {/* Circle container with higher z-index */}
+              <div className="flex-shrink-0 relative z-10">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
