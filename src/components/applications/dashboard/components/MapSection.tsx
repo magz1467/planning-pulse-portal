@@ -5,7 +5,7 @@ import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicatio
 interface MapSectionProps {
   isMobile: boolean;
   isMapView: boolean;
-  coordinates: [number, number] | null;
+  coordinates: [number, number];
   applications: Application[];
   selectedId: number | null;
   onMarkerClick: (id: number | null) => void;
@@ -36,8 +36,8 @@ export const MapSection = ({
         <MapView
           applications={applications}
           selectedId={selectedId}
+          coordinates={coordinates}
           onMarkerClick={onMarkerClick}
-          initialCenter={coordinates}
           onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
