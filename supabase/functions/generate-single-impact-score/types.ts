@@ -1,3 +1,10 @@
+export interface ApplicationData {
+  description: string;
+  application_id: number;
+  status: string;
+  [key: string]: any;
+}
+
 export interface PerplexityResponse {
   id: string;
   model: string;

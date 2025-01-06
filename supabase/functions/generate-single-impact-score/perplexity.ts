@@ -9,7 +9,7 @@ if (!PERPLEXITY_API_KEY) {
 export async function generateImpactScore(description: string) {
   console.log('Generating impact score for description:', description);
 
-  const prompt = `Analyze the following planning application description and provide a numerical impact assessment in JSON format only. The response must be a valid JSON object with the following structure:
+  const prompt = `Analyze the following planning application description and provide an impact assessment in JSON format only. Return a valid JSON object with this exact structure:
   {
     "overall_score": <number between 1-100>,
     "category_scores": {
@@ -26,8 +26,8 @@ export async function generateImpactScore(description: string) {
         "details": "<brief explanation>"
       }
     },
-    "key_concerns": ["<concern 1>", "<concern 2>", ...],
-    "recommendations": ["<recommendation 1>", "<recommendation 2>", ...]
+    "key_concerns": ["<concern 1>", "<concern 2>"],
+    "recommendations": ["<recommendation 1>", "<recommendation 2>"]
   }
 
   Planning application: "${description}"`;
@@ -45,7 +45,7 @@ export async function generateImpactScore(description: string) {
         model: 'pplx-7b-chat',
         messages: [{
           role: 'system',
-          content: 'You are a planning application impact assessor. Always respond in valid JSON format only, no additional text or markdown.'
+          content: 'You are a planning application impact assessor. Always respond with valid JSON only, no additional text or markdown. Follow the exact structure provided in the prompt.'
         }, {
           role: 'user',
           content: prompt
