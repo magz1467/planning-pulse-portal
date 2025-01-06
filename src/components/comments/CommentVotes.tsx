@@ -32,7 +32,28 @@ export const CommentVotes = ({
       return;
     }
 
-    onVoteChange(type);
+    try {
+      // First try to get existing vote
+      const { data: existingVote, error: fetchError } = await supabase
+        .from('comment_votes')
+        .select()
+        .eq('comment_id', commentId)
+        .eq('user_id', currentUserId)
+        .maybeSingle(); // Using maybeSingle instead of single to handle no results case
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      onVoteChange(type);
+    } catch (error) {
+      console.error('Error handling vote:', error);
+      toast({
+        title: "Error",
+        description: "Failed to register vote. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
