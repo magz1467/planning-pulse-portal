@@ -42,7 +42,7 @@ export async function generateImpactScore(description: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'pplx-7b-chat',
+        model: 'llama-2-70b-chat',
         messages: [{
           role: 'system',
           content: 'You are a planning application impact assessor. Always respond with valid JSON only, no additional text or markdown. Follow the exact structure provided in the prompt.'
