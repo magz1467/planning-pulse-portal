@@ -1,104 +1,174 @@
-import { PerplexityResponse, ImpactScoreResponse } from "./types.ts";
+import { corsHeaders } from '../_shared/cors.ts';
+import { ApplicationData } from './types.ts';
 
-const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY');
-
-if (!PERPLEXITY_API_KEY) {
-  throw new Error('Missing PERPLEXITY_API_KEY environment variable');
-}
-
-export async function generateImpactScore(description: string): Promise<ImpactScoreResponse> {
-  console.log('Generating impact score for description:', description);
-
-  const prompt = `Analyze the following planning application description and provide an impact assessment in JSON format only. Return a valid JSON object with this exact structure:
-  {
-    "overall_score": <number between 1-100>,
-    "category_scores": {
-      "environmental": {
-        "score": <number between 1-100>,
-        "details": "<brief explanation>"
-      },
-      "social": {
-        "score": <number between 1-100>,
-        "details": "<brief explanation>"
-      },
-      "infrastructure": {
-        "score": <number between 1-100>,
-        "details": "<brief explanation>"
-      }
-    },
-    "key_concerns": ["<concern 1>", "<concern 2>"],
-    "recommendations": ["<recommendation 1>", "<recommendation 2>"]
+export async function calculateImpactScore(
+  application: ApplicationData, 
+  retryCount = 0
+): Promise<{ score: number; details: any }> {
+  console.log(`[Impact Score ${application.application_id}] Starting calculation (attempt ${retryCount + 1})`);
+  
+  const apiKey = Deno.env.get('PERPLEXITY_API_KEY');
+  if (!apiKey) {
+    throw new Error('Missing Perplexity API key');
   }
 
-  Planning application: "${description}"`;
-
   try {
-    console.log('Sending request to Perplexity API');
+    const prompt = `
+      Analyze this planning application and provide impact scores for each category. 
+      Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
+      Return a valid JSON object with no markdown formatting.
+      Format: {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}}
+      
+      Application details:
+      Description: ${application.description || 'N/A'}
+      Type: ${application.development_type || application.application_type || 'N/A'}
+      Additional details: ${JSON.stringify(application.application_details || {})}
+    `;
+
+    console.log(`[Impact Score ${application.application_id}] Sending request to Perplexity API`);
     
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'llama-3.1-sonar-small-128k-online',
-        messages: [{
-          role: 'system',
-          content: 'You are a planning application impact assessor specialized in evaluating environmental, social, and infrastructure impacts. Always respond with a precise JSON object following the exact structure provided. Maintain consistent scoring criteria where: 0-30 indicates minimal impact, 31-60 moderate impact, 61-90 significant impact, and 91-100 severe impact. Base scores on concrete factors in the application description.'
-        }, {
-          role: 'user',
-          content: prompt
-        }],
-        temperature: 0.1, // Lower temperature for more consistent results
-        max_tokens: 1000,
-        top_p: 0.9,
-        presence_penalty: 0.1
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores, no explanations or markdown.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.2,
+        max_tokens: 1000
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
+      console.error(`[Impact Score ${application.application_id}] API Error:`, {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+
+      if (retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.log(`[Impact Score ${application.application_id}] Retrying after ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return calculateImpactScore(application, retryCount + 1);
+      }
+
+      throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json() as PerplexityResponse;
-    console.log('Received response from Perplexity API:', data);
+    const data = await response.json();
+    console.log(`[Impact Score ${application.application_id}] API Response:`, data);
 
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response format from Perplexity API');
+      throw new Error('Invalid API response format');
     }
+
+    const cleanContent = data.choices[0].message.content
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
 
     try {
-      const content = data.choices[0].message.content;
-      console.log('Raw content:', content);
+      const scores = JSON.parse(cleanContent);
+      console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
       
-      // Remove any markdown formatting if present
-      const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
-      console.log('Cleaned content:', cleanContent);
+      // Calculate weighted average for each category first
+      const categoryScores: Record<string, number> = {};
+      const weights = {
+        'Environmental': 0.4,  // 40% weight
+        'Social': 0.35,       // 35% weight
+        'Infrastructure': 0.25 // 25% weight
+      };
       
-      const parsedResponse = JSON.parse(cleanContent);
-      console.log('Parsed response:', parsedResponse);
-      
-      // Validate score ranges
-      if (parsedResponse.overall_score < 1 || parsedResponse.overall_score > 100) {
-        throw new Error('Overall score out of valid range (1-100)');
+      let totalWeightedScore = 0;
+      let totalWeightsApplied = 0;
+
+      // Calculate each category's score and overall weighted score
+      for (const [category, subcategories] of Object.entries(scores)) {
+        let categoryTotal = 0;
+        let count = 0;
+        
+        for (const score of Object.values(subcategories as Record<string, number>)) {
+          categoryTotal += score as number;
+          count++;
+        }
+        
+        const categoryScore = Math.round((categoryTotal / count) * 20); // Convert to /100 scale
+        categoryScores[category] = categoryScore;
+        
+        const weight = weights[category as keyof typeof weights] || 0.33;
+        totalWeightedScore += categoryScore * weight;
+        totalWeightsApplied += weight;
       }
-      
+
+      // Calculate final weighted average
+      const normalizedScore = Math.round(totalWeightedScore / totalWeightsApplied);
+
+      // Prepare the details object with the calculated scores
+      const details = {
+        category_scores: {
+          environmental: {
+            score: categoryScores['Environmental'] || 0,
+            details: "Impact on local environment including air quality, noise, and natural resources"
+          },
+          social: {
+            score: categoryScores['Social'] || 0,
+            details: "Impact on local community, amenities, and social fabric"
+          },
+          infrastructure: {
+            score: categoryScores['Infrastructure'] || 0,
+            details: "Impact on local infrastructure, transport, and utilities"
+          }
+        },
+        key_concerns: [
+          "Environmental sustainability and resource management",
+          "Community integration and social cohesion",
+          "Infrastructure capacity and accessibility"
+        ],
+        recommendations: [
+          "Consider implementing additional environmental mitigation measures",
+          "Engage with local community for feedback and improvements",
+          "Assess and plan for infrastructure requirements"
+        ]
+      };
+
       return {
-        success: true,
-        data: parsedResponse
+        score: normalizedScore,
+        details: details
       };
     } catch (parseError) {
-      console.error('Error parsing response:', parseError);
-      throw new Error(`Failed to parse API response: ${parseError.message}`);
-    }
+      console.error(`[Impact Score ${application.application_id}] JSON Parse Error:`, {
+        content: cleanContent,
+        error: parseError.message
+      });
 
+      if (retryCount < 2) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.log(`[Impact Score ${application.application_id}] Retrying after parse error in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return calculateImpactScore(application, retryCount + 1);
+      }
+
+      throw parseError;
+    }
   } catch (error) {
-    console.error('Error calling Perplexity API:', error);
-    return {
-      success: false,
-      error: error.message
-    };
+    console.error(`[Impact Score ${application.application_id}] Error:`, {
+      message: error.message,
+      stack: error.stack,
+      attempt: retryCount + 1
+    });
+    throw error;
   }
 }
