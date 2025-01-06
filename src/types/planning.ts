@@ -20,6 +20,9 @@ export interface Application {
   ai_title?: string;
   last_date_consultation_comments?: string;
   valid_date?: string;
+  centroid?: {
+    coordinates: [number, number];
+  };
 }
 
 export interface Comment {

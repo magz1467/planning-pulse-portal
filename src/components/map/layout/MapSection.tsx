@@ -1,6 +1,8 @@
 import { Application } from "@/types/planning";
-import { MapContainerComponent } from "../MapContainer";
-import { MobileApplicationCards } from "../mobile/MobileApplicationCards";
+import { MapView } from "./MapView";
+import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { RedoSearchButton } from "@/components/map/RedoSearchButton";
+import { useState } from "react";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -21,6 +23,8 @@ export const MapSection = ({
   onMarkerClick,
   onCenterChange,
 }: MapSectionProps) => {
+  const [hasMapMoved, setHasMapMoved] = useState(false);
+
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   return (
@@ -33,12 +37,34 @@ export const MapSection = ({
       }}
     >
       <div className="absolute inset-0">
-        <MapContainerComponent
+        <MapView
           applications={applications}
+          selectedId={selectedId}
           coordinates={coordinates}
           onMarkerClick={onMarkerClick}
           onCenterChange={onCenterChange}
+          onMapMove={(map) => {
+            const bounds = map.getBounds();
+            const isAnyMarkerVisible = applications.some(app => {
+              if (!app.centroid?.coordinates) return false;
+              const [lng, lat] = app.centroid.coordinates;
+              return bounds.contains([lat, lng]);
+            });
+            setHasMapMoved(!isAnyMarkerVisible);
+          }}
         />
+        {onCenterChange && hasMapMoved && (
+          <RedoSearchButton onClick={() => {
+            const map = document.querySelector('.leaflet-container');
+            // @ts-ignore - we know this exists because Leaflet adds it
+            const leafletMap = map?._leaflet_map;
+            if (leafletMap) {
+              const center = leafletMap.getCenter();
+              onCenterChange([center.lat, center.lng]);
+              setHasMapMoved(false);
+            }
+          }} />
+        )}
         {isMobile && selectedId && (
           <MobileApplicationCards
             applications={applications}
