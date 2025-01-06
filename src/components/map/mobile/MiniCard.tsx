@@ -1,9 +1,9 @@
 import { Application } from "@/types/planning";
-import { MapPin, Timer } from "lucide-react";
+import { Timer } from "lucide-react";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
-import { getStatusColor, getStatusText } from "@/utils/statusColors";
-import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { useToast } from "@/hooks/use-toast";
+import { ImageResolver } from "./components/ImageResolver";
+import { StatusBadge } from "./components/StatusBadge";
+import { LocationInfo } from "./components/LocationInfo";
 
 interface MiniCardProps {
   application: Application;
@@ -12,60 +12,6 @@ interface MiniCardProps {
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   const isClosingSoon = application.last_date_consultation_comments;
-  const { toast } = useToast();
-
-  // Array of diverse house images from Unsplash
-  const houseImages = [
-    "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60", 
-    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60"
-  ];
-
-  // Function to get a random image based on application id
-  const getRandomImage = (id: number) => {
-    return houseImages[id % houseImages.length];
-  };
-
-  // Get the appropriate image URL with detailed logging
-  console.log('MiniCard - Starting image URL resolution for application:', application.id);
-  
-  const imageUrl = (() => {
-    // First try to use image_map_url if it exists and is valid
-    if (application.image_map_url && application.image_map_url !== 'undefined') {
-      console.log('MiniCard - Using image_map_url:', application.image_map_url);
-      return application.image_map_url;
-    }
-
-    // Then try to use the image property if it exists and is not a placeholder
-    if (application.image && application.image !== '/placeholder.svg') {
-      // Check if it's a Supabase storage URL
-      if (application.image.startsWith('/storage/')) {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const fullUrl = `${supabaseUrl}${application.image}`;
-        console.log('MiniCard - Constructed Supabase storage URL:', fullUrl);
-        return fullUrl;
-      }
-      console.log('MiniCard - Using application.image:', application.image);
-      return application.image;
-    }
-
-    // Finally fall back to random Unsplash image
-    const fallbackImage = getRandomImage(application.id);
-    console.log('MiniCard - Using fallback image:', fallbackImage);
-    return fallbackImage;
-  })();
-
-  // Log the final resolution for debugging
-  console.log('MiniCard - Final image URL resolution:', {
-    applicationId: application.id,
-    imageMapUrl: application.image_map_url,
-    image: application.image,
-    fallbackImage: getRandomImage(application.id),
-    finalImageUrl: imageUrl,
-    applicationDetails: application
-  });
 
   return (
     <div 
@@ -74,28 +20,12 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       style={{ zIndex: 1500 }}
     >
       <div className="flex gap-4 items-center">
-        <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
-          <ImageWithFallback
-            src={imageUrl}
-            alt={application.title || application.description || ''}
-            width={80}
-            height={80}
-            className="w-full h-full object-cover"
-            fallbackSrc={getRandomImage(application.id)}
-            onError={(e) => {
-              console.error('MiniCard - Image failed to load:', {
-                attemptedUrl: imageUrl,
-                error: e,
-                application: application
-              });
-              toast({
-                title: "Image failed to load",
-                description: "Using fallback image instead",
-                variant: "default",
-              });
-            }}
-          />
-        </div>
+        <ImageResolver
+          imageMapUrl={application.image_map_url}
+          image={application.image}
+          title={application.title || application.description || ''}
+          applicationId={application.id}
+        />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <ApplicationTitle 
@@ -109,14 +39,9 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1 mt-1 text-gray-600">
-            <MapPin className="w-3 h-3" />
-            <p className="text-sm truncate">{application.address}</p>
-          </div>
+          <LocationInfo address={application.address} />
           <div className="flex items-center justify-between mt-2">
-            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-              {getStatusText(application.status)}
-            </span>
+            <StatusBadge status={application.status} />
             <span className="text-xs text-gray-500">
               {application.distance}
             </span>
