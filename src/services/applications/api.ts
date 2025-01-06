@@ -18,7 +18,12 @@ export const fetchApplicationsFromSupabase = async ({
         page_size: pageSize,
         page_number: pageNumber
       }
-    ).throwOnError();
+    );
+
+    if (error) {
+      console.error('Error fetching applications:', error);
+      throw error;
+    }
 
     if (!apps || !Array.isArray(apps)) {
       throw new Error('Invalid response format from database');
