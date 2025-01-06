@@ -1,5 +1,5 @@
 import { Application } from "@/types/planning";
-import { MapView } from "./MapView";
+import { MapView } from "@/components/map/MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { RedoSearchButton } from "@/components/map/RedoSearchButton";
 import { useState } from "react";

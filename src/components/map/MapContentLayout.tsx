@@ -86,9 +86,8 @@ export const MapContentLayout = ({
           isMobile={isMobile}
           isMapView={isMapView}
           coordinates={coordinates}
-          postcode={postcode}
           applications={filteredApplications}
-          selectedApplication={selectedApplication}
+          selectedId={selectedApplication}
           onMarkerClick={onMarkerClick}
         />
         
