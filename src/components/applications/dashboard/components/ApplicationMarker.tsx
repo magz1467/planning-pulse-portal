@@ -19,8 +19,7 @@ export const ApplicationMarker = memo(({
   isSelected, 
   onClick 
 }: ApplicationMarkerProps) => {
-  const handleClick = useCallback((e: L.LeafletMouseEvent) => {
-    e.originalEvent.stopPropagation();
+  const handleClick = useCallback(() => {
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
@@ -41,10 +40,10 @@ export const ApplicationMarker = memo(({
   return (
     <Marker
       position={[application.centroid.lat, application.centroid.lng]}
-      eventHandlers={{
-        click: handleClick,
-      }}
       icon={icon}
+      eventHandlers={{
+        click: handleClick
+      }}
       zIndexOffset={isSelected ? 1000 : 0}
     />
   );
