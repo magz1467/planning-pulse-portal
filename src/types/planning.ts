@@ -37,7 +37,7 @@ export interface Comment {
   upvotes?: number;
   downvotes?: number;
   user?: {
-    email: string;
+    username?: string;
   };
   profiles?: {
     username?: string;

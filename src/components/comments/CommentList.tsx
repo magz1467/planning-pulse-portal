@@ -1,91 +1,20 @@
-import { useEffect, useState } from 'react';
 import { Comment } from '@/types/planning';
 import { supabase } from '@/integrations/supabase/client';
 import { CommentItem } from './CommentItem';
 import { useToast } from '@/hooks/use-toast';
+import { useComments } from './hooks/useComments';
+import { useRealtimeComments } from './hooks/useRealtimeComments';
 
 interface CommentListProps {
   applicationId: number;
 }
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [currentUserId, setCurrentUserId] = useState<string>();
+  const { comments, currentUserId, setComments } = useComments(applicationId);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const { data: session } = await supabase.auth.getSession();
-        if (session?.session?.user) {
-          setCurrentUserId(session.session.user.id);
-        }
-
-        const { data, error } = await supabase
-          .from('Comments')
-          .select('*, user:user_id (username)')
-          .eq('application_id', applicationId)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching comments:', error);
-          toast({
-            title: "Error",
-            description: "Failed to load comments",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        setComments(data as Comment[]);
-      } catch (error) {
-        console.error('Error in fetchComments:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load comments",
-          variant: "destructive"
-        });
-      }
-    };
-
-    const channel = supabase
-      .channel('comments-channel')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'Comments',
-          filter: `application_id=eq.${applicationId}`
-        },
-        (payload) => {
-          console.log('Real-time update:', payload);
-          
-          if (payload.eventType === 'INSERT') {
-            const newComment = payload.new as Comment;
-            setComments(prevComments => [newComment, ...prevComments]);
-            
-            if (newComment.user_id !== currentUserId) {
-              toast({
-                title: "New Comment",
-                description: "Someone just added a new comment"
-              });
-            }
-          } else if (payload.eventType === 'DELETE') {
-            setComments(prevComments => 
-              prevComments.filter(c => c.id !== (payload.old as Comment).id)
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    fetchComments();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [applicationId, toast, currentUserId]);
+  // Set up realtime subscription
+  useRealtimeComments(applicationId, currentUserId, setComments);
 
   const handleDeleteComment = async (commentId: number) => {
     try {
