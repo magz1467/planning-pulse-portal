@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useDebounce } from "./use-debounce";
 
 interface AddressSuggestion {
   postcode: string;
@@ -24,8 +24,8 @@ export const useAddressSuggestions = (search: string) => {
       try {
         // Check if the search string contains coordinates
         const coordsMatch = debouncedSearch.match(/^(-?\d+\.?\d*),\s*(-?\d+\.?\d*)$/);
-        
         let url;
+        
         if (coordsMatch) {
           // Use reverse geocoding endpoint for coordinates
           const [_, lat, lon] = coordsMatch;

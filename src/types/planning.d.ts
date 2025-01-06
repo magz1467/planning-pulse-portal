@@ -32,6 +32,7 @@ export interface Comment {
   created_at: string;
   comment: string;
   user_id: string;
+  user_email: string;
   application_id: number;
   parent_id?: number;
   upvotes?: number;
