@@ -71,9 +71,9 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
 
     fetchComments();
 
-    // Subscribe to new comments
+    // Subscribe to real-time changes
     const channel = supabase
-      .channel('comments')
+      .channel('comments-channel')
       .on(
         'postgres_changes',
         {
@@ -82,8 +82,35 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           table: 'Comments',
           filter: `application_id=eq.${applicationId}`
         },
-        () => {
-          fetchComments();
+        (payload) => {
+          console.log('Real-time update:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            const newComment = payload.new as any;
+            const transformedComment: Comment = {
+              id: newComment.id,
+              created_at: newComment.created_at,
+              comment: newComment.comment || '',
+              user_id: newComment.user_id || '',
+              application_id: newComment.application_id || 0,
+              parent_id: newComment.parent_id,
+              upvotes: newComment.upvotes || 0,
+              downvotes: newComment.downvotes || 0,
+              user: {
+                email: newComment.user_email || 'Unknown User'
+              }
+            };
+            
+            setComments(prevComments => [transformedComment, ...prevComments]);
+            
+            // Show toast notification for new comments
+            if (newComment.user_id !== currentUserId) {
+              toast({
+                title: "New Comment",
+                description: "Someone just added a new comment"
+              });
+            }
+          }
         }
       )
       .subscribe();
@@ -91,7 +118,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [applicationId, toast]);
+  }, [applicationId, toast, currentUserId]);
 
   const handleDeleteComment = async (commentId: number) => {
     try {
@@ -118,21 +145,9 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
     }
   };
 
-  // Organize comments into threads
-  const threadedComments = comments.reduce((acc, comment) => {
-    if (!comment.parent_id) {
-      const replies = comments.filter(c => c.parent_id === comment.id);
-      acc.push({
-        ...comment,
-        replies
-      });
-    }
-    return acc;
-  }, [] as (Comment & { replies: Comment[] })[]);
-
   return (
     <div className="space-y-4">
-      {threadedComments.map((comment) => (
+      {comments.map((comment) => (
         <CommentItem
           key={comment.id}
           comment={comment}

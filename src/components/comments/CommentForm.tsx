@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface CommentFormProps {
   applicationId: number;
@@ -17,52 +18,44 @@ export const CommentForm = ({ applicationId, parentId, onSubmit }: CommentFormPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to comment",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!comment.trim()) {
-      toast({
-        title: "Empty comment",
-        description: "Please enter a comment",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!comment.trim()) return;
 
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from('Comments')
-        .insert({
-          comment: comment.trim(),
-          application_id: applicationId,
-          user_id: session.session.user.id,
-          parent_id: parentId || null
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to comment",
+          variant: "destructive"
         });
+        return;
+      }
+
+      const { error } = await supabase.from('Comments').insert({
+        comment: comment.trim(),
+        application_id: applicationId,
+        parent_id: parentId,
+        user_id: session.user.id,
+        user_email: session.user.email
+      });
 
       if (error) throw error;
 
       setComment('');
+      if (onSubmit) onSubmit();
+      
       toast({
         title: "Comment submitted",
         description: "Your comment has been posted successfully"
       });
-      
-      onSubmit?.();
     } catch (error) {
       console.error('Error submitting comment:', error);
       toast({
         title: "Error",
-        description: "There was an error posting your comment",
+        description: "Failed to submit comment",
         variant: "destructive"
       });
     } finally {
@@ -73,17 +66,25 @@ export const CommentForm = ({ applicationId, parentId, onSubmit }: CommentFormPr
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Textarea
-        placeholder="Write a comment..."
         value={comment}
         onChange={(e) => setComment(e.target.value)}
+        placeholder="Write a comment..."
         className="min-h-[100px]"
+        disabled={isSubmitting}
       />
       <Button 
         type="submit" 
-        disabled={isSubmitting}
-        className="w-full"
+        disabled={isSubmitting || !comment.trim()}
+        className="w-full sm:w-auto"
       >
-        {isSubmitting ? 'Posting...' : 'Post Comment'}
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          'Submit Comment'
+        )}
       </Button>
     </form>
   );
