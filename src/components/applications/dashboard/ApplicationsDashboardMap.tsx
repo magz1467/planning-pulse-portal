@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect, useMemo } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -32,6 +32,18 @@ export const ApplicationsDashboardMap = () => {
     ...statusCounts
   }), [statusCounts]);
 
+  // Memoize coordinates to prevent unnecessary re-renders
+  const memoizedCoordinates = useMemo(() => coordinates as [number, number], [coordinates]);
+
+  // Memoize filtered applications to prevent unnecessary re-renders
+  const memoizedFilteredApplications = useMemo(() => filteredApplications, [filteredApplications]);
+
+  // Memoize the marker click handler
+  const memoizedHandleMarkerClick = useCallback((id: number | null) => {
+    console.log('Marker clicked:', id);
+    handleMarkerClick(id);
+  }, [handleMarkerClick]);
+
   // Debug logging for selectedId
   useEffect(() => {
     console.log('Selected ID state changed:', selectedId);
@@ -45,9 +57,6 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
-  // Memoize coordinates to prevent unnecessary re-renders
-  const memoizedCoordinates = useMemo(() => coordinates as [number, number], [coordinates]);
-
   return (
     <DashboardLayout
       selectedId={selectedId}
@@ -59,9 +68,9 @@ export const ApplicationsDashboardMap = () => {
       coordinates={memoizedCoordinates}
       isLoading={isLoading}
       applications={applications}
-      filteredApplications={filteredApplications}
+      filteredApplications={memoizedFilteredApplications}
       statusCounts={defaultStatusCounts}
-      handleMarkerClick={handleMarkerClick}
+      handleMarkerClick={memoizedHandleMarkerClick}
       handleFilterChange={handleFilterChange}
       handlePostcodeSelect={handlePostcodeSelect}
       handleSortChange={handleSortChange}
