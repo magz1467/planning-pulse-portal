@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Application } from '@/types/planning';
-import { supabase } from '@/integrations/supabase/client';
+import { Application } from "@/types/planning";
+import { supabase } from "@/integrations/supabase/client";
 import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
 
@@ -26,11 +26,19 @@ export const useApplicationsFetch = () => {
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        });
+        })
+        .timeout(30000); // 30 second timeout
 
       if (error) {
         console.error('Error fetching applications:', error);
         throw error;
+      }
+
+      if (!applications) {
+        console.log('No applications found');
+        setApplications([]);
+        setTotalCount(0);
+        return;
       }
 
       console.log(`📦 Received ${applications?.length || 0} applications from database`);
@@ -49,7 +57,8 @@ export const useApplicationsFetch = () => {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
-        });
+        })
+        .timeout(15000); // 15 second timeout
 
       if (countError) {
         console.error('Error fetching count:', countError);
@@ -57,8 +66,15 @@ export const useApplicationsFetch = () => {
         setTotalCount(countData || 0);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch applications:', error);
+      // Show more detailed error information
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
     } finally {
       setIsLoading(false);
     }

@@ -9,13 +9,13 @@ interface CategoryScore {
 }
 
 interface ImpactScoreDetails {
-  category_scores: {
-    environmental: CategoryScore;
-    social: CategoryScore;
-    infrastructure: CategoryScore;
+  category_scores?: {
+    environmental?: CategoryScore;
+    social?: CategoryScore;
+    infrastructure?: CategoryScore;
   };
-  key_concerns: string[];
-  recommendations: string[];
+  key_concerns?: string[];
+  recommendations?: string[];
 }
 
 interface ImpactScoreBreakdownProps {
@@ -47,7 +47,7 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
   return (
     <div className="space-y-4">
       {categories.map(({ name, key }) => {
-        const categoryData = impactDetails.category_scores[key as keyof typeof impactDetails.category_scores];
+        const categoryData = impactDetails.category_scores?.[key as keyof typeof impactDetails.category_scores];
         if (!categoryData) return null;
 
         return (
