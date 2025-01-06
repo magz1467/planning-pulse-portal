@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Bell, X } from "lucide-react";
 import { useState } from "react";
 import { ImageResolver } from "./components/ImageResolver";
+import { StatusBadge } from "./components/StatusBadge";
 
 interface MobileListViewProps {
   postcode: string;
@@ -70,9 +71,7 @@ export const MobileListView = ({
                 </h3>
                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">{app.address}</p>
                 <div className="flex justify-between items-center mt-2">
-                  <span className={`text-xs px-2 py-1 rounded ${getStatusColor(app.status)}`}>
-                    {app.status}
-                  </span>
+                  <StatusBadge status={app.status} />
                   <span className="text-xs text-gray-500">{app.distance}</span>
                 </div>
               </div>
