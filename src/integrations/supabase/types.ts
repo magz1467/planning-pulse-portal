@@ -127,6 +127,8 @@ export type Database = {
           geom: unknown | null
           id: string
           image_map_url: string | null
+          impact_score: number | null
+          impact_score_details: Json | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
@@ -185,6 +187,8 @@ export type Database = {
           geom?: unknown | null
           id: string
           image_map_url?: string | null
+          impact_score?: number | null
+          impact_score_details?: Json | null
           lapsed_date?: string | null
           last_date_consultation_comments?: string | null
           last_synced?: string | null
@@ -243,6 +247,8 @@ export type Database = {
           geom?: unknown | null
           id?: string
           image_map_url?: string | null
+          impact_score?: number | null
+          impact_score_details?: Json | null
           lapsed_date?: string | null
           last_date_consultation_comments?: string | null
           last_synced?: string | null
@@ -383,6 +389,60 @@ export type Database = {
           id?: number
           message?: string | null
           phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      impact_criteria: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: number
+          subcategory: string
+          weight: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: number
+          subcategory: string
+          weight: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: number
+          subcategory?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      impact_score_batch_status: {
+        Row: {
+          batch_size: number
+          completed_count: number | null
+          created_at: string
+          error_message: string | null
+          id: number
+          status: string | null
+        }
+        Insert: {
+          batch_size: number
+          completed_count?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: number
+          status?: string | null
+        }
+        Update: {
+          batch_size?: number
+          completed_count?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: number
           status?: string | null
         }
         Relationships: []
@@ -1501,6 +1561,8 @@ export type Database = {
           geom: unknown | null
           id: string
           image_map_url: string | null
+          impact_score: number | null
+          impact_score_details: Json | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
@@ -1568,6 +1630,8 @@ export type Database = {
           geom: unknown | null
           id: string
           image_map_url: string | null
+          impact_score: number | null
+          impact_score_details: Json | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null

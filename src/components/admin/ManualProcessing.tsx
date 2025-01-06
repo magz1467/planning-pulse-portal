@@ -17,8 +17,48 @@ export const ManualProcessing = ({
 }: ManualProcessingProps) => {
   const { toast } = useToast();
   const [isGeneratingMaps, setIsGeneratingMaps] = useState(false);
+  const [isGeneratingScores, setIsGeneratingScores] = useState(false);
   const [mapBatchSize, setMapBatchSize] = useState(100);
+  const [scoreBatchSize, setScoreBatchSize] = useState(50);
   const batchSizes = [50, 100, 250, 500];
+
+  const handleGenerateScores = async () => {
+    try {
+      setIsGeneratingScores(true);
+      console.log('Starting impact score generation process...');
+      
+      toast({
+        title: "Generating impact scores",
+        description: `This may take a few minutes for up to ${scoreBatchSize} applications`,
+      });
+
+      const { data, error } = await supabase.functions.invoke('generate-impact-scores', {
+        body: { limit: scoreBatchSize }
+      });
+
+      if (error) {
+        console.error('Error response:', error);
+        throw new Error(`Failed to generate scores: ${error.message}`);
+      }
+
+      console.log('Generation result:', data);
+      
+      toast({
+        title: "Success!",
+        description: data.message,
+      });
+
+    } catch (error) {
+      console.error('Error generating scores:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to generate impact scores. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingScores(false);
+    }
+  };
 
   const handleGenerateMaps = async () => {
     try {
@@ -30,7 +70,6 @@ export const ManualProcessing = ({
         description: `This may take a few minutes for up to ${mapBatchSize} applications`,
       });
 
-      // Use supabase client to invoke the function instead of raw fetch
       const { data, error } = await supabase.functions.invoke('generate-static-maps-manual', {
         body: { batch_size: mapBatchSize }
       });
@@ -108,6 +147,38 @@ export const ManualProcessing = ({
         </div>
         <p className="text-sm text-muted-foreground">
           Click to generate static map images for applications that don't have them yet. Choose between processing 100 or 500 applications at a time.
+        </p>
+      </div>
+
+      <Separator className="my-6" />
+
+      <div className="space-y-4">
+        <div className="flex gap-4">
+          <Button
+            onClick={() => {
+              setScoreBatchSize(50);
+              handleGenerateScores();
+            }}
+            className="flex-1 md:flex-none"
+            disabled={isGeneratingScores}
+          >
+            {isGeneratingScores && scoreBatchSize === 50 ? "Generating Scores..." : "Generate 50 Impact Scores"}
+          </Button>
+
+          <Button
+            onClick={() => {
+              setScoreBatchSize(100);
+              handleGenerateScores();
+            }}
+            className="flex-1 md:flex-none"
+            disabled={isGeneratingScores}
+            variant="secondary"
+          >
+            {isGeneratingScores && scoreBatchSize === 100 ? "Generating Scores..." : "Generate 100 Impact Scores"}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Click to generate environmental impact scores for applications that don't have them yet. Choose between processing 50 or 100 applications at a time.
         </p>
       </div>
     </div>
