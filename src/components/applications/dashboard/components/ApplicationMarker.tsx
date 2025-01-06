@@ -21,28 +21,38 @@ const getStatusColor = (status: string): string => {
 
 const createIcon = (color: string, isSelected: boolean) => {
   console.log('Creating icon with selected state:', isSelected); // Debug log
-  return L.divIcon({
+  const size = isSelected ? 32 : 24;
+  const icon = L.divIcon({
     className: 'bg-transparent',
-    html: `<svg width="${isSelected ? '32' : '24'}" height="${isSelected ? '32' : '24'}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" fill="${color}"/>
     </svg>`,
-    iconSize: [isSelected ? 32 : 24, isSelected ? 32 : 24],
-    iconAnchor: [isSelected ? 16 : 12, isSelected ? 32 : 24],
+    iconSize: [size, size],
+    iconAnchor: [size/2, size],
   });
-};
+  console.log('Icon created with size:', size); // Debug icon size
+  return icon;
+}
 
 export const ApplicationMarker = ({ application, isSelected, onClick }: ApplicationMarkerProps) => {
   console.log('ApplicationMarker render - Application:', application.id, 'Selected:', isSelected); // Debug log
+  console.log('Application coordinates:', application.coordinates); // Debug coordinates
   
   const color = getStatusColor(application.status);
+  console.log('Status color:', color); // Debug color
+  
   const icon = createIcon(color, isSelected);
+  console.log('Icon object:', icon); // Debug icon object
 
   return (
     <Marker
       position={application.coordinates}
       icon={icon}
       eventHandlers={{
-        click: onClick,
+        click: () => {
+          console.log('Marker clicked - Application:', application.id); // Debug click
+          onClick();
+        },
       }}
     />
   );
