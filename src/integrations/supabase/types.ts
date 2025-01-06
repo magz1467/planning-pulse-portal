@@ -374,6 +374,13 @@ export type Database = {
             referencedRelation: "Comments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "Comments_user_id_fkey_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       contact_requests: {
