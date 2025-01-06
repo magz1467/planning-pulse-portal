@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { ScoreDisplay } from "./impact-score/ScoreDisplay";
+import { useImpactScore } from "@/hooks/use-impact-score";
 
 interface EnvironmentalImpactDialProps {
   score?: number | null;
@@ -17,104 +15,13 @@ export const EnvironmentalImpactDial = ({
   details: initialDetails, 
   applicationId 
 }: EnvironmentalImpactDialProps) => {
-  const [progress, setProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasTriggered, setHasTriggered] = useState(false);
-  const [score, setScore] = useState<number | null>(initialScore);
-  const [details, setDetails] = useState(initialDetails);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    // Reset state when applicationId changes
-    setScore(initialScore);
-    setDetails(initialDetails);
-    setProgress(0);
-    setHasTriggered(false);
-  }, [applicationId, initialScore, initialDetails]);
-
-  useEffect(() => {
-    if (score !== null) {
-      const timer = setTimeout(() => setProgress(score), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [score]);
-
-  const handleGenerateScore = async () => {
-    setIsLoading(true);
-    setHasTriggered(true);
-
-    try {
-      console.log('Calling generate-single-impact-score with applicationId:', applicationId);
-      
-      const { data, error } = await supabase.functions.invoke('generate-single-impact-score', {
-        body: JSON.stringify({ applicationId })
-      });
-
-      console.log('Response from generate-single-impact-score:', { data, error });
-
-      if (error) {
-        console.error('Supabase function error:', error);
-        throw error;
-      }
-
-      if (!data) {
-        throw new Error('No response from server');
-      }
-
-      if (data.success) {
-        toast({
-          title: "Impact score generated",
-          description: "The application's impact score has been calculated and saved.",
-        });
-        
-        setScore(data.score);
-        setDetails(data.details);
-      } else {
-        console.error('Failed to generate impact score:', data.error);
-        throw new Error(data.error || 'Failed to generate impact score');
-      }
-    } catch (error) {
-      console.error('Error generating impact score:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate impact score. Please try again later.",
-        variant: "destructive",
-      });
-      setHasTriggered(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getColor = (score: number) => {
-    if (score < 30) {
-      return '#22c55e';
-    } else if (score >= 70) {
-      return '#ea384c';
-    } else {
-      const orangeIntensity = (score - 30) / 40;
-      const start = {
-        r: parseInt("FE", 16),
-        g: parseInt("C6", 16),
-        b: parseInt("A1", 16)
-      };
-      const end = {
-        r: parseInt("F9", 16),
-        g: parseInt("73", 16),
-        b: parseInt("16", 16)
-      };
-      const r = Math.round(start.r + (end.r - start.r) * orangeIntensity);
-      const g = Math.round(start.g + (end.g - start.g) * orangeIntensity);
-      const b = Math.round(start.b + (end.b - start.b) * orangeIntensity);
-      return `rgb(${r}, ${g}, ${b})`;
-    }
-  };
-
-  const getImpactText = (score: number) => {
-    if (score < 30) return "Low Impact";
-    if (score >= 70) return "High Impact";
-    return "Medium Impact";
-  };
+  const {
+    progress,
+    isLoading,
+    hasTriggered,
+    score,
+    generateScore
+  } = useImpactScore(initialScore, initialDetails, applicationId);
 
   if (!score) {
     return (
@@ -125,7 +32,7 @@ export const EnvironmentalImpactDial = ({
             Impact score calculation is available for this application
           </p>
           <Button 
-            onClick={handleGenerateScore}
+            onClick={generateScore}
             disabled={isLoading || hasTriggered}
           >
             {isLoading ? (
@@ -149,29 +56,7 @@ export const EnvironmentalImpactDial = ({
         <p className="text-xs text-gray-500">
           Score calculated using weighted factors including size, location sensitivity, and development type
         </p>
-        <div className="flex items-center gap-2">
-          <span 
-            className="text-sm font-medium"
-            style={{ color: getColor(score) }}
-          >
-            {score}/100
-          </span>
-          <span className="text-xs text-gray-500">
-            ({getImpactText(score)})
-          </span>
-        </div>
-        <Progress 
-          value={progress} 
-          className="h-2"
-          style={{
-            background: '#F2FCE2',
-            '--progress-background': getColor(score)
-          } as React.CSSProperties}
-        />
-        <div className="flex justify-between text-xs text-gray-500">
-          <span>Low Impact</span>
-          <span>High Impact</span>
-        </div>
+        <ScoreDisplay score={score} progress={progress} />
       </div>
     </Card>
   );
