@@ -30,6 +30,20 @@ export const fetchApplicationsFromSupabase = async ({
   }
 };
 
+export const fetchApplicationsCountFromSupabase = async (
+  center: [number, number],
+  radiusInMeters: number
+): Promise<number> => {
+  const { count, error } = await supabase
+    .from('applications')
+    .select('*', { count: 'exact', head: true })
+    .not('geom', 'is', null)
+    .filter('geom', 'not.is', null);
+
+  if (error) throw error;
+  return count || 0;
+};
+
 export const fetchStatusCounts = async (
   center: [number, number],
   radiusInMeters: number
@@ -42,11 +56,10 @@ export const fetchStatusCounts = async (
         center_lng: center[1],
         radius_meters: radiusInMeters
       }
-    ).throwOnError();
+    );
 
     if (error) throw error;
 
-    // Convert to expected format
     const counts: StatusCounts = {
       'Under Review': 0,
       'Approved': 0,
@@ -56,13 +69,14 @@ export const fetchStatusCounts = async (
 
     if (Array.isArray(data)) {
       data.forEach((row: { status: string; count: number }) => {
-        counts[row.status as keyof StatusCounts] = row.count;
+        if (row.status in counts) {
+          counts[row.status as keyof StatusCounts] = row.count;
+        }
       });
     }
 
     return counts;
-
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching status counts:', error);
     return {
       'Under Review': 0,

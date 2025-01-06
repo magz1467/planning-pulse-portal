@@ -51,7 +51,7 @@ export async function generateImpactScore(description: string): Promise<Perplexi
         temperature: 0.4, // Lowered for more consistent but still varied responses
         max_tokens: 1000,
         top_p: 0.9,
-        presence_penalty: 0.6 // Added to encourage more diverse responses
+        presence_penalty: 0.6 // Removed frequency_penalty to fix the API error
       }),
     });
 
