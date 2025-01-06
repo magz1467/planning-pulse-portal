@@ -12,7 +12,7 @@ interface MapContainerProps {
   onCenterChange?: (center: [number, number]) => void;
 }
 
-export const MapContainer = ({
+export const MapContainerComponent = ({
   coordinates,
   applications,
   onMarkerClick,

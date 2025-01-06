@@ -1,4 +1,4 @@
-import { MapContainer } from "@/components/map/MapContainer";
+import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
 
 interface MapViewProps {
@@ -18,7 +18,7 @@ export const MapView = ({
 }: MapViewProps) => {
   return (
     <div className="absolute inset-0">
-      <MapContainer
+      <MapContainerComponent
         applications={applications}
         coordinates={coordinates}
         onMarkerClick={onMarkerClick}
