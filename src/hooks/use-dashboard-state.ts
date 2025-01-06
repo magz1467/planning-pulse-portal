@@ -48,12 +48,16 @@ export const useDashboardState = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      await supabase.from('Searches').insert({
+      const { error } = await supabase.from('Searches').insert({
         'Post Code': postcode,
         'Status': initialTab,
         'User_logged_in': !!session?.user,
         'load_time': loadTime
       });
+
+      if (error) {
+        console.error('Error logging search:', error);
+      }
     } catch (error) {
       console.error('Error logging search:', error);
     }
