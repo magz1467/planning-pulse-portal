@@ -58,12 +58,14 @@ export const MobileListView = ({
           >
             <div className="flex gap-4">
               <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                <ImageResolver
-                  imageMapUrl={app.image_map_url}
-                  image={app.image}
-                  title={app.title || app.description || ''}
-                  applicationId={app.id}
-                />
+
+<ImageResolver
+  imageUrl={app.image_map_url}
+  image={app.image}
+  title={app.title || app.description || ''}
+  applicationId={app.id}
+/>
+
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-primary truncate">
