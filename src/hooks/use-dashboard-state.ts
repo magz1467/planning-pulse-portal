@@ -79,9 +79,10 @@ export const useDashboardState = () => {
   useEffect(() => {
     if ((isInitialSearch || isNewSearch) && coordinates) {
       setSearchPoint(coordinates);
-      fetchApplicationsInRadius(coordinates as [number, number], activeFilters);
+      // Default radius of 1000 meters if not specified
+      fetchApplicationsInRadius(coordinates, 1000);
     }
-  }, [coordinates, isInitialSearch, isNewSearch, activeFilters, fetchApplicationsInRadius, setSearchPoint]);
+  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, setSearchPoint]);
 
   // Log search performance
   useEffect(() => {
@@ -90,7 +91,7 @@ export const useDashboardState = () => {
       logSearch(loadTime);
       setSearchStartTime(null);
     }
-  }, [isLoadingApps, isLoadingCoords, searchStartTime, logSearch]);
+  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
