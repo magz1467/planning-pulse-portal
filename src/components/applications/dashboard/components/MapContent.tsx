@@ -44,7 +44,7 @@ export const MapContent = memo(({
     </>
   );
 }, (prevProps, nextProps) => {
-  // Only re-render if these props change
+  // Only re-render if these specific props change
   return prevProps.selectedId === nextProps.selectedId &&
          prevProps.center.lat === nextProps.center.lat &&
          prevProps.center.lng === nextProps.center.lng;
