@@ -75,7 +75,6 @@ export const MapLayout = ({
           isMobile={isMobile}
           isMapView={isMapView}
           coordinates={coordinates}
-          postcode={postcode}
           applications={filteredApplications}
           selectedApplication={selectedApplication}
           onMarkerClick={onMarkerClick}

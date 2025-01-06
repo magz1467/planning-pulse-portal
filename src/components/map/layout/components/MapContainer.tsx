@@ -34,6 +34,7 @@ export const MapContainer = ({
         <MapContainerComponent
           coordinates={coordinates}
           applications={applications}
+          selectedId={selectedApplication}
           onMarkerClick={onMarkerClick}
         />
         {isMobile && isMapView && selectedApplication !== null && (
