@@ -44,6 +44,7 @@ export const ApplicationMarker = memo(({
     />
   );
 }, (prevProps, nextProps) => {
+  // Only re-render if these specific props change
   return prevProps.isSelected === nextProps.isSelected &&
          prevProps.application.application_id === nextProps.application.application_id &&
          prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
