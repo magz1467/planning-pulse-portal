@@ -1,8 +1,8 @@
 import { Application } from "@/types/planning";
 import { ApplicationHeader } from "./planning-details/ApplicationHeader";
 import { ApplicationImage } from "./planning-details/ApplicationImage";
-import { ApplicationDetails } from "./planning-details/ApplicationDetails";
 import { ApplicationTimeline } from "./planning-details/ApplicationTimeline";
+import { CollapsibleApplicationDetails } from "./planning-details/CollapsibleApplicationDetails";
 import { ApplicationDescription } from "./planning-details/ApplicationDescription";
 import { ApplicationComments } from "./planning-details/ApplicationComments";
 import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
@@ -109,8 +109,6 @@ export const PlanningApplicationDetails = ({
     });
   };
 
-  if (!application) return null;
-
   return (
     <div className="p-6 space-y-4 pb-20">
       <div className="flex justify-between items-start">
@@ -122,8 +120,10 @@ export const PlanningApplicationDetails = ({
         applicationId={application.id} 
         reference={application.reference}
       />
-      <ApplicationTimeline application={application} />
-      <ApplicationDetails application={application} />
+      <Card className="overflow-hidden">
+        <ApplicationTimeline application={application} />
+        <CollapsibleApplicationDetails application={application} />
+      </Card>
       <ExpectedImpactAreas application={application} />
       <EnvironmentalImpactDial 
         score={application.impact_score} 
