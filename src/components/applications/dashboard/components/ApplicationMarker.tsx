@@ -22,7 +22,7 @@ const getStatusColor = (status: string): string => {
 
 const createIcon = (color: string, isSelected: boolean) => {
   const size = isSelected ? 40 : 24; // Increased size difference
-  console.log(`Creating marker icon - Selected: ${isSelected}, Size: ${size}px`);
+  console.log(`Creating marker icon - Selected: ${isSelected}, Size: ${size}px, Color: ${color}`);
   
   return L.divIcon({
     className: `custom-marker-icon ${isSelected ? 'selected' : ''}`,
@@ -60,6 +60,9 @@ export const ApplicationMarker = ({ application, isSelected, onClick }: Applicat
       icon={icon}
       eventHandlers={{
         click: handleClick,
+        mouseover: () => {
+          console.log(`Marker hover - Application ${application.id}`);
+        }
       }}
       zIndexOffset={isSelected ? 1000 : 0} // Ensure selected marker appears above others
     />

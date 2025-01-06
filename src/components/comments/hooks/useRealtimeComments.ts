@@ -1,14 +1,9 @@
-import { useEffect } from 'react';
-import { Comment } from '@/types/planning';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Comment } from '@/types/planning';
 
-export const useRealtimeComments = (
-  applicationId: number,
-  currentUserId: string | undefined,
-  setComments: (comments: Comment[]) => void
-) => {
-  const { toast } = useToast();
+export const useRealtimeComments = (initialComments: Comment[]) => {
+  const [comments, setComments] = useState<Comment[]>(initialComments);
 
   useEffect(() => {
     const channel = supabase
@@ -16,29 +11,27 @@ export const useRealtimeComments = (
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
-          table: 'Comments',
-          filter: `application_id=eq.${applicationId}`
+          table: 'comments'
         },
         (payload) => {
-          console.log('Real-time update:', payload);
-          
-          if (payload.eventType === 'INSERT') {
-            const newComment = payload.new as Comment;
-            setComments((prevComments: Comment[]) => [newComment, ...prevComments]);
-            
-            if (newComment.user_id !== currentUserId) {
-              toast({
-                title: "New Comment",
-                description: "Someone just added a new comment"
-              });
-            }
-          } else if (payload.eventType === 'DELETE') {
-            setComments((prevComments: Comment[]) => 
-              prevComments.filter(c => c.id !== (payload.old as Comment).id)
-            );
-          }
+          console.log('New comment received:', payload);
+          setComments((prevComments: Comment[]) => [...prevComments, payload.new as Comment]);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'comments'
+        },
+        (payload) => {
+          console.log('Comment deleted:', payload);
+          setComments((prevComments: Comment[]) => 
+            prevComments.filter(comment => comment.id !== payload.old.id)
+          );
         }
       )
       .subscribe();
@@ -46,5 +39,7 @@ export const useRealtimeComments = (
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [applicationId, currentUserId, setComments, toast]);
+  }, []);
+
+  return comments;
 };
