@@ -35,6 +35,10 @@ export const ApplicationMarker = memo(({
       position={position}
       onClick={handleClick}
       zIndex={isSelected ? 2 : 1}
+      options={{
+        optimized: true,
+        clickable: true
+      }}
     />
   );
 });
