@@ -1,53 +1,49 @@
-import { Application } from "@/types/planning";
-import { LatLngTuple } from "leaflet";
-import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
-import { ApplicationMarkers } from "@/components/map/ApplicationMarkers";
-import { SearchLocationPin } from "@/components/map/SearchLocationPin";
-import { useEffect, useState } from 'react';
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState } from "react";
 import { RedoSearchButton } from "@/components/map/RedoSearchButton";
-import "leaflet/dist/leaflet.css";
+import { MapContainer } from "@/components/map/layout/components/MapContainer";
+import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { Application } from "@/types/planning";
 
 interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
-  onMarkerClick: (id: number) => void;
-  initialCenter: LatLngTuple;
-  onCenterChange?: (center: LatLngTuple) => void;
+  coordinates: [number, number];
+  isMobile: boolean;
+  isMapView: boolean;
+  onMarkerClick: (id: number | null) => void;
+  onCenterChange: (center: [number, number]) => void;
 }
 
-const MapController = ({ 
-  applications, 
-  onCenterChange 
-}: { 
-  applications: Application[],
-  onCenterChange?: (center: LatLngTuple) => void 
-}) => {
-  const map = useMap();
+const RedoSearchControl = ({ onRedoSearch }: { onRedoSearch: (center: [number, number]) => void }) => {
   const [showRedoSearch, setShowRedoSearch] = useState(false);
 
-  useMapEvents({
-    moveend: () => {
-      // Check if any markers are visible in the current view
-      const bounds = map.getBounds();
-      const isAnyMarkerVisible = applications.some(app => {
-        if (!app.coordinates) return false;
-        return bounds.contains([app.coordinates[0], app.coordinates[1]]);
-      });
-      
-      setShowRedoSearch(!isAnyMarkerVisible);
-    }
-  });
+  useEffect(() => {
+    const handleMapMove = () => {
+      setShowRedoSearch(true);
+    };
+
+    window.addEventListener('map-move', handleMapMove);
+
+    return () => {
+      window.removeEventListener('map-move', handleMapMove);
+    };
+  }, []);
 
   const handleRedoSearch = () => {
-    const center = map.getCenter();
-    onCenterChange?.([center.lat, center.lng]);
+    const mapCenter = window.map?.getCenter();
+    if (mapCenter) {
+      onRedoSearch([mapCenter.lat, mapCenter.lng]);
+    }
     setShowRedoSearch(false);
   };
 
   return (
-    <div className="relative w-full h-full">
-      {showRedoSearch && <RedoSearchButton onClick={handleRedoSearch} />}
+    <div className="absolute inset-0 pointer-events-none">
+      {showRedoSearch && (
+        <div className="relative w-full h-full">
+          <RedoSearchButton onClick={handleRedoSearch} />
+        </div>
+      )}
     </div>
   );
 };
@@ -55,46 +51,29 @@ const MapController = ({
 export const MapView = ({
   applications,
   selectedId,
+  coordinates,
+  isMobile,
+  isMapView,
   onMarkerClick,
-  initialCenter,
-  onCenterChange
+  onCenterChange,
 }: MapViewProps) => {
-  const isMobile = useIsMobile();
-  
-  useEffect(() => {
-    console.log('MapView - Number of applications:', applications.length);
-  }, [applications]);
-
-  const defaultZoom = isMobile ? 13 : 15;
-
   return (
-    <div className="w-full h-full relative">
+    <div className="relative flex-1 w-full">
       <MapContainer
-        center={initialCenter as [number, number]}
-        zoom={defaultZoom}
-        scrollWheelZoom={true}
-        style={{ height: "100%", width: "100%" }}
-        zoomControl={true}
-        minZoom={12}
-        maxZoom={18}
-      >
-        <TileLayer 
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          maxZoom={19}
-        />
-        <SearchLocationPin position={initialCenter as [number, number]} />
-        <ApplicationMarkers
+        applications={applications}
+        selectedId={selectedId}
+        coordinates={coordinates}
+        onMarkerClick={onMarkerClick}
+        onCenterChange={onCenterChange}
+      />
+      <RedoSearchControl onRedoSearch={onCenterChange} />
+      {isMobile && isMapView && (
+        <MobileApplicationCards
           applications={applications}
-          baseCoordinates={initialCenter as [number, number]}
-          onMarkerClick={onMarkerClick}
           selectedId={selectedId}
+          onSelectApplication={onMarkerClick}
         />
-        <MapController 
-          applications={applications}
-          onCenterChange={onCenterChange}
-        />
-      </MapContainer>
+      )}
     </div>
   );
 };
