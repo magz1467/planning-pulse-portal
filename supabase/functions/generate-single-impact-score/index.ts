@@ -1,118 +1,101 @@
-import { corsHeaders } from '../_shared/cors.ts';
-import { Database } from './database.ts';
-import { generateImpactScore } from './perplexity.ts';
-import { calculateNormalizedScore } from './score-calculator.ts';
-import { ImpactScoreResponse } from './types.ts';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { generateImpactScore } from "./perplexity.ts";
+import { ApplicationData } from "./types.ts";
+import { createClient } from '@supabase/supabase-js';
 
-Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { 
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Allow-Methods': 'POST',
-      }
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const requestBody = await req.text();
-    console.log('Raw request body:', requestBody);
-    
-    let { applicationId } = JSON.parse(requestBody);
-    
+    const { applicationId } = await req.json();
+
     if (!applicationId) {
-      console.error('Missing applicationId in request');
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Application ID is required' 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400
-        }
-      );
+      throw new Error('Application ID is required');
     }
 
-    console.log('Processing applicationId:', applicationId);
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY')!;
-    
-    if (!perplexityKey) {
-      console.error('Missing Perplexity API key in environment');
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Server configuration error' 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500
-        }
-      );
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
     }
 
-    const db = new Database(supabaseUrl, supabaseKey);
-    
-    // Get application details
-    const application = await db.getApplication(applicationId);
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Generate impact scores using Perplexity
-    const perplexityResponse = await generateImpactScore(application.description);
-    
-    if (!perplexityResponse.success || !perplexityResponse.data) {
-      throw new Error(perplexityResponse.error || 'Failed to generate impact score');
+    const { data: application, error: fetchError } = await supabase
+      .from('applications')
+      .select('*')
+      .eq('application_id', applicationId)
+      .single();
+
+    if (fetchError || !application) {
+      throw new Error(`Failed to fetch application: ${fetchError?.message || 'Not found'}`);
     }
 
-    const { overall_score, category_scores, key_concerns, recommendations } = perplexityResponse.data;
-    
-    // Calculate normalized score
-    const normalizedScore = Math.round((overall_score / 100) * 20);
+    const appData = application as ApplicationData;
+    const description = appData.description || '';
 
-    // Update application with score
-    await db.updateImpactScore(applicationId, normalizedScore, {
-      category_scores,
-      key_concerns,
-      recommendations
-    });
+    console.log('Generating impact score for application:', applicationId);
+    const result = await generateImpactScore(description);
 
-    const response: ImpactScoreResponse = {
-      success: true,
-      score: normalizedScore,
-      details: {
-        category_scores,
-        key_concerns,
-        recommendations
-      }
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to generate impact score');
+    }
+
+    const score = result.data.overall_score;
+    const details = {
+      category_scores: result.data.category_scores,
+      key_concerns: result.data.key_concerns,
+      recommendations: result.data.recommendations
     };
 
+    const { error: updateError } = await supabase
+      .from('applications')
+      .update({
+        impact_score: score,
+        impact_score_details: details
+      })
+      .eq('application_id', applicationId);
+
+    if (updateError) {
+      throw new Error(`Failed to update application: ${updateError.message}`);
+    }
+
     return new Response(
-      JSON.stringify(response),
-      { 
-        headers: { 
+      JSON.stringify({
+        success: true,
+        score,
+        details
+      }),
+      {
+        headers: {
           ...corsHeaders,
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json',
         },
-        status: 200
       }
     );
 
   } catch (error) {
     console.error('Error in generate-single-impact-score:', error);
+    
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      JSON.stringify({
+        success: false,
+        error: error.message
       }),
-      { 
-        headers: { 
+      {
+        headers: {
           ...corsHeaders,
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json',
         },
-        status: 500
+        status: 500,
       }
     );
   }
