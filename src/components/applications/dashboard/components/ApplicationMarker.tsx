@@ -25,10 +25,32 @@ export const ApplicationMarker = memo(({
   });
 
   const handleClick = useCallback((e: L.LeafletMouseEvent) => {
-    e.originalEvent.stopPropagation();
-    console.log(`Marker clicked - Application ${application.application_id}`);
-    onClick(application.application_id);
-  }, [application.application_id, onClick]);
+    try {
+      e.originalEvent.stopPropagation();
+      console.log(`Marker clicked - Application ${application.application_id}`);
+      
+      // Track marker state before click
+      console.log('Marker state before click:', {
+        isSelected,
+        eventType: e.type,
+        hasOriginalEvent: !!e.originalEvent,
+        propagationStopped: e.originalEvent.cancelBubble,
+        coordinates: [application.centroid.lat, application.centroid.lng]
+      });
+
+      onClick(application.application_id);
+
+      // Verify click handler executed successfully
+      console.log(`Click handler completed for marker ${application.application_id}`);
+    } catch (error) {
+      console.error('Error in marker click handler:', {
+        markerId: application.application_id,
+        error,
+        eventDetails: e,
+        markerState: { isSelected }
+      });
+    }
+  }, [application.application_id, onClick, isSelected]);
 
   const icon = useMemo(() => {
     const size = isSelected ? 40 : 24;
@@ -56,6 +78,16 @@ export const ApplicationMarker = memo(({
     />
   );
 }, (prevProps, nextProps) => {
+  // Log comparison details
+  console.log('Marker comparison:', {
+    id: prevProps.application.application_id,
+    prevSelected: prevProps.isSelected,
+    nextSelected: nextProps.isSelected,
+    coordsMatch: prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
+                 prevProps.application.centroid.lng === nextProps.application.centroid.lng,
+    idMatch: prevProps.application.application_id === nextProps.application.application_id
+  });
+
   // Only re-render if these specific props change
   return prevProps.isSelected === nextProps.isSelected &&
          prevProps.application.application_id === nextProps.application.application_id &&
