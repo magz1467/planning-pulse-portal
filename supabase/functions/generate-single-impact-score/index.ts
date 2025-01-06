@@ -1,4 +1,5 @@
 import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from '@supabase/supabase-js';
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -78,22 +79,26 @@ Deno.serve(async (req) => {
 
     console.log('Generating prompt for application');
     
-    // Generate the prompt
+    // Generate the prompt with more specific details to ensure unique scores
     const prompt = `
       Analyze this planning application and provide impact scores for each category. 
       Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
+      Consider the specific details of this application carefully.
       Return only a valid JSON object with numerical scores, no explanations or markdown formatting.
       Format example: {"Environmental":{"air_quality":3,"noise":2},"Social":{"community":4}}
       
       Application details:
+      ID: ${application.application_id}
       Description: ${application.description || 'N/A'}
       Type: ${application.development_type || application.application_type || 'N/A'}
+      Status: ${application.status || 'N/A'}
+      Location: ${application.address || 'N/A'}
       Additional details: ${JSON.stringify(application.application_details || {})}
     `;
 
-    console.log('Calling Perplexity API');
+    console.log('Calling Perplexity API with unique application context');
     
-    // Call Perplexity API
+    // Call Perplexity API with temperature set to ensure more varied responses
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -105,14 +110,14 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores, no explanations or markdown formatting.'
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Analyze each application uniquely based on its specific details. Return only a valid JSON object with numerical scores.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.2,
+        temperature: 0.7, // Increased temperature for more variation
         max_tokens: 1000
       }),
     });
@@ -177,13 +182,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Calculate normalized score
+    // Calculate normalized score with weighted categories
     let totalScore = 0;
     let totalWeights = 0;
 
+    // Define category weights
+    const categoryWeights = {
+      'Environmental': 1.2,
+      'Social': 1.0,
+      'Infrastructure': 0.8
+    };
+
     for (const [category, subcategories] of Object.entries(scores)) {
+      const categoryWeight = categoryWeights[category] || 1.0;
       for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
-        const weight = 1;
+        const weight = categoryWeight;
         totalScore += (score as number) * weight;
         totalWeights += weight;
       }
