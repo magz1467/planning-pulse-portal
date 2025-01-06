@@ -54,6 +54,11 @@ export const ApplicationMarker = memo(({
       zIndexOffset={isSelected ? 1000 : 0}
     />
   );
+}, (prevProps, nextProps) => {
+  return prevProps.isSelected === nextProps.isSelected &&
+         prevProps.application.application_id === nextProps.application.application_id &&
+         prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
+         prevProps.application.centroid.lng === nextProps.application.centroid.lng;
 });
 
 ApplicationMarker.displayName = 'ApplicationMarker';

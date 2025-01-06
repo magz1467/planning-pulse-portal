@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -24,13 +24,13 @@ export const ApplicationsDashboardMap = () => {
   } = useDashboardState();
 
   // Initialize default status counts
-  const defaultStatusCounts = {
+  const defaultStatusCounts = useMemo(() => ({
     'Under Review': 0,
     'Approved': 0,
     'Declined': 0,
     'Other': 0,
     ...statusCounts
-  };
+  }), [statusCounts]);
 
   // Debug logging for selectedId
   useEffect(() => {
@@ -45,6 +45,9 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
+  // Memoize coordinates to prevent unnecessary re-renders
+  const memoizedCoordinates = useMemo(() => coordinates as [number, number], [coordinates]);
+
   return (
     <DashboardLayout
       selectedId={selectedId}
@@ -53,7 +56,7 @@ export const ApplicationsDashboardMap = () => {
       isMapView={isMapView}
       setIsMapView={setIsMapView}
       postcode={postcode}
-      coordinates={coordinates as [number, number]}
+      coordinates={memoizedCoordinates}
       isLoading={isLoading}
       applications={applications}
       filteredApplications={filteredApplications}
