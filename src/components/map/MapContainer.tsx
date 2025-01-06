@@ -58,6 +58,15 @@ export const MapContainerComponent = memo(({
       try {
         console.log('MapContainer - Setting view to:', coordinates);
         mapRef.current.setView(coordinates, 14);
+        
+        // Debug map container dimensions
+        const container = mapRef.current.getContainer();
+        console.log('Map container dimensions:', {
+          width: container.clientWidth,
+          height: container.clientHeight,
+          boundingRect: container.getBoundingClientRect()
+        });
+
         setTimeout(() => {
           if (mapRef.current) {
             mapRef.current.invalidateSize();
@@ -124,6 +133,16 @@ export const MapContainerComponent = memo(({
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           maxZoom={19}
+          eventHandlers={{
+            tileerror: (error) => {
+              console.error('Tile loading error:', error);
+              toast({
+                title: "Map Error",
+                description: "Failed to load map tiles",
+                variant: "destructive",
+              });
+            }
+          }}
         />
         <SearchLocationPin position={coordinates} />
         <ApplicationMarkers

@@ -23,7 +23,7 @@ export const ImageResolver = ({
       src={finalImageUrl}
       alt={title}
       className="w-full h-full object-cover"
-      defaultSrc={defaultImage}
+      fallback={defaultImage}
     />
   );
 };
