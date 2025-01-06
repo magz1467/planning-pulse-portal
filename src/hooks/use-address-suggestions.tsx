@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostcodeSuggestion {
   postcode: string;
@@ -11,6 +12,7 @@ interface PostcodeSuggestion {
 
 export const useAddressSuggestions = (search: string) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const { toast } = useToast();
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -30,6 +32,14 @@ export const useAddressSuggestions = (search: string) => {
           const postcodeResponse = await fetch(
             `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
           );
+          
+          if (!postcodeResponse.ok) {
+            if (postcodeResponse.status === 404) {
+              return []; // No results found
+            }
+            throw new Error('Postcode API error');
+          }
+
           const postcodeData = await postcodeResponse.json();
           
           if (postcodeData.result) {
@@ -37,6 +47,11 @@ export const useAddressSuggestions = (search: string) => {
               const detailsResponse = await fetch(
                 `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
               );
+              
+              if (!detailsResponse.ok) {
+                return null;
+              }
+
               const details = await detailsResponse.json();
               
               if (details.result) {
@@ -58,6 +73,11 @@ export const useAddressSuggestions = (search: string) => {
         const generalResponse = await fetch(
           `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
         );
+        
+        if (!generalResponse.ok) {
+          throw new Error('Address search failed');
+        }
+
         const generalData = await generalResponse.json();
         
         if (generalData.result && generalData.result.length > 0) {
@@ -71,10 +91,16 @@ export const useAddressSuggestions = (search: string) => {
         return [];
       } catch (error) {
         console.error('Error fetching suggestions:', error);
+        toast({
+          title: "Address lookup error",
+          description: "There was a problem looking up addresses. Please try again later.",
+          variant: "destructive"
+        });
         return [];
       }
     },
     enabled: debouncedSearch.length >= 2,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: 1, // Only retry once to avoid too many failed requests
   });
 };

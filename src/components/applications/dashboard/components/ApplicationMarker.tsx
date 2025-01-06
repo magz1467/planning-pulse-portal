@@ -34,10 +34,12 @@ export const ApplicationMarker = memo(({
     <Marker
       position={position}
       onClick={handleClick}
-      zIndex={isSelected ? 2 : 1}
+      zIndex={isSelected ? 1000 : 1}
       options={{
         clickable: true,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        optimized: false, // Helps with z-index issues
+        animation: isSelected ? google.maps.Animation.BOUNCE : undefined
       }}
     />
   );

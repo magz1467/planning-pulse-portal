@@ -1,4 +1,4 @@
-import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo } from "react";
@@ -49,6 +49,11 @@ export const MapContainerComponent = memo(({
     coordinates
   });
 
+  const handleMarkerClick = (id: number) => {
+    console.log('Marker clicked in MapContainer:', id);
+    onMarkerClick(id);
+  };
+
   return (
     <div className="w-full h-full relative">
       <LeafletMapContainer
@@ -59,15 +64,15 @@ export const MapContainerComponent = memo(({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer 
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           maxZoom={19}
         />
         <SearchLocationPin position={coordinates} />
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={coordinates}
-          onMarkerClick={onMarkerClick}
+          onMarkerClick={handleMarkerClick}
           selectedId={selectedId}
         />
       </LeafletMapContainer>
