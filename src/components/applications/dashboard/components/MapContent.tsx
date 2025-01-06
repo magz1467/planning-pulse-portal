@@ -9,6 +9,7 @@ interface MapContentProps {
   isMobile: boolean;
   isMapView: boolean;
   onMarkerClick: (id: number | null) => void;
+  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapContent = ({
@@ -18,6 +19,7 @@ export const MapContent = ({
   isMobile,
   isMapView,
   onMarkerClick,
+  onCenterChange,
 }: MapContentProps) => {
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -36,6 +38,7 @@ export const MapContent = ({
           selectedId={selectedId}
           onMarkerClick={onMarkerClick}
           initialCenter={coordinates}
+          onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards
