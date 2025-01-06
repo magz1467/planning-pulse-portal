@@ -39,22 +39,14 @@ serve(async (req) => {
       throw new Error(`Failed to fetch application: ${fetchError?.message || 'Not found'}`);
     }
 
-    const appData = application as ApplicationData;
-    const description = appData.description || '';
-
     console.log('Generating impact score for application:', applicationId);
-    const result = await generateImpactScore(description);
+    const result = await generateImpactScore(application as ApplicationData);
 
     if (!result.success) {
       throw new Error(result.error || 'Failed to generate impact score');
     }
 
-    const score = result.data.overall_score;
-    const details = {
-      category_scores: result.data.category_scores,
-      key_concerns: result.data.key_concerns,
-      recommendations: result.data.recommendations
-    };
+    const { data: { score, details } } = result;
 
     const { error: updateError } = await supabase
       .from('applications')

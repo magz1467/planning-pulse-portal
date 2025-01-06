@@ -33,7 +33,7 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Reco
       console.log('Calling generate-single-impact-score with applicationId:', applicationId);
       
       const { data, error } = await supabase.functions.invoke('generate-single-impact-score', {
-        body: JSON.stringify({ applicationId })
+        body: { applicationId }
       });
 
       console.log('Response from generate-single-impact-score:', { data, error });
@@ -63,7 +63,7 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Reco
       console.error('Error generating impact score:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to generate impact score. Please try again later.",
+        description: "Failed to generate impact score. Please try again later.",
         variant: "destructive",
       });
       setHasTriggered(false);
