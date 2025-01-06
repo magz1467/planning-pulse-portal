@@ -1,50 +1,38 @@
 import { useState, useEffect } from 'react';
 import { Comment } from '@/types/planning';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 export const useComments = (applicationId: number) => {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [currentUserId, setCurrentUserId] = useState<string>();
-  const { toast } = useToast();
+  const [currentUserId, setCurrentUserId] = useState<string>('');
 
   useEffect(() => {
     const fetchComments = async () => {
-      try {
-        const { data: session } = await supabase.auth.getSession();
-        if (session?.session?.user) {
-          setCurrentUserId(session.session.user.id);
-        }
-
-        const { data, error } = await supabase
-          .from('Comments')
-          .select('*, user:user_id (username)')
-          .eq('application_id', applicationId)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching comments:', error);
-          toast({
-            title: "Error",
-            description: "Failed to load comments",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        setComments(data as Comment[]);
-      } catch (error) {
-        console.error('Error in fetchComments:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load comments",
-          variant: "destructive"
-        });
+      const { data: session } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setCurrentUserId(session.user.id);
       }
+
+      const { data, error } = await supabase
+        .from('Comments')
+        .select('*')
+        .eq('application_id', applicationId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching comments:', error);
+        return;
+      }
+
+      setComments(data || []);
     };
 
     fetchComments();
-  }, [applicationId, toast]);
+  }, [applicationId]);
 
-  return { comments, currentUserId, setComments };
+  return {
+    comments,
+    currentUserId,
+    setComments,
+  };
 };

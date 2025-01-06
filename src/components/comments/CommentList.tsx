@@ -8,7 +8,7 @@ interface CommentListProps {
 }
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
-  const { comments, isLoading, error } = useComments(applicationId);
+  const { comments, currentUserId, setComments } = useComments(applicationId);
   const { subscribeToComments } = useRealtimeComments(applicationId);
 
   useEffect(() => {
@@ -18,14 +18,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
       if (unsubscribe) unsubscribe();
     };
   }, [applicationId, subscribeToComments]);
-
-  if (isLoading) {
-    return <div>Loading comments...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading comments</div>;
-  }
 
   if (!comments?.length) {
     return <div>No comments yet</div>;
