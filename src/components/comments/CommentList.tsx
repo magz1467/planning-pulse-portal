@@ -25,9 +25,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           .from('Comments')
           .select(`
             *,
-            profiles:user_id (
-              username
-            )
+            profiles:user_id(username)
           `)
           .eq('application_id', applicationId)
           .order('created_at', { ascending: false });
