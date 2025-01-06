@@ -16,7 +16,7 @@ interface ImpactCriteria {
 }
 
 async function calculateImpactScore(application: ApplicationData): Promise<{ score: number; details: any }> {
-  console.log(`[Impact Score] Calculating score for application ${application.application_id}`);
+  console.log(`[Impact Score ${application.application_id}] Starting calculation`);
   
   const apiKey = Deno.env.get('PERPLEXITY_API_KEY');
   if (!apiKey) {
@@ -34,7 +34,9 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
     Additional details: ${JSON.stringify(application.application_details || {})}
   `;
 
-  console.log(`[Impact Score] Sending request to Perplexity API for application ${application.application_id}`);
+  console.log(`[Impact Score ${application.application_id}] Sending request to Perplexity API`);
+  console.log(`[Impact Score ${application.application_id}] Application description: ${application.description}`);
+  console.log(`[Impact Score ${application.application_id}] Development type: ${application.development_type || application.application_type}`);
   
   try {
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -61,9 +63,14 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
     });
 
     const data = await response.json();
-    console.log(`[Impact Score] Received response from Perplexity API for application ${application.application_id}:`, data);
+    console.log(`[Impact Score ${application.application_id}] Perplexity API response:`, data);
     
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} - ${JSON.stringify(data)}`);
+    }
+
     const scores = JSON.parse(data.choices[0].message.content);
+    console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
     
     // Calculate weighted score
     let totalScore = 0;
@@ -79,8 +86,8 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       }
     }
 
-    console.log(`[Impact Score] Calculated final score for application ${application.application_id}:`, {
-      totalScore,
+    console.log(`[Impact Score ${application.application_id}] Final score:`, {
+      totalScore: Math.round(totalScore),
       details
     });
 
@@ -89,7 +96,7 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       details: scores
     };
   } catch (error) {
-    console.error(`[Impact Score] Error calculating score for application ${application.application_id}:`, error);
+    console.error(`[Impact Score ${application.application_id}] Error calculating score:`, error);
     throw error;
   }
 }
@@ -100,8 +107,9 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log('[Impact Score] Starting batch processing');
     const { limit = 50 } = await req.json();
-    console.log('[Impact Score] Starting batch processing with limit:', limit);
+    console.log('[Impact Score] Batch size:', limit);
     
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -109,11 +117,16 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Create batch status record
-    const { data: batchStatus } = await supabase
+    const { data: batchStatus, error: batchError } = await supabase
       .from('impact_score_batch_status')
       .insert([{ batch_size: limit }])
       .select()
       .single();
+
+    if (batchError) {
+      console.error('[Impact Score] Error creating batch status:', batchError);
+      throw batchError;
+    }
 
     console.log('[Impact Score] Created batch status record:', batchStatus);
 

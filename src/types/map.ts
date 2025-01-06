@@ -1,16 +1,16 @@
-import { Application } from "./planning";
-
-export interface MapState {
-  selectedApplication: number | null;
-  activeFilters: {
-    status?: string;
-    type?: string;
-  };
-  activeSort: 'closingSoon' | 'newest' | null;
+export interface Application {
+  application_id: number;
+  description: string;
+  development_type: string;
+  application_type: string;
+  application_details: any;
 }
 
-export interface MapActions {
-  handleMarkerClick: (id: number | null) => void;
-  handleFilterChange: (filterType: string, value: string) => void;
-  handleSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
+export interface MapViewProps {
+  applications: Application[];
+  selectedId: number;
+  coordinates: [number, number];
+  onMarkerClick: (id: number) => void;
+  onCenterChange: (center: [number, number]) => void;
+  onMapMove?: (map: any) => void; // Added this optional prop
 }
