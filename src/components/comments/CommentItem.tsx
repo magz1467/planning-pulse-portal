@@ -31,8 +31,7 @@ export const CommentItem = ({
   const { toast } = useToast();
   const maxLevel = 3;
 
-  const displayName = comment.user?.profile?.username || 
-                     (comment.user?.email ? comment.user.email.split('@')[0] : 'Anonymous');
+  const displayName = comment.profiles?.username || 'Anonymous';
 
   const handleVote = async (type: 'up' | 'down') => {
     try {
