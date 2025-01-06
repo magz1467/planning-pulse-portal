@@ -60,13 +60,20 @@ export const transformApplicationData = (
     image: imageUrl,
     coordinates,
     ai_title: app.ai_title,
-    postcode: app.postcode || ''
+    postcode: app.postcode || '',
+    impact_score: app.impact_score || null,
+    impact_score_details: app.impact_score_details || null,
+    image_map_url: app.image_map_url || null,
+    last_date_consultation_comments: app.last_date_consultation_comments || null,
+    valid_date: app.valid_date || null,
+    centroid: app.centroid || null
   };
 
   console.log('✅ Transformed application:', {
     id: application.id,
     coordinates: application.coordinates,
-    distance: application.distance
+    distance: application.distance,
+    impact_score: application.impact_score
   });
   console.groupEnd();
   return application;
