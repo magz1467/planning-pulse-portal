@@ -31,7 +31,13 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           parent_id,
           upvotes,
           downvotes,
-          user_email
+          user_email,
+          user:user_id (
+            email,
+            profile:profiles (
+              username
+            )
+          )
         `)
         .eq('application_id', applicationId)
         .order('created_at', { ascending: false });
@@ -51,22 +57,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         return;
       }
 
-      // Transform the data to match the Comment type
-      const transformedComments: Comment[] = data.map(comment => ({
-        id: comment.id,
-        created_at: comment.created_at,
-        comment: comment.comment || '',
-        user_id: comment.user_id || '',
-        application_id: comment.application_id || 0,
-        parent_id: comment.parent_id,
-        upvotes: comment.upvotes || 0,
-        downvotes: comment.downvotes || 0,
-        user: {
-          email: comment.user_email || 'Unknown User'
-        }
-      }));
-
-      setComments(transformedComments);
+      setComments(data as Comment[]);
     };
 
     fetchComments();
@@ -87,21 +78,22 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           
           if (payload.eventType === 'INSERT') {
             const newComment = payload.new as any;
-            const transformedComment: Comment = {
-              id: newComment.id,
-              created_at: newComment.created_at,
-              comment: newComment.comment || '',
-              user_id: newComment.user_id || '',
-              application_id: newComment.application_id || 0,
-              parent_id: newComment.parent_id,
-              upvotes: newComment.upvotes || 0,
-              downvotes: newComment.downvotes || 0,
-              user: {
-                email: newComment.user_email || 'Unknown User'
-              }
-            };
-            
-            setComments(prevComments => [transformedComment, ...prevComments]);
+            // Fetch the user profile for the new comment
+            supabase
+              .from('profiles')
+              .select('username')
+              .eq('id', newComment.user_id)
+              .single()
+              .then(({ data: profile }) => {
+                const transformedComment: Comment = {
+                  ...newComment,
+                  user: {
+                    email: newComment.user_email,
+                    profile: profile
+                  }
+                };
+                setComments(prevComments => [transformedComment, ...prevComments]);
+              });
             
             // Show toast notification for new comments
             if (newComment.user_id !== currentUserId) {

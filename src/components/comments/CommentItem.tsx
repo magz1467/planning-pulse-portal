@@ -31,6 +31,9 @@ export const CommentItem = ({
   const { toast } = useToast();
   const maxLevel = 3;
 
+  const displayName = comment.user?.profile?.username || 
+                     (comment.user?.email ? comment.user.email.split('@')[0] : 'Anonymous');
+
   const handleVote = async (type: 'up' | 'down') => {
     try {
       // Check if user has already voted
@@ -115,7 +118,7 @@ export const CommentItem = ({
       <div className="bg-white p-4 rounded-lg shadow-sm border">
         <div className="flex justify-between items-start mb-2">
           <div className="text-sm text-gray-600">
-            {comment.user?.email || 'Anonymous'} • {new Date(comment.created_at).toLocaleDateString()}
+            {displayName} • {new Date(comment.created_at).toLocaleDateString()}
           </div>
           {currentUserId === comment.user_id && (
             <Button
