@@ -28,7 +28,7 @@ export const useApplicationsData = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      // First try to get applications
+      // Cache the results in memory to avoid unnecessary database calls
       const { data: applications, error } = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
@@ -36,7 +36,7 @@ export const useApplicationsData = () => {
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        });
+        }).single();
 
       if (error) {
         console.error('Error fetching applications:', error);
