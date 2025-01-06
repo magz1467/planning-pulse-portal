@@ -25,11 +25,8 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           .from('Comments')
           .select(`
             *,
-            user:user_id (
-              email,
-              profile:profiles (
-                username
-              )
+            profiles:user_id (
+              username
             )
           `)
           .eq('application_id', applicationId)
