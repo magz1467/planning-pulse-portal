@@ -1,12 +1,6 @@
-import { PerplexityResponse } from "./types.ts";
+import { ImpactScoreResponse } from "./types.ts";
 
-const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY');
-
-if (!PERPLEXITY_API_KEY) {
-  throw new Error('Missing PERPLEXITY_API_KEY environment variable');
-}
-
-export async function generateImpactScore(description: string) {
+export async function generateImpactScore(description: string): Promise<ImpactScoreResponse> {
   console.log('Generating impact score for description:', description);
 
   const prompt = `Analyze the following planning application description and provide an impact assessment in JSON format only. Return a valid JSON object with this exact structure:
@@ -38,14 +32,14 @@ export async function generateImpactScore(description: string) {
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+        'Authorization': `Bearer ${Deno.env.get('PERPLEXITY_API_KEY')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'llama-3.1-sonar-small-128k-online',
         messages: [{
           role: 'system',
-          content: 'You are a planning application impact assessor. Always respond with valid JSON only, no additional text or markdown. Follow the exact structure provided in the prompt.'
+          content: 'You are a planning application impact assessor. Respond with a raw JSON object only, no markdown formatting or additional text.'
         }, {
           role: 'user',
           content: prompt
@@ -62,7 +56,7 @@ export async function generateImpactScore(description: string) {
       throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json() as PerplexityResponse;
+    const data = await response.json();
     console.log('Received response from Perplexity API:', data);
 
     if (!data.choices?.[0]?.message?.content) {
@@ -73,7 +67,11 @@ export async function generateImpactScore(description: string) {
       const content = data.choices[0].message.content;
       console.log('Raw content:', content);
       
-      const parsedResponse = JSON.parse(content);
+      // Remove any markdown formatting if present
+      const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
+      console.log('Cleaned content:', cleanContent);
+      
+      const parsedResponse = JSON.parse(cleanContent);
       console.log('Parsed response:', parsedResponse);
       
       return {
