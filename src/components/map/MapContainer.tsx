@@ -1,9 +1,10 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo, useCallback } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
+import debounce from 'lodash/debounce';
 import "leaflet/dist/leaflet.css";
 
 export interface MapContainerProps {
@@ -25,8 +26,17 @@ export const MapContainerComponent = memo(({
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
+  // Debounce the center change handler
+  const debouncedCenterChange = useCallback(
+    debounce((center: [number, number]) => {
+      if (onCenterChange) {
+        onCenterChange(center);
+      }
+    }, 300),
+    [onCenterChange]
+  );
+
   useEffect(() => {
-    console.log('MapContainer - Coordinates changed:', coordinates);
     if (mapRef.current) {
       mapRef.current.setView(coordinates, 14);
       setTimeout(() => {
@@ -37,17 +47,18 @@ export const MapContainerComponent = memo(({
 
   useEffect(() => {
     if (mapRef.current && onMapMove) {
-      mapRef.current.on('move', () => {
+      const handleMove = debounce(() => {
         onMapMove(mapRef.current!);
-      });
+      }, 300);
+
+      mapRef.current.on('move', handleMove);
+
+      return () => {
+        mapRef.current?.off('move', handleMove);
+        handleMove.cancel();
+      };
     }
   }, [onMapMove]);
-
-  console.log('MapContainer - Rendering with:', {
-    applicationsCount: applications.length,
-    selectedId,
-    coordinates
-  });
 
   return (
     <div className="w-full h-full relative">
