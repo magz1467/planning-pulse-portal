@@ -6,6 +6,7 @@ import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { cn } from "@/lib/utils";
+import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -21,21 +22,6 @@ export const PlanningApplicationList = ({
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
 
-  // Array of diverse house images from Unsplash
-  const houseImages = [
-    "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60", // Modern house
-    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop&q=60", // Traditional house
-    "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&auto=format&fit=crop&q=60", // Suburban house
-    "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60", // Luxury house
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60"  // Contemporary house
-  ];
-
-  // Function to get a random image based on application id
-  const getRandomImage = (id: number) => {
-    // Use the application id to consistently get the same image for the same application
-    return houseImages[id % houseImages.length];
-  };
-
   return (
     <div className="divide-y">
       {sortedApplications.map((application) => {
@@ -50,10 +36,11 @@ export const PlanningApplicationList = ({
           >
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                <img
-                  src={getRandomImage(application.id)}
-                  alt="Property image"
-                  className="w-full h-full object-cover"
+                <ImageResolver
+                  imageMapUrl={application.image_map_url}
+                  image={application.image}
+                  title={application.title || application.description || ''}
+                  applicationId={application.id}
                 />
               </div>
               <div className="flex-1 min-w-0">
