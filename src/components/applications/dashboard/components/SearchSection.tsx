@@ -42,21 +42,6 @@ export const SearchSection = ({
           className="w-full"
         />
       </div>
-
-      {onFilterChange && (
-        <div className="px-4">
-          <FilterBar 
-            onFilterChange={onFilterChange}
-            onSortChange={onSortChange}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            isMapView={isMapView}
-            onToggleView={onToggleView}
-            applications={applications}
-            statusCounts={statusCounts}
-          />
-        </div>
-      )}
     </div>
   );
 };
