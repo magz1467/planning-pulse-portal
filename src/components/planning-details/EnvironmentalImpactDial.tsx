@@ -12,17 +12,31 @@ interface EnvironmentalImpactDialProps {
   applicationId: number;
 }
 
-export const EnvironmentalImpactDial = ({ score: initialScore, details: initialDetails, applicationId }: EnvironmentalImpactDialProps) => {
+export const EnvironmentalImpactDial = ({ 
+  score: initialScore, 
+  details: initialDetails, 
+  applicationId 
+}: EnvironmentalImpactDialProps) => {
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
-  const [score, setScore] = useState(initialScore);
+  const [score, setScore] = useState<number | null>(initialScore);
   const [details, setDetails] = useState(initialDetails);
   const { toast } = useToast();
 
   useEffect(() => {
-    const timer = setTimeout(() => setProgress(score || 0), 100);
-    return () => clearTimeout(timer);
+    // Reset state when applicationId changes
+    setScore(initialScore);
+    setDetails(initialDetails);
+    setProgress(0);
+    setHasTriggered(false);
+  }, [applicationId, initialScore, initialDetails]);
+
+  useEffect(() => {
+    if (score !== null) {
+      const timer = setTimeout(() => setProgress(score), 100);
+      return () => clearTimeout(timer);
+    }
   }, [score]);
 
   const handleGenerateScore = async () => {
@@ -53,7 +67,6 @@ export const EnvironmentalImpactDial = ({ score: initialScore, details: initialD
           description: "The application's impact score has been calculated and saved.",
         });
         
-        // Update local state instead of reloading
         setScore(data.score);
         setDetails(data.details);
       } else {
