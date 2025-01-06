@@ -1,10 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
-import { FetchApplicationsParams } from './types';
+import { FetchApplicationsParams, StatusCounts } from './types';
 
 export const fetchApplicationsFromSupabase = async ({
   center,
   radiusInMeters,
-  statusFilter,
   pageSize = 100,
   pageNumber = 0
 }: FetchApplicationsParams) => {
@@ -15,7 +14,6 @@ export const fetchApplicationsFromSupabase = async ({
         center_lat: center[0],
         center_lng: center[1],
         radius_meters: radiusInMeters,
-        status_filter: statusFilter,
         page_size: pageSize,
         page_number: pageNumber
       }
@@ -35,7 +33,7 @@ export const fetchApplicationsFromSupabase = async ({
 export const fetchStatusCounts = async (
   center: [number, number],
   radiusInMeters: number
-) => {
+): Promise<StatusCounts> => {
   try {
     const { data, error } = await supabase.rpc(
       'get_applications_status_counts',
@@ -49,16 +47,18 @@ export const fetchStatusCounts = async (
     if (error) throw error;
 
     // Convert to expected format
-    const counts = {
+    const counts: StatusCounts = {
       'Under Review': 0,
       'Approved': 0,
       'Declined': 0,
       'Other': 0
     };
 
-    data?.forEach((row: { status: string; count: number }) => {
-      counts[row.status as keyof typeof counts] = row.count;
-    });
+    if (Array.isArray(data)) {
+      data.forEach((row: { status: string; count: number }) => {
+        counts[row.status as keyof StatusCounts] = row.count;
+      });
+    }
 
     return counts;
 
