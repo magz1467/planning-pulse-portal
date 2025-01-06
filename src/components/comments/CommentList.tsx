@@ -23,9 +23,15 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
       const { data, error } = await supabase
         .from('Comments')
         .select(`
-          *,
-          user:user_id (
-            id,
+          id,
+          created_at,
+          comment,
+          user_id,
+          application_id,
+          parent_id,
+          upvotes,
+          downvotes,
+          profiles:user_id (
             email
           )
         `)
@@ -44,9 +50,16 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
 
       // Transform the data to match the Comment type
       const transformedComments = data.map(comment => ({
-        ...comment,
+        id: comment.id,
+        created_at: comment.created_at,
+        comment: comment.comment,
+        user_id: comment.user_id,
+        application_id: comment.application_id,
+        parent_id: comment.parent_id,
+        upvotes: comment.upvotes,
+        downvotes: comment.downvotes,
         user: {
-          email: comment.user?.email || 'Unknown User'
+          email: comment.profiles?.email || 'Unknown User'
         }
       }));
 
