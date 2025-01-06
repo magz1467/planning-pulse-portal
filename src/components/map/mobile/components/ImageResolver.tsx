@@ -6,9 +6,10 @@ interface ImageResolverProps {
   image?: string;
   title: string;
   applicationId: number;
+  coordinates?: [number, number];
 }
 
-export const ImageResolver = ({ imageMapUrl, image, title, applicationId }: ImageResolverProps) => {
+export const ImageResolver = ({ imageMapUrl, image, title, applicationId, coordinates }: ImageResolverProps) => {
   const { toast } = useToast();
 
   // Array of diverse house images from Unsplash
@@ -25,10 +26,20 @@ export const ImageResolver = ({ imageMapUrl, image, title, applicationId }: Imag
     return houseImages[id % houseImages.length];
   };
 
+  const generateMapboxUrl = (coords: [number, number]) => {
+    const [lat, lng] = coords;
+    return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},17,45,60/800x600@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}&logo=false`;
+  };
+
   const imageUrl = (() => {
     // First try to use image_map_url if it exists and is valid
     if (imageMapUrl && imageMapUrl !== 'undefined') {
       return imageMapUrl;
+    }
+
+    // Then try to generate a new mapbox URL if we have coordinates
+    if (coordinates) {
+      return generateMapboxUrl(coordinates);
     }
 
     // Then try to use the image property if it exists and is not a placeholder
