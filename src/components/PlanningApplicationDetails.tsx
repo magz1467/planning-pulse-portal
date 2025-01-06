@@ -38,7 +38,6 @@ export const PlanningApplicationDetails = ({
   const { toast } = useToast();
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
 
-  // Cleanup function to handle modal states
   useEffect(() => {
     return () => {
       setShowEmailDialog(false);
@@ -135,7 +134,7 @@ export const PlanningApplicationDetails = ({
         feedbackStats={feedbackStats}
       />
 
-      <ApplicationComments />
+      <ApplicationComments applicationId={application.id} />
       <CreatePetition applicationId={application.id} />
       <ApplicationDocuments />
 

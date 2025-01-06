@@ -301,26 +301,67 @@ export type Database = {
         }
         Relationships: []
       }
+      comment_votes: {
+        Row: {
+          comment_id: number
+          created_at: string
+          id: number
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          comment_id: number
+          created_at?: string
+          id?: number
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          comment_id?: number
+          created_at?: string
+          id?: number
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_votes_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "Comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Comments: {
         Row: {
           application_id: number | null
           comment: string | null
           created_at: string
+          downvotes: number | null
           id: number
+          parent_id: number | null
+          upvotes: number | null
           user_id: string | null
         }
         Insert: {
           application_id?: number | null
           comment?: string | null
           created_at?: string
+          downvotes?: number | null
           id?: number
+          parent_id?: number | null
+          upvotes?: number | null
           user_id?: string | null
         }
         Update: {
           application_id?: number | null
           comment?: string | null
           created_at?: string
+          downvotes?: number | null
           id?: number
+          parent_id?: number | null
+          upvotes?: number | null
           user_id?: string | null
         }
         Relationships: [
@@ -330,6 +371,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "applications"
             referencedColumns: ["application_id"]
+          },
+          {
+            foreignKeyName: "Comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "Comments"
+            referencedColumns: ["id"]
           },
         ]
       }
