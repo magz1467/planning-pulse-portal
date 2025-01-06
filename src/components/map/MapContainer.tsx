@@ -1,7 +1,7 @@
 import { MapContainer as LeafletMapContainer, TileLayer, useMap } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
-import { useEffect, useRef, memo, useCallback } from "react";
+import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import debounce from 'lodash/debounce';
@@ -40,7 +40,6 @@ export interface MapContainerProps {
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapContainerComponent = memo(({

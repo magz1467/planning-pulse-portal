@@ -63,7 +63,8 @@ export const ApplicationMarkers = ({
               key={app.id}
               position={app.coordinates}
               eventHandlers={{
-                click: () => {
+                click: (e) => {
+                  e.originalEvent.stopPropagation(); // Stop event from bubbling to map
                   console.log(`Marker clicked - Application ${app.id}`);
                   onMarkerClick(app.id);
                 },
