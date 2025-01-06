@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { ScoreDisplay } from "./impact-score/ScoreDisplay";
+import { ImpactScoreBreakdown } from "./impact-score/ImpactScoreDetails";
 import { useImpactScore } from "@/hooks/use-impact-score";
 
 interface EnvironmentalImpactDialProps {
@@ -20,6 +21,7 @@ export const EnvironmentalImpactDial = ({
     isLoading,
     hasTriggered,
     score,
+    details,
     generateScore
   } = useImpactScore(initialScore, initialDetails, applicationId);
 
@@ -50,14 +52,18 @@ export const EnvironmentalImpactDial = ({
   }
 
   return (
-    <Card className="p-4">
-      <div className="space-y-2">
-        <h3 className="font-semibold">Expected impact score</h3>
-        <p className="text-xs text-gray-500">
-          Score calculated using weighted factors including size, location sensitivity, and development type
-        </p>
-        <ScoreDisplay score={score} progress={progress} />
-      </div>
-    </Card>
+    <div className="space-y-4">
+      <Card className="p-4">
+        <div className="space-y-2">
+          <h3 className="font-semibold">Expected impact score</h3>
+          <p className="text-xs text-gray-500">
+            Score calculated using weighted factors including size, location sensitivity, and development type
+          </p>
+          <ScoreDisplay score={score} progress={progress} />
+        </div>
+      </Card>
+      
+      <ImpactScoreBreakdown details={details} />
+    </div>
   );
 };
