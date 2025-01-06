@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { FetchApplicationsParams, StatusCounts } from './types';
+import { transformApplicationData } from '@/utils/applicationTransforms';
 
 export const fetchApplicationsFromSupabase = async ({
   center,
