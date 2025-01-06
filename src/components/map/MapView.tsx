@@ -1,5 +1,6 @@
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
+import { Map as LeafletMap } from "leaflet";
 
 interface MapViewProps {
   applications: Application[];
@@ -7,6 +8,7 @@ interface MapViewProps {
   coordinates: [number, number];
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
+  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapView = ({
@@ -15,6 +17,7 @@ export const MapView = ({
   coordinates,
   onMarkerClick,
   onCenterChange,
+  onMapMove,
 }: MapViewProps) => {
   return (
     <div className="absolute inset-0">
@@ -23,6 +26,7 @@ export const MapView = ({
         coordinates={coordinates}
         onMarkerClick={onMarkerClick}
         onCenterChange={onCenterChange}
+        onMapMove={onMapMove}
       />
     </div>
   );
