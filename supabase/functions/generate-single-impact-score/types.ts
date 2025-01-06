@@ -1,21 +1,3 @@
-export interface ApplicationData {
-  description: string;
-  application_id: number;
-  status: string;
-  [key: string]: any;
-}
-
-export interface ImpactScoreResponse {
-  success: boolean;
-  score?: number;
-  details?: {
-    category_scores: Record<string, Record<string, number>>;
-    key_concerns: string[];
-    recommendations: string[];
-  };
-  error?: string;
-}
-
 export interface PerplexityResponse {
   id: string;
   model: string;
@@ -27,4 +9,28 @@ export interface PerplexityResponse {
     };
     finish_reason: string;
   }>;
+}
+
+export interface ImpactScoreResponse {
+  success: boolean;
+  score?: number;
+  details?: {
+    category_scores: {
+      environmental: {
+        score: number;
+        details: string;
+      };
+      social: {
+        score: number;
+        details: string;
+      };
+      infrastructure: {
+        score: number;
+        details: string;
+      };
+    };
+    key_concerns: string[];
+    recommendations: string[];
+  };
+  error?: string;
 }
