@@ -152,7 +152,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           key={comment.id}
           comment={comment}
           applicationId={applicationId}
-          replies={comment.replies}
           currentUserId={currentUserId}
           onDelete={handleDeleteComment}
         />
