@@ -18,9 +18,11 @@ export const MapContent = memo(({
   const { applications, isLoading } = useApplicationsData();
 
   useEffect(() => {
-    console.log(`MapContent rendered with ${applications?.length || 0} applications, selectedId: ${selectedId}`);
-    setRenderedMarkersCount(applications?.length || 0);
-  }, [applications?.length, selectedId]);
+    if (applications?.length !== renderedMarkersCount) {
+      console.log(`MapContent rendered with ${applications?.length || 0} applications, selectedId: ${selectedId}`);
+      setRenderedMarkersCount(applications?.length || 0);
+    }
+  }, [applications?.length, selectedId, renderedMarkersCount]);
 
   const handleMarkerClick = useCallback((id: number) => {
     console.log(`Marker clicked in MapContent: ${id}`);
@@ -49,6 +51,11 @@ export const MapContent = memo(({
       ))}
     </>
   );
+}, (prevProps, nextProps) => {
+  // Only re-render if these props change
+  return prevProps.selectedId === nextProps.selectedId &&
+         prevProps.center.lat === nextProps.center.lat &&
+         prevProps.center.lng === nextProps.center.lng;
 });
 
 MapContent.displayName = 'MapContent';

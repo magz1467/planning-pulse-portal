@@ -30,17 +30,25 @@ export const ApplicationMarker = memo(({
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
+  const options = useMemo(() => ({
+    optimized: true,
+    clickable: true
+  }), []);
+
   return (
     <Marker
       position={position}
       onClick={handleClick}
       zIndex={isSelected ? 2 : 1}
-      options={{
-        optimized: true,
-        clickable: true
-      }}
+      options={options}
     />
   );
+}, (prevProps, nextProps) => {
+  // Only re-render if these props change
+  return prevProps.isSelected === nextProps.isSelected &&
+         prevProps.application.application_id === nextProps.application.application_id &&
+         prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
+         prevProps.application.centroid.lng === nextProps.application.centroid.lng;
 });
 
 ApplicationMarker.displayName = 'ApplicationMarker';
