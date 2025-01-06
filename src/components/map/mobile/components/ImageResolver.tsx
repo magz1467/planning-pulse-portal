@@ -25,12 +25,9 @@ export const ImageResolver = ({ imageMapUrl, image, title, applicationId }: Imag
     return houseImages[id % houseImages.length];
   };
 
-  console.log('ImageResolver - Starting image URL resolution for application:', applicationId);
-  
   const imageUrl = (() => {
     // First try to use image_map_url if it exists and is valid
     if (imageMapUrl && imageMapUrl !== 'undefined') {
-      console.log('ImageResolver - Using image_map_url:', imageMapUrl);
       return imageMapUrl;
     }
 
@@ -39,31 +36,17 @@ export const ImageResolver = ({ imageMapUrl, image, title, applicationId }: Imag
       // Check if it's a Supabase storage URL
       if (image.startsWith('/storage/')) {
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const fullUrl = `${supabaseUrl}${image}`;
-        console.log('ImageResolver - Constructed Supabase storage URL:', fullUrl);
-        return fullUrl;
+        return `${supabaseUrl}${image}`;
       }
-      console.log('ImageResolver - Using application.image:', image);
       return image;
     }
 
     // Finally fall back to random Unsplash image
-    const fallbackImage = getRandomImage(applicationId);
-    console.log('ImageResolver - Using fallback image:', fallbackImage);
-    return fallbackImage;
+    return getRandomImage(applicationId);
   })();
 
-  // Log the final resolution for debugging
-  console.log('ImageResolver - Final image URL resolution:', {
-    applicationId,
-    imageMapUrl,
-    image,
-    fallbackImage: getRandomImage(applicationId),
-    finalImageUrl: imageUrl
-  });
-
   return (
-    <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+    <div className="w-full h-full flex items-center justify-center bg-gray-100 overflow-hidden">
       <ImageWithFallback
         src={imageUrl}
         alt={title}
@@ -72,7 +55,7 @@ export const ImageResolver = ({ imageMapUrl, image, title, applicationId }: Imag
         className="w-full h-full object-cover"
         fallbackSrc={getRandomImage(applicationId)}
         onError={(e) => {
-          console.error('ImageResolver - Image failed to load:', {
+          console.error('Image failed to load:', {
             attemptedUrl: imageUrl,
             error: e
           });
