@@ -26,6 +26,7 @@ export const MapContainerComponent = ({
   const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
+    console.log('MapContainer - Coordinates changed:', coordinates);
     if (mapRef.current) {
       mapRef.current.setView(coordinates, 14);
       setTimeout(() => {
@@ -41,6 +42,12 @@ export const MapContainerComponent = ({
       });
     }
   }, [onMapMove]);
+
+  console.log('MapContainer - Rendering with:', {
+    applicationsCount: applications.length,
+    selectedId,
+    coordinates
+  });
 
   return (
     <div className="w-full h-full relative">
