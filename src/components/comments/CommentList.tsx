@@ -33,6 +33,11 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
 
       if (error) {
         console.error('Error fetching comments:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load comments",
+          variant: "destructive"
+        });
         return;
       }
 
