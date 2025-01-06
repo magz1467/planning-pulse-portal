@@ -31,9 +31,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           parent_id,
           upvotes,
           downvotes,
-          user:user_id (
-            email
-          )
+          user_email
         `)
         .eq('application_id', applicationId)
         .order('created_at', { ascending: false });
@@ -64,7 +62,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         upvotes: comment.upvotes || 0,
         downvotes: comment.downvotes || 0,
         user: {
-          email: comment.user?.email || 'Unknown User'
+          email: comment.user_email || 'Unknown User'
         }
       }));
 

@@ -342,6 +342,7 @@ export type Database = {
           id: number
           parent_id: number | null
           upvotes: number | null
+          user_email: string | null
           user_id: string | null
         }
         Insert: {
@@ -352,6 +353,7 @@ export type Database = {
           id?: number
           parent_id?: number | null
           upvotes?: number | null
+          user_email?: string | null
           user_id?: string | null
         }
         Update: {
@@ -362,6 +364,7 @@ export type Database = {
           id?: number
           parent_id?: number | null
           upvotes?: number | null
+          user_email?: string | null
           user_id?: string | null
         }
         Relationships: [
