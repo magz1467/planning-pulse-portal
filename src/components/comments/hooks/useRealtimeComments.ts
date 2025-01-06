@@ -26,7 +26,7 @@ export const useRealtimeComments = (
           
           if (payload.eventType === 'INSERT') {
             const newComment = payload.new as Comment;
-            setComments(prevComments => [newComment, ...prevComments]);
+            setComments((prevComments: Comment[]) => [newComment, ...prevComments]);
             
             if (newComment.user_id !== currentUserId) {
               toast({
@@ -35,7 +35,7 @@ export const useRealtimeComments = (
               });
             }
           } else if (payload.eventType === 'DELETE') {
-            setComments(prevComments => 
+            setComments((prevComments: Comment[]) => 
               prevComments.filter(c => c.id !== (payload.old as Comment).id)
             );
           }
