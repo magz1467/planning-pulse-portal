@@ -6,7 +6,6 @@ import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import "leaflet/dist/leaflet.css";
 
 export interface MapContainerProps {
@@ -29,29 +28,7 @@ export const MapContainerComponent = memo(({
   const mapRef = useRef<LeafletMap | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
   const { toast } = useToast();
-
-  // Fetch Mapbox token from Supabase Edge Function
-  useEffect(() => {
-    const fetchMapboxToken = async () => {
-      try {
-        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
-        if (error) throw error;
-        setMapboxToken(token);
-      } catch (err) {
-        console.error('Error fetching Mapbox token:', err);
-        setError('Failed to load map configuration');
-        toast({
-          title: "Map Error",
-          description: "Failed to load map configuration. Please try again later.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    fetchMapboxToken();
-  }, [toast]);
 
   useEffect(() => {
     console.log('MapContainer - Component mounted');
@@ -134,7 +111,7 @@ export const MapContainerComponent = memo(({
     );
   }
 
-  if (isLoading || !mapboxToken) {
+  if (isLoading) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-50">
         <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
@@ -152,8 +129,8 @@ export const MapContainerComponent = memo(({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer 
-          url={`https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/{z}/{x}/{y}?access_token=${mapboxToken}`}
-          attribution='© <a href="https://www.mapbox.com/about/maps/">Mapbox</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           maxZoom={19}
         />
         <SearchLocationPin position={coordinates} />
