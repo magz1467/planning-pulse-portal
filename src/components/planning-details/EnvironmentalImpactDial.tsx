@@ -63,7 +63,6 @@ export const EnvironmentalImpactDial = ({
       
       {details && (
         <div className="space-y-2 pt-4 border-t">
-          <h3 className="font-semibold">Impact Score Breakdown</h3>
           <ImpactScoreBreakdown details={details} />
         </div>
       )}

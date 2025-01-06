@@ -45,37 +45,33 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
   ];
 
   return (
-    <Card className="p-4 space-y-4">
-      <h3 className="font-semibold">Impact Score Breakdown</h3>
-      
-      <div className="space-y-4">
-        {categories.map(({ name, key }) => {
-          const categoryData = impactDetails.category_scores[key as keyof typeof impactDetails.category_scores];
-          if (!categoryData) return null;
+    <div className="space-y-4">
+      {categories.map(({ name, key }) => {
+        const categoryData = impactDetails.category_scores[key as keyof typeof impactDetails.category_scores];
+        if (!categoryData) return null;
 
-          return (
-            <Collapsible key={key}>
-              <CollapsibleTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-                >
-                  <div className="flex items-center gap-2">
-                    {getCategoryIcon(categoryData.score)}
-                    <span className={`font-medium ${getCategoryColor(categoryData.score)}`}>
-                      {name}: {categoryData.score}/100
-                    </span>
-                  </div>
-                  <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <p className="text-sm text-gray-600 ml-7 mt-2">{categoryData.details}</p>
-              </CollapsibleContent>
-            </Collapsible>
-          );
-        })}
-      </div>
+        return (
+          <Collapsible key={key}>
+            <CollapsibleTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+              >
+                <div className="flex items-center gap-2">
+                  {getCategoryIcon(categoryData.score)}
+                  <span className={`font-medium ${getCategoryColor(categoryData.score)}`}>
+                    {name}: {categoryData.score}/100
+                  </span>
+                </div>
+                <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <p className="text-sm text-gray-600 ml-7 mt-2">{categoryData.details}</p>
+            </CollapsibleContent>
+          </Collapsible>
+        );
+      })}
 
       {impactDetails.key_concerns && impactDetails.key_concerns.length > 0 && (
         <Collapsible>
@@ -118,6 +114,6 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
           </CollapsibleContent>
         </Collapsible>
       )}
-    </Card>
+    </div>
   );
 };
