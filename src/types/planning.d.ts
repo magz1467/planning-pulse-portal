@@ -36,6 +36,7 @@ export interface Comment {
   parent_id?: number;
   upvotes?: number;
   downvotes?: number;
+  user_email?: string;
   user?: {
     email?: string;
     profile?: {

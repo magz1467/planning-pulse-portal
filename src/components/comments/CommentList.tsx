@@ -24,12 +24,18 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         const { data, error } = await supabase
           .from('Comments')
           .select(`
-            *,
-            user:user_id (
-              email,
-              profile:profiles (
-                username
-              )
+            id,
+            created_at,
+            comment,
+            user_id,
+            application_id,
+            parent_id,
+            upvotes,
+            downvotes,
+            user_email,
+            user:profiles!user_id(
+              email:auth.users!id(email),
+              profile:profiles(username)
             )
           `)
           .eq('application_id', applicationId)
@@ -78,23 +84,8 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           console.log('Real-time update:', payload);
           
           if (payload.eventType === 'INSERT') {
-            const newComment = payload.new as any;
-            // Fetch the user profile for the new comment
-            supabase
-              .from('profiles')
-              .select('username')
-              .eq('id', newComment.user_id)
-              .single()
-              .then(({ data: profile }) => {
-                const transformedComment: Comment = {
-                  ...newComment,
-                  user: {
-                    email: newComment.user_email,
-                    profile: profile
-                  }
-                };
-                setComments(prevComments => [transformedComment, ...prevComments]);
-              });
+            const newComment = payload.new as Comment;
+            setComments(prevComments => [newComment, ...prevComments]);
             
             // Show toast notification for new comments
             if (newComment.user_id !== currentUserId) {
@@ -103,6 +94,10 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
                 description: "Someone just added a new comment"
               });
             }
+          } else if (payload.eventType === 'DELETE') {
+            setComments(prevComments => 
+              prevComments.filter(c => c.id !== (payload.old as Comment).id)
+            );
           }
         }
       )
