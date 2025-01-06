@@ -1,3 +1,18 @@
+export interface Comment {
+  id: number;
+  created_at: string;
+  comment: string;
+  user_id?: string;
+  application_id?: number;
+  parent_id?: number;
+  upvotes?: number;
+  downvotes?: number;
+  user_email?: string;
+  profiles?: {
+    username?: string;
+  };
+}
+
 export interface Application {
   id: number;
   title: string;
@@ -25,18 +40,4 @@ export interface Application {
   };
   impact_score?: number | null;
   impact_score_details?: Record<string, any>;
-}
-
-export interface Comment {
-  id: number;
-  created_at: string;
-  comment: string;
-  user_id: string;
-  application_id: number;
-  parent_id?: number;
-  upvotes?: number;
-  downvotes?: number;
-  profiles?: {
-    username?: string;
-  };
 }
