@@ -22,7 +22,6 @@ export const useDashboardState = () => {
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode);
-  const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
@@ -62,7 +61,6 @@ export const useDashboardState = () => {
   };
 
   const handlePostcodeSelect = async (newPostcode: string) => {
-    setSearchStartTime(Date.now());
     setPostcode(newPostcode);
   };
 
@@ -77,15 +75,6 @@ export const useDashboardState = () => {
       fetchApplicationsInRadius(coordinates, 1000);
     }
   }, [coordinates, fetchApplicationsInRadius]);
-
-  // Log search performance
-  useEffect(() => {
-    if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
-      const loadTime = (Date.now() - searchStartTime) / 1000;
-      logSearch(loadTime);
-      setSearchStartTime(null);
-    }
-  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;

@@ -60,6 +60,11 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
+  // Only render layout if coordinates exist or loading is complete
+  if (!coordinates && !isLoading) {
+    return null;
+  }
+
   return (
     <DashboardLayout
       selectedId={selectedId}
