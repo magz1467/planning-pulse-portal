@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Comment } from '@/types/planning';
 
 export const useRealtimeComments = (applicationId: number) => {
-  const subscribeToComments = () => {
+  const subscribeToComments = useCallback(() => {
     console.log('Subscribing to comments for application:', applicationId);
     
     const channel = supabase
@@ -37,7 +37,7 @@ export const useRealtimeComments = (applicationId: number) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [applicationId]);
 
   return { subscribeToComments };
 };
