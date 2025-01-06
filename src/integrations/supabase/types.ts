@@ -323,15 +323,7 @@ export type Database = {
           user_id?: string
           vote_type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "comment_votes_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "Comments"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       Comments: {
         Row: {
@@ -350,7 +342,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           downvotes?: number | null
-          id?: number
+          id?: never
           parent_id?: number | null
           upvotes?: number | null
           user_email?: string | null
@@ -361,7 +353,7 @@ export type Database = {
           comment?: string | null
           created_at?: string
           downvotes?: number | null
-          id?: number
+          id?: never
           parent_id?: number | null
           upvotes?: number | null
           user_email?: string | null

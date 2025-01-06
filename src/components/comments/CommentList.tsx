@@ -15,49 +15,50 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
 
   useEffect(() => {
     const fetchComments = async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (session?.session?.user) {
-        setCurrentUserId(session.session.user.id);
-      }
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (session?.session?.user) {
+          setCurrentUserId(session.session.user.id);
+        }
 
-      const { data, error } = await supabase
-        .from('Comments')
-        .select(`
-          id,
-          created_at,
-          comment,
-          user_id,
-          application_id,
-          parent_id,
-          upvotes,
-          downvotes,
-          user_email,
-          user:user_id (
-            email,
-            profile:profiles (
-              username
+        const { data, error } = await supabase
+          .from('Comments')
+          .select(`
+            *,
+            user:user_id (
+              email,
+              profile:profiles (
+                username
+              )
             )
-          )
-        `)
-        .eq('application_id', applicationId)
-        .order('created_at', { ascending: false });
+          `)
+          .eq('application_id', applicationId)
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching comments:', error);
+        if (error) {
+          console.error('Error fetching comments:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load comments",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (!data) {
+          setComments([]);
+          return;
+        }
+
+        setComments(data as Comment[]);
+      } catch (error) {
+        console.error('Error in fetchComments:', error);
         toast({
           title: "Error",
           description: "Failed to load comments",
           variant: "destructive"
         });
-        return;
       }
-
-      if (!data) {
-        setComments([]);
-        return;
-      }
-
-      setComments(data as Comment[]);
     };
 
     fetchComments();
