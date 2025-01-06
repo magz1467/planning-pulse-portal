@@ -40,7 +40,6 @@ export const ApplicationMarker = memo(({
       url: isSelected ? '/marker-selected.svg' : '/marker.svg',
       scaledSize: new google.maps.Size(isSelected ? 40 : 24, isSelected ? 40 : 24),
       anchor: new google.maps.Point(isSelected ? 20 : 12, isSelected ? 40 : 24),
-      // This ensures smooth size transition
       animation: isSelected ? google.maps.Animation.BOUNCE : null
     }
   }), [isSelected, position]);
