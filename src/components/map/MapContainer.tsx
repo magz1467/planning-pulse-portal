@@ -5,6 +5,7 @@ import { useEffect, useRef, memo, useState } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import "leaflet/dist/leaflet.css";
 
 export interface MapContainerProps {
@@ -27,9 +28,13 @@ export const MapContainerComponent = memo(({
   const mapRef = useRef<LeafletMap | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     console.log('MapContainer - Component mounted');
+    console.log('Initial coordinates:', coordinates);
+    console.log('Initial applications:', applications);
+    
     return () => {
       console.log('MapContainer - Component unmounted');
     };
@@ -37,9 +42,15 @@ export const MapContainerComponent = memo(({
 
   useEffect(() => {
     console.log('MapContainer - Coordinates changed:', coordinates);
-    if (!coordinates) {
-      console.error('MapContainer - Invalid coordinates:', coordinates);
-      setError('Invalid coordinates provided');
+    if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+      const errorMsg = 'Invalid coordinates provided';
+      console.error('MapContainer -', errorMsg, coordinates);
+      setError(errorMsg);
+      toast({
+        title: "Map Error",
+        description: errorMsg,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -55,11 +66,17 @@ export const MapContainerComponent = memo(({
           }
         }, 100);
       } catch (err) {
-        console.error('MapContainer - Error setting map view:', err);
-        setError('Error initializing map');
+        const errorMsg = 'Error setting map view';
+        console.error('MapContainer -', errorMsg, err);
+        setError(errorMsg);
+        toast({
+          title: "Map Error",
+          description: errorMsg,
+          variant: "destructive",
+        });
       }
     }
-  }, [coordinates]);
+  }, [coordinates, toast]);
 
   useEffect(() => {
     if (mapRef.current && onMapMove) {

@@ -5,13 +5,15 @@ interface ImageResolverProps {
   image?: string | null;
   title: string;
   applicationId: number;
+  coordinates?: [number, number] | null;  // Added back coordinates prop
 }
 
 export const ImageResolver = ({
   imageUrl,
   image,
   title,
-  applicationId
+  applicationId,
+  coordinates  // Added back coordinates prop
 }: ImageResolverProps) => {
   const defaultImage = '/placeholder.svg';
   const finalImageUrl = imageUrl || image || defaultImage;
@@ -21,7 +23,7 @@ export const ImageResolver = ({
       src={finalImageUrl}
       alt={title}
       className="w-full h-full object-cover"
-      defaultSrc={defaultImage}
+      fallback={defaultImage}  // Changed defaultSrc to fallback
     />
   );
 };
