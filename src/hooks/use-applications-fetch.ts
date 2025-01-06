@@ -3,12 +3,19 @@ import { useToast } from "@/components/ui/use-toast";
 import { Application } from "@/types/planning";
 import { MAP_DEFAULTS } from '@/utils/mapConstants';
 import { transformApplicationData } from '@/utils/applicationTransforms';
-import { fetchApplicationsFromSupabase, fetchApplicationsCountFromSupabase } from '@/services/applicationsService';
+import { fetchApplicationsFromSupabase, fetchApplicationsCountFromSupabase, fetchStatusCounts } from '@/services/applicationsService';
+import { StatusCounts } from '@/services/applications/types';
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [statusCounts, setStatusCounts] = useState<StatusCounts>({
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  });
   const { toast } = useToast();
 
   const fetchApplicationsInRadius = async (
@@ -29,6 +36,10 @@ export const useApplicationsFetch = () => {
       const count = await fetchApplicationsCountFromSupabase(center, radiusInMeters);
       setTotalCount(count || 0);
 
+      // Get status counts
+      const counts = await fetchStatusCounts(center, radiusInMeters);
+      setStatusCounts(counts);
+
       if (count === 0) {
         toast({
           title: "No results found",
@@ -42,7 +53,8 @@ export const useApplicationsFetch = () => {
       // Then fetch the applications
       const apps = await fetchApplicationsFromSupabase({
         center,
-        radiusInMeters
+        radiusInMeters,
+        statusFilter: filters?.status
       });
 
       const transformedData = apps
@@ -50,6 +62,12 @@ export const useApplicationsFetch = () => {
         .filter((app): app is Application => app !== null);
       
       setApplications(transformedData);
+
+      console.log('Fetched applications:', {
+        total: count,
+        filtered: transformedData.length,
+        statusCounts: counts
+      });
 
     } catch (error: any) {
       console.error('Error fetching applications:', error);
@@ -68,6 +86,7 @@ export const useApplicationsFetch = () => {
     applications,
     isLoading,
     totalCount,
+    statusCounts,
     fetchApplicationsInRadius
   };
 };
