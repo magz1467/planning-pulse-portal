@@ -33,6 +33,9 @@ export interface Comment {
   comment: string;
   user_id: string;
   application_id: number;
+  parent_id?: number;
+  upvotes?: number;
+  downvotes?: number;
   user?: {
     email: string;
   };

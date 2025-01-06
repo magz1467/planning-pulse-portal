@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Comment } from '@/types/planning';
 import { Button } from '@/components/ui/button';
-import { ThumbsUp, ThumbsDown, Reply, Trash } from 'lucide-react';
+import { Reply, Trash } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { CommentForm } from './CommentForm';
+import { CommentVotes } from './CommentVotes';
 
 interface CommentItemProps {
   comment: Comment;
@@ -31,15 +32,6 @@ export const CommentItem = ({
   const maxLevel = 3;
 
   const handleVote = async (type: 'up' | 'down') => {
-    if (!currentUserId) {
-      toast({
-        title: "Please sign in",
-        description: "You need to be signed in to vote on comments",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
       // Check if user has already voted
       const { data: existingVote } = await supabase
@@ -61,7 +53,7 @@ export const CommentItem = ({
           await supabase
             .from('Comments')
             .update({
-              [type === 'up' ? 'upvotes' : 'downvotes']: comment[type === 'up' ? 'upvotes' : 'downvotes'] - 1
+              [type === 'up' ? 'upvotes' : 'downvotes']: comment[type === 'up' ? 'upvotes' : 'downvotes']! - 1
             })
             .eq('id', comment.id);
 
@@ -77,8 +69,8 @@ export const CommentItem = ({
           await supabase
             .from('Comments')
             .update({
-              [type === 'up' ? 'upvotes' : 'downvotes']: comment[type === 'up' ? 'upvotes' : 'downvotes'] + 1,
-              [type === 'up' ? 'downvotes' : 'upvotes']: comment[type === 'up' ? 'downvotes' : 'upvotes'] - 1
+              [type === 'up' ? 'upvotes' : 'downvotes']: comment[type === 'up' ? 'upvotes' : 'downvotes']! + 1,
+              [type === 'up' ? 'downvotes' : 'upvotes']: comment[type === 'up' ? 'downvotes' : 'upvotes']! - 1
             })
             .eq('id', comment.id);
 
@@ -97,7 +89,7 @@ export const CommentItem = ({
         await supabase
           .from('Comments')
           .update({
-            [type === 'up' ? 'upvotes' : 'downvotes']: comment[type === 'up' ? 'upvotes' : 'downvotes'] + 1
+            [type === 'up' ? 'upvotes' : 'downvotes']: comment[type === 'up' ? 'upvotes' : 'downvotes']! + 1
           })
           .eq('id', comment.id);
 
@@ -138,24 +130,14 @@ export const CommentItem = ({
         </div>
         <p className="text-gray-800 mb-3">{comment.comment}</p>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleVote('up')}
-            className={voteStatus === 'up' ? 'text-green-500' : ''}
-          >
-            <ThumbsUp className="h-4 w-4 mr-1" />
-            {comment.upvotes || 0}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleVote('down')}
-            className={voteStatus === 'down' ? 'text-red-500' : ''}
-          >
-            <ThumbsDown className="h-4 w-4 mr-1" />
-            {comment.downvotes || 0}
-          </Button>
+          <CommentVotes
+            commentId={comment.id}
+            upvotes={comment.upvotes || 0}
+            downvotes={comment.downvotes || 0}
+            currentUserId={currentUserId}
+            voteStatus={voteStatus}
+            onVoteChange={handleVote}
+          />
           {level < maxLevel && (
             <Button
               variant="ghost"
