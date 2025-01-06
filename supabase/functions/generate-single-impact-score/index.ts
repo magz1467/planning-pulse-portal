@@ -1,6 +1,6 @@
 import { corsHeaders } from '../_shared/cors.ts';
 import { Database } from './database.ts';
-import { generateImpactAnalysis } from './perplexity.ts';
+import { generateImpactScore } from './perplexity.ts';
 import { calculateNormalizedScore } from './score-calculator.ts';
 import { ImpactScoreResponse } from './types.ts';
 
@@ -61,18 +61,32 @@ Deno.serve(async (req) => {
     const application = await db.getApplication(applicationId);
 
     // Generate impact scores using Perplexity
-    const scores = await generateImpactAnalysis(application, perplexityKey);
+    const perplexityResponse = await generateImpactScore(application.description);
+    
+    if (!perplexityResponse.success || !perplexityResponse.data) {
+      throw new Error(perplexityResponse.error || 'Failed to generate impact score');
+    }
+
+    const { overall_score, category_scores, key_concerns, recommendations } = perplexityResponse.data;
     
     // Calculate normalized score
-    const normalizedScore = calculateNormalizedScore(scores);
+    const normalizedScore = Math.round((overall_score / 100) * 20);
 
     // Update application with score
-    await db.updateImpactScore(applicationId, normalizedScore, scores);
+    await db.updateImpactScore(applicationId, normalizedScore, {
+      category_scores,
+      key_concerns,
+      recommendations
+    });
 
     const response: ImpactScoreResponse = {
       success: true,
       score: normalizedScore,
-      details: scores
+      details: {
+        category_scores,
+        key_concerns,
+        recommendations
+      }
     };
 
     return new Response(
