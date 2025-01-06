@@ -1,9 +1,10 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo, useState } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
+import { Loader2 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
 export interface MapContainerProps {
@@ -24,6 +25,7 @@ export const MapContainerComponent = memo(({
   onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log('MapContainer - Coordinates changed:', coordinates);
@@ -31,6 +33,7 @@ export const MapContainerComponent = memo(({
       mapRef.current.setView(coordinates, 14);
       setTimeout(() => {
         mapRef.current?.invalidateSize();
+        setIsLoading(false);
       }, 100);
     }
   }, [coordinates]);
@@ -48,6 +51,14 @@ export const MapContainerComponent = memo(({
     selectedId,
     coordinates
   });
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full relative">
