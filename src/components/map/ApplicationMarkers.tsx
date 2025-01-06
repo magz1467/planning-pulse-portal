@@ -49,6 +49,11 @@ export const ApplicationMarkers = ({
   return (
     <>
       {applications.map((app) => {
+        if (!app.coordinates) {
+          console.warn(`Application ${app.id} has no coordinates`);
+          return null;
+        }
+
         const color = getStatusColor(app.status);
         const isSelected = app.id === selectedId;
         console.log(`Rendering marker ${app.id}:`, {
@@ -57,23 +62,20 @@ export const ApplicationMarkers = ({
           coordinates: app.coordinates
         });
         
-        if (app.coordinates) {
-          return (
-            <Marker
-              key={app.id}
-              position={app.coordinates}
-              eventHandlers={{
-                click: () => {
-                  console.log(`Marker clicked - Application ${app.id}`);
-                  onMarkerClick(app.id);
-                },
-              }}
-              icon={createIcon(color, isSelected)}
-              zIndexOffset={isSelected ? 1000 : 0}
-            />
-          );
-        }
-        return null;
+        return (
+          <Marker
+            key={app.id}
+            position={app.coordinates}
+            eventHandlers={{
+              click: () => {
+                console.log(`Marker clicked - Application ${app.id}`);
+                onMarkerClick(app.id);
+              },
+            }}
+            icon={createIcon(color, isSelected)}
+            zIndexOffset={isSelected ? 1000 : 0}
+          />
+        );
       })}
     </>
   );

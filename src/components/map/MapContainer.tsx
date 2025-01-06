@@ -26,20 +26,44 @@ export const MapContainerComponent = memo(({
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('MapContainer - Component mounted');
+    return () => {
+      console.log('MapContainer - Component unmounted');
+    };
+  }, []);
 
   useEffect(() => {
     console.log('MapContainer - Coordinates changed:', coordinates);
+    if (!coordinates) {
+      console.error('MapContainer - Invalid coordinates:', coordinates);
+      setError('Invalid coordinates provided');
+      return;
+    }
+
     if (mapRef.current) {
-      mapRef.current.setView(coordinates, 14);
-      setTimeout(() => {
-        mapRef.current?.invalidateSize();
-        setIsLoading(false);
-      }, 100);
+      try {
+        console.log('MapContainer - Setting view to:', coordinates);
+        mapRef.current.setView(coordinates, 14);
+        setTimeout(() => {
+          if (mapRef.current) {
+            mapRef.current.invalidateSize();
+            setIsLoading(false);
+            console.log('MapContainer - Map initialized successfully');
+          }
+        }, 100);
+      } catch (err) {
+        console.error('MapContainer - Error setting map view:', err);
+        setError('Error initializing map');
+      }
     }
   }, [coordinates]);
 
   useEffect(() => {
     if (mapRef.current && onMapMove) {
+      console.log('MapContainer - Setting up move handler');
       mapRef.current.on('move', () => {
         onMapMove(mapRef.current!);
       });
@@ -49,8 +73,18 @@ export const MapContainerComponent = memo(({
   console.log('MapContainer - Rendering with:', {
     applicationsCount: applications.length,
     selectedId,
-    coordinates
+    coordinates,
+    isLoading,
+    error
   });
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-red-50">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
