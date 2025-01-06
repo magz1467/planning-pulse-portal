@@ -1,4 +1,4 @@
-import { PerplexityResponse } from './types';
+import { PerplexityResponse } from "./types.ts";
 
 const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY');
 
