@@ -153,7 +153,9 @@ Deno.serve(async (req) => {
 
     let scores;
     try {
-      scores = JSON.parse(data.choices[0].message.content)
+      // Remove any markdown formatting that might be present
+      const content = data.choices[0].message.content.replace(/```json\n|\n```/g, '');
+      scores = JSON.parse(content)
       console.log('Parsed impact scores:', scores)
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
