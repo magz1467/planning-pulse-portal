@@ -1,7 +1,9 @@
-import { MapView } from "@/components/map/layout/MapView";
+import { Application } from "@/types/planning";
+import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { RedoSearchButton } from "@/components/map/RedoSearchButton";
 import { useState } from "react";
+import { Map as LeafletMap } from "leaflet";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -26,6 +28,16 @@ export const MapSection = ({
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
+  const handleMapMove = (map: LeafletMap) => {
+    const bounds = map.getBounds();
+    const isAnyMarkerVisible = applications.some((app) => {
+      if (!app.centroid?.coordinates) return false;
+      const [lng, lat] = app.centroid.coordinates;
+      return bounds.contains([lat, lng]);
+    });
+    setHasMapMoved(!isAnyMarkerVisible);
+  };
+
   return (
     <div 
       className="flex-1 relative"
@@ -42,15 +54,7 @@ export const MapSection = ({
           coordinates={coordinates}
           onMarkerClick={onMarkerClick}
           onCenterChange={onCenterChange}
-          onMapMove={(map) => {
-            const bounds = map.getBounds();
-            const isAnyMarkerVisible = applications.some(app => {
-              if (!app.centroid?.coordinates) return false;
-              const [lng, lat] = app.centroid.coordinates;
-              return bounds.contains([lat, lng]);
-            });
-            setHasMapMoved(!isAnyMarkerVisible);
-          }}
+          onMapMove={handleMapMove}
         />
         {onCenterChange && hasMapMoved && (
           <RedoSearchButton onClick={() => {

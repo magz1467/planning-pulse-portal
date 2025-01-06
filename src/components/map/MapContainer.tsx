@@ -6,9 +6,10 @@ import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
 
-interface MapContainerProps {
+export interface MapContainerProps {
   applications: Application[];
   coordinates: [number, number];
+  selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
   onMapMove?: (map: LeafletMap) => void;
@@ -17,6 +18,7 @@ interface MapContainerProps {
 export const MapContainerComponent = ({
   coordinates,
   applications,
+  selectedId,
   onMarkerClick,
   onCenterChange,
   onMapMove,
@@ -62,7 +64,7 @@ export const MapContainerComponent = ({
           applications={applications}
           baseCoordinates={coordinates}
           onMarkerClick={onMarkerClick}
-          selectedId={null}
+          selectedId={selectedId}
         />
       </LeafletMapContainer>
     </div>

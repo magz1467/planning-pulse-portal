@@ -24,6 +24,7 @@ export const MapView = ({
       <MapContainerComponent
         applications={applications}
         coordinates={coordinates}
+        selectedId={selectedId}
         onMarkerClick={onMarkerClick}
         onCenterChange={onCenterChange}
         onMapMove={onMapMove}
