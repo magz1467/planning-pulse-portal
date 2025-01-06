@@ -39,4 +39,7 @@ export interface Comment {
   user?: {
     email: string;
   };
+  profiles?: {
+    username?: string;
+  };
 }
