@@ -41,7 +41,7 @@ export const SearchSection = ({
     <div className="bg-white border-b">
       <div className="p-4">
         <PostcodeSearch 
-          onPostcodeSelect={onPostcodeSelect}
+          onSelect={onPostcodeSelect}
           className="w-full"
         />
       </div>
