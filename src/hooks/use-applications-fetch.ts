@@ -21,7 +21,6 @@ export const useApplicationsFetch = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      // Set a timeout for the query
       const { data: applications, error } = await supabase.rpc(
         'get_applications_within_radius',
         {
@@ -33,8 +32,7 @@ export const useApplicationsFetch = () => {
         },
         { 
           count: 'exact',
-          head: false,
-          abortSignal: new AbortController().signal
+          head: false
         }
       );
 

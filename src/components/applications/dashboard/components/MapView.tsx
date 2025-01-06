@@ -1,5 +1,6 @@
-import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
+import { MapContainerComponent } from "@/components/map/MapContainer";
+import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 
 interface MapViewProps {
   applications: Application[];
@@ -21,6 +22,7 @@ export const MapView = ({
       <MapContainerComponent
         applications={applications}
         coordinates={coordinates}
+        selectedId={selectedId}
         onMarkerClick={onMarkerClick}
         onCenterChange={onCenterChange}
       />
