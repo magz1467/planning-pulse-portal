@@ -18,6 +18,7 @@ Deno.serve(async (req) => {
     const { applicationId } = await req.json()
     
     if (!applicationId) {
+      console.error('Missing applicationId in request')
       throw new Error('Application ID is required')
     }
 
@@ -26,11 +27,14 @@ Deno.serve(async (req) => {
     const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY')!
     
     if (!perplexityKey) {
+      console.error('Missing Perplexity API key in environment')
       throw new Error('Missing Perplexity API key')
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
+    console.log(`Fetching application details for ID: ${applicationId}`)
+    
     // Get application details
     const { data: application, error: fetchError } = await supabase
       .from('applications')
@@ -39,9 +43,12 @@ Deno.serve(async (req) => {
       .single()
 
     if (fetchError || !application) {
+      console.error('Error fetching application:', fetchError)
       throw new Error('Application not found')
     }
 
+    console.log('Generating prompt for application')
+    
     // Generate the prompt
     const prompt = `
       Analyze this planning application and provide impact scores for each category. 
@@ -55,6 +62,8 @@ Deno.serve(async (req) => {
       Additional details: ${JSON.stringify(application.application_details || {})}
     `
 
+    console.log('Calling Perplexity API')
+    
     // Call Perplexity API
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -80,11 +89,25 @@ Deno.serve(async (req) => {
     })
 
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Perplexity API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      })
       throw new Error(`API error: ${response.status}`)
     }
 
     const data = await response.json()
+    console.log('Received API response:', data)
+    
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Invalid API response format:', data)
+      throw new Error('Invalid API response format')
+    }
+
     const scores = JSON.parse(data.choices[0].message.content)
+    console.log('Parsed impact scores:', scores)
 
     // Calculate normalized score
     let totalScore = 0
@@ -99,6 +122,7 @@ Deno.serve(async (req) => {
     }
 
     const normalizedScore = Math.round((totalScore / totalWeights) * 20)
+    console.log('Calculated normalized score:', normalizedScore)
 
     // Update application with score
     const { error: updateError } = await supabase
@@ -110,8 +134,11 @@ Deno.serve(async (req) => {
       .eq('application_id', applicationId)
 
     if (updateError) {
+      console.error('Failed to update application:', updateError)
       throw new Error('Failed to update application')
     }
+
+    console.log('Successfully updated application with impact score')
 
     return new Response(
       JSON.stringify({ 
@@ -128,6 +155,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
+    console.error('Error in generate-single-impact-score:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

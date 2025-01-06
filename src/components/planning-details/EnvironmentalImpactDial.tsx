@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
 interface EnvironmentalImpactDialProps {
   score?: number | null;
@@ -31,7 +32,10 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
         body: { applicationId }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       if (data.success) {
         toast({
@@ -42,6 +46,7 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
         // Reload the page to show the new score
         window.location.reload();
       } else {
+        console.error('Failed to generate impact score:', data.error);
         throw new Error(data.error || 'Failed to generate impact score');
       }
     } catch (error) {
@@ -99,7 +104,14 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
             onClick={handleGenerateScore}
             disabled={isLoading || hasTriggered}
           >
-            {isLoading ? "Generating..." : "See impact score"}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              "See impact score"
+            )}
           </Button>
         </div>
       </Card>
