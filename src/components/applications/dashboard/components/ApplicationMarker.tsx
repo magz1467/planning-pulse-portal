@@ -20,6 +20,7 @@ const getStatusColor = (status: string): string => {
 };
 
 const createIcon = (color: string, isSelected: boolean) => {
+  console.log('Creating icon with selected state:', isSelected); // Debug log
   return L.divIcon({
     className: 'bg-transparent',
     html: `<svg width="${isSelected ? '32' : '24'}" height="${isSelected ? '32' : '24'}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,6 +32,8 @@ const createIcon = (color: string, isSelected: boolean) => {
 };
 
 export const ApplicationMarker = ({ application, isSelected, onClick }: ApplicationMarkerProps) => {
+  console.log('ApplicationMarker render - Application:', application.id, 'Selected:', isSelected); // Debug log
+  
   const color = getStatusColor(application.status);
   const icon = createIcon(color, isSelected);
 
