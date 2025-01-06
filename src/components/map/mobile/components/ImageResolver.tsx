@@ -28,7 +28,7 @@ export const ImageResolver = ({ imageMapUrl, image, title, applicationId, coordi
 
   const generateMapboxUrl = (coords: [number, number]) => {
     const [lat, lng] = coords;
-    return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},17,45,60/800x600@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}&logo=false`;
+    return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},17,45,60/800x600@2x?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}&logo=false`;
   };
 
   const imageUrl = (() => {

@@ -3,11 +3,13 @@ import { Application } from "@/types/planning";
 import { supabase } from "@/integrations/supabase/client";
 import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
+import { useToast } from "@/hooks/use-toast";
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const { toast } = useToast();
 
   const fetchApplicationsInRadius = async (
     center: LatLngTuple,
@@ -30,7 +32,14 @@ export const useApplicationsFetch = () => {
 
       if (error) {
         console.error('Error fetching applications:', error);
-        throw error;
+        toast({
+          title: 'Error fetching applications',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setApplications([]);
+        setTotalCount(0);
+        return;
       }
 
       if (!applications) {
@@ -60,12 +69,22 @@ export const useApplicationsFetch = () => {
 
       if (countError) {
         console.error('Error fetching count:', countError);
+        toast({
+          title: 'Error fetching count',
+          description: countError.message,
+          variant: 'destructive',
+        });
       } else {
         setTotalCount(countData || 0);
       }
 
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
+      toast({
+        title: 'Error fetching applications',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      });
       // Show more detailed error information
       console.error('Error details:', {
         message: error.message,
