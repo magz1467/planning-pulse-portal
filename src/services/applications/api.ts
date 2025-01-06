@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { FetchApplicationsParams, StatusCounts } from './types';
+import { FetchApplicationsParams, ApplicationsResponse, ApplicationsError, StatusCounts } from './types';
 import { transformApplicationData } from '@/utils/applicationTransforms';
 
 export const fetchApplicationsFromSupabase = async ({
@@ -35,14 +35,22 @@ export const fetchApplicationsCountFromSupabase = async (
   center: [number, number],
   radiusInMeters: number
 ): Promise<number> => {
-  const { count, error } = await supabase
-    .from('applications')
-    .select('*', { count: 'exact', head: true })
-    .not('geom', 'is', null)
-    .filter('geom', 'not.is', null);
+  try {
+    const { data, error } = await supabase.rpc(
+      'get_applications_count_within_radius',
+      {
+        center_lat: center[0],
+        center_lng: center[1],
+        radius_meters: radiusInMeters
+      }
+    );
 
-  if (error) throw error;
-  return count || 0;
+    if (error) throw error;
+    return data || 0;
+  } catch (error) {
+    console.error('Error fetching count:', error);
+    return 0;
+  }
 };
 
 export const fetchStatusCounts = async (
