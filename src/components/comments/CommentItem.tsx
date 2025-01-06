@@ -12,7 +12,11 @@ export interface CommentItemProps {
 export const CommentItem = ({ comment, currentUserId }: CommentItemProps) => {
   return (
     <Card className="p-4">
-      <CommentHeader comment={comment} />
+      <CommentHeader 
+        displayName={comment.user?.username || 'Anonymous'} 
+        createdAt={comment.created_at || ''} 
+        canDelete={currentUserId === comment.user_id}
+      />
       <CommentContent content={comment.comment || ''} />
       <CommentVoteButtons 
         commentId={comment.id} 

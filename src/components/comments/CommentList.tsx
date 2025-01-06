@@ -1,17 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Comment } from '@/types/planning';
 import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
-import { useComments } from './hooks/useComments';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useComments } from './hooks/useComments';
 
 interface CommentListProps {
   applicationId: number;
 }
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
-  const { comments, isLoading, setComments } = useComments(applicationId);
-  const [currentUserId, setCurrentUserId] = useState<string>('');
+  const { comments, isLoading, currentUserId, setComments } = useComments(applicationId);
+
+  useEffect(() => {
+    console.log('CommentList rendered with:', {
+      commentsCount: comments?.length,
+      applicationId,
+      isLoading
+    });
+  }, [comments, applicationId, isLoading]);
 
   if (isLoading) {
     return (
@@ -30,7 +37,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         <CommentItem 
           key={comment.id} 
           comment={comment}
-          currentUserId={currentUserId}
+          currentUserId={currentUserId || ''}
         />
       ))}
     </div>

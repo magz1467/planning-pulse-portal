@@ -1,7 +1,11 @@
 interface CommentContentProps {
-  comment: string;
+  content: string;
 }
 
-export const CommentContent = ({ comment }: CommentContentProps) => {
-  return <p className="text-gray-800 mb-3">{comment}</p>;
-};
+export const CommentContent = ({ content }: CommentContentProps) => {
+  return (
+    <div className="text-sm text-gray-800">
+      {content}
+    </div>
+  );
+}

@@ -1,91 +1,58 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Button, Textarea } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Comment } from '@/types/planning';
 
 interface CommentFormProps {
   applicationId: number;
-  parentId?: number;
-  onSubmit?: () => void;
+  setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
 }
 
-export const CommentForm = ({ applicationId, parentId, onSubmit }: CommentFormProps) => {
-  const [comment, setComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export const CommentForm = ({
+  applicationId,
+  setComments
+}: CommentFormProps) => {
+  const [content, setContent] = useState('');
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!comment.trim()) return;
 
-    setIsSubmitting(true);
+    if (!content) return;
 
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to comment",
-          variant: "destructive"
-        });
-        return;
-      }
+    const { data, error } = await supabase
+      .from('Comments')
+      .insert([{ application_id: applicationId, comment: content }]);
 
-      const { error } = await supabase.from('Comments').insert({
-        comment: comment.trim(),
-        application_id: applicationId,
-        parent_id: parentId,
-        user_id: session.user.id,
-        user_email: session.user.email
-      });
-
-      if (error) throw error;
-
-      setComment('');
-      if (onSubmit) onSubmit();
-      
-      toast({
-        title: "Comment submitted",
-        description: "Your comment has been posted successfully"
-      });
-    } catch (error) {
+    if (error) {
       console.error('Error submitting comment:', error);
       toast({
         title: "Error",
         description: "Failed to submit comment",
-        variant: "destructive"
+        variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
+      return;
     }
+
+    setComments(prev => [...prev, ...data]);
+    setContent('');
+    toast({
+      title: "Comment submitted",
+      description: "Your comment has been added",
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="Write a comment..."
-        className="min-h-[100px]"
-        disabled={isSubmitting}
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Write your comment..."
+        rows={3}
+        required
       />
-      <Button 
-        type="submit" 
-        disabled={isSubmitting || !comment.trim()}
-        className="w-full sm:w-auto"
-      >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting...
-          </>
-        ) : (
-          'Submit Comment'
-        )}
-      </Button>
+      <Button type="submit">Submit Comment</Button>
     </form>
   );
 };

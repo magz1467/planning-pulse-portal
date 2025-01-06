@@ -2,23 +2,21 @@ import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface CommentVoteButtonsProps {
+  commentId: number;
+  currentUserId: string;
   upvotes: number;
   downvotes: number;
-  voteStatus: 'up' | 'down' | null;
-  onVote: (type: 'up' | 'down') => void;
-  currentUserId?: string;
 }
 
 export const CommentVoteButtons = ({
+  commentId,
+  currentUserId,
   upvotes,
-  downvotes,
-  voteStatus,
-  onVote,
-  currentUserId
+  downvotes
 }: CommentVoteButtonsProps) => {
   const handleVote = async (type: 'up' | 'down') => {
     if (!currentUserId) return;
-    onVote(type);
+    // Logic to handle voting
   };
 
   return (

@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   children: ReactNode;
@@ -20,7 +21,23 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error('Error caught by boundary:', error);
+    console.error('Component stack:', errorInfo.componentStack);
+    
+    // Log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.group('🚨 Application Error Details');
+      console.error('Error:', error);
+      console.error('Error Info:', errorInfo);
+      console.groupEnd();
+    }
+
+    // Show toast notification
+    toast({
+      title: "An error occurred",
+      description: "The application encountered an error. Please try refreshing the page.",
+      variant: "destructive",
+    });
   }
 
   public render() {
