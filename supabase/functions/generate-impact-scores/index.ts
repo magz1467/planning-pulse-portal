@@ -33,7 +33,8 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
   const prompt = `
     Analyze this planning application and provide impact scores for each category. 
     Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
-    Return ONLY a valid JSON object with no markdown formatting or backticks.
+    Return a valid JSON object with no markdown formatting.
+    Format: {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}}
     
     Application details:
     Description: ${application.description || 'N/A'}
@@ -55,7 +56,7 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in analyzing planning applications and their potential impacts. Provide numerical scores only. Return ONLY valid JSON with no markdown formatting.'
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores, no explanations or markdown.'
           },
           {
             role: 'user',
@@ -88,8 +89,8 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
 
     // Clean the response content by removing any markdown formatting
     const cleanContent = data.choices[0].message.content
-      .replace(/```json\n?/g, '')  // Remove ```json
-      .replace(/```\n?/g, '')      // Remove closing ```
+      .replace(/```json\s*/g, '')  // Remove ```json and any whitespace
+      .replace(/```\s*/g, '')      // Remove closing ``` and any whitespace
       .trim();                     // Remove any extra whitespace
 
     console.log(`[Impact Score ${application.application_id}] Cleaned content:`, cleanContent);
@@ -100,20 +101,25 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       
       // Calculate weighted score
       let totalScore = 0;
+      let totalWeights = 0;
       const details: Record<string, any> = {};
 
+      // Iterate through all categories and subcategories
       for (const [category, subcategories] of Object.entries(scores)) {
         details[category] = subcategories;
         for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
-          const weight = criteria.find(c => 
-            c.category === category && c.subcategory === subcategory
-          )?.weight || 0;
-          totalScore += (score as number / 5) * weight;
+          // Default weight of 1 if no specific weight is found
+          const weight = 1;
+          totalScore += (score as number) * weight;
+          totalWeights += weight;
         }
       }
 
+      // Normalize score to 0-100 range
+      const normalizedScore = Math.round((totalScore / totalWeights) * 20); // Convert 1-5 scale to 0-100
+
       return {
-        score: Math.round(totalScore),
+        score: normalizedScore,
         details: scores
       };
     } catch (parseError) {
