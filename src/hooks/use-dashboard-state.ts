@@ -6,6 +6,7 @@ import { SortType } from "./use-application-sorting";
 import { useURLState } from "./use-url-state";
 import { useSelectionState } from "./use-selection-state";
 import { useFilterState } from "./use-filter-state";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useDashboardState = () => {
   const { 
@@ -21,6 +22,7 @@ export const useDashboardState = () => {
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode);
+  const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
@@ -42,7 +44,23 @@ export const useDashboardState = () => {
     });
   }, [postcode, initialTab, activeFilters.status, selectedId]);
 
+  const logSearch = async (loadTime: number) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      await supabase.from('Searches').insert({
+        'Post Code': postcode,
+        'Status': initialTab,
+        'User_logged_in': !!session?.user,
+        'load_time': loadTime
+      });
+    } catch (error) {
+      console.error('Error logging search:', error);
+    }
+  };
+
   const handlePostcodeSelect = async (newPostcode: string) => {
+    setSearchStartTime(Date.now());
     setPostcode(newPostcode);
   };
 
@@ -60,6 +78,15 @@ export const useDashboardState = () => {
       fetchApplicationsInRadius(coordinates as [number, number], activeFilters);
     }
   }, [coordinates, isInitialSearch, isNewSearch, activeFilters]);
+
+  // Log search performance
+  useEffect(() => {
+    if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
+      const loadTime = (Date.now() - searchStartTime) / 1000; // Convert to seconds
+      logSearch(loadTime);
+      setSearchStartTime(null);
+    }
+  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;

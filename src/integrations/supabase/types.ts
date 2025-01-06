@@ -518,6 +518,7 @@ export type Database = {
         Row: {
           created_at: string
           id: number
+          load_time: number | null
           "Post Code": string | null
           Status: string | null
           User_logged_in: boolean | null
@@ -525,6 +526,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: number
+          load_time?: number | null
           "Post Code"?: string | null
           Status?: string | null
           User_logged_in?: boolean | null
@@ -532,6 +534,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
+          load_time?: number | null
           "Post Code"?: string | null
           Status?: string | null
           User_logged_in?: boolean | null
