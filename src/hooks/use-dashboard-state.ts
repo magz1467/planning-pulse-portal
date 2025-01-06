@@ -78,9 +78,11 @@ export const useDashboardState = () => {
 
   useEffect(() => {
     if ((isInitialSearch || isNewSearch) && coordinates) {
+      console.log('Fetching applications with coordinates:', coordinates);
       setSearchPoint(coordinates);
-      // Default radius of 1000 meters if not specified
-      fetchApplicationsInRadius(coordinates, 1000);
+      // Ensure coordinates are properly typed as [number, number]
+      const [lat, lng] = coordinates;
+      fetchApplicationsInRadius([lat, lng], 1000);
     }
   }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, setSearchPoint]);
 
