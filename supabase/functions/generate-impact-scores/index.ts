@@ -16,6 +16,8 @@ interface ImpactCriteria {
 }
 
 async function calculateImpactScore(application: ApplicationData): Promise<{ score: number; details: any }> {
+  console.log(`[Impact Score] Calculating score for application ${application.application_id}`);
+  
   const apiKey = Deno.env.get('PERPLEXITY_API_KEY');
   if (!apiKey) {
     throw new Error('Missing Perplexity API key');
@@ -32,6 +34,8 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
     Additional details: ${JSON.stringify(application.application_details || {})}
   `;
 
+  console.log(`[Impact Score] Sending request to Perplexity API for application ${application.application_id}`);
+  
   try {
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -57,6 +61,8 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
     });
 
     const data = await response.json();
+    console.log(`[Impact Score] Received response from Perplexity API for application ${application.application_id}:`, data);
+    
     const scores = JSON.parse(data.choices[0].message.content);
     
     // Calculate weighted score
@@ -73,12 +79,17 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       }
     }
 
+    console.log(`[Impact Score] Calculated final score for application ${application.application_id}:`, {
+      totalScore,
+      details
+    });
+
     return {
       score: Math.round(totalScore),
       details: scores
     };
   } catch (error) {
-    console.error('Error calculating impact score:', error);
+    console.error(`[Impact Score] Error calculating score for application ${application.application_id}:`, error);
     throw error;
   }
 }
@@ -90,6 +101,7 @@ Deno.serve(async (req) => {
 
   try {
     const { limit = 50 } = await req.json();
+    console.log('[Impact Score] Starting batch processing with limit:', limit);
     
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -103,6 +115,8 @@ Deno.serve(async (req) => {
       .select()
       .single();
 
+    console.log('[Impact Score] Created batch status record:', batchStatus);
+
     // Get applications without impact scores
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
@@ -110,13 +124,19 @@ Deno.serve(async (req) => {
       .is('impact_score', null)
       .limit(limit);
 
-    if (fetchError) throw fetchError;
+    if (fetchError) {
+      console.error('[Impact Score] Error fetching applications:', fetchError);
+      throw fetchError;
+    }
 
-    console.log(`Processing ${applications?.length} applications`);
+    console.log(`[Impact Score] Processing ${applications?.length} applications`);
     let processed = 0;
+    let errors = 0;
 
     for (const application of applications || []) {
       try {
+        console.log(`[Impact Score] Processing application ${application.application_id} (${processed + 1}/${applications?.length})`);
+        
         const { score, details } = await calculateImpactScore(application);
         
         const { error: updateError } = await supabase
@@ -127,7 +147,10 @@ Deno.serve(async (req) => {
           })
           .eq('application_id', application.application_id);
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error(`[Impact Score] Error updating application ${application.application_id}:`, updateError);
+          throw updateError;
+        }
         
         processed++;
         
@@ -138,7 +161,8 @@ Deno.serve(async (req) => {
           .eq('id', batchStatus.id);
 
       } catch (error) {
-        console.error(`Error processing application ${application.application_id}:`, error);
+        console.error(`[Impact Score] Error processing application ${application.application_id}:`, error);
+        errors++;
       }
     }
 
@@ -147,21 +171,29 @@ Deno.serve(async (req) => {
       .from('impact_score_batch_status')
       .update({ 
         status: 'completed',
-        completed_count: processed
+        completed_count: processed,
+        error_message: errors > 0 ? `Failed to process ${errors} applications` : null
       })
       .eq('id', batchStatus.id);
+
+    console.log('[Impact Score] Batch processing completed:', {
+      processed,
+      errors,
+      batchId: batchStatus.id
+    });
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         processed,
-        message: `Successfully processed ${processed} applications`
+        errors,
+        message: `Successfully processed ${processed} applications${errors > 0 ? ` (${errors} failed)` : ''}`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[Impact Score] Fatal error:', error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }

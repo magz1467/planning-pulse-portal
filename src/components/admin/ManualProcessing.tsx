@@ -25,31 +25,50 @@ export const ManualProcessing = ({
   const handleGenerateScores = async () => {
     try {
       setIsGeneratingScores(true);
-      console.log('Starting impact score generation process...');
+      console.log('[Impact Scores] Starting generation process...');
       
       toast({
         title: "Generating impact scores",
         description: `This may take a few minutes for up to ${scoreBatchSize} applications`,
       });
 
+      console.log('[Impact Scores] Invoking edge function with batch size:', scoreBatchSize);
       const { data, error } = await supabase.functions.invoke('generate-impact-scores', {
         body: { limit: scoreBatchSize }
       });
 
       if (error) {
-        console.error('Error response:', error);
+        console.error('[Impact Scores] Error response from edge function:', error);
         throw new Error(`Failed to generate scores: ${error.message}`);
       }
 
-      console.log('Generation result:', data);
+      console.log('[Impact Scores] Generation result:', data);
+      
+      // Query the database to verify results
+      const { count } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .not('impact_score', 'is', null);
+      
+      console.log('[Impact Scores] Total applications with impact scores:', count);
+
+      // Query recently processed applications
+      const { data: recentScores } = await supabase
+        .from('applications')
+        .select('application_id, impact_score, impact_score_details')
+        .not('impact_score', 'is', null)
+        .order('application_id', { ascending: false })
+        .limit(5);
+
+      console.log('[Impact Scores] Recent scores generated:', recentScores);
       
       toast({
         title: "Success!",
-        description: data.message,
+        description: `${data.message}. Total applications with impact scores: ${count}`,
       });
 
     } catch (error) {
-      console.error('Error generating scores:', error);
+      console.error('[Impact Scores] Error generating scores:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to generate impact scores. Please try again.",
