@@ -21,11 +21,12 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           setCurrentUserId(session.session.user.id);
         }
 
+        // Updated query to properly join with profiles
         const { data, error } = await supabase
           .from('Comments')
           .select(`
             *,
-            profiles (
+            profiles:user_id (
               username
             )
           `)
@@ -52,8 +53,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         });
       }
     };
-
-    fetchComments();
 
     const channel = supabase
       .channel('comments-channel')
@@ -86,6 +85,8 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         }
       )
       .subscribe();
+
+    fetchComments();
 
     return () => {
       supabase.removeChannel(channel);
