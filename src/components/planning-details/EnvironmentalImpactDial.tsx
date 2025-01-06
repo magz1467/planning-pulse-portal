@@ -12,10 +12,12 @@ interface EnvironmentalImpactDialProps {
   applicationId: number;
 }
 
-export const EnvironmentalImpactDial = ({ score, details, applicationId }: EnvironmentalImpactDialProps) => {
+export const EnvironmentalImpactDial = ({ score: initialScore, details: initialDetails, applicationId }: EnvironmentalImpactDialProps) => {
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
+  const [score, setScore] = useState(initialScore);
+  const [details, setDetails] = useState(initialDetails);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,8 +53,9 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
           description: "The application's impact score has been calculated and saved.",
         });
         
-        // Reload the page to show the new score
-        window.location.reload();
+        // Update local state instead of reloading
+        setScore(data.score);
+        setDetails(data.details);
       } else {
         console.error('Failed to generate impact score:', data.error);
         throw new Error(data.error || 'Failed to generate impact score');

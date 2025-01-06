@@ -10,8 +10,14 @@ interface ApplicationData {
 }
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST',
+      }
+    });
   }
 
   try {
@@ -159,7 +165,10 @@ Deno.serve(async (req) => {
     let scores;
     try {
       // Remove any markdown formatting that might be present
-      const content = data.choices[0].message.content.replace(/```json\n|\n```/g, '').trim();
+      const content = data.choices[0].message.content
+        .replace(/```json\n|\n```/g, '')
+        .replace(/```/g, '')
+        .trim();
       console.log('Cleaned content:', content);
       scores = JSON.parse(content);
       console.log('Parsed impact scores:', scores);
