@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -29,6 +30,7 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    console.log('Fetching application:', applicationId);
     const { data: application, error: fetchError } = await supabase
       .from('applications')
       .select('*')
@@ -48,6 +50,7 @@ serve(async (req) => {
 
     const { data: { score, details } } = result;
 
+    console.log('Updating application with score:', score);
     const { error: updateError } = await supabase
       .from('applications')
       .update({
@@ -66,7 +69,7 @@ serve(async (req) => {
         score,
         details
       }),
-      {
+      { 
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json',
@@ -82,7 +85,7 @@ serve(async (req) => {
         success: false,
         error: error.message
       }),
-      {
+      { 
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json',
