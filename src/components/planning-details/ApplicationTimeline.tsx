@@ -97,11 +97,6 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
                       }`}>
                         {stage.label}
                       </span>
-                      {stage.date && (
-                        <span className="text-xs text-gray-500 mt-1">
-                          {new Date(stage.date).toLocaleDateString()}
-                        </span>
-                      )}
                       {isConsultationEndingSoon && stage.label === 'Consultation' && (
                         <span className="flex items-center gap-1 text-xs text-amber-600 mt-1">
                           <AlertCircle className="h-3 w-3" />
