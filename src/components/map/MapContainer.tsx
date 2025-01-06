@@ -12,7 +12,6 @@ export interface MapContainerProps {
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapContainerComponent = ({
@@ -21,7 +20,6 @@ export const MapContainerComponent = ({
   selectedId,
   onMarkerClick,
   onCenterChange,
-  onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
@@ -33,17 +31,6 @@ export const MapContainerComponent = ({
       }, 100);
     }
   }, [coordinates]);
-
-  useEffect(() => {
-    if (mapRef.current && onMapMove) {
-      const map = mapRef.current;
-      const handleMove = () => onMapMove(map);
-      map.on('moveend', handleMove);
-      return () => {
-        map.off('moveend', handleMove);
-      };
-    }
-  }, [onMapMove]);
 
   return (
     <div className="w-full h-full relative">
