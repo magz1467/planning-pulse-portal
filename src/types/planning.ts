@@ -23,6 +23,8 @@ export interface Application {
   centroid?: {
     coordinates: [number, number];
   };
+  impact_score?: number | null;
+  impact_score_details?: Record<string, any>;
 }
 
 export interface Comment {

@@ -51,7 +51,6 @@ export const PlanningApplicationDetails = ({
   if (!application) return null;
 
   const isSaved = savedApplications.includes(application.id);
-  const environmentalImpactScore = Math.floor((Math.random() * 100));
   const feedbackStats = {
     thumbsUp: feedback === 'up' ? 13 : 12,
     thumbsDown: feedback === 'down' ? 4 : 3
@@ -123,7 +122,10 @@ export const PlanningApplicationDetails = ({
       />
       <ApplicationDetails application={application} />
       <ExpectedImpactAreas application={application} />
-      <EnvironmentalImpactDial score={environmentalImpactScore} />
+      <EnvironmentalImpactDial 
+        score={application.impact_score} 
+        details={application.impact_score_details}
+      />
       <ApplicationDescription application={application} />
       
       <ApplicationFeedback 

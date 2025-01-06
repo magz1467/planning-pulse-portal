@@ -3,16 +3,28 @@ import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
 
 interface EnvironmentalImpactDialProps {
-  score: number;
+  score?: number | null;
+  details?: Record<string, any>;
 }
 
-export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps) => {
+export const EnvironmentalImpactDial = ({ score, details }: EnvironmentalImpactDialProps) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setProgress(score), 100);
+    const timer = setTimeout(() => setProgress(score || 0), 100);
     return () => clearTimeout(timer);
   }, [score]);
+
+  if (!score) {
+    return (
+      <Card className="p-4">
+        <div className="space-y-2">
+          <h3 className="font-semibold">Expected impact score</h3>
+          <p className="text-sm text-gray-500">Impact score calculation coming soon for this application</p>
+        </div>
+      </Card>
+    );
+  }
 
   const getColor = (score: number) => {
     if (score < 30) {
@@ -55,8 +67,10 @@ export const EnvironmentalImpactDial = ({ score }: EnvironmentalImpactDialProps)
   return (
     <Card className="p-4">
       <div className="space-y-2">
-        <h3 className="font-semibold">Environmental Impact</h3>
-        <p className="text-xs text-gray-500">This is calculated using variables in the application</p>
+        <h3 className="font-semibold">Expected impact score</h3>
+        <p className="text-xs text-gray-500">
+          Score calculated using weighted factors including size, location sensitivity, and development type
+        </p>
         <div className="flex items-center gap-2">
           <span 
             className="text-sm font-medium"
