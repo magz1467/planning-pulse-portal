@@ -1,13 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { corsHeaders } from '../_shared/cors.ts'
-
-interface ApplicationData {
-  application_id: number;
-  description: string;
-  development_type: string;
-  application_type: string;
-  application_details: any;
-}
+import { corsHeaders } from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
@@ -37,14 +28,14 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400
         }
-      )
+      );
     }
 
     console.log('Processing applicationId:', applicationId);
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const perplexityKey = Deno.env.get('PERPLEXITY_API_KEY')!;
     
     if (!perplexityKey) {
       console.error('Missing Perplexity API key in environment');
@@ -57,19 +48,19 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500
         }
-      )
+      );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log(`Fetching application details for ID: ${applicationId}`)
+    console.log(`Fetching application details for ID: ${applicationId}`);
     
     // Get application details
     const { data: application, error: fetchError } = await supabase
       .from('applications')
       .select('*')
       .eq('application_id', applicationId)
-      .single()
+      .single();
 
     if (fetchError || !application) {
       console.error('Error fetching application:', fetchError);
@@ -82,7 +73,7 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 404
         }
-      )
+      );
     }
 
     console.log('Generating prompt for application');
@@ -142,7 +133,7 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 502
         }
-      )
+      );
     }
 
     const data = await response.json();
@@ -159,7 +150,7 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 502
         }
-      )
+      );
     }
 
     let scores;
@@ -183,7 +174,7 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 502
         }
-      )
+      );
     }
 
     // Calculate normalized score
@@ -221,7 +212,7 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500
         }
-      )
+      );
     }
 
     console.log('Successfully updated application with impact score');
@@ -239,7 +230,7 @@ Deno.serve(async (req) => {
         },
         status: 200
       }
-    )
+    );
 
   } catch (error) {
     console.error('Error in generate-single-impact-score:', error);
@@ -255,6 +246,6 @@ Deno.serve(async (req) => {
         },
         status: 500
       }
-    )
+    );
   }
-})
+});
