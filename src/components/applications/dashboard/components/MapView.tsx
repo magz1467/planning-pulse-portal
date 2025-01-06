@@ -1,4 +1,4 @@
-import { MapContainer } from "@/components/MapContainer";
+import { MapContainer } from "@/components/map/MapContainer";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { Application } from "@/types/planning";
 
