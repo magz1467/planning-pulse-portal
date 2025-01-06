@@ -1,32 +1,23 @@
 export const getStatusColor = (status: string) => {
-  const statusLower = status.toLowerCase();
-  switch (statusLower) {
-    case 'declined':
-    case 'refused':
-    case 'withdrawn':
-    case 'dismissed':
-      return 'bg-[#ea384c]/10 text-[#ea384c]';
-    case 'under review':
-    case 'pending':
-    case 'under consideration':
-    case 'application under consideration':
-    case 'appeal in progress':
-    case 'application received':
-      return 'bg-[#FEC6A1]/30 text-[#F97316]';
-    case 'approved':
-      return 'bg-[#F2FCE2] text-[#16a34a]';
-    default:
-      return 'bg-[#F2FCE2] text-[#16a34a]';
+  const statusLower = status?.toLowerCase() || '';
+
+  if (statusLower.includes('under consideration') || statusLower.includes('pending')) {
+    return 'bg-yellow-100 text-yellow-800';
+  } else if (statusLower.includes('approved') || statusLower.includes('granted') || statusLower.includes('no objection')) {
+    return 'bg-green-100 text-green-800';
+  } else if (statusLower.includes('refused') || statusLower.includes('rejected') || statusLower.includes('withdrawn')) {
+    return 'bg-red-100 text-red-800';
   }
+  return 'bg-gray-100 text-gray-800';
 };
 
 export const getStatusText = (status: string) => {
-  const statusLower = status.toLowerCase();
-  switch (statusLower) {
-    case 'under consideration':
-    case 'application under consideration':
-      return 'Under Consideration';
-    default:
-      return status;
+  const statusLower = status?.toLowerCase() || '';
+
+  if (statusLower.includes('application under consideration')) {
+    return 'Under Consideration';
+  } else if (statusLower.includes('no objection to proposal (obs only)')) {
+    return 'No Objection to Proposal';
   }
+  return status;
 };
