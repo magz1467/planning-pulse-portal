@@ -1,25 +1,43 @@
-import { Comment } from "@/types/planning";
+import { useEffect } from "react";
 import { CommentItem } from "./CommentItem";
-import { Dispatch, SetStateAction } from "react";
+import { useComments } from "./hooks/useComments";
+import { useRealtimeComments } from "./hooks/useRealtimeComments";
 
-export interface CommentListProps {
-  comments: Comment[];
-  currentUserId: string;
-  setComments: Dispatch<SetStateAction<Comment[]>>;
-  applicationId?: number;
+interface CommentListProps {
+  applicationId: number;
 }
 
-export const CommentList = ({ comments = [], currentUserId, setComments }: CommentListProps) => {
-  if (!comments) return null;
-  
+export const CommentList = ({ applicationId }: CommentListProps) => {
+  const { comments, isLoading, error } = useComments(applicationId);
+  const { subscribeToComments } = useRealtimeComments(applicationId);
+
+  useEffect(() => {
+    // Subscribe to real-time updates for this application's comments
+    const unsubscribe = subscribeToComments();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [applicationId, subscribeToComments]);
+
+  if (isLoading) {
+    return <div>Loading comments...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading comments</div>;
+  }
+
+  if (!comments?.length) {
+    return <div>No comments yet</div>;
+  }
+
   return (
     <div className="space-y-4">
       {comments.map((comment) => (
-        <CommentItem
-          key={comment.id}
+        <CommentItem 
+          key={comment.id} 
           comment={comment}
-          currentUserId={currentUserId}
-          setComments={setComments}
+          applicationId={applicationId}
         />
       ))}
     </div>

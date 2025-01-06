@@ -1,60 +1,80 @@
-import { useState, useEffect } from "react";
-import { useDebounce } from "./use-debounce";
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-interface AddressSuggestion {
+interface PostcodeSuggestion {
   postcode: string;
-  address?: string;
-  admin_district: string;
   country: string;
+  nhs_ha: string;
+  admin_district: string;
+  address?: string;
 }
 
 export const useAddressSuggestions = (search: string) => {
-  const [data, setData] = useState<AddressSuggestion[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const debouncedSearch = useDebounce(search, 300);
-
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (!debouncedSearch || debouncedSearch.length < 2) {
-        setData([]);
-        setError(null);
-        return;
-      }
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-      setIsLoading(true);
-      setError(null);
-
+  return useQuery({
+    queryKey: ['address-suggestions', debouncedSearch],
+    queryFn: async () => {
+      if (!debouncedSearch || debouncedSearch.length < 2) return [];
+      
       try {
-        const url = `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`;
-        console.log('Fetching suggestions from:', url);
-        
-        const response = await fetch(url);
-        const json = await response.json();
-
-        if (json.status === 200 && json.result) {
-          setData(json.result.map((postcode: string) => ({
-            postcode,
-            admin_district: "",
-            country: "United Kingdom"
-          })));
-        } else {
-          setData([]);
-          if (json.error) {
-            setError(json.error);
+        // If search includes numbers (likely a postcode), try postcode lookup first
+        if (/\d/.test(debouncedSearch)) {
+          const postcodeResponse = await fetch(
+            `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
+          );
+          const postcodeData = await postcodeResponse.json();
+          
+          if (postcodeData.result) {
+            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
+              const detailsResponse = await fetch(
+                `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+              );
+              const details = await detailsResponse.json();
+              
+              if (details.result) {
+                return {
+                  ...details.result,
+                  postcode: details.result.postcode,
+                  address: `${details.result.admin_ward}, ${details.result.parish || ''} ${details.result.admin_district}, ${details.result.postcode}`.trim()
+                };
+              }
+              return null;
+            });
+            
+            const results = await Promise.all(detailsPromises);
+            return results.filter(Boolean);
           }
         }
+
+        // If no postcode results or search doesn't include numbers, try general address search
+        const generalResponse = await fetch(
+          `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
+        );
+        const generalData = await generalResponse.json();
+        
+        if (generalData.result && generalData.result.length > 0) {
+          return generalData.result.map((result: any) => ({
+            ...result,
+            postcode: result.postcode,
+            address: `${result.admin_ward}, ${result.parish || ''} ${result.admin_district}, ${result.postcode}`.trim()
+          }));
+        }
+        
+        return [];
       } catch (error) {
-        console.error("Error fetching address suggestions:", error);
-        setError("Failed to fetch address suggestions. Please try again.");
-        setData([]);
-      } finally {
-        setIsLoading(false);
+        console.error('Error fetching suggestions:', error);
+        return [];
       }
-    };
-
-    fetchSuggestions();
-  }, [debouncedSearch]);
-
-  return { data, isLoading, error };
+    },
+    enabled: debouncedSearch.length >= 2,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
 };

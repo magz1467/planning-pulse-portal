@@ -1,11 +1,10 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
-  const hasAutoSelected = useRef(false);
   const {
     selectedId,
     activeFilters,
@@ -38,27 +37,13 @@ export const ApplicationsDashboardMap = () => {
     console.log('Selected ID state changed:', selectedId);
   }, [selectedId]);
 
-  // Mobile auto-selection effect with useRef to prevent infinite loop
+  // Mobile auto-selection effect
   useEffect(() => {
-    if (
-      isMobile && 
-      filteredApplications.length > 0 && 
-      !selectedId && 
-      isMapView && 
-      !hasAutoSelected.current
-    ) {
+    if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
       console.log('Auto-selecting first application on mobile');
-      hasAutoSelected.current = true;
       handleMarkerClick(filteredApplications[0].id);
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
-
-  // Reset the auto-selection flag when key dependencies change
-  useEffect(() => {
-    if (!isMapView || !isMobile) {
-      hasAutoSelected.current = false;
-    }
-  }, [isMapView, isMobile]);
 
   return (
     <DashboardLayout
