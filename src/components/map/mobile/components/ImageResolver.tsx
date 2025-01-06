@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { MapPin } from 'lucide-react';
 
 interface ImageResolverProps {
   imageUrl?: string | null;
@@ -7,15 +7,15 @@ interface ImageResolverProps {
   title: string;
   applicationId: number;
   coordinates?: [number, number] | null;
+  className?: string;
 }
 
 export const ImageResolver = ({
   imageUrl,
   image,
-  title,
-  applicationId,
+  className = '',
 }: ImageResolverProps) => {
-  const [currentImageSource, setCurrentImageSource] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   const resolvedImageUrl = (() => {
     if (imageUrl) return imageUrl;
@@ -23,18 +23,20 @@ export const ImageResolver = ({
     return null;
   })();
 
-  const handleImageError = () => {
-    if (currentImageSource !== '/placeholder.svg') {
-      setCurrentImageSource('/placeholder.svg');
-    }
-  };
+  if (!resolvedImageUrl || imageError) {
+    return (
+      <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
+        <MapPin className="w-8 h-8 text-gray-400" />
+      </div>
+    );
+  }
 
   return (
-    <ImageWithFallback
-      src={resolvedImageUrl || '/placeholder.svg'}
-      alt={title}
-      className="w-full h-full object-cover"
-      onError={handleImageError}
+    <img
+      src={resolvedImageUrl}
+      alt="Location"
+      className={`object-cover ${className}`}
+      onError={() => setImageError(true)}
     />
   );
 };
