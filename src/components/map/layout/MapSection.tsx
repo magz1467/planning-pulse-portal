@@ -1,46 +1,52 @@
 import { Application } from "@/types/planning";
 import { MapContainerComponent } from "../MapContainer";
-import { MobileApplicationCards } from "../MobileApplicationCards";
+import { MobileApplicationCards } from "../mobile/MobileApplicationCards";
 
 interface MapSectionProps {
   isMobile: boolean;
   isMapView: boolean;
   coordinates: [number, number];
-  postcode: string;
   applications: Application[];
-  selectedApplication: number | null;
-  onMarkerClick: (id: number) => void;
+  selectedId: number | null;
+  onMarkerClick: (id: number | null) => void;
+  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapSection = ({
   isMobile,
   isMapView,
   coordinates,
-  postcode,
   applications,
-  selectedApplication,
+  selectedId,
   onMarkerClick,
+  onCenterChange,
 }: MapSectionProps) => {
+  if (!coordinates || (!isMobile && !isMapView)) return null;
+
   return (
     <div 
-      className={`flex-1 relative ${isMobile && !isMapView ? 'hidden' : 'block'}`}
-      style={{ height: isMobile ? 'calc(100dvh - 120px)' : '100%' }}
+      className="flex-1 relative"
+      style={{ 
+        height: isMobile ? 'calc(100vh - 120px)' : '100%',
+        position: 'relative',
+        zIndex: 1
+      }}
     >
-      <MapContainerComponent
-        coordinates={coordinates}
-        postcode={postcode}
-        applications={applications}
-        selectedApplication={selectedApplication}
-        onMarkerClick={onMarkerClick}
-      />
-
-      {isMobile && isMapView && selectedApplication !== null && (
-        <MobileApplicationCards
+      <div className="absolute inset-0">
+        <MapContainerComponent
           applications={applications}
-          selectedId={selectedApplication}
-          onSelectApplication={onMarkerClick}
+          coordinates={coordinates}
+          onMarkerClick={onMarkerClick}
+          onCenterChange={onCenterChange}
         />
-      )}
+        {isMobile && selectedId && (
+          <MobileApplicationCards
+            applications={applications}
+            selectedId={selectedId}
+            onSelectApplication={onMarkerClick}
+          />
+        )}
+      </div>
     </div>
   );
 };

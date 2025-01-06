@@ -6,7 +6,6 @@ interface MapContainerProps {
   isMobile: boolean;
   isMapView: boolean;
   coordinates: [number, number];
-  postcode: string;
   applications: Application[];
   selectedApplication: number | null;
   onMarkerClick: (id: number | null) => void;
@@ -16,7 +15,6 @@ export const MapContainer = ({
   isMobile,
   isMapView,
   coordinates,
-  postcode,
   applications,
   selectedApplication,
   onMarkerClick,
@@ -35,9 +33,7 @@ export const MapContainer = ({
       <div className="absolute inset-0">
         <MapContainerComponent
           coordinates={coordinates}
-          postcode={postcode}
           applications={applications}
-          selectedApplication={selectedApplication}
           onMarkerClick={onMarkerClick}
         />
         {isMobile && isMapView && selectedApplication !== null && (
