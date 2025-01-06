@@ -78,21 +78,27 @@ export const ApplicationMarker = memo(({
     />
   );
 }, (prevProps, nextProps) => {
-  // Log comparison details
-  console.log('Marker comparison:', {
-    id: prevProps.application.application_id,
-    prevSelected: prevProps.isSelected,
-    nextSelected: nextProps.isSelected,
-    coordsMatch: prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
-                 prevProps.application.centroid.lng === nextProps.application.centroid.lng,
-    idMatch: prevProps.application.application_id === nextProps.application.application_id
-  });
-
   // Only re-render if these specific props change
-  return prevProps.isSelected === nextProps.isSelected &&
-         prevProps.application.application_id === nextProps.application.application_id &&
-         prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
-         prevProps.application.centroid.lng === nextProps.application.centroid.lng;
+  const shouldUpdate = 
+    prevProps.isSelected !== nextProps.isSelected ||
+    prevProps.application.application_id !== nextProps.application.application_id ||
+    prevProps.application.centroid.lat !== nextProps.application.centroid.lat ||
+    prevProps.application.centroid.lng !== nextProps.application.centroid.lng;
+
+  if (shouldUpdate) {
+    console.log('Marker will update:', {
+      id: prevProps.application.application_id,
+      reason: {
+        selectedChanged: prevProps.isSelected !== nextProps.isSelected,
+        idChanged: prevProps.application.application_id !== nextProps.application.application_id,
+        positionChanged: 
+          prevProps.application.centroid.lat !== nextProps.application.centroid.lat ||
+          prevProps.application.centroid.lng !== nextProps.application.centroid.lng
+      }
+    });
+  }
+
+  return !shouldUpdate;
 });
 
 ApplicationMarker.displayName = 'ApplicationMarker';
