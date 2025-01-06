@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 
 interface CategoryScore {
   score: number;
@@ -52,39 +54,69 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
           if (!categoryData) return null;
 
           return (
-            <div key={key} className="space-y-2">
-              <div className="flex items-center gap-2">
-                {getCategoryIcon(categoryData.score)}
-                <span className={`font-medium ${getCategoryColor(categoryData.score)}`}>
-                  {name}: {categoryData.score}/100
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 ml-7">{categoryData.details}</p>
-            </div>
+            <Collapsible key={key}>
+              <CollapsibleTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+                >
+                  <div className="flex items-center gap-2">
+                    {getCategoryIcon(categoryData.score)}
+                    <span className={`font-medium ${getCategoryColor(categoryData.score)}`}>
+                      {name}: {categoryData.score}/100
+                    </span>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <p className="text-sm text-gray-600 ml-7 mt-2">{categoryData.details}</p>
+              </CollapsibleContent>
+            </Collapsible>
           );
         })}
       </div>
 
       {impactDetails.key_concerns && impactDetails.key_concerns.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-medium">Key Concerns</h4>
-          <ul className="list-disc pl-5 space-y-1">
-            {impactDetails.key_concerns.map((concern, index) => (
-              <li key={index} className="text-sm text-gray-600">{concern}</li>
-            ))}
-          </ul>
-        </div>
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+            >
+              <h4 className="font-medium">Key Concerns</h4>
+              <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <ul className="list-disc pl-5 space-y-1 mt-2">
+              {impactDetails.key_concerns.map((concern, index) => (
+                <li key={index} className="text-sm text-gray-600">{concern}</li>
+              ))}
+            </ul>
+          </CollapsibleContent>
+        </Collapsible>
       )}
 
       {impactDetails.recommendations && impactDetails.recommendations.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-medium">Recommendations</h4>
-          <ul className="list-disc pl-5 space-y-1">
-            {impactDetails.recommendations.map((recommendation, index) => (
-              <li key={index} className="text-sm text-gray-600">{recommendation}</li>
-            ))}
-          </ul>
-        </div>
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+            >
+              <h4 className="font-medium">Recommendations</h4>
+              <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <ul className="list-disc pl-5 space-y-1 mt-2">
+              {impactDetails.recommendations.map((recommendation, index) => (
+                <li key={index} className="text-sm text-gray-600">{recommendation}</li>
+              ))}
+            </ul>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </Card>
   );
