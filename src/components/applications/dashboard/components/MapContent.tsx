@@ -17,12 +17,20 @@ export const MapContent = memo(({
   const { applications, isLoading } = useApplicationsData();
 
   const handleMarkerClick = useCallback((id: number) => {
+    console.log('MapContent: Marker clicked:', id);
     onMarkerClick(id);
   }, [onMarkerClick]);
 
   if (isLoading) {
+    console.log('MapContent: Loading applications...');
     return null;
   }
+
+  console.log('MapContent: Rendering with', {
+    applicationsCount: applications?.length,
+    selectedId,
+    center
+  });
 
   return (
     <>
@@ -43,9 +51,25 @@ export const MapContent = memo(({
     </>
   );
 }, (prevProps, nextProps) => {
-  return prevProps.selectedId === nextProps.selectedId &&
-         prevProps.center.lat === nextProps.center.lat &&
-         prevProps.center.lng === nextProps.center.lng;
+  // Only re-render if these specific props change
+  const centerChanged = 
+    prevProps.center.lat !== nextProps.center.lat || 
+    prevProps.center.lng !== nextProps.center.lng;
+  
+  const selectedIdChanged = prevProps.selectedId !== nextProps.selectedId;
+  
+  const shouldUpdate = centerChanged || selectedIdChanged;
+  
+  if (shouldUpdate) {
+    console.log('MapContent will update:', {
+      reason: {
+        centerChanged,
+        selectedIdChanged
+      }
+    });
+  }
+  
+  return !shouldUpdate;
 });
 
 MapContent.displayName = 'MapContent';

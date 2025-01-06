@@ -25,38 +25,15 @@ export const ApplicationMarker = memo(({
   });
 
   const handleClick = useCallback((e: L.LeafletMouseEvent) => {
-    try {
-      e.originalEvent.stopPropagation();
-      console.log(`Marker clicked - Application ${application.application_id}`);
-      
-      // Track marker state before click
-      console.log('Marker state before click:', {
-        isSelected,
-        eventType: e.type,
-        hasOriginalEvent: !!e.originalEvent,
-        propagationStopped: e.originalEvent.cancelBubble,
-        coordinates: [application.centroid.lat, application.centroid.lng]
-      });
-
-      onClick(application.application_id);
-
-      // Verify click handler executed successfully
-      console.log(`Click handler completed for marker ${application.application_id}`);
-    } catch (error) {
-      console.error('Error in marker click handler:', {
-        markerId: application.application_id,
-        error,
-        eventDetails: e,
-        markerState: { isSelected }
-      });
-    }
-  }, [application.application_id, onClick, isSelected]);
+    e.originalEvent.stopPropagation();
+    console.log(`Marker clicked - Application ${application.application_id}`);
+    onClick(application.application_id);
+  }, [application.application_id, onClick]);
 
   const icon = useMemo(() => {
     const size = isSelected ? 40 : 24;
     const color = '#F97316'; // Default orange color
-    console.log('Creating marker icon - Selected:', isSelected, 'Size:', size + 'px');
-
+    
     return L.divIcon({
       className: `custom-marker-icon ${isSelected ? 'selected' : ''}`,
       html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -77,28 +54,6 @@ export const ApplicationMarker = memo(({
       zIndexOffset={isSelected ? 1000 : 0}
     />
   );
-}, (prevProps, nextProps) => {
-  // Only re-render if these specific props change
-  const shouldUpdate = 
-    prevProps.isSelected !== nextProps.isSelected ||
-    prevProps.application.application_id !== nextProps.application.application_id ||
-    prevProps.application.centroid.lat !== nextProps.application.centroid.lat ||
-    prevProps.application.centroid.lng !== nextProps.application.centroid.lng;
-
-  if (shouldUpdate) {
-    console.log('Marker will update:', {
-      id: prevProps.application.application_id,
-      reason: {
-        selectedChanged: prevProps.isSelected !== nextProps.isSelected,
-        idChanged: prevProps.application.application_id !== nextProps.application.application_id,
-        positionChanged: 
-          prevProps.application.centroid.lat !== nextProps.application.centroid.lat ||
-          prevProps.application.centroid.lng !== nextProps.application.centroid.lng
-      }
-    });
-  }
-
-  return !shouldUpdate;
 });
 
 ApplicationMarker.displayName = 'ApplicationMarker';
