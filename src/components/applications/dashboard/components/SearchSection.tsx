@@ -1,6 +1,5 @@
 import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { FilterBar } from "@/components/FilterBar";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Application } from "@/types/planning";
 
 interface SearchSectionProps {
@@ -34,8 +33,6 @@ export const SearchSection = ({
   applications = [],
   statusCounts
 }: SearchSectionProps) => {
-  const isMobile = useIsMobile();
-
   return (
     <div className="flex flex-col border-b shadow-sm">
       <div className="container mx-auto pl-4 pr-8 py-4">
@@ -46,8 +43,7 @@ export const SearchSection = ({
         />
       </div>
 
-      {/* Only show FilterBar in mobile view */}
-      {isMobile && onFilterChange && (
+      {onFilterChange && (
         <div className="px-4">
           <FilterBar 
             onFilterChange={onFilterChange}

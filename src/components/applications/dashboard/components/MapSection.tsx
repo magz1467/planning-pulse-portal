@@ -1,0 +1,53 @@
+import { Application } from "@/types/planning";
+import { MapView } from "./MapView";
+import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+
+interface MapSectionProps {
+  isMobile: boolean;
+  isMapView: boolean;
+  coordinates: [number, number] | null;
+  applications: Application[];
+  selectedId: number | null;
+  onMarkerClick: (id: number | null) => void;
+  onCenterChange?: (center: [number, number]) => void;
+}
+
+export const MapSection = ({
+  isMobile,
+  isMapView,
+  coordinates,
+  applications,
+  selectedId,
+  onMarkerClick,
+  onCenterChange,
+}: MapSectionProps) => {
+  if (!coordinates || (!isMobile && !isMapView)) return null;
+
+  return (
+    <div 
+      className="flex-1 relative"
+      style={{ 
+        height: isMobile ? 'calc(100vh - 120px)' : '100%',
+        position: 'relative',
+        zIndex: 1
+      }}
+    >
+      <div className="absolute inset-0">
+        <MapView
+          applications={applications}
+          selectedId={selectedId}
+          onMarkerClick={onMarkerClick}
+          initialCenter={coordinates}
+          onCenterChange={onCenterChange}
+        />
+        {isMobile && selectedId && (
+          <MobileApplicationCards
+            applications={applications}
+            selectedId={selectedId}
+            onSelectApplication={onMarkerClick}
+          />
+        )}
+      </div>
+    </div>
+  );
+};

@@ -1,8 +1,8 @@
 import { DashboardHeader } from "./DashboardHeader";
 import { SearchSection } from "./SearchSection";
 import { LoadingOverlay } from "./LoadingOverlay";
-import { MapContent } from "./MapContent";
-import { SidebarContent } from "./SidebarContent";
+import { MapSection } from "./MapSection";
+import { SidebarSection } from "./SidebarSection";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Application } from "@/types/planning";
 
@@ -52,7 +52,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const isMobile = useIsMobile();
 
   const handleClose = () => {
-    console.log("Closing application details");
     handleMarkerClick(null);
   };
 
@@ -85,7 +84,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
       <div className="flex-1 relative w-full">
         <div className="absolute inset-0 flex" style={{ zIndex: 10 }}>
-          <SidebarContent
+          <SidebarSection
             isMobile={isMobile}
             isMapView={isMapView}
             applications={filteredApplications}
@@ -102,7 +101,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           />
 
           {(!isMobile || isMapView) && (
-            <MapContent
+            <MapSection
               applications={filteredApplications}
               selectedId={selectedId}
               coordinates={coordinates as [number, number]}
