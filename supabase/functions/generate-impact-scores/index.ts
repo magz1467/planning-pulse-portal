@@ -33,7 +33,7 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
   const prompt = `
     Analyze this planning application and provide impact scores for each category. 
     Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
-    Respond in JSON format only.
+    Return ONLY a valid JSON object with no markdown formatting or backticks.
     
     Application details:
     Description: ${application.description || 'N/A'}
@@ -55,7 +55,7 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in analyzing planning applications and their potential impacts. Provide numerical scores only.'
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Provide numerical scores only. Return ONLY valid JSON with no markdown formatting.'
           },
           {
             role: 'user',
@@ -86,27 +86,43 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       throw new Error('Invalid API response format');
     }
 
-    const scores = JSON.parse(data.choices[0].message.content);
-    console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
-    
-    // Calculate weighted score
-    let totalScore = 0;
-    const details: Record<string, any> = {};
+    // Clean the response content by removing any markdown formatting
+    const cleanContent = data.choices[0].message.content
+      .replace(/```json\n?/g, '')  // Remove ```json
+      .replace(/```\n?/g, '')      // Remove closing ```
+      .trim();                     // Remove any extra whitespace
 
-    for (const [category, subcategories] of Object.entries(scores)) {
-      details[category] = subcategories;
-      for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
-        const weight = criteria.find(c => 
-          c.category === category && c.subcategory === subcategory
-        )?.weight || 0;
-        totalScore += (score as number / 5) * weight;
+    console.log(`[Impact Score ${application.application_id}] Cleaned content:`, cleanContent);
+
+    try {
+      const scores = JSON.parse(cleanContent);
+      console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
+      
+      // Calculate weighted score
+      let totalScore = 0;
+      const details: Record<string, any> = {};
+
+      for (const [category, subcategories] of Object.entries(scores)) {
+        details[category] = subcategories;
+        for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
+          const weight = criteria.find(c => 
+            c.category === category && c.subcategory === subcategory
+          )?.weight || 0;
+          totalScore += (score as number / 5) * weight;
+        }
       }
-    }
 
-    return {
-      score: Math.round(totalScore),
-      details: scores
-    };
+      return {
+        score: Math.round(totalScore),
+        details: scores
+      };
+    } catch (parseError) {
+      console.error(`[Impact Score ${application.application_id}] JSON Parse Error:`, {
+        content: cleanContent,
+        error: parseError.message
+      });
+      throw new Error(`Failed to parse API response as JSON: ${parseError.message}`);
+    }
   } catch (error) {
     console.error(`[Impact Score ${application.application_id}] Error:`, {
       message: error.message,
