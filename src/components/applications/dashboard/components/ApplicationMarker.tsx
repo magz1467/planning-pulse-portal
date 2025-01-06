@@ -31,8 +31,8 @@ export const ApplicationMarker = memo(({
 
   const icon = useMemo(() => ({
     url: isSelected ? '/marker-selected.svg' : '/marker.svg',
-    scaledSize: new google.maps.Size(isSelected ? 32 : 24, isSelected ? 32 : 24),
-    anchor: new google.maps.Point(isSelected ? 16 : 12, isSelected ? 32 : 24)
+    scaledSize: new google.maps.Size(isSelected ? 40 : 24, isSelected ? 40 : 24),
+    anchor: new google.maps.Point(isSelected ? 20 : 12, isSelected ? 40 : 24)
   }), [isSelected]);
 
   return (
@@ -40,7 +40,7 @@ export const ApplicationMarker = memo(({
       position={position}
       onClick={handleClick}
       icon={icon}
-      zIndex={isSelected ? 2 : 1}
+      zIndex={isSelected ? 1000 : 1} // Ensure selected marker appears above others
     />
   );
 }, (prevProps, nextProps) => {
