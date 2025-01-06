@@ -19,7 +19,16 @@ Deno.serve(async (req) => {
     
     if (!applicationId) {
       console.error('Missing applicationId in request')
-      throw new Error('Application ID is required')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Application ID is required' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      )
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -28,7 +37,16 @@ Deno.serve(async (req) => {
     
     if (!perplexityKey) {
       console.error('Missing Perplexity API key in environment')
-      throw new Error('Missing Perplexity API key')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Server configuration error' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        }
+      )
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
@@ -44,7 +62,16 @@ Deno.serve(async (req) => {
 
     if (fetchError || !application) {
       console.error('Error fetching application:', fetchError)
-      throw new Error('Application not found')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Application not found' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404
+        }
+      )
     }
 
     console.log('Generating prompt for application')
@@ -95,7 +122,16 @@ Deno.serve(async (req) => {
         statusText: response.statusText,
         error: errorText
       })
-      throw new Error(`API error: ${response.status}`)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `AI Service error: ${response.status}` 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 502
+        }
+      )
     }
 
     const data = await response.json()
@@ -103,11 +139,35 @@ Deno.serve(async (req) => {
     
     if (!data.choices?.[0]?.message?.content) {
       console.error('Invalid API response format:', data)
-      throw new Error('Invalid API response format')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid AI response format' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 502
+        }
+      )
     }
 
-    const scores = JSON.parse(data.choices[0].message.content)
-    console.log('Parsed impact scores:', scores)
+    let scores;
+    try {
+      scores = JSON.parse(data.choices[0].message.content)
+      console.log('Parsed impact scores:', scores)
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid score format returned' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 502
+        }
+      )
+    }
 
     // Calculate normalized score
     let totalScore = 0
@@ -135,7 +195,16 @@ Deno.serve(async (req) => {
 
     if (updateError) {
       console.error('Failed to update application:', updateError)
-      throw new Error('Failed to update application')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Failed to save score' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        }
+      )
     }
 
     console.log('Successfully updated application with impact score')
@@ -150,7 +219,8 @@ Deno.serve(async (req) => {
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json' 
-        } 
+        },
+        status: 200
       }
     )
 
@@ -166,7 +236,7 @@ Deno.serve(async (req) => {
           ...corsHeaders,
           'Content-Type': 'application/json' 
         },
-        status: 400
+        status: 500
       }
     )
   }

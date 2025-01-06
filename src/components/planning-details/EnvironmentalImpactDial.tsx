@@ -37,6 +37,10 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
         throw error;
       }
 
+      if (!data) {
+        throw new Error('No response from server');
+      }
+
       if (data.success) {
         toast({
           title: "Impact score generated",
@@ -53,7 +57,7 @@ export const EnvironmentalImpactDial = ({ score, details, applicationId }: Envir
       console.error('Error generating impact score:', error);
       toast({
         title: "Error",
-        description: "Failed to generate impact score. Please try again later.",
+        description: error.message || "Failed to generate impact score. Please try again later.",
         variant: "destructive",
       });
       setHasTriggered(false);
