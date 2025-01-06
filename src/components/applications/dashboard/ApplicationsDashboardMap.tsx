@@ -40,19 +40,22 @@ export const ApplicationsDashboardMap = () => {
 
   // Memoize the marker click handler
   const memoizedHandleMarkerClick = useCallback((id: number | null) => {
-    console.log('Marker clicked:', id);
     handleMarkerClick(id);
   }, [handleMarkerClick]);
 
-  // Debug logging for selectedId
-  useEffect(() => {
-    console.log('Selected ID state changed:', selectedId);
-  }, [selectedId]);
+  // Memoize filter change handler
+  const memoizedHandleFilterChange = useCallback((filterType: string, value: string) => {
+    handleFilterChange(filterType, value);
+  }, [handleFilterChange]);
+
+  // Memoize sort change handler
+  const memoizedHandleSort = useCallback((sortType: any) => {
+    handleSortChange(sortType);
+  }, [handleSortChange]);
 
   // Mobile auto-selection effect
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
-      console.log('Auto-selecting first application on mobile');
       handleMarkerClick(filteredApplications[0].id);
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
@@ -71,9 +74,9 @@ export const ApplicationsDashboardMap = () => {
       filteredApplications={memoizedFilteredApplications}
       statusCounts={defaultStatusCounts}
       handleMarkerClick={memoizedHandleMarkerClick}
-      handleFilterChange={handleFilterChange}
+      handleFilterChange={memoizedHandleFilterChange}
       handlePostcodeSelect={handlePostcodeSelect}
-      handleSortChange={handleSortChange}
+      handleSortChange={memoizedHandleSort}
     />
   );
 };

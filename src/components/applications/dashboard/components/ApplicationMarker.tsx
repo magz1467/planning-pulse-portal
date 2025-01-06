@@ -19,14 +19,8 @@ export const ApplicationMarker = memo(({
   isSelected, 
   onClick 
 }: ApplicationMarkerProps) => {
-  console.log(`Rendering marker ${application.application_id}:`, {
-    isSelected,
-    coordinates: [application.centroid.lat, application.centroid.lng]
-  });
-
   const handleClick = useCallback((e: L.LeafletMouseEvent) => {
     e.originalEvent.stopPropagation();
-    console.log(`Marker clicked - Application ${application.application_id}`);
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
