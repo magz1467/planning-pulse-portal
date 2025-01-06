@@ -51,8 +51,7 @@ export async function generateImpactAnalysis(
         temperature: 0.4, // Lowered for more consistent but still varied responses
         max_tokens: 1000,
         top_p: 0.9,
-        presence_penalty: 0.6, // Added to encourage more diverse responses
-        frequency_penalty: 0.3 // Added to discourage repetitive scoring patterns
+        presence_penalty: 0.6 // Added to encourage more diverse responses
       }),
     });
 

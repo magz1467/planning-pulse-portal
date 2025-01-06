@@ -72,24 +72,3 @@ export const fetchStatusCounts = async (
     };
   }
 };
-
-export const fetchApplicationsCountFromSupabase = async (
-  center: [number, number],
-  radiusInMeters: number
-) => {
-  try {
-    const { data: count, error } = await supabase.rpc(
-      'get_applications_count_within_radius',
-      {
-        center_lat: center[0],
-        center_lng: center[1],
-        radius_meters: radiusInMeters
-      }
-    ).throwOnError();
-
-    return count;
-
-  } catch (error: any) {
-    throw error;
-  }
-};
