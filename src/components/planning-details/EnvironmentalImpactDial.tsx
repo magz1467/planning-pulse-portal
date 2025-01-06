@@ -52,18 +52,21 @@ export const EnvironmentalImpactDial = ({
   }
 
   return (
-    <div className="space-y-4">
-      <Card className="p-4">
-        <div className="space-y-2">
-          <h3 className="font-semibold">Expected impact score</h3>
-          <p className="text-xs text-gray-500">
-            Score calculated using weighted factors including size, location sensitivity, and development type
-          </p>
-          <ScoreDisplay score={score} progress={progress} />
-        </div>
-      </Card>
+    <Card className="p-4 space-y-6">
+      <div className="space-y-2">
+        <h3 className="font-semibold">Expected impact score</h3>
+        <p className="text-xs text-gray-500">
+          Score calculated using weighted factors including size, location sensitivity, and development type
+        </p>
+        <ScoreDisplay score={score} progress={progress} />
+      </div>
       
-      <ImpactScoreBreakdown details={details} />
-    </div>
+      {details && (
+        <div className="space-y-2 pt-4 border-t">
+          <h3 className="font-semibold">Impact Score Breakdown</h3>
+          <ImpactScoreBreakdown details={details} />
+        </div>
+      )}
+    </Card>
   );
 };
