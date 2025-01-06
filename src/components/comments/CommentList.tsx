@@ -21,15 +21,9 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           setCurrentUserId(session.session.user.id);
         }
 
-        // Updated query to properly join with profiles
         const { data, error } = await supabase
           .from('Comments')
-          .select(`
-            *,
-            profiles:user_id (
-              username
-            )
-          `)
+          .select('*, user:user_id (username)')
           .eq('application_id', applicationId)
           .order('created_at', { ascending: false });
 
