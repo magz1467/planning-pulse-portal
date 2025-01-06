@@ -25,6 +25,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         .select(`
           *,
           user:user_id (
+            id,
             email
           )
         `)
@@ -41,7 +42,15 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         return;
       }
 
-      setComments(data || []);
+      // Transform the data to match the Comment type
+      const transformedComments = data.map(comment => ({
+        ...comment,
+        user: {
+          email: comment.user?.email || 'Unknown User'
+        }
+      }));
+
+      setComments(transformedComments);
     };
 
     fetchComments();
