@@ -1,9 +1,8 @@
 import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { Bell, X } from "lucide-react";
-import { getStatusColor } from "@/utils/statusColors";
 import { useState } from "react";
-import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { ImageResolver } from "./components/ImageResolver";
 
 interface MobileListViewProps {
   postcode: string;
@@ -19,20 +18,6 @@ export const MobileListView = ({
   onShowEmailDialog,
 }: MobileListViewProps) => {
   const [showAlerts, setShowAlerts] = useState(true);
-
-  // Array of diverse house images from Unsplash
-  const houseImages = [
-    "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60"
-  ];
-
-  // Function to get a random image based on application id
-  const getRandomImage = (id: number) => {
-    return houseImages[id % houseImages.length];
-  };
 
   return (
     <div className="absolute inset-0 flex flex-col h-full max-h-[100dvh] overflow-hidden bg-gray-50">
@@ -72,11 +57,11 @@ export const MobileListView = ({
           >
             <div className="flex gap-4">
               <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                <ImageWithFallback
-                  src={app.image_map_url || app.image}
-                  alt={app.title || app.description || ''}
-                  fallbackSrc={getRandomImage(app.id)}
-                  className="w-full h-full object-cover"
+                <ImageResolver
+                  imageMapUrl={app.image_map_url}
+                  image={app.image}
+                  title={app.title || app.description || ''}
+                  applicationId={app.id}
                 />
               </div>
               <div className="flex-1 min-w-0">
