@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Application } from "@/types/planning";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
 interface ApplicationDetailsProps {
@@ -10,6 +10,11 @@ interface ApplicationDetailsProps {
 
 export const ApplicationDetails = ({ application }: ApplicationDetailsProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Reset expanded state when application changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [application?.id]); // Reset when application ID changes
   
   if (!application) return null;
 
