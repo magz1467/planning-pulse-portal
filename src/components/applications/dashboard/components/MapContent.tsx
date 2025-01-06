@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { ApplicationMarker } from './ApplicationMarker';
 import { useApplicationsData } from '../hooks/useApplicationsData';
 import { Application } from '@/types/planning';
@@ -14,15 +14,7 @@ export const MapContent = memo(({
   selectedId, 
   onMarkerClick 
 }: MapContentProps) => {
-  const [renderedMarkersCount, setRenderedMarkersCount] = useState(0);
   const { applications, isLoading } = useApplicationsData();
-
-  useEffect(() => {
-    if (applications?.length !== renderedMarkersCount) {
-      console.log(`MapContent rendered with ${applications?.length || 0} applications, selectedId: ${selectedId}`);
-      setRenderedMarkersCount(applications?.length || 0);
-    }
-  }, [applications?.length, selectedId, renderedMarkersCount]);
 
   const handleMarkerClick = useCallback((id: number) => {
     console.log(`Marker clicked in MapContent: ${id}`);
