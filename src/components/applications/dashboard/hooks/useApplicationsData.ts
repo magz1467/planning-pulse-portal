@@ -24,6 +24,8 @@ export const useApplicationsData = () => {
     page = 0,
     pageSize = 100
   ) => {
+    if (isLoading) return; // Prevent multiple simultaneous fetches
+    
     setIsLoading(true);
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
@@ -44,6 +46,8 @@ export const useApplicationsData = () => {
           description: 'Please try again later',
           variant: 'destructive',
         });
+        setApplications([]);
+        setTotalCount(0);
         return;
       }
 
@@ -64,7 +68,7 @@ export const useApplicationsData = () => {
 
       setApplications(transformedApplications || []);
 
-      // Then get status counts
+      // Fetch status counts
       const { data: counts, error: countsError } = await supabase
         .rpc('get_applications_status_counts', {
           center_lat: center[0],
@@ -93,7 +97,7 @@ export const useApplicationsData = () => {
         setStatusCounts(formattedCounts);
       }
 
-      // Finally get total count
+      // Get total count
       const { data: countData, error: countError } = await supabase
         .rpc('get_applications_count_within_radius', {
           center_lng: center[1],

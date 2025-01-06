@@ -32,6 +32,7 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
+  // Update URL params when relevant state changes
   useEffect(() => {
     updateURLParams({
       postcode,
@@ -41,20 +42,17 @@ export const useDashboardState = () => {
     });
   }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams]);
 
+  // Log search analytics
   const logSearch = async (loadTime: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      const { error } = await supabase.from('Searches').insert({
+      await supabase.from('Searches').insert({
         'Post Code': postcode,
         'Status': initialTab,
         'User_logged_in': !!session?.user,
         'load_time': loadTime
       });
-
-      if (error) {
-        console.error('Error logging search:', error);
-      }
     } catch (error) {
       console.error('Error logging search:', error);
     }
@@ -68,13 +66,25 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  // Only fetch applications when coordinates change
+  // Only fetch applications when coordinates change and are valid
   useEffect(() => {
-    if (coordinates) {
-      console.log('Fetching applications with coordinates:', coordinates);
-      fetchApplicationsInRadius(coordinates, 1000);
-    }
-  }, [coordinates, fetchApplicationsInRadius]);
+    const fetchData = async () => {
+      if (coordinates) {
+        console.log('Fetching applications with coordinates:', coordinates);
+        const startTime = performance.now();
+        
+        try {
+          await fetchApplicationsInRadius(coordinates, 1000);
+          const loadTime = performance.now() - startTime;
+          await logSearch(loadTime);
+        } catch (error) {
+          console.error('Error fetching applications:', error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [coordinates, fetchApplicationsInRadius]); // Only depend on coordinates and the fetch function
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
