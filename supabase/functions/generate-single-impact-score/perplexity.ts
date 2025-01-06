@@ -6,28 +6,30 @@ if (!PERPLEXITY_API_KEY) {
   throw new Error('Missing PERPLEXITY_API_KEY environment variable');
 }
 
-export async function generateImpactScore(description: string): Promise<PerplexityResponse> {
+export async function generateImpactScore(description: string) {
   console.log('Generating impact score for description:', description);
 
-  const prompt = `You are an expert urban planner and environmental impact assessor. 
-  Analyze the following planning application description and provide a numerical impact score from 1-100, 
-  where 1 represents minimal impact and 100 represents maximum impact on the local area.
-  
-  Consider factors such as:
-  - Environmental impact (trees, wildlife, green space)
-  - Visual impact on streetscape
-  - Traffic and parking implications  
-  - Noise and disruption during construction
-  - Impact on local infrastructure and services
-  - Scale relative to surrounding buildings
-  - Heritage and conservation considerations
-  
-  Provide your assessment in JSON format with:
-  - overall_score: number between 1-100
-  - category_scores: object with scores for each impact category
-  - key_concerns: array of main impact points
-  - recommendations: array of mitigation suggestions
-  
+  const prompt = `Analyze the following planning application description and provide a numerical impact assessment in JSON format only. The response must be a valid JSON object with the following structure:
+  {
+    "overall_score": <number between 1-100>,
+    "category_scores": {
+      "environmental": {
+        "score": <number between 1-100>,
+        "details": "<brief explanation>"
+      },
+      "social": {
+        "score": <number between 1-100>,
+        "details": "<brief explanation>"
+      },
+      "infrastructure": {
+        "score": <number between 1-100>,
+        "details": "<brief explanation>"
+      }
+    },
+    "key_concerns": ["<concern 1>", "<concern 2>", ...],
+    "recommendations": ["<recommendation 1>", "<recommendation 2>", ...]
+  }
+
   Planning application: "${description}"`;
 
   try {
@@ -43,15 +45,15 @@ export async function generateImpactScore(description: string): Promise<Perplexi
         model: 'pplx-7b-chat',
         messages: [{
           role: 'system',
-          content: 'You are an expert urban planner and environmental impact assessor. Always respond in valid JSON format.'
+          content: 'You are a planning application impact assessor. Always respond in valid JSON format only, no additional text or markdown.'
         }, {
           role: 'user',
           content: prompt
         }],
-        temperature: 0.4,
+        temperature: 0.1,
         max_tokens: 1000,
         top_p: 0.9,
-        presence_penalty: 0.6
+        presence_penalty: 0.1
       }),
     });
 
@@ -60,21 +62,18 @@ export async function generateImpactScore(description: string): Promise<Perplexi
       throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as PerplexityResponse;
     console.log('Received response from Perplexity API:', data);
 
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response format from Perplexity API');
+    }
+
     try {
-      // Extract the JSON from the response content
       const content = data.choices[0].message.content;
       console.log('Raw content:', content);
       
-      // Find JSON content between curly braces
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
-      }
-      
-      const parsedResponse = JSON.parse(jsonMatch[0]);
+      const parsedResponse = JSON.parse(content);
       console.log('Parsed response:', parsedResponse);
       
       return {
