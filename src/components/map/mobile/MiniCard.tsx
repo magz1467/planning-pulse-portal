@@ -32,10 +32,13 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   console.log('MiniCard - Starting image URL resolution for application:', application.id);
   
   const imageUrl = (() => {
-    if (application.image_map_url) {
+    // First try to use image_map_url if it exists and is valid
+    if (application.image_map_url && application.image_map_url !== 'undefined') {
       console.log('MiniCard - Using image_map_url:', application.image_map_url);
       return application.image_map_url;
     }
+
+    // Then try to use the image property if it exists and is not a placeholder
     if (application.image && application.image !== '/placeholder.svg') {
       // Check if it's a Supabase storage URL
       if (application.image.startsWith('/storage/')) {
@@ -47,11 +50,14 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       console.log('MiniCard - Using application.image:', application.image);
       return application.image;
     }
+
+    // Finally fall back to random Unsplash image
     const fallbackImage = getRandomImage(application.id);
     console.log('MiniCard - Using fallback image:', fallbackImage);
     return fallbackImage;
   })();
 
+  // Log the final resolution for debugging
   console.log('MiniCard - Final image URL resolution:', {
     applicationId: application.id,
     imageMapUrl: application.image_map_url,
