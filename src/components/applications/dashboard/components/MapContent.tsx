@@ -1,28 +1,23 @@
 import { memo, useCallback } from 'react';
 import { ApplicationMarker } from './ApplicationMarker';
-import { useApplicationsData } from '../hooks/useApplicationsData';
 import { Application } from '@/types/planning';
 
 interface MapContentProps {
   center: google.maps.LatLngLiteral;
   selectedId?: number;
   onMarkerClick: (id: number) => void;
+  applications: Application[];
 }
 
 export const MapContent = memo(({ 
   center, 
   selectedId, 
-  onMarkerClick 
+  onMarkerClick,
+  applications
 }: MapContentProps) => {
-  const { applications, isLoading } = useApplicationsData();
-
   const handleMarkerClick = useCallback((id: number) => {
     onMarkerClick(id);
   }, [onMarkerClick]);
-
-  if (isLoading) {
-    return null;
-  }
 
   return (
     <>
@@ -50,7 +45,10 @@ export const MapContent = memo(({
   
   const selectedIdChanged = prevProps.selectedId !== nextProps.selectedId;
   
-  return !(centerChanged || selectedIdChanged);
+  const applicationsChanged = 
+    prevProps.applications !== nextProps.applications;
+  
+  return !(centerChanged || selectedIdChanged || applicationsChanged);
 });
 
 MapContent.displayName = 'MapContent';
