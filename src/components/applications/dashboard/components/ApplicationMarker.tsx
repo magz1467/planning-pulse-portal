@@ -1,67 +1,60 @@
-import { Marker } from "react-leaflet";
-import { Application } from "@/types/planning";
-import L from "leaflet";
-import { useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo } from 'react';
+import { Marker } from '@react-google-maps/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface ApplicationMarkerProps {
-  application: Application;
+  application: {
+    application_id: number;
+    centroid: {
+      lat: number;
+      lng: number;
+    };
+  };
   isSelected: boolean;
-  onClick: () => void;
+  onClick: (id: number) => void;
 }
 
-const getStatusColor = (status: string): string => {
-  const statusLower = status.toLowerCase();
-  if (statusLower.includes('approved')) {
-    return '#16a34a'; // green
-  } else if (statusLower.includes('refused') || statusLower.includes('declined') || statusLower.includes('withdrawn')) {
-    return '#ea384c'; // red
-  } else {
-    return '#F97316'; // orange for under consideration/pending
-  }
-};
+export const ApplicationMarker = memo(({ 
+  application, 
+  isSelected, 
+  onClick 
+}: ApplicationMarkerProps) => {
+  const { toast } = useToast();
+  
+  console.log(`Rendering marker for application ${application.application_id}, isSelected: ${isSelected}`);
 
-export const ApplicationMarker = ({ application, isSelected, onClick }: ApplicationMarkerProps) => {
-  // Validate coordinates
-  if (!application.coordinates || !Array.isArray(application.coordinates)) {
-    console.warn('Invalid coordinates for application:', application.id);
+  const markerSize = useMemo(() => {
+    return isSelected ? 40 : 24;
+  }, [isSelected]);
+
+  const handleClick = useCallback(() => {
+    console.log(`Marker clicked: ${application.application_id}`);
+    if (onClick) {
+      onClick(application.application_id);
+    }
+  }, [application.application_id, onClick]);
+
+  // Validate coordinates before rendering
+  if (!application.centroid?.lat || !application.centroid?.lng) {
+    console.warn(`Invalid coordinates for application ${application.application_id}`);
     return null;
   }
 
-  // Memoize color calculation
-  const color = useMemo(() => getStatusColor(application.status), [application.status]);
-
-  // Memoize icon creation
-  const icon = useMemo(() => {
-    const size = isSelected ? 40 : 24;
-    console.log(`Creating marker icon for application ${application.id} - Selected: ${isSelected}, Size: ${size}px`);
-    
-    return L.divIcon({
-      className: `custom-marker-icon ${isSelected ? 'selected' : ''}`,
-      html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" fill="${color}"/>
-      </svg>`,
-      iconSize: [size, size],
-      iconAnchor: [size/2, size],
-    });
-  }, [isSelected, color, application.id]);
-
-  // Memoize click handler
-  const handleClick = useCallback(() => {
-    console.log(`Marker clicked - Application ${application.id}, Selected: ${isSelected}`);
-    onClick();
-  }, [application.id, isSelected, onClick]);
-
   return (
     <Marker
-      position={application.coordinates}
-      icon={icon}
-      eventHandlers={{
-        click: handleClick,
-        mouseover: () => {
-          console.log(`Marker hover - Application ${application.id}`);
-        }
+      position={{
+        lat: application.centroid.lat,
+        lng: application.centroid.lng
       }}
-      zIndexOffset={isSelected ? 1000 : 0}
+      onClick={handleClick}
+      icon={{
+        url: isSelected ? '/marker-selected.svg' : '/marker.svg',
+        scaledSize: new google.maps.Size(markerSize, markerSize),
+        anchor: new google.maps.Point(markerSize/2, markerSize/2)
+      }}
+      zIndex={isSelected ? 1000 : 1}
     />
   );
-};
+});
+
+ApplicationMarker.displayName = 'ApplicationMarker';

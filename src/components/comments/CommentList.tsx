@@ -1,54 +1,37 @@
-import { Comment } from '@/types/planning';
-import { supabase } from '@/integrations/supabase/client';
-import { CommentItem } from './CommentItem';
-import { useToast } from '@/hooks/use-toast';
-import { useComments } from './hooks/useComments';
-import { useRealtimeComments } from './hooks/useRealtimeComments';
+import { useEffect } from "react";
+import { CommentItem } from "./CommentItem";
+import { useComments } from "./hooks/useComments";
+import { useRealtimeComments } from "./hooks/useRealtimeComments";
 
 interface CommentListProps {
   applicationId: number;
 }
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
-  const { comments, currentUserId, setComments } = useComments(applicationId);
-  const { toast } = useToast();
+  const { comments, isLoading, error } = useComments(applicationId);
+  const { subscribeToComments } = useRealtimeComments();
 
-  // Set up realtime subscription
-  useRealtimeComments(applicationId, currentUserId, setComments);
+  useEffect(() => {
+    // Subscribe to real-time updates for this application's comments
+    subscribeToComments(applicationId);
+  }, [applicationId, subscribeToComments]);
 
-  const handleDeleteComment = async (commentId: number) => {
-    try {
-      const { error } = await supabase
-        .from('Comments')
-        .delete()
-        .eq('id', commentId);
+  if (isLoading) {
+    return <div>Loading comments...</div>;
+  }
 
-      if (error) throw error;
-      
-      toast({
-        title: "Comment deleted",
-        description: "Your comment has been deleted successfully"
-      });
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-      toast({
-        title: "Error",
-        description: "There was an error deleting your comment",
-        variant: "destructive"
-      });
-    }
-  };
+  if (error) {
+    return <div>Error loading comments</div>;
+  }
+
+  if (!comments?.length) {
+    return <div>No comments yet</div>;
+  }
 
   return (
     <div className="space-y-4">
       {comments.map((comment) => (
-        <CommentItem
-          key={comment.id}
-          comment={comment}
-          applicationId={applicationId}
-          currentUserId={currentUserId}
-          onDelete={handleDeleteComment}
-        />
+        <CommentItem key={comment.id} comment={comment} />
       ))}
     </div>
   );

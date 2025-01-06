@@ -1,53 +1,47 @@
-import { Application } from "@/types/planning";
-import { MapView } from "./MapView";
-import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { memo, useCallback, useEffect, useState } from 'react';
+import { ApplicationMarker } from './ApplicationMarker';
+import { useApplicationsData } from '../hooks/useApplicationsData';
 
 interface MapContentProps {
-  applications: Application[];
-  selectedId: number | null;
-  coordinates: [number, number];
-  isMobile: boolean;
-  isMapView: boolean;
-  onMarkerClick: (id: number | null) => void;
-  onCenterChange?: (center: [number, number]) => void;
+  center: google.maps.LatLngLiteral;
+  selectedId?: number;
+  onMarkerClick: (id: number) => void;
 }
 
-export const MapContent = ({
-  applications,
-  selectedId,
-  coordinates,
-  isMobile,
-  isMapView,
-  onMarkerClick,
-  onCenterChange,
+export const MapContent = memo(({ 
+  center, 
+  selectedId, 
+  onMarkerClick 
 }: MapContentProps) => {
-  if (!coordinates || (!isMobile && !isMapView)) return null;
+  const [renderedMarkersCount, setRenderedMarkersCount] = useState(0);
+  const { applications, isLoading } = useApplicationsData(center);
+
+  useEffect(() => {
+    console.log(`MapContent rendered with ${applications?.length || 0} applications, selectedId: ${selectedId}`);
+    setRenderedMarkersCount(applications?.length || 0);
+  }, [applications?.length, selectedId]);
+
+  const handleMarkerClick = useCallback((id: number) => {
+    console.log(`Marker clicked in MapContent: ${id}`);
+    onMarkerClick(id);
+  }, [onMarkerClick]);
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
-    <div className="flex-1 relative h-full">
-      <div 
-        className="absolute inset-0"
-        style={{ 
-          height: isMobile ? 'calc(100vh - 120px)' : '100%',
-          position: 'relative',
-          zIndex: 1
-        }}
-      >
-        <MapView
-          applications={applications}
-          selectedId={selectedId}
-          coordinates={coordinates}
-          onMarkerClick={onMarkerClick}
-          onCenterChange={onCenterChange}
+    <>
+      {applications?.map((application) => (
+        <ApplicationMarker
+          key={application.application_id}
+          application={application}
+          isSelected={application.application_id === selectedId}
+          onClick={handleMarkerClick}
         />
-        {isMobile && selectedId && (
-          <MobileApplicationCards
-            applications={applications}
-            selectedId={selectedId}
-            onSelectApplication={onMarkerClick}
-          />
-        )}
-      </div>
-    </div>
+      ))}
+    </>
   );
-};
+});
+
+MapContent.displayName = 'MapContent';
