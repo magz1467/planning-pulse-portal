@@ -21,13 +21,6 @@ export const ImageResolver: React.FC<ImageResolverProps> = ({
   const resolvedImageUrl = (() => {
     if (imageUrl) return imageUrl;
     if (image) return image;
-    if (coordinates) {
-      // Use Google Static Maps API if coordinates are provided
-      const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-      if (googleMapsApiKey) {
-        return `https://maps.googleapis.com/maps/api/staticmap?center=${coordinates[0]},${coordinates[1]}&zoom=17&size=800x600&maptype=satellite&key=${googleMapsApiKey}`;
-      }
-    }
     return null;
   })();
 
