@@ -32,9 +32,15 @@ export const ApplicationsDashboardMap = () => {
     ...statusCounts
   };
 
-  // Always declare the effect, but conditionally execute the logic inside
+  // Debug logging for selectedId
+  useEffect(() => {
+    console.log('Selected ID state changed:', selectedId);
+  }, [selectedId]);
+
+  // Mobile auto-selection effect
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
+      console.log('Auto-selecting first application on mobile');
       handleMarkerClick(filteredApplications[0].id);
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);

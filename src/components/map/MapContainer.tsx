@@ -1,7 +1,7 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
@@ -15,7 +15,7 @@ export interface MapContainerProps {
   onMapMove?: (map: LeafletMap) => void;
 }
 
-export const MapContainerComponent = ({
+export const MapContainerComponent = memo(({
   coordinates,
   applications,
   selectedId,
@@ -73,4 +73,6 @@ export const MapContainerComponent = ({
       </LeafletMapContainer>
     </div>
   );
-};
+});
+
+MapContainerComponent.displayName = 'MapContainerComponent';
