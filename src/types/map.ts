@@ -1,23 +1,28 @@
 import { Map } from 'leaflet';
+import { Application } from './planning';
+import { SortType } from '@/hooks/use-sort-applications';
 
 export interface MapState {
-  map: Map | null;
-  center: [number, number];
-  zoom: number;
+  selectedId: number | null;
+  activeFilters: {
+    status?: string;
+    type?: string;
+  };
+  activeSort: SortType | null;
 }
 
 export interface MapActions {
-  setMap: (map: Map | null) => void;
-  setCenter: (center: [number, number]) => void;
-  setZoom: (zoom: number) => void;
+  handleMarkerClick: (id: number | null) => void;
+  handleFilterChange: (filterType: string, value: string) => void;
+  handleSortChange: (sortType: SortType | null) => void;
 }
 
 export interface MapViewProps {
-  applications: any[];
+  applications: Application[];
   selectedId: number | null;
   coordinates: [number, number];
   onMarkerClick: (id: number | null) => void;
-  onCenterChange: (center: [number, number]) => void;
+  onCenterChange?: (center: [number, number]) => void;
   onMapMove?: (map: Map) => void;
   isMobile?: boolean;
   isMapView?: boolean;
