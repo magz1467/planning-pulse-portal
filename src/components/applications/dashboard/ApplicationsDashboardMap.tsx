@@ -60,6 +60,12 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
 
+  // Handle map center changes without triggering new searches
+  const handleCenterChange = useCallback((newCenter: [number, number]) => {
+    // Only update the view, don't trigger a new search
+    console.log('Map center changed:', newCenter);
+  }, []);
+
   return (
     <DashboardLayout
       selectedId={selectedId}
@@ -77,6 +83,7 @@ export const ApplicationsDashboardMap = () => {
       handleFilterChange={memoizedHandleFilterChange}
       handlePostcodeSelect={handlePostcodeSelect}
       handleSortChange={memoizedHandleSort}
+      onCenterChange={handleCenterChange}
     />
   );
 };

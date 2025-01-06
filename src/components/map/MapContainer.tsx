@@ -1,4 +1,4 @@
-import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer, useMap } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo, useCallback } from "react";
@@ -6,6 +6,33 @@ import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import debounce from 'lodash/debounce';
 import "leaflet/dist/leaflet.css";
+
+// Separate component to handle map events
+const MapEvents = ({ onCenterChange }: { onCenterChange?: (center: [number, number]) => void }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (!onCenterChange) return;
+
+    const debouncedCenterChange = debounce((center: [number, number]) => {
+      onCenterChange(center);
+    }, 1000);
+
+    const handleMoveEnd = () => {
+      const center = map.getCenter();
+      debouncedCenterChange([center.lat, center.lng]);
+    };
+
+    map.on('moveend', handleMoveEnd);
+
+    return () => {
+      map.off('moveend', handleMoveEnd);
+      debouncedCenterChange.cancel();
+    };
+  }, [map, onCenterChange]);
+
+  return null;
+};
 
 export interface MapContainerProps {
   applications: Application[];
@@ -22,19 +49,8 @@ export const MapContainerComponent = memo(({
   selectedId,
   onMarkerClick,
   onCenterChange,
-  onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
-
-  // Debounce the center change handler
-  const debouncedCenterChange = useCallback(
-    debounce((center: [number, number]) => {
-      if (onCenterChange) {
-        onCenterChange(center);
-      }
-    }, 300),
-    [onCenterChange]
-  );
 
   useEffect(() => {
     if (mapRef.current) {
@@ -44,21 +60,6 @@ export const MapContainerComponent = memo(({
       }, 100);
     }
   }, [coordinates]);
-
-  useEffect(() => {
-    if (mapRef.current && onMapMove) {
-      const handleMove = debounce(() => {
-        onMapMove(mapRef.current!);
-      }, 300);
-
-      mapRef.current.on('move', handleMove);
-
-      return () => {
-        mapRef.current?.off('move', handleMove);
-        handleMove.cancel();
-      };
-    }
-  }, [onMapMove]);
 
   return (
     <div className="w-full h-full relative">
@@ -81,6 +82,7 @@ export const MapContainerComponent = memo(({
           onMarkerClick={onMarkerClick}
           selectedId={selectedId}
         />
+        <MapEvents onCenterChange={onCenterChange} />
       </LeafletMapContainer>
     </div>
   );
