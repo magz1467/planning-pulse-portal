@@ -43,7 +43,7 @@ export async function generateImpactScore(description: string): Promise<Perplexi
         model: 'pplx-7b-chat',
         messages: [{
           role: 'system',
-          content: 'You are an expert urban planner and environmental impact assessor.'
+          content: 'You are an expert urban planner and environmental impact assessor. Always respond in valid JSON format.'
         }, {
           role: 'user',
           content: prompt
@@ -64,8 +64,12 @@ export async function generateImpactScore(description: string): Promise<Perplexi
     console.log('Received response from Perplexity API:', data);
 
     try {
-      // Extract the JSON from the response text
-      const jsonMatch = data.choices[0].message.content.match(/\{[\s\S]*\}/);
+      // Extract the JSON from the response content
+      const content = data.choices[0].message.content;
+      console.log('Raw content:', content);
+      
+      // Find JSON content between curly braces
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }

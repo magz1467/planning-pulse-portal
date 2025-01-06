@@ -16,8 +16,12 @@ export interface ImpactScoreError {
 }
 
 export interface PerplexityResponse {
-  id: string;
-  model: string;
-  created: number;
-  response: string;
+  success: boolean;
+  data?: {
+    overall_score: number;
+    category_scores: Record<string, number>;
+    key_concerns: string[];
+    recommendations: string[];
+  };
+  error?: string;
 }
