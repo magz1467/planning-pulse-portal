@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { ApplicationMarker } from './ApplicationMarker';
 import { useApplicationsData } from '../hooks/useApplicationsData';
+import { Application } from '@/types/planning';
 
 interface MapContentProps {
   center: google.maps.LatLngLiteral;
@@ -14,7 +15,7 @@ export const MapContent = memo(({
   onMarkerClick 
 }: MapContentProps) => {
   const [renderedMarkersCount, setRenderedMarkersCount] = useState(0);
-  const { applications, isLoading } = useApplicationsData(center);
+  const { applications, isLoading } = useApplicationsData();
 
   useEffect(() => {
     console.log(`MapContent rendered with ${applications?.length || 0} applications, selectedId: ${selectedId}`);
@@ -34,9 +35,15 @@ export const MapContent = memo(({
     <>
       {applications?.map((application) => (
         <ApplicationMarker
-          key={application.application_id}
-          application={application}
-          isSelected={application.application_id === selectedId}
+          key={application.id}
+          application={{
+            application_id: application.id,
+            centroid: {
+              lat: application.coordinates[0],
+              lng: application.coordinates[1]
+            }
+          }}
+          isSelected={application.id === selectedId}
           onClick={handleMarkerClick}
         />
       ))}

@@ -9,11 +9,14 @@ interface CommentListProps {
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
   const { comments, isLoading, error } = useComments(applicationId);
-  const { subscribeToComments } = useRealtimeComments();
+  const { subscribeToComments } = useRealtimeComments(applicationId);
 
   useEffect(() => {
     // Subscribe to real-time updates for this application's comments
-    subscribeToComments(applicationId);
+    const unsubscribe = subscribeToComments();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [applicationId, subscribeToComments]);
 
   if (isLoading) {
@@ -31,7 +34,11 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
   return (
     <div className="space-y-4">
       {comments.map((comment) => (
-        <CommentItem key={comment.id} comment={comment} />
+        <CommentItem 
+          key={comment.id} 
+          comment={comment}
+          applicationId={applicationId}
+        />
       ))}
     </div>
   );

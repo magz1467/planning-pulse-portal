@@ -1,58 +1,40 @@
 import { memo, useCallback, useMemo } from 'react';
 import { Marker } from '@react-google-maps/api';
-import { useToast } from '@/hooks/use-toast';
+
+interface MarkerApplication {
+  application_id: number;
+  centroid: {
+    lat: number;
+    lng: number;
+  };
+}
 
 interface ApplicationMarkerProps {
-  application: {
-    application_id: number;
-    centroid: {
-      lat: number;
-      lng: number;
-    };
-  };
+  application: MarkerApplication;
   isSelected: boolean;
   onClick: (id: number) => void;
 }
 
-export const ApplicationMarker = memo(({ 
-  application, 
-  isSelected, 
-  onClick 
+export const ApplicationMarker = memo(({
+  application,
+  isSelected,
+  onClick
 }: ApplicationMarkerProps) => {
-  const { toast } = useToast();
-  
-  console.log(`Rendering marker for application ${application.application_id}, isSelected: ${isSelected}`);
-
-  const markerSize = useMemo(() => {
-    return isSelected ? 40 : 24;
-  }, [isSelected]);
+  const position = useMemo(() => ({
+    lat: application.centroid.lat,
+    lng: application.centroid.lng
+  }), [application.centroid]);
 
   const handleClick = useCallback(() => {
-    console.log(`Marker clicked: ${application.application_id}`);
-    if (onClick) {
-      onClick(application.application_id);
-    }
+    console.log('Marker clicked:', application.application_id);
+    onClick(application.application_id);
   }, [application.application_id, onClick]);
-
-  // Validate coordinates before rendering
-  if (!application.centroid?.lat || !application.centroid?.lng) {
-    console.warn(`Invalid coordinates for application ${application.application_id}`);
-    return null;
-  }
 
   return (
     <Marker
-      position={{
-        lat: application.centroid.lat,
-        lng: application.centroid.lng
-      }}
+      position={position}
       onClick={handleClick}
-      icon={{
-        url: isSelected ? '/marker-selected.svg' : '/marker.svg',
-        scaledSize: new google.maps.Size(markerSize, markerSize),
-        anchor: new google.maps.Point(markerSize/2, markerSize/2)
-      }}
-      zIndex={isSelected ? 1000 : 1}
+      zIndex={isSelected ? 2 : 1}
     />
   );
 });
