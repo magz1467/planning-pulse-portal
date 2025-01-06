@@ -31,7 +31,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
           parent_id,
           upvotes,
           downvotes,
-          profiles:user_id (
+          user:user_id (
             email
           )
         `)
@@ -48,18 +48,23 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         return;
       }
 
+      if (!data) {
+        setComments([]);
+        return;
+      }
+
       // Transform the data to match the Comment type
-      const transformedComments = data.map(comment => ({
+      const transformedComments: Comment[] = data.map(comment => ({
         id: comment.id,
         created_at: comment.created_at,
-        comment: comment.comment,
-        user_id: comment.user_id,
-        application_id: comment.application_id,
+        comment: comment.comment || '',
+        user_id: comment.user_id || '',
+        application_id: comment.application_id || 0,
         parent_id: comment.parent_id,
-        upvotes: comment.upvotes,
-        downvotes: comment.downvotes,
+        upvotes: comment.upvotes || 0,
+        downvotes: comment.downvotes || 0,
         user: {
-          email: comment.profiles?.email || 'Unknown User'
+          email: comment.user?.email || 'Unknown User'
         }
       }));
 
@@ -88,7 +93,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [applicationId]);
+  }, [applicationId, toast]);
 
   const handleDeleteComment = async (commentId: number) => {
     try {

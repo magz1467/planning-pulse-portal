@@ -42,7 +42,7 @@ export const useDashboardState = () => {
       filter: activeFilters.status,
       applicationId: selectedId
     });
-  }, [postcode, initialTab, activeFilters.status, selectedId]);
+  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams]);
 
   const logSearch = async (loadTime: number) => {
     try {
@@ -81,7 +81,7 @@ export const useDashboardState = () => {
       setSearchPoint(coordinates);
       fetchApplicationsInRadius(coordinates as [number, number], activeFilters);
     }
-  }, [coordinates, isInitialSearch, isNewSearch, activeFilters]);
+  }, [coordinates, isInitialSearch, isNewSearch, activeFilters, fetchApplicationsInRadius, setSearchPoint]);
 
   // Log search performance
   useEffect(() => {
@@ -90,7 +90,7 @@ export const useDashboardState = () => {
       logSearch(loadTime);
       setSearchStartTime(null);
     }
-  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
+  }, [isLoadingApps, isLoadingCoords, searchStartTime, logSearch]);
 
   const selectedApplication = applications?.find(app => app.id === selectedId);
   const isLoading = isLoadingCoords || isLoadingApps;
