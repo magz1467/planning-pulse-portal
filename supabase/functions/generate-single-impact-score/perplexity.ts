@@ -13,11 +13,37 @@ export async function calculateImpactScore(
   }
 
   try {
+    // Enhanced prompt to emphasize development scale and type
     const prompt = `
-      Analyze this planning application and provide impact scores for each category. 
+      Analyze this planning application with special consideration for development scale and type.
       Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
+      
+      Key factors to consider:
+      - New buildings or major developments should receive higher impact scores (4-5)
+      - Minor alterations or domestic changes should receive lower impact scores (1-2)
+      - Consider the scale of new resident influx for residential developments
+      - Evaluate infrastructure strain from new developments
+      
       Return a valid JSON object with no markdown formatting.
-      Format: {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}}
+      Format: {
+        "Environmental": {
+          "land_use": 1-5,
+          "biodiversity": 1-5,
+          "resource_consumption": 1-5,
+          "construction_impact": 1-5
+        },
+        "Social": {
+          "population_change": 1-5,
+          "community_services": 1-5,
+          "neighborhood_character": 1-5,
+          "housing_provision": 1-5
+        },
+        "Infrastructure": {
+          "transport_network": 1-5,
+          "utilities_demand": 1-5,
+          "public_services": 1-5
+        }
+      }
       
       Application details:
       Description: ${application.description || 'N/A'}
@@ -84,18 +110,18 @@ export async function calculateImpactScore(
       const scores = JSON.parse(cleanContent);
       console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
       
-      // Calculate weighted average for each category first
-      const categoryScores: Record<string, number> = {};
+      // Updated weights to emphasize development impact
       const weights = {
-        'Environmental': 0.4,  // 40% weight
-        'Social': 0.35,       // 35% weight
+        'Environmental': 0.35,  // 35% weight
+        'Social': 0.40,        // 40% weight - increased to emphasize population impact
         'Infrastructure': 0.25 // 25% weight
       };
       
+      // Calculate weighted average for each category
+      const categoryScores: Record<string, number> = {};
       let totalWeightedScore = 0;
       let totalWeightsApplied = 0;
 
-      // Calculate each category's score and overall weighted score
       for (const [category, subcategories] of Object.entries(scores)) {
         let categoryTotal = 0;
         let count = 0;
@@ -121,26 +147,26 @@ export async function calculateImpactScore(
         category_scores: {
           environmental: {
             score: categoryScores['Environmental'] || 0,
-            details: "Impact on local environment including air quality, noise, and natural resources"
+            details: "Impact on local environment including biodiversity and resources"
           },
           social: {
             score: categoryScores['Social'] || 0,
-            details: "Impact on local community, amenities, and social fabric"
+            details: "Impact on local community and population changes"
           },
           infrastructure: {
             score: categoryScores['Infrastructure'] || 0,
-            details: "Impact on local infrastructure, transport, and utilities"
+            details: "Impact on local infrastructure and services"
           }
         },
         key_concerns: [
-          "Environmental sustainability and resource management",
-          "Community integration and social cohesion",
-          "Infrastructure capacity and accessibility"
+          "Scale of development and population change",
+          "Environmental sustainability",
+          "Infrastructure capacity"
         ],
         recommendations: [
-          "Consider implementing additional environmental mitigation measures",
-          "Engage with local community for feedback and improvements",
-          "Assess and plan for infrastructure requirements"
+          "Consider development scale in relation to local area",
+          "Implement environmental mitigation measures",
+          "Assess infrastructure requirements"
         ]
       };
 
