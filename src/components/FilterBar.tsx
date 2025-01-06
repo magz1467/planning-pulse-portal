@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
+import { useCallback } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -38,11 +39,25 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
+  // Memoize the filter change handler
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
+    if (onFilterChange) {
+      onFilterChange(filterType, value);
+    }
+  }, [onFilterChange]);
+
+  // Memoize the sort change handler
+  const handleSortChange = useCallback((sortType: SortType) => {
+    if (onSortChange) {
+      onSortChange(sortType);
+    }
+  }, [onSortChange]);
+
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">
         <StatusFilter
-          onFilterChange={onFilterChange}
+          onFilterChange={handleFilterChange}
           activeFilters={activeFilters}
           isMobile={isMobile}
           applications={applications}
@@ -51,7 +66,7 @@ export const FilterBar = ({
 
         <SortDropdown
           activeSort={activeSort}
-          onSortChange={onSortChange}
+          onSortChange={handleSortChange}
         >
           <Button 
             variant="outline" 

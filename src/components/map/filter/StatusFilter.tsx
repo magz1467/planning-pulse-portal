@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { FilterDropdown } from "./FilterDropdown";
 import { Application } from "@/types/planning";
+import { memo } from "react";
 
 interface StatusFilterProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -19,7 +20,7 @@ interface StatusFilterProps {
   };
 }
 
-export const StatusFilter = ({
+export const StatusFilter = memo(({
   onFilterChange,
   activeFilters = {},
   isMobile,
@@ -51,4 +52,6 @@ export const StatusFilter = ({
       </Button>
     </FilterDropdown>
   );
-};
+});
+
+StatusFilter.displayName = 'StatusFilter';
