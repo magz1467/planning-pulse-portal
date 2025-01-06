@@ -26,25 +26,24 @@ export const ApplicationMarker = memo(({
   }), [application.centroid]);
 
   const handleClick = useCallback(() => {
-    console.log('Marker clicked:', application.application_id);
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
-  const options = useMemo(() => ({
-    optimized: true,
-    clickable: true
-  }), []);
+  const icon = useMemo(() => ({
+    url: isSelected ? '/marker-selected.svg' : '/marker.svg',
+    scaledSize: new google.maps.Size(isSelected ? 32 : 24, isSelected ? 32 : 24),
+    anchor: new google.maps.Point(isSelected ? 16 : 12, isSelected ? 32 : 24)
+  }), [isSelected]);
 
   return (
     <Marker
       position={position}
       onClick={handleClick}
+      icon={icon}
       zIndex={isSelected ? 2 : 1}
-      options={options}
     />
   );
 }, (prevProps, nextProps) => {
-  // Only re-render if these props change
   return prevProps.isSelected === nextProps.isSelected &&
          prevProps.application.application_id === nextProps.application.application_id &&
          prevProps.application.centroid.lat === nextProps.application.centroid.lat &&

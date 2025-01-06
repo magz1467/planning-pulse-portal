@@ -17,7 +17,6 @@ export const MapContent = memo(({
   const { applications, isLoading } = useApplicationsData();
 
   const handleMarkerClick = useCallback((id: number) => {
-    console.log(`Marker clicked in MapContent: ${id}`);
     onMarkerClick(id);
   }, [onMarkerClick]);
 
@@ -44,7 +43,6 @@ export const MapContent = memo(({
     </>
   );
 }, (prevProps, nextProps) => {
-  // Only re-render if these specific props change
   return prevProps.selectedId === nextProps.selectedId &&
          prevProps.center.lat === nextProps.center.lat &&
          prevProps.center.lng === nextProps.center.lng;
