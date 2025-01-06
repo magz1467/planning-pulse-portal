@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Button, Textarea } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Comment } from '@/types/planning';
@@ -21,26 +22,36 @@ export const CommentForm = ({
 
     if (!content) return;
 
-    const { data, error } = await supabase
-      .from('Comments')
-      .insert([{ application_id: applicationId, comment: content }]);
+    try {
+      const { data, error } = await supabase
+        .from('Comments')
+        .insert([{ application_id: applicationId, comment: content }])
+        .select();
 
-    if (error) {
-      console.error('Error submitting comment:', error);
+      if (error) {
+        console.error('Error submitting comment:', error);
+        toast({
+          title: "Error",
+          description: "Failed to submit comment",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setComments(prev => [...prev, ...(data || [])]);
+      setContent('');
+      toast({
+        title: "Comment submitted",
+        description: "Your comment has been added",
+      });
+    } catch (err) {
+      console.error('Error in handleSubmit:', err);
       toast({
         title: "Error",
         description: "Failed to submit comment",
         variant: "destructive",
       });
-      return;
     }
-
-    setComments(prev => [...prev, ...data]);
-    setContent('');
-    toast({
-      title: "Comment submitted",
-      description: "Your comment has been added",
-    });
   };
 
   return (

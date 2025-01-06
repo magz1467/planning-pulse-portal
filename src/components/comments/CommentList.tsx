@@ -10,11 +10,11 @@ interface CommentListProps {
 }
 
 export const CommentList = ({ applicationId }: CommentListProps) => {
-  const { comments, isLoading, currentUserId, setComments } = useComments(applicationId);
+  const { comments = [], isLoading, currentUserId, setComments } = useComments(applicationId);
 
   useEffect(() => {
     console.log('CommentList rendered with:', {
-      commentsCount: comments?.length,
+      commentsCount: comments?.length || 0,
       applicationId,
       isLoading
     });

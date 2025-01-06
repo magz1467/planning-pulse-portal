@@ -5,12 +5,14 @@ import { useToast } from '@/hooks/use-toast';
 
 export const useComments = (applicationId: number) => {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string>();
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        setIsLoading(true);
         const { data: session } = await supabase.auth.getSession();
         if (session?.session?.user) {
           setCurrentUserId(session.session.user.id);
@@ -40,11 +42,13 @@ export const useComments = (applicationId: number) => {
           description: "Failed to load comments",
           variant: "destructive"
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchComments();
   }, [applicationId, toast]);
 
-  return { comments, currentUserId, setComments };
+  return { comments, isLoading, currentUserId, setComments };
 };
