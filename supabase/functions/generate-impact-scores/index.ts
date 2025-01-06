@@ -15,34 +15,27 @@ interface ImpactCriteria {
   weight: number;
 }
 
-async function calculateImpactScore(application: ApplicationData): Promise<{ score: number; details: any }> {
-  console.log(`[Impact Score ${application.application_id}] Starting calculation`);
+async function calculateImpactScore(application: ApplicationData, retryCount = 0): Promise<{ score: number; details: any }> {
+  console.log(`[Impact Score ${application.application_id}] Starting calculation (attempt ${retryCount + 1})`);
   
   const apiKey = Deno.env.get('PERPLEXITY_API_KEY');
   if (!apiKey) {
     throw new Error('Missing Perplexity API key');
   }
 
-  // Log application details for debugging
-  console.log(`[Impact Score ${application.application_id}] Application details:`, {
-    description: application.description,
-    type: application.development_type || application.application_type,
-    details: application.application_details
-  });
-
-  const prompt = `
-    Analyze this planning application and provide impact scores for each category. 
-    Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
-    Return a valid JSON object with no markdown formatting.
-    Format: {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}}
-    
-    Application details:
-    Description: ${application.description || 'N/A'}
-    Type: ${application.development_type || application.application_type || 'N/A'}
-    Additional details: ${JSON.stringify(application.application_details || {})}
-  `;
-
   try {
+    const prompt = `
+      Analyze this planning application and provide impact scores for each category. 
+      Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
+      Return a valid JSON object with no markdown formatting.
+      Format: {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}}
+      
+      Application details:
+      Description: ${application.description || 'N/A'}
+      Type: ${application.development_type || application.application_type || 'N/A'}
+      Additional details: ${JSON.stringify(application.application_details || {})}
+    `;
+
     console.log(`[Impact Score ${application.application_id}] Sending request to Perplexity API`);
     
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -68,8 +61,6 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       }),
     });
 
-    console.log(`[Impact Score ${application.application_id}] API Response status:`, response.status);
-    
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`[Impact Score ${application.application_id}] API Error:`, {
@@ -77,6 +68,15 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
         statusText: response.statusText,
         error: errorText
       });
+
+      // Retry on API errors with exponential backoff
+      if (retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.log(`[Impact Score ${application.application_id}] Retrying after ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return calculateImpactScore(application, retryCount + 1);
+      }
+
       throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
@@ -87,13 +87,11 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       throw new Error('Invalid API response format');
     }
 
-    // Clean the response content by removing any markdown formatting
+    // Clean the response content
     const cleanContent = data.choices[0].message.content
-      .replace(/```json\s*/g, '')  // Remove ```json and any whitespace
-      .replace(/```\s*/g, '')      // Remove closing ``` and any whitespace
-      .trim();                     // Remove any extra whitespace
-
-    console.log(`[Impact Score ${application.application_id}] Cleaned content:`, cleanContent);
+      .replace(/```json\s*/g, '')
+      .replace(/```\s*/g, '')
+      .trim();
 
     try {
       const scores = JSON.parse(cleanContent);
@@ -104,19 +102,16 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
       let totalWeights = 0;
       const details: Record<string, any> = {};
 
-      // Iterate through all categories and subcategories
       for (const [category, subcategories] of Object.entries(scores)) {
         details[category] = subcategories;
         for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
-          // Default weight of 1 if no specific weight is found
           const weight = 1;
           totalScore += (score as number) * weight;
           totalWeights += weight;
         }
       }
 
-      // Normalize score to 0-100 range
-      const normalizedScore = Math.round((totalScore / totalWeights) * 20); // Convert 1-5 scale to 0-100
+      const normalizedScore = Math.round((totalScore / totalWeights) * 20);
 
       return {
         score: normalizedScore,
@@ -127,12 +122,22 @@ async function calculateImpactScore(application: ApplicationData): Promise<{ sco
         content: cleanContent,
         error: parseError.message
       });
-      throw new Error(`Failed to parse API response as JSON: ${parseError.message}`);
+
+      // Retry on parse errors
+      if (retryCount < 2) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.log(`[Impact Score ${application.application_id}] Retrying after parse error in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return calculateImpactScore(application, retryCount + 1);
+      }
+
+      throw parseError;
     }
   } catch (error) {
     console.error(`[Impact Score ${application.application_id}] Error:`, {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      attempt: retryCount + 1
     });
     throw error;
   }
@@ -148,7 +153,6 @@ Deno.serve(async (req) => {
     const { limit = 50 } = await req.json();
     console.log('[Impact Score] Batch size:', limit);
     
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -165,8 +169,6 @@ Deno.serve(async (req) => {
       throw batchError;
     }
 
-    console.log('[Impact Score] Created batch status record:', batchStatus);
-
     // Get applications without impact scores
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
@@ -180,7 +182,6 @@ Deno.serve(async (req) => {
     }
 
     if (!applications?.length) {
-      console.log('[Impact Score] No applications found needing impact scores');
       return new Response(
         JSON.stringify({ 
           success: true, 
@@ -195,11 +196,10 @@ Deno.serve(async (req) => {
     console.log(`[Impact Score] Processing ${applications.length} applications`);
     let processed = 0;
     let errors = 0;
+    let errorDetails: Array<{id: number, error: string}> = [];
 
     for (const application of applications) {
       try {
-        console.log(`[Impact Score] Processing application ${application.application_id} (${processed + 1}/${applications.length})`);
-        
         const { score, details } = await calculateImpactScore(application);
         
         const { error: updateError } = await supabase
@@ -211,17 +211,18 @@ Deno.serve(async (req) => {
           .eq('application_id', application.application_id);
 
         if (updateError) {
-          console.error(`[Impact Score] Error updating application ${application.application_id}:`, updateError);
           throw updateError;
         }
         
         processed++;
         
-        // Update batch status
-        await supabase
-          .from('impact_score_batch_status')
-          .update({ completed_count: processed })
-          .eq('id', batchStatus.id);
+        // Update batch status periodically
+        if (processed % 5 === 0) {
+          await supabase
+            .from('impact_score_batch_status')
+            .update({ completed_count: processed })
+            .eq('id', batchStatus.id);
+        }
 
       } catch (error) {
         console.error(`[Impact Score] Error processing application ${application.application_id}:`, {
@@ -229,6 +230,10 @@ Deno.serve(async (req) => {
           stack: error.stack
         });
         errors++;
+        errorDetails.push({
+          id: application.application_id,
+          error: error.message
+        });
       }
     }
 
@@ -238,14 +243,15 @@ Deno.serve(async (req) => {
       .update({ 
         status: 'completed',
         completed_count: processed,
-        error_message: errors > 0 ? `Failed to process ${errors} applications` : null
+        error_message: errors > 0 ? JSON.stringify(errorDetails) : null
       })
       .eq('id', batchStatus.id);
 
     console.log('[Impact Score] Batch processing completed:', {
       processed,
       errors,
-      batchId: batchStatus.id
+      batchId: batchStatus.id,
+      errorDetails
     });
 
     return new Response(
@@ -253,6 +259,7 @@ Deno.serve(async (req) => {
         success: true, 
         processed,
         errors,
+        errorDetails,
         message: `Successfully processed ${processed} applications${errors > 0 ? ` (${errors} failed)` : ''}`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -261,7 +268,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('[Impact Score] Fatal error:', error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        stack: error.stack 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
