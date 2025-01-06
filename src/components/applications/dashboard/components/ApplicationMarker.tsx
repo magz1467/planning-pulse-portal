@@ -20,6 +20,7 @@ export const ApplicationMarker = memo(({
   onClick 
 }: ApplicationMarkerProps) => {
   const handleClick = useCallback(() => {
+    console.log('Marker clicked:', application.application_id);
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
@@ -48,10 +49,13 @@ export const ApplicationMarker = memo(({
     />
   );
 }, (prevProps, nextProps) => {
-  return prevProps.isSelected === nextProps.isSelected &&
-         prevProps.application.application_id === nextProps.application.application_id &&
-         prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
-         prevProps.application.centroid.lng === nextProps.application.centroid.lng;
+  // Only re-render if these specific props change
+  return (
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.application.application_id === nextProps.application.application_id &&
+    prevProps.application.centroid.lat === nextProps.application.centroid.lat &&
+    prevProps.application.centroid.lng === nextProps.application.centroid.lng
+  );
 });
 
 ApplicationMarker.displayName = 'ApplicationMarker';

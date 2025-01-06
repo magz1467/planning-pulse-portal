@@ -19,6 +19,8 @@ export const MapContent = memo(({
     onMarkerClick(id);
   }, [onMarkerClick]);
 
+  console.log('MapContent rendering with', applications.length, 'applications');
+
   return (
     <>
       {applications?.map((application) => (
@@ -39,16 +41,12 @@ export const MapContent = memo(({
   );
 }, (prevProps, nextProps) => {
   // Only re-render if these specific props change
-  const centerChanged = 
-    prevProps.center.lat !== nextProps.center.lat || 
-    prevProps.center.lng !== nextProps.center.lng;
-  
-  const selectedIdChanged = prevProps.selectedId !== nextProps.selectedId;
-  
-  const applicationsChanged = 
-    prevProps.applications !== nextProps.applications;
-  
-  return !(centerChanged || selectedIdChanged || applicationsChanged);
+  return (
+    prevProps.selectedId === nextProps.selectedId &&
+    prevProps.applications === nextProps.applications &&
+    prevProps.center.lat === nextProps.center.lat &&
+    prevProps.center.lng === nextProps.center.lng
+  );
 });
 
 MapContent.displayName = 'MapContent';
