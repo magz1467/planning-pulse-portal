@@ -30,17 +30,19 @@ export const ApplicationMarker = memo(({
     onClick(application.application_id);
   }, [application.application_id, onClick]);
 
+  const markerOptions = useMemo(() => ({
+    clickable: true,
+    cursor: 'pointer',
+    optimized: false,
+    zIndex: isSelected ? 1000 : 1,
+    animation: isSelected ? google.maps.Animation.BOUNCE : undefined
+  }), [isSelected]);
+
   return (
     <Marker
       position={position}
       onClick={handleClick}
-      zIndex={isSelected ? 1000 : 1}
-      options={{
-        clickable: true,
-        cursor: 'pointer',
-        optimized: false, // Helps with z-index issues
-        animation: isSelected ? google.maps.Animation.BOUNCE : undefined
-      }}
+      options={markerOptions}
     />
   );
 });
