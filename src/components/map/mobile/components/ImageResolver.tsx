@@ -1,22 +1,21 @@
-import React, { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { useState } from 'react';
+import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 
-export interface ImageResolverProps {
-  imageUrl?: string;
-  image?: string;
+interface ImageResolverProps {
+  imageUrl?: string | null;
+  image?: string | null;
   title: string;
   applicationId: number;
-  coordinates?: [number, number];
-  className?: string;
+  coordinates?: [number, number] | null;
 }
 
-export const ImageResolver: React.FC<ImageResolverProps> = ({
+export const ImageResolver = ({
   imageUrl,
   image,
-  coordinates,
-  className = ''
-}) => {
-  const [imageError, setImageError] = useState(false);
+  title,
+  applicationId,
+}: ImageResolverProps) => {
+  const [currentImageSource, setCurrentImageSource] = useState<string | null>(null);
 
   const resolvedImageUrl = (() => {
     if (imageUrl) return imageUrl;
@@ -24,20 +23,18 @@ export const ImageResolver: React.FC<ImageResolverProps> = ({
     return null;
   })();
 
-  if (!resolvedImageUrl || imageError) {
-    return (
-      <div className={`flex items-center justify-center bg-gray-100 ${className}`}>
-        <MapPin className="w-8 h-8 text-gray-400" />
-      </div>
-    );
-  }
+  const handleImageError = () => {
+    if (currentImageSource !== '/placeholder.svg') {
+      setCurrentImageSource('/placeholder.svg');
+    }
+  };
 
   return (
-    <img
-      src={resolvedImageUrl}
-      alt="Location"
-      className={className}
-      onError={() => setImageError(true)}
+    <ImageWithFallback
+      src={resolvedImageUrl || '/placeholder.svg'}
+      alt={title}
+      className="w-full h-full object-cover"
+      onError={handleImageError}
     />
   );
 };
