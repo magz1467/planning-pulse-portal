@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { RedoSearchButton } from "@/components/map/RedoSearchButton";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -40,6 +41,15 @@ export const MapSection = ({
           onMarkerClick={onMarkerClick}
           onCenterChange={onCenterChange}
         />
+        {onCenterChange && (
+          <RedoSearchButton onClick={() => {
+            const map = document.querySelector('.leaflet-container')?._leaflet_map;
+            if (map) {
+              const center = map.getCenter();
+              onCenterChange([center.lat, center.lng]);
+            }
+          }} />
+        )}
         {isMobile && selectedId && (
           <MobileApplicationCards
             applications={applications}
