@@ -9,7 +9,6 @@ interface MapSectionProps {
   applications: Application[];
   selectedId: number | null;
   onMarkerClick: (id: number | null) => void;
-  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapSection = ({
@@ -19,7 +18,6 @@ export const MapSection = ({
   applications,
   selectedId,
   onMarkerClick,
-  onCenterChange,
 }: MapSectionProps) => {
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -38,7 +36,6 @@ export const MapSection = ({
           selectedId={selectedId}
           coordinates={coordinates}
           onMarkerClick={onMarkerClick}
-          onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards

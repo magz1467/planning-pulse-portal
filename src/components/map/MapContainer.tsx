@@ -4,42 +4,13 @@ import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
-import debounce from 'lodash/debounce';
 import "leaflet/dist/leaflet.css";
-
-// Separate component to handle map events
-const MapEvents = ({ onCenterChange }: { onCenterChange?: (center: [number, number]) => void }) => {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (!onCenterChange) return;
-
-    const debouncedCenterChange = debounce((center: [number, number]) => {
-      onCenterChange(center);
-    }, 1000);
-
-    const handleMoveEnd = () => {
-      const center = map.getCenter();
-      debouncedCenterChange([center.lat, center.lng]);
-    };
-
-    map.on('moveend', handleMoveEnd);
-
-    return () => {
-      map.off('moveend', handleMoveEnd);
-      debouncedCenterChange.cancel();
-    };
-  }, [map, onCenterChange]);
-
-  return null;
-};
 
 export interface MapContainerProps {
   applications: Application[];
   coordinates: [number, number];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
-  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapContainerComponent = memo(({
@@ -47,7 +18,6 @@ export const MapContainerComponent = memo(({
   applications,
   selectedId,
   onMarkerClick,
-  onCenterChange,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
@@ -81,7 +51,6 @@ export const MapContainerComponent = memo(({
           onMarkerClick={onMarkerClick}
           selectedId={selectedId}
         />
-        <MapEvents onCenterChange={onCenterChange} />
       </LeafletMapContainer>
     </div>
   );

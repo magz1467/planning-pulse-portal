@@ -30,7 +30,6 @@ interface DashboardLayoutProps {
   handleFilterChange: (filterType: string, value: string) => void;
   handlePostcodeSelect: (postcode: string) => void;
   handleSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
-  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
@@ -49,7 +48,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   handleFilterChange,
   handlePostcodeSelect,
   handleSortChange,
-  onCenterChange,
 }) => {
   const isMobile = useIsMobile();
 
@@ -104,7 +102,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               isMobile={isMobile}
               isMapView={isMapView}
               onMarkerClick={handleMarkerClick}
-              onCenterChange={onCenterChange}
             />
           )}
         </div>
