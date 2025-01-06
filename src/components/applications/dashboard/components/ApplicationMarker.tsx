@@ -20,8 +20,10 @@ const getStatusColor = (status: string): string => {
 };
 
 const createIcon = (color: string, isSelected: boolean) => {
-  console.log('Creating icon with selected state:', isSelected); // Debug log
+  console.log('Creating icon - Selected:', isSelected, 'Color:', color);
   const size = isSelected ? 32 : 24;
+  console.log('Icon size will be:', size);
+  
   const icon = L.divIcon({
     className: 'bg-transparent',
     html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -30,29 +32,38 @@ const createIcon = (color: string, isSelected: boolean) => {
     iconSize: [size, size],
     iconAnchor: [size/2, size],
   });
-  console.log('Icon created with size:', size); // Debug icon size
+  
+  console.log('Icon created successfully:', {
+    size: icon.options.iconSize,
+    anchor: icon.options.iconAnchor
+  });
+  
   return icon;
-}
+};
 
 export const ApplicationMarker = ({ application, isSelected, onClick }: ApplicationMarkerProps) => {
-  console.log('ApplicationMarker render - Application:', application.id, 'Selected:', isSelected); // Debug log
-  console.log('Application coordinates:', application.coordinates); // Debug coordinates
+  console.log(`Rendering ApplicationMarker - ID: ${application.id}, Selected: ${isSelected}`);
+  console.log('Application coordinates:', application.coordinates);
   
+  if (!application.coordinates || !Array.isArray(application.coordinates)) {
+    console.error('Invalid coordinates for application:', application.id);
+    return null;
+  }
+
   const color = getStatusColor(application.status);
-  console.log('Status color:', color); // Debug color
-  
   const icon = createIcon(color, isSelected);
-  console.log('Icon object:', icon); // Debug icon object
+
+  const handleClick = () => {
+    console.log(`Marker clicked - Application: ${application.id}, Was Selected: ${isSelected}`);
+    onClick();
+  };
 
   return (
     <Marker
       position={application.coordinates}
       icon={icon}
       eventHandlers={{
-        click: () => {
-          console.log('Marker clicked - Application:', application.id); // Debug click
-          onClick();
-        },
+        click: handleClick,
       }}
     />
   );
