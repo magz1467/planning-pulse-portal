@@ -55,7 +55,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
 
     fetchComments();
 
-    // Subscribe to real-time changes
     const channel = supabase
       .channel('comments-channel')
       .on(
@@ -101,8 +100,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         .eq('id', commentId);
 
       if (error) throw error;
-
-      setComments(comments.filter(c => c.id !== commentId));
       
       toast({
         title: "Comment deleted",
