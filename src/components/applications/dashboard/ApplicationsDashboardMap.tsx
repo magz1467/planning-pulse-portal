@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
-import { useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
+import { useEffect } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -23,7 +23,7 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Select first application by default when applications are loaded, but only on mobile and in map view
+  // Always declare the effect, but conditionally execute the logic inside
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
       handleMarkerClick(filteredApplications[0].id);
