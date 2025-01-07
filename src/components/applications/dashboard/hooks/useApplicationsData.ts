@@ -36,27 +36,27 @@ export const useApplicationsData = () => {
 
     try {
       // First get the total count
-      const { data: countData, error: countError } = await supabase
+      const countResponse = await supabase
         .rpc('get_applications_count_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
         });
 
-      if (countError) {
-        console.error('Error fetching count:', countError);
+      if (countResponse.error) {
+        console.error('Error fetching count:', countResponse.error);
         toast({
           title: "Error fetching count",
-          description: countError.message,
+          description: countResponse.error.message,
           variant: "destructive",
         });
         setTotalCount(0);
       } else {
-        setTotalCount(countData || 0);
+        setTotalCount(countResponse.data || 0);
       }
 
       // Then get the applications
-      const { data: apps, error } = await supabase
+      const appsResponse = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
@@ -65,11 +65,11 @@ export const useApplicationsData = () => {
           page_number: page
         });
 
-      if (error) {
-        console.error('Error fetching applications:', error);
+      if (appsResponse.error) {
+        console.error('Error fetching applications:', appsResponse.error);
         toast({
           title: "Error fetching applications",
-          description: error.message,
+          description: appsResponse.error.message,
           variant: "destructive",
         });
         setApplications([]);
@@ -77,6 +77,8 @@ export const useApplicationsData = () => {
         return;
       }
 
+      const apps = appsResponse.data;
+      
       if (!apps || !Array.isArray(apps)) {
         console.log('No applications found');
         setApplications([]);
