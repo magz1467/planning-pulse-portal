@@ -126,12 +126,18 @@ export const PlanningApplicationDetails = ({
         <Separator className="my-4" />
         <CollapsibleApplicationDetails application={application} />
       </Card>
-      <ExpectedImpactAreas application={application} />
+      
       <EnvironmentalImpactDial 
         score={application.impact_score} 
         details={application.impact_score_details}
         applicationId={application.id}
       />
+
+      <ExpectedImpactAreas 
+        application={application} 
+        impactedServices={application.impacted_services}
+      />
+
       <ApplicationDescription application={application} />
       
       <ApplicationFeedback 

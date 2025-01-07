@@ -25,6 +25,12 @@ export interface Application {
   };
   impact_score?: number | null;
   impact_score_details?: Record<string, any>;
+  impacted_services?: {
+    [key: string]: {
+      impact: 'positive' | 'negative' | 'neutral';
+      details: string;
+    };
+  };
 }
 
 export interface Comment {

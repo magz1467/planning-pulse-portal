@@ -8,33 +8,28 @@ import {
 } from "@/components/ui/collapsible";
 import { useState } from "react";
 
-interface ImpactArea {
-  name: string;
-  impact: 'positive' | 'negative' | 'neutral';
-}
-
 interface ExpectedImpactAreasProps {
   application?: Application;
+  impactedServices?: Application['impacted_services'];
 }
 
-export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) => {
+export const ExpectedImpactAreas = ({ application, impactedServices }: ExpectedImpactAreasProps) => {
   const [isOpen, setIsOpen] = useState(false);
   
   if (!application) return null;
 
-  // Updated impact areas to match the requested distribution
-  const impactAreas: ImpactArea[] = [
-    { name: "Schools", impact: "negative" },
-    { name: "Health", impact: "negative" },
-    { name: "Roads", impact: "neutral" },
-    { name: "Public Transport", impact: "neutral" },
-    { name: "Utilities", impact: "neutral" },
-    { name: "Community Services", impact: "positive" },
-  ];
+  const services = impactedServices || {
+    "Schools": { impact: "negative" as const, details: "May increase pressure on local schools" },
+    "Health": { impact: "negative" as const, details: "May increase pressure on health services" },
+    "Roads": { impact: "neutral" as const, details: "No significant impact expected" },
+    "Public Transport": { impact: "neutral" as const, details: "No significant impact expected" },
+    "Utilities": { impact: "neutral" as const, details: "No significant impact expected" },
+    "Community Services": { impact: "positive" as const, details: "May support these services" }
+  };
 
   // Count impacts by type
-  const impactCounts = impactAreas.reduce((acc, area) => {
-    acc[area.impact] = (acc[area.impact] || 0) + 1;
+  const impactCounts = Object.values(services).reduce((acc, { impact }) => {
+    acc[impact] = (acc[impact] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -46,17 +41,6 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
         return <AlertCircle className="w-4 h-4 text-[#ea384c]" />;
       default:
         return <MinusCircle className="w-4 h-4 text-gray-400" />;
-    }
-  };
-
-  const getImpactLabel = (impact: string) => {
-    switch (impact) {
-      case 'positive':
-        return 'May support these services';
-      case 'negative':
-        return 'May increase pressure on services';
-      default:
-        return 'No significant impact expected';
     }
   };
 
@@ -88,17 +72,17 @@ export const ExpectedImpactAreas = ({ application }: ExpectedImpactAreasProps) =
 
         <CollapsibleContent className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
-            {impactAreas.map((area) => (
+            {Object.entries(services).map(([name, { impact, details }]) => (
               <div 
-                key={area.name} 
-                className={`flex items-start gap-2 group transition-all ${getImpactClass(area.impact)}`}
-                title={getImpactLabel(area.impact)}
+                key={name} 
+                className={`flex items-start gap-2 group transition-all ${getImpactClass(impact)}`}
+                title={details}
               >
-                {getImpactIcon(area.impact)}
+                {getImpactIcon(impact)}
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">{area.name}</span>
+                  <span className="text-sm font-medium">{name}</span>
                   <span className="text-xs text-gray-500 mt-0.5">
-                    {getImpactLabel(area.impact)}
+                    {details}
                   </span>
                 </div>
               </div>

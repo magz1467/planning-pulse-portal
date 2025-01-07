@@ -57,7 +57,7 @@ serve(async (req) => {
       throw new Error('Failed to calculate impact score');
     }
 
-    const { score, details } = result;
+    const { score, details, impacted_services } = result;
 
     console.log(`[Impact Score] Updating application ${applicationId} with score:`, score);
     
@@ -65,7 +65,8 @@ serve(async (req) => {
       .from('applications')
       .update({
         impact_score: score,
-        impact_score_details: details
+        impact_score_details: details,
+        impacted_services: impacted_services
       })
       .eq('application_id', applicationId);
 
@@ -77,7 +78,8 @@ serve(async (req) => {
     const response: ImpactScoreResponse = {
       success: true,
       score,
-      details
+      details,
+      impacted_services
     };
 
     return new Response(

@@ -4,7 +4,7 @@ import { ApplicationData } from './types.ts';
 export async function calculateImpactScore(
   application: ApplicationData, 
   retryCount = 0
-): Promise<{ score: number; details: any }> {
+): Promise<{ score: number; details: any; impacted_services: any }> {
   console.log(`[Impact Score ${application.application_id}] Starting calculation (attempt ${retryCount + 1})`);
   
   const apiKey = Deno.env.get('PERPLEXITY_API_KEY');
@@ -13,51 +13,25 @@ export async function calculateImpactScore(
   }
 
   try {
-    // Enhanced prompt to generate more specific analysis
     const prompt = `
-      Analyze this specific planning application and provide a detailed impact assessment.
-      Consider the exact details, scale, and context of this development.
+      Analyze this planning application and provide:
+      1. Impact scores for each category (rate 1-5, 1=minimal impact, 5=severe impact)
+      2. Assessment of impact on local services (positive/negative/neutral)
       
-      Application details to analyze:
+      Return a valid JSON object with no markdown formatting.
+      Format: {
+        "impact_scores": {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}},
+        "impacted_services": {
+          "Schools": {"impact": "negative", "details": "May increase pressure on local schools"},
+          "Health": {"impact": "neutral", "details": "No significant impact expected"},
+          "Transport": {"impact": "positive", "details": "New bus route proposed"}
+        }
+      }
+      
+      Application details:
       Description: ${application.description || 'N/A'}
       Type: ${application.development_type || application.application_type || 'N/A'}
-      Status: ${application.status || 'N/A'}
-      Location: ${application.site_name || ''} ${application.street_name || ''} ${application.locality || ''} ${application.postcode || ''}
       Additional details: ${JSON.stringify(application.application_details || {})}
-      
-      Provide a detailed analysis in JSON format with:
-      1. Specific impact scores (1-5) for each category based on this exact development
-      2. Detailed explanations referencing specific aspects of this development
-      3. Key concerns unique to this application
-      4. Tailored recommendations addressing the specific challenges
-      
-      Return a valid JSON object with no markdown formatting:
-      {
-        "category_scores": {
-          "environmental": {
-            "score": number,
-            "details": "Specific analysis referencing the development details"
-          },
-          "social": {
-            "score": number,
-            "details": "Specific analysis referencing the development details"
-          },
-          "infrastructure": {
-            "score": number,
-            "details": "Specific analysis referencing the development details"
-          }
-        },
-        "key_concerns": [
-          "Specific concern 1 referencing development details",
-          "Specific concern 2 referencing development details",
-          "Specific concern 3 referencing development details"
-        ],
-        "recommendations": [
-          "Specific recommendation 1 addressing development details",
-          "Specific recommendation 2 addressing development details",
-          "Specific recommendation 3 addressing development details"
-        ]
-      }
     `;
 
     console.log(`[Impact Score ${application.application_id}] Sending request to Perplexity API`);
@@ -73,7 +47,7 @@ export async function calculateImpactScore(
         messages: [
           {
             role: 'system',
-            content: 'You are an expert urban planner and environmental impact assessor. Provide detailed, specific analysis referencing the exact details of each planning application. Avoid generic responses.'
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores and impact assessments, no explanations or markdown.'
           },
           {
             role: 'user',
@@ -116,32 +90,28 @@ export async function calculateImpactScore(
       .trim();
 
     try {
-      const scores = JSON.parse(cleanContent);
-      console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
-      
-      // Calculate weighted average for final score
-      const weights = {
-        'environmental': 0.35,
-        'social': 0.40,
-        'infrastructure': 0.25
-      };
+      const result = JSON.parse(cleanContent);
+      console.log(`[Impact Score ${application.application_id}] Parsed result:`, result);
       
       let totalScore = 0;
       let totalWeights = 0;
+      
+      // Calculate impact score from impact_scores
+      for (const [category, subcategories] of Object.entries(result.impact_scores)) {
+        for (const [subcategory, score] of Object.entries(subcategories as Record<string, number>)) {
+          const weight = 1;
+          totalScore += (score as number) * weight;
+          totalWeights += weight;
+        }
+      }
 
-      Object.entries(scores.category_scores).forEach(([category, data]: [string, any]) => {
-        const weight = weights[category as keyof typeof weights] || 0.33;
-        totalScore += data.score * weight * 20; // Convert 1-5 scale to 0-100
-        totalWeights += weight;
-      });
-
-      const normalizedScore = Math.round(totalScore / totalWeights);
+      const normalizedScore = Math.round((totalScore / totalWeights) * 20);
 
       return {
         score: normalizedScore,
-        details: scores
+        details: result.impact_scores,
+        impacted_services: result.impacted_services
       };
-
     } catch (parseError) {
       console.error(`[Impact Score ${application.application_id}] JSON Parse Error:`, {
         content: cleanContent,
