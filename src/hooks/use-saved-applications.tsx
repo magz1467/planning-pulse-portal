@@ -24,7 +24,7 @@ export const useSavedApplications = () => {
         throw error;
       }
 
-      setSavedApplications(data.map(item => Number(item.application_id)));
+      setSavedApplications(data.map(item => item.application_id));
     } catch (error: any) {
       console.error('Error fetching saved applications:', error);
       toast({
@@ -51,7 +51,7 @@ export const useSavedApplications = () => {
           .from('saved_applications')
           .delete()
           .eq('user_id', session.session.user.id)
-          .eq('application_id', applicationId);
+          .eq('application_id', applicationId.toString());
 
         if (error) throw error;
 
@@ -61,7 +61,7 @@ export const useSavedApplications = () => {
         const { data: applicationExists, error: checkError } = await supabase
           .from('applications')
           .select('application_id')
-          .eq('application_id', applicationId)
+          .eq('application_id', applicationId.toString())
           .single();
 
         if (checkError || !applicationExists) {

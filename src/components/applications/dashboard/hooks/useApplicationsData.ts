@@ -35,28 +35,8 @@ export const useApplicationsData = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      // First get the total count
-      const countResponse = await supabase
-        .rpc('get_applications_count_within_radius', {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: radius
-        });
-
-      if (countResponse.error) {
-        console.error('Error fetching count:', countResponse.error);
-        toast({
-          title: "Error fetching count",
-          description: countResponse.error.message,
-          variant: "destructive",
-        });
-        setTotalCount(0);
-      } else {
-        setTotalCount(countResponse.data || 0);
-      }
-
-      // Then get the applications
-      const appsResponse = await supabase
+      // Get applications within radius
+      const { data: apps, error } = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
@@ -65,20 +45,18 @@ export const useApplicationsData = () => {
           page_number: page
         });
 
-      if (appsResponse.error) {
-        console.error('Error fetching applications:', appsResponse.error);
+      if (error) {
+        console.error('Error fetching applications:', error);
         toast({
-          title: "Error fetching applications",
-          description: appsResponse.error.message,
-          variant: "destructive",
+          title: 'Error fetching applications',
+          description: 'Please try again later',
+          variant: 'destructive',
         });
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      const apps = appsResponse.data;
-      
       if (!apps || !Array.isArray(apps)) {
         console.log('No applications found');
         setApplications([]);
@@ -88,12 +66,14 @@ export const useApplicationsData = () => {
 
       console.log(`📦 Received ${apps.length} applications from database`);
 
+      // Transform applications
       const transformedApplications = apps
         .map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
       console.log('✨ Transformed applications:', transformedApplications.length);
 
+      // Calculate status counts from applications
       const counts: StatusCounts = {
         'Under Review': 0,
         'Approved': 0,
@@ -101,18 +81,35 @@ export const useApplicationsData = () => {
         'Other': 0
       };
 
-      transformedApplications.forEach(app => {
-        const status = app.status.toLowerCase();
-        if (status.includes('under consideration')) {
-          counts['Under Review']++;
-        } else if (status.includes('approved')) {
-          counts['Approved']++;
-        } else if (status.includes('declined')) {
-          counts['Declined']++;
-        } else {
-          counts['Other']++;
-        }
-      });
+      if (transformedApplications && transformedApplications.length > 0) {
+        transformedApplications.forEach(app => {
+          const status = app.status.toLowerCase();
+          if (status.includes('under consideration')) {
+            counts['Under Review']++;
+          } else if (status.includes('approved')) {
+            counts['Approved']++;
+          } else if (status.includes('declined')) {
+            counts['Declined']++;
+          } else {
+            counts['Other']++;
+          }
+        });
+      }
+
+      // Get total count
+      const { data: totalData, error: countError } = await supabase
+        .rpc('get_applications_count_within_radius', {
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: radius
+        });
+
+      if (countError) {
+        console.error('Error fetching count:', countError);
+        setTotalCount(0);
+      } else {
+        setTotalCount(totalData || 0);
+      }
 
       setApplications(transformedApplications);
       setStatusCounts(counts);
@@ -120,9 +117,9 @@ export const useApplicationsData = () => {
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
       toast({
-        title: "Error fetching applications",
-        description: error.message || "Please try again later",
-        variant: "destructive",
+        title: 'Error fetching applications',
+        description: 'Please try again later',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
