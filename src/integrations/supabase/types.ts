@@ -129,7 +129,6 @@ export type Database = {
           image_map_url: string | null
           impact_score: number | null
           impact_score_details: Json | null
-          impacted_services: Json | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
@@ -190,7 +189,6 @@ export type Database = {
           image_map_url?: string | null
           impact_score?: number | null
           impact_score_details?: Json | null
-          impacted_services?: Json | null
           lapsed_date?: string | null
           last_date_consultation_comments?: string | null
           last_synced?: string | null
@@ -251,7 +249,6 @@ export type Database = {
           image_map_url?: string | null
           impact_score?: number | null
           impact_score_details?: Json | null
-          impacted_services?: Json | null
           lapsed_date?: string | null
           last_date_consultation_comments?: string | null
           last_synced?: string | null
@@ -1640,7 +1637,6 @@ export type Database = {
           image_map_url: string | null
           impact_score: number | null
           impact_score_details: Json | null
-          impacted_services: Json | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
@@ -1735,7 +1731,6 @@ export type Database = {
           image_map_url: string | null
           impact_score: number | null
           impact_score_details: Json | null
-          impacted_services: Json | null
           lapsed_date: string | null
           last_date_consultation_comments: string | null
           last_synced: string | null
