@@ -12,7 +12,6 @@ interface ApplicationMarkersProps {
 }
 
 const getStatusColor = (status: string): string => {
-  console.log('Getting status color for:', status);
   const statusLower = status.toLowerCase();
   if (statusLower.includes('approved')) {
     return '#16a34a'; // green
@@ -25,7 +24,6 @@ const getStatusColor = (status: string): string => {
 
 const createIcon = (color: string, isSelected: boolean) => {
   const size = isSelected ? 40 : 24;
-  console.log(`Creating marker icon - Selected: ${isSelected}, Size: ${size}px`);
 
   return L.divIcon({
     className: `custom-marker-icon ${isSelected ? 'selected' : ''}`,
@@ -43,19 +41,11 @@ export const ApplicationMarkers = ({
   onMarkerClick,
   selectedId,
 }: ApplicationMarkersProps) => {
-  console.log('ApplicationMarkers - Processing applications:', applications.length);
-  console.log('Selected ID:', selectedId);
-
   return (
     <>
       {applications.map((app) => {
         const color = getStatusColor(app.status);
         const isSelected = app.id === selectedId;
-        console.log(`Rendering marker ${app.id}:`, {
-          isSelected,
-          color,
-          coordinates: app.coordinates
-        });
         
         if (app.coordinates) {
           return (
@@ -64,7 +54,6 @@ export const ApplicationMarkers = ({
               position={app.coordinates}
               eventHandlers={{
                 click: () => {
-                  console.log(`Marker clicked - Application ${app.id}`);
                   onMarkerClick(app.id);
                 },
               }}
