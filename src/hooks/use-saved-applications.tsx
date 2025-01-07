@@ -51,7 +51,7 @@ export const useSavedApplications = () => {
           .from('saved_applications')
           .delete()
           .eq('user_id', session.session.user.id)
-          .eq('application_id', applicationId);
+          .eq('application_id', applicationId.toString());
 
         if (error) throw error;
 
@@ -60,8 +60,8 @@ export const useSavedApplications = () => {
         // First verify the application exists
         const { data: applicationExists, error: checkError } = await supabase
           .from('applications')
-          .select('id')
-          .eq('id', applicationId)
+          .select('application_id')
+          .eq('application_id', applicationId.toString())
           .single();
 
         if (checkError || !applicationExists) {
