@@ -4,6 +4,7 @@ import { ImpactList } from "./ImpactList";
 import { ImpactScoreData, CategoryScore } from "./types";
 import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface ImpactScoreBreakdownProps {
   details: ImpactScoreData | null;
@@ -40,8 +41,6 @@ export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ deta
     };
   }
 
-  console.log('ImpactScoreBreakdown - Calculated category scores:', categoryScores);
-
   // Order categories for consistent display
   const orderedCategories = ['Environmental', 'Social', 'Infrastructure', 'Economic'];
   const otherCategories = Object.keys(categoryScores).filter(
@@ -49,81 +48,84 @@ export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ deta
   );
 
   return (
-    <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-      <div className="space-y-4">
-        {/* Display ordered categories first */}
-        {orderedCategories.map(category => {
-          if (!categoryScores[category]) return null;
-          return (
-            <ImpactCategoryCard 
-              key={category}
-              category={category}
-              scoreData={categoryScores[category]}
-            />
-          );
-        })}
+    <ScrollArea className="h-[500px] w-full rounded-md border p-6">
+      <div className="space-y-6">
+        {/* Impact Categories */}
+        <div className="space-y-4">
+          {orderedCategories.map(category => {
+            if (!categoryScores[category]) return null;
+            return (
+              <ImpactCategoryCard 
+                key={category}
+                category={category}
+                scoreData={categoryScores[category]}
+              />
+            );
+          })}
+          {otherCategories.map(category => {
+            if (!categoryScores[category]) return null;
+            return (
+              <ImpactCategoryCard 
+                key={category}
+                category={category}
+                scoreData={categoryScores[category]}
+              />
+            );
+          })}
+        </div>
 
-        {/* Display any additional categories */}
-        {otherCategories.map(category => {
-          if (!categoryScores[category]) return null;
-          return (
-            <ImpactCategoryCard 
-              key={category}
-              category={category}
-              scoreData={categoryScores[category]}
-            />
-          );
-        })}
-
-        {/* Display impacted services analysis */}
+        {/* Impacted Services Analysis */}
         {details.impacted_services && Object.keys(details.impacted_services).length > 0 && (
-          <Card className="p-4">
-            <h3 className="font-semibold mb-4">Impact on Local Services</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {Object.entries(details.impacted_services).map(([service, { impact, details }]) => (
-                <div 
-                  key={service} 
-                  className={`flex items-start gap-2 group transition-all ${
-                    impact === 'positive' ? 'bg-primary/5' : 
-                    impact === 'negative' ? 'bg-destructive/5' : 
-                    'bg-muted/5'
-                  } p-2 rounded-lg`}
-                  title={details}
-                >
-                  <AlertCircle className={`h-5 w-5 ${
-                    impact === 'positive' ? 'text-primary' : 
-                    impact === 'negative' ? 'text-destructive' : 
-                    'text-muted-foreground'
-                  }`} />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">{service}</span>
-                    <span className="text-xs text-gray-500 mt-0.5">
-                      {details}
-                    </span>
+          <>
+            <Separator className="my-6" />
+            <Card className="p-6">
+              <h3 className="font-semibold text-lg mb-4">Impact on Local Services</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(details.impacted_services).map(([service, { impact, details }]) => (
+                  <div 
+                    key={service} 
+                    className={`flex items-start gap-3 p-4 rounded-lg transition-all ${
+                      impact === 'positive' ? 'bg-primary/5 text-primary-dark' : 
+                      impact === 'negative' ? 'bg-destructive/5 text-destructive' : 
+                      'bg-muted/5 text-muted-foreground'
+                    }`}
+                    title={details}
+                  >
+                    <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-medium">{service}</p>
+                      <p className="text-sm opacity-90">
+                        {details}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="border-t pt-3 mt-4">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <AlertCircle className="w-3 h-3 text-primary" />
-                <span>May support these services</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-sm">
+                <div className="flex items-center gap-2 text-primary">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Supports services</span>
+                </div>
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Increases pressure</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Neutral impact</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                <AlertCircle className="w-3 h-3 text-destructive" />
-                <span>May increase pressure on services</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                <AlertCircle className="w-3 h-3 text-muted-foreground" />
-                <span>No significant impact expected</span>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </>
         )}
 
-        <ImpactList title="Key Concerns" items={details.key_concerns} />
-        <ImpactList title="Recommendations" items={details.recommendations} />
+        {/* Key Concerns and Recommendations */}
+        <Separator className="my-6" />
+        <div className="space-y-6">
+          <ImpactList title="Key Concerns" items={details.key_concerns} />
+          <ImpactList title="Recommendations" items={details.recommendations} />
+        </div>
       </div>
     </ScrollArea>
   );
