@@ -1,52 +1,80 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ImageResolverProps {
-  imageMapUrl?: string | null;
-  image?: string | null;
+  imageMapUrl: string | null;
+  image: string | undefined;
   title: string;
   applicationId: number;
   coordinates?: [number, number];
 }
 
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60";
+
 export const ImageResolver = ({ 
-  imageMapUrl,
-  image,
+  imageMapUrl, 
+  image, 
   title,
   applicationId,
   coordinates 
 }: ImageResolverProps) => {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-  const generateMapboxUrl = (coords: [number, number]) => {
-    const [lat, lng] = coords;
-    const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
-    return `https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/${lng},${lat},15,0/400x400@2x?access_token=${mapboxToken}`;
-  };
+  const [currentImageSource, setCurrentImageSource] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    if (imageMapUrl) {
-      setImageUrl(imageMapUrl);
-    } else if (image) {
-      setImageUrl(image);
-    } else if (coordinates) {
-      setImageUrl(generateMapboxUrl(coordinates));
-    } else {
-      setImageUrl('/placeholder.svg');
-    }
-  }, [imageMapUrl, image, coordinates]);
+    console.log('ApplicationImage - Initial State:', {
+      applicationId,
+      image_map_url: imageMapUrl,
+      image,
+      currentImageSource
+    });
 
-  if (!imageUrl) {
+    // Reset error state when props change
+    setHasError(false);
+
+    // Try to use the map image first
+    if (imageMapUrl) {
+      setCurrentImageSource(imageMapUrl);
+    }
+    // Then try the regular image
+    else if (image && image !== '/placeholder.svg') {
+      setCurrentImageSource(image);
+    }
+    // Finally use fallback
+    else {
+      console.log('ApplicationImage - Using fallback image:', FALLBACK_IMAGE);
+      setCurrentImageSource(FALLBACK_IMAGE);
+    }
+  }, [imageMapUrl, image, applicationId]);
+
+  const handleImageError = () => {
+    console.log('ApplicationImage - Error loading image:', currentImageSource);
+    setHasError(true);
+    
+    // If current source failed, try the next option
+    if (currentImageSource === imageMapUrl && image) {
+      setCurrentImageSource(image);
+    } else if (currentImageSource !== FALLBACK_IMAGE) {
+      setCurrentImageSource(FALLBACK_IMAGE);
+    }
+  };
+
+  if (!currentImageSource || hasError) {
     return (
-      <div className="w-full h-full bg-gray-100 animate-pulse" />
+      <img
+        src={FALLBACK_IMAGE}
+        alt={title}
+        className="w-full h-full object-cover"
+        onError={handleImageError}
+      />
     );
   }
 
   return (
     <img
-      src={imageUrl}
+      src={currentImageSource}
       alt={title}
       className="w-full h-full object-cover"
-      onError={() => setImageUrl('/placeholder.svg')}
+      onError={handleImageError}
     />
   );
 };

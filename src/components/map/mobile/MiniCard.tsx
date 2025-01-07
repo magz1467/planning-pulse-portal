@@ -4,6 +4,7 @@ import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { ImageResolver } from "./components/ImageResolver";
 import { StatusBadge } from "./components/StatusBadge";
 import { LocationInfo } from "./components/LocationInfo";
+import { useEffect } from "react";
 
 interface MiniCardProps {
   application: Application;
@@ -12,6 +13,14 @@ interface MiniCardProps {
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   const isClosingSoon = application.last_date_consultation_comments;
+
+  useEffect(() => {
+    console.log('MiniCard - Rendering with application:', {
+      id: application.id,
+      hasImage: !!application.image,
+      hasMapUrl: !!application.image_map_url
+    });
+  }, [application]);
 
   return (
     <div 
@@ -26,6 +35,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             image={application.image}
             title={application.title || application.description || ''}
             applicationId={application.id}
+            coordinates={application.coordinates}
           />
         </div>
         <div className="flex-1 min-w-0">
