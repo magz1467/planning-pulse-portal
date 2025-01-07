@@ -18,7 +18,6 @@ interface TimelineStage {
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return 'Not available';
   
-  // Try parsing different date formats
   const formats = [
     'dd/MM/yyyy',
     'yyyy-MM-dd',
@@ -41,7 +40,6 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
   const getStages = (): TimelineStage[] => {
     const today = new Date();
     
-    // Parse dates with validation
     const validDate = application.valid_date ? 
       parse(application.valid_date, 'dd/MM/yyyy', new Date()) : null;
     
@@ -51,7 +49,6 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
     const decisionDue = application.decisionDue ? 
       parse(application.decisionDue, 'dd/MM/yyyy', new Date()) : null;
 
-    // Log date parsing results for debugging
     console.log('Date parsing results:', {
       validDate: application.valid_date,
       parsedValidDate: validDate,
@@ -89,12 +86,12 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
   const stages = getStages();
 
   return (
-    <div className="flex flex-col space-y-4 pt-8 pb-4"> {/* Increased pt-6 to pt-8 for more top padding */}
+    <div className="flex flex-col space-y-2 pt-6 pb-4"> {/* Changed space-y-4 to space-y-2 */}
       <div className="relative">
-        {/* Timeline line - now positioned behind circles */}
-        <div className="absolute left-[15px] top-[30px] bottom-4 w-0.5 bg-gray-200 -z-10" />
+        {/* Timeline line positioned behind circles */}
+        <div className="absolute left-[15px] top-[24px] bottom-4 w-0.5 bg-gray-200 -z-10" /> {/* Adjusted top position */}
         
-        <div className="space-y-8">
+        <div className="space-y-4"> {/* Changed from space-y-8 to space-y-4 */}
           {stages.map((stage, index) => (
             <div key={index} className="flex items-start relative">
               {/* Circle container with higher z-index */}
