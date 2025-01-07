@@ -11,6 +11,7 @@ import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 
 export const useDashboardState = () => {
+  // First, initialize all URL and router related hooks
   const { 
     initialPostcode, 
     initialTab, 
@@ -18,28 +19,29 @@ export const useDashboardState = () => {
     initialApplicationId,
     updateURLParams 
   } = useURLState();
-
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Then, initialize all state management hooks
   const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
-  const [postcode, setPostcode] = useState(initialPostcode);
+  const [postcode, setPostcode] = useState(initialPostcode || '');
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchPoint, setSearchPoint] = useState<[number, number] | null>(null);
 
+  // Initialize data fetching hooks
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
-  
   const { 
     applications, 
     isLoading: isLoadingApps, 
     fetchApplicationsInRadius,
-    searchPoint,
-    setSearchPoint,
     statusCounts
   } = useApplicationsData();
 
+  // URL params effect
   useEffect(() => {
     if (isSearching && !coordinates) {
       toast({
@@ -60,6 +62,7 @@ export const useDashboardState = () => {
     });
   }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast]);
 
+  // Search logging
   const logSearch = async (loadTime: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -79,64 +82,73 @@ export const useDashboardState = () => {
     }
   };
 
+  // Postcode selection handler
   const handlePostcodeSelect = async (newPostcode: string) => {
+    if (!newPostcode) return;
     setIsSearching(true);
     setSearchStartTime(Date.now());
     setPostcode(newPostcode);
   };
 
+  // Sort handler
   const handleSortChange = (sortType: SortType) => {
     setActiveSort(sortType);
   };
 
+  // Search effect
   const isInitialSearch = !searchPoint && coordinates;
   const isNewSearch = searchPoint && coordinates && 
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
 
   useEffect(() => {
-    if ((isInitialSearch || isNewSearch) && coordinates) {
+    if (!coordinates) return;
+    
+    if (isInitialSearch || isNewSearch) {
       console.log('Fetching applications with coordinates:', coordinates);
       setSearchPoint(coordinates);
-      // Ensure coordinates are properly typed as [number, number]
-      const [lat, lng] = coordinates;
-      fetchApplicationsInRadius([lat, lng], 1000);
+      fetchApplicationsInRadius(coordinates, 1000);
     }
-  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, setSearchPoint]);
+  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius]);
 
-  // Log search performance
+  // Search performance logging
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
-      const loadTime = (Date.now() - searchStartTime) / 1000; // Convert to seconds
+      const loadTime = (Date.now() - searchStartTime) / 1000;
       logSearch(loadTime);
       setSearchStartTime(null);
       setIsSearching(false);
     }
-  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
+  }, [isLoadingApps, isLoadingCoords, searchStartTime, postcode]);
 
-  const selectedApplication = applications?.find(app => app.id === selectedId);
-  const isLoading = isLoadingCoords || isLoadingApps;
-
+  // Filter applications
   const safeApplications = applications || [];
-  
   const filteredApplications = useFilteredApplications(
     safeApplications,
     activeFilters,
     activeSort
   );
 
+  // Initialize default status counts
+  const defaultStatusCounts = {
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0,
+    ...statusCounts
+  };
+
   return {
     selectedId,
-    selectedApplication,
     activeFilters,
     activeSort,
     isMapView,
     setIsMapView,
     postcode,
     coordinates,
-    isLoading,
+    isLoading: isLoadingCoords || isLoadingApps,
     applications: safeApplications,
     filteredApplications,
-    statusCounts,
+    statusCounts: defaultStatusCounts,
     handleMarkerClick,
     handleFilterChange,
     handlePostcodeSelect,
