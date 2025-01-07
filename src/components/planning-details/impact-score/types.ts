@@ -4,12 +4,23 @@ export interface CategoryScore {
 }
 
 export interface ImpactScoreDetails {
-  [category: string]: CategoryScore;
+  environmental?: CategoryScore;
+  social?: CategoryScore;
+  infrastructure?: CategoryScore;
+  economic?: CategoryScore;
+  [key: string]: CategoryScore | undefined;
 }
 
-export interface ImpactScoreData extends ImpactScoreDetails {
+export interface ImpactScoreData {
+  impact_scores: ImpactScoreDetails;
   key_concerns?: string[];
   recommendations?: string[];
+  impacted_services?: {
+    [key: string]: {
+      impact: 'positive' | 'negative' | 'neutral';
+      details: string;
+    };
+  };
 }
 
 export interface ImpactCategory {
