@@ -5,19 +5,6 @@ export interface ApplicationData {
   [key: string]: any;
 }
 
-export interface PerplexityResponse {
-  id: string;
-  model: string;
-  created: number;
-  choices: Array<{
-    message: {
-      role: string;
-      content: string;
-    };
-    finish_reason: string;
-  }>;
-}
-
 export interface ImpactScoreResponse {
   success: boolean;
   score?: number;
