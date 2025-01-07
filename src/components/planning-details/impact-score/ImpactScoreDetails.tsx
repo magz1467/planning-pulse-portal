@@ -50,10 +50,15 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
 
   // Filter out impacted_services from categories
   const categories = Object.entries(details).filter(([key]) => 
-    key !== 'impacted_services' && typeof details[key] === 'object'
+    key !== 'impacted_services' && 
+    key !== 'key_concerns' && 
+    key !== 'recommendations' &&
+    typeof details[key] === 'object'
   );
 
   const impactedServices = details.impacted_services || {};
+  const keyConcerns = details.key_concerns || [];
+  const recommendations = details.recommendations || [];
 
   return (
     <div className="space-y-4">
@@ -89,6 +94,30 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
           </Collapsible>
         ))}
       </div>
+
+      {/* Key Concerns */}
+      {keyConcerns.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="font-medium">Key Concerns</h4>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+            {keyConcerns.map((concern, index) => (
+              <li key={index}>{concern}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Recommendations */}
+      {recommendations.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="font-medium">Recommendations</h4>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+            {recommendations.map((recommendation, index) => (
+              <li key={index}>{recommendation}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Impacted Services */}
       {Object.keys(impactedServices).length > 0 && (
