@@ -32,12 +32,42 @@ export const SimpleImpactScore = ({
   
   if (!details) return null;
 
-  // Create executive summary from key impacts
+  // Enhanced executive summary that includes more key features
   const getExecutiveSummary = () => {
     const positiveCount = Object.values(impactedServices || {}).filter(s => s.impact === "positive").length;
     const negativeCount = Object.values(impactedServices || {}).filter(s => s.impact === "negative").length;
+    const neutralCount = Object.values(impactedServices || {}).filter(s => s.impact === "neutral").length;
     
-    return `This development has ${positiveCount} positive and ${negativeCount} negative potential impacts on local services and infrastructure.`;
+    // Get the most significant impacts
+    const significantImpacts = Object.entries(impactedServices || {})
+      .filter(([_, data]) => data.impact !== "neutral")
+      .map(([service, data]) => ({
+        service,
+        impact: data.impact,
+        details: data.details
+      }))
+      .slice(0, 2); // Get top 2 most significant impacts
+
+    let summary = `This development has ${positiveCount} positive and ${negativeCount} negative potential impacts`;
+    
+    // Add specific impacts if available
+    if (significantImpacts.length > 0) {
+      summary += ", notably ";
+      summary += significantImpacts
+        .map(impact => `${impact.impact === "positive" ? "supporting" : "affecting"} ${impact.service.toLowerCase()}`)
+        .join(" and ");
+    }
+    
+    // Add environmental context if available
+    if (details.Environmental) {
+      const envFactors = Object.keys(details.Environmental);
+      if (envFactors.length > 0) {
+        summary += `. Environmental considerations include ${envFactors.slice(0, 2).join(" and ")}`;
+      }
+    }
+
+    summary += ".";
+    return summary;
   };
 
   return (
