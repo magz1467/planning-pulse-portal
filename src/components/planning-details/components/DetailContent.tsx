@@ -4,7 +4,7 @@ import { ApplicationDescription } from "@/components/planning-details/Applicatio
 import { ApplicationTimeline } from "@/components/planning-details/ApplicationTimeline";
 import { ApplicationComments } from "@/components/planning-details/ApplicationComments";
 import { ApplicationFeedback } from "@/components/planning-details/ApplicationFeedback";
-import { ImpactScoreDetails } from "@/components/planning-details/impact-score/ImpactScoreDetails";
+import { EnvironmentalImpactDial } from "@/components/planning-details/EnvironmentalImpactDial";
 
 interface DetailContentProps {
   application: Application;
@@ -21,11 +21,15 @@ export const DetailContent = ({
       
       <ApplicationTimeline application={application} />
 
-      <ImpactScoreDetails application={application} />
+      <EnvironmentalImpactDial 
+        score={application.impact_score || null}
+        details={application.impact_score_details}
+        applicationId={application.application_id}
+      />
       
-      <ApplicationComments application={application} />
+      <ApplicationComments applicationId={application.application_id} />
       
-      <ApplicationFeedback application={application} />
+      <ApplicationFeedback applicationId={application.application_id} />
     </div>
   );
 };
