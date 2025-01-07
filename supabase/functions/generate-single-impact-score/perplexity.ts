@@ -13,9 +13,8 @@ export async function calculateImpactScore(
   }
 
   try {
-    // Enhanced prompt to generate more specific analysis
     const prompt = `
-      Analyze this specific planning application and provide a detailed impact assessment.
+      Analyze this specific planning application and provide a detailed impact assessment including affected local services.
       Consider the exact details, scale, and context of this development.
       
       Application details to analyze:
@@ -30,6 +29,7 @@ export async function calculateImpactScore(
       2. Detailed explanations referencing specific aspects of this development
       3. Key concerns unique to this application
       4. Tailored recommendations addressing the specific challenges
+      5. List of potentially impacted local services with confidence levels (high/medium/low)
       
       Return a valid JSON object with no markdown formatting:
       {
@@ -56,6 +56,13 @@ export async function calculateImpactScore(
           "Specific recommendation 1 addressing development details",
           "Specific recommendation 2 addressing development details",
           "Specific recommendation 3 addressing development details"
+        ],
+        "impacted_services": [
+          {
+            "service": "Name of service",
+            "impact_level": "high/medium/low",
+            "details": "Specific explanation of impact"
+          }
         ]
       }
     `;

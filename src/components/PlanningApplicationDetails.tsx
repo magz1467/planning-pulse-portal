@@ -5,7 +5,6 @@ import { ApplicationTimeline } from "./planning-details/ApplicationTimeline";
 import { CollapsibleApplicationDetails } from "./planning-details/CollapsibleApplicationDetails";
 import { ApplicationDescription } from "./planning-details/ApplicationDescription";
 import { ApplicationComments } from "./planning-details/ApplicationComments";
-import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
 import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
 import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { ApplicationSharing } from "./planning-details/ApplicationSharing";
@@ -126,7 +125,6 @@ export const PlanningApplicationDetails = ({
         <Separator className="my-4" />
         <CollapsibleApplicationDetails application={application} />
       </Card>
-      <ExpectedImpactAreas application={application} />
       <EnvironmentalImpactDial 
         score={application.impact_score} 
         details={application.impact_score_details}

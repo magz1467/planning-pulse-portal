@@ -8,6 +8,12 @@ interface CategoryScore {
   details: string;
 }
 
+interface ImpactedService {
+  service: string;
+  impact_level: string;
+  details: string;
+}
+
 interface ImpactScoreDetails {
   category_scores?: {
     environmental?: CategoryScore;
@@ -16,6 +22,7 @@ interface ImpactScoreDetails {
   };
   key_concerns?: string[];
   recommendations?: string[];
+  impacted_services?: ImpactedService[];
 }
 
 interface ImpactScoreBreakdownProps {
@@ -32,6 +39,19 @@ const getCategoryColor = (score: number) => {
   if (score <= 30) return "text-green-700";
   if (score >= 70) return "text-red-700";
   return "text-orange-700";
+};
+
+const getImpactLevelColor = (level: string) => {
+  switch (level.toLowerCase()) {
+    case 'high':
+      return 'text-red-600';
+    case 'medium':
+      return 'text-orange-600';
+    case 'low':
+      return 'text-green-600';
+    default:
+      return 'text-gray-600';
+  }
 };
 
 export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => {
@@ -111,6 +131,35 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
                 <li key={index} className="text-sm text-gray-600">{recommendation}</li>
               ))}
             </ul>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {impactDetails.impacted_services && impactDetails.impacted_services.length > 0 && (
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+            >
+              <h4 className="font-medium">Impacted Services</h4>
+              <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="space-y-3 mt-2">
+              {impactDetails.impacted_services.map((service, index) => (
+                <div key={index} className="text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{service.service}</span>
+                    <span className={`text-xs ${getImpactLevelColor(service.impact_level)}`}>
+                      {service.impact_level} impact
+                    </span>
+                  </div>
+                  <p className="text-gray-600 mt-1">{service.details}</p>
+                </div>
+              ))}
+            </div>
           </CollapsibleContent>
         </Collapsible>
       )}
