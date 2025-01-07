@@ -24,7 +24,10 @@ export const MapSection = memo(({
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
-    onMarkerClick(id);
+    // Force the click to be handled synchronously
+    setTimeout(() => {
+      onMarkerClick(id);
+    }, 0);
   }, [onMarkerClick]); // Add onMarkerClick to dependencies
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
