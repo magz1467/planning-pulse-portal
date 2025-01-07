@@ -8,7 +8,7 @@ export const DashboardHeader = () => {
     <header className="bg-white">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2">
+          <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-2 cursor-pointer">
             <Home className="h-6 w-6" />
             PlanningPulse
           </Link>
