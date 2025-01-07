@@ -19,6 +19,13 @@ interface TimelineStage {
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return 'Not available';
   
+  // First try to parse the date directly
+  const directDate = new Date(dateStr);
+  if (isValid(directDate)) {
+    return format(directDate, 'dd MMM yyyy');
+  }
+  
+  // If direct parsing fails, try different formats
   const formats = [
     'dd/MM/yyyy',
     'yyyy-MM-dd',
@@ -53,13 +60,13 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
     const today = new Date();
     
     const validDate = application.valid_date ? 
-      parse(application.valid_date, 'dd/MM/yyyy', new Date()) : null;
+      new Date(application.valid_date) : null;
     
     const consultationEnd = application.last_date_consultation_comments ? 
-      parse(application.last_date_consultation_comments, 'dd/MM/yyyy', new Date()) : null;
+      new Date(application.last_date_consultation_comments) : null;
     
     const decisionDue = application.decisionDue ? 
-      parse(application.decisionDue, 'dd/MM/yyyy', new Date()) : null;
+      new Date(application.decisionDue) : null;
 
     const decisionStatus = getDecisionStatus(application.status);
 
