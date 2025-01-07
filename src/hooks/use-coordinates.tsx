@@ -6,6 +6,8 @@ export const useCoordinates = (postcode: string | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchCoordinates = async () => {
       if (!postcode) return;
       
@@ -13,20 +15,33 @@ export const useCoordinates = (postcode: string | undefined) => {
       try {
         const response = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
         const data = await response.json();
-        if (data.status === 200) {
+        
+        if (isMounted && data.status === 200) {
           setCoordinates([data.result.latitude, data.result.longitude]);
         }
       } catch (error) {
         console.error("Error fetching coordinates:", error);
       } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
+        if (isMounted) {
+          // Add a small delay to ensure smooth loading state
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        }
       }
     };
 
     fetchCoordinates();
-    window.scrollTo(0, 0);
+    
+    // Reset coordinates when postcode changes
+    if (!postcode) {
+      setCoordinates(null);
+    }
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
   }, [postcode]);
 
   return { coordinates, isLoading };
