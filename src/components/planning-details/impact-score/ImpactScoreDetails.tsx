@@ -37,83 +37,40 @@ const getCategoryColor = (score: number) => {
 export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => {
   if (!details) return null;
 
-  const impactDetails = details as ImpactScoreDetails;
-  const categories = [
-    { name: "Environmental", key: "environmental" },
-    { name: "Social", key: "social" },
-    { name: "Infrastructure", key: "infrastructure" },
-  ];
+  const categories = Object.entries(details).filter(([key]) => 
+    key !== 'impacted_services' && typeof details[key] === 'object'
+  );
 
   return (
-    <div className="space-y-4">
-      {categories.map(({ name, key }) => {
-        const categoryData = impactDetails.category_scores?.[key as keyof typeof impactDetails.category_scores];
-        if (!categoryData) return null;
-
-        return (
-          <Collapsible key={key}>
-            <CollapsibleTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-              >
-                <div className="flex items-center gap-2">
-                  {getCategoryIcon(categoryData.score)}
-                  <span className={`font-medium ${getCategoryColor(categoryData.score)}`}>
-                    {name}: {categoryData.score}/100
-                  </span>
+    <div className="space-y-2">
+      {categories.map(([category, scores]) => (
+        <Collapsible key={category}>
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
+            >
+              <div className="flex items-center gap-2">
+                {getCategoryIcon(Object.values(scores).reduce((acc: number, curr: any) => acc + curr, 0) / Object.keys(scores).length)}
+                <span className={`font-medium capitalize`}>
+                  {category}
+                </span>
+              </div>
+              <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="ml-7 mt-2 space-y-1">
+              {Object.entries(scores).map(([subCategory, score]: [string, any]) => (
+                <div key={subCategory} className="text-sm flex justify-between">
+                  <span className="capitalize">{subCategory.replace(/_/g, ' ')}</span>
+                  <span className={getCategoryColor(score)}>{score}/5</span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <p className="text-sm text-gray-600 ml-7 mt-2">{categoryData.details}</p>
-            </CollapsibleContent>
-          </Collapsible>
-        );
-      })}
-
-      {impactDetails.key_concerns && impactDetails.key_concerns.length > 0 && (
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-            >
-              <h4 className="font-medium">Key Concerns</h4>
-              <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <ul className="list-disc pl-5 space-y-1 mt-2">
-              {impactDetails.key_concerns.map((concern, index) => (
-                <li key={index} className="text-sm text-gray-600">{concern}</li>
               ))}
-            </ul>
+            </div>
           </CollapsibleContent>
         </Collapsible>
-      )}
-
-      {impactDetails.recommendations && impactDetails.recommendations.length > 0 && (
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-            >
-              <h4 className="font-medium">Recommendations</h4>
-              <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <ul className="list-disc pl-5 space-y-1 mt-2">
-              {impactDetails.recommendations.map((recommendation, index) => (
-                <li key={index} className="text-sm text-gray-600">{recommendation}</li>
-              ))}
-            </ul>
-          </CollapsibleContent>
-        </Collapsible>
-      )}
+      ))}
     </div>
   );
 };

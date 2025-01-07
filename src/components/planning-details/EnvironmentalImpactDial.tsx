@@ -62,8 +62,25 @@ export const EnvironmentalImpactDial = ({
       </div>
       
       {details && (
-        <div className="space-y-2 pt-4 border-t">
-          <ImpactScoreBreakdown details={details} />
+        <div className="space-y-4 pt-4 border-t">
+          <div className="space-y-2">
+            <h4 className="font-medium">Impact Score Breakdown</h4>
+            <ImpactScoreBreakdown details={details} />
+          </div>
+
+          {details.impacted_services && (
+            <div className="space-y-2">
+              <h4 className="font-medium">Expected Service Impacts</h4>
+              <div className="space-y-2">
+                {Object.entries(details.impacted_services).map(([service, data]: [string, any]) => (
+                  <div key={service} className="flex items-start space-x-2 text-sm">
+                    <span className="font-medium min-w-[100px]">{service}:</span>
+                    <span className="text-gray-600">{data.details}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Card>
