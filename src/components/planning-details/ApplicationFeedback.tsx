@@ -22,24 +22,27 @@ export const ApplicationFeedback = ({
 
   useEffect(() => {
     const fetchFeedbackStats = async () => {
-      const { data: upVotes } = await supabase
-        .from('application_feedback')
-        .select('count')
-        .eq('application_id', applicationId)
-        .eq('feedback_type', 'up')
-        .single();
+      const { data: feedbackData } = await supabase
+        .rpc('get_application_feedback_stats', {
+          app_id: applicationId
+        });
 
-      const { data: downVotes } = await supabase
-        .from('application_feedback')
-        .select('count')
-        .eq('application_id', applicationId)
-        .eq('feedback_type', 'down')
-        .single();
+      if (feedbackData && feedbackData.length) {
+        const stats = {
+          thumbsUp: 0,
+          thumbsDown: 0
+        };
+        
+        feedbackData.forEach((item: { feedback_type: string, count: number }) => {
+          if (item.feedback_type === 'up') {
+            stats.thumbsUp = item.count;
+          } else if (item.feedback_type === 'down') {
+            stats.thumbsDown = item.count;
+          }
+        });
 
-      setFeedbackStats({
-        thumbsUp: upVotes?.count || 0,
-        thumbsDown: downVotes?.count || 0
-      });
+        setFeedbackStats(stats);
+      }
     };
 
     if (applicationId) {
