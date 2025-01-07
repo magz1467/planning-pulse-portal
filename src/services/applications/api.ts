@@ -75,7 +75,7 @@ export async function getApplicationById(id: number) {
 export async function getApplicationComments(applicationId: number) {
   try {
     const { data, error } = await supabase
-      .from('comments')  
+      .from('Comments')  // Changed from 'comments' to 'Comments'
       .select('*')
       .eq('application_id', applicationId)
       .order('created_at', { ascending: false });
@@ -105,7 +105,7 @@ export async function getApplicationComments(applicationId: number) {
 export async function addApplicationComment(applicationId: number, comment: string, userId: string) {
   try {
     const { data, error } = await supabase
-      .from('comments')
+      .from('Comments')  // Changed from 'comments' to 'Comments'
       .insert([
         {
           application_id: applicationId,
