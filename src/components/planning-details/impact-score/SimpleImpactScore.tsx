@@ -10,7 +10,7 @@ import { FactorScores } from "./components/FactorScores";
 import { DetailedAnalysis } from "./components/DetailedAnalysis";
 import { Application } from "@/types/planning";
 
-interface SimpleImpactScoreProps {
+export interface SimpleImpactScoreProps {
   score: number;
   progress: number;
   details?: ImpactScoreData;
