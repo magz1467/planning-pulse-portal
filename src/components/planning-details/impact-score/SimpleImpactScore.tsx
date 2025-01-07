@@ -36,7 +36,6 @@ export const SimpleImpactScore = ({
   const getExecutiveSummary = () => {
     const positiveCount = Object.values(impactedServices || {}).filter(s => s.impact === "positive").length;
     const negativeCount = Object.values(impactedServices || {}).filter(s => s.impact === "negative").length;
-    const neutralCount = Object.values(impactedServices || {}).filter(s => s.impact === "neutral").length;
     
     // Get the most significant impacts
     const significantImpacts = Object.entries(impactedServices || {})
@@ -48,23 +47,44 @@ export const SimpleImpactScore = ({
       }))
       .slice(0, 2);
 
-    let summary = `This development has ${positiveCount} positive and ${negativeCount} negative potential impacts`;
+    let summary = '';
     
-    if (significantImpacts.length > 0) {
-      summary += ", notably ";
-      summary += significantImpacts
-        .map(impact => `${impact.impact === "positive" ? "supporting" : "affecting"} ${impact.service.toLowerCase()}`)
-        .join(" and ");
+    // More conversational tone for the summary
+    if (positiveCount > negativeCount) {
+      summary = `Overall, this looks like a promising development with ${positiveCount} positive features`;
+      if (negativeCount > 0) {
+        summary += `, though there are ${negativeCount} aspects that need consideration`;
+      }
+    } else if (negativeCount > positiveCount) {
+      summary = `This development raises ${negativeCount} important concerns`;
+      if (positiveCount > 0) {
+        summary += `, although it does offer ${positiveCount} positive benefits`;
+      }
+    } else {
+      summary = `This development has a balanced impact with ${positiveCount} positive and ${negativeCount} negative aspects`;
     }
-    
+
+    // Add specific impacts in a more conversational way
+    if (significantImpacts.length > 0) {
+      summary += ". In particular, it ";
+      const impactPhrases = significantImpacts.map(impact => {
+        if (impact.impact === "positive") {
+          return `would benefit ${impact.service.toLowerCase()}`;
+        } else {
+          return `might affect ${impact.service.toLowerCase()}`;
+        }
+      });
+      summary += impactPhrases.join(" and ");
+    }
+
+    // Add environmental context in a more approachable way
     if (details.Environmental) {
       const envFactors = Object.keys(details.Environmental);
       if (envFactors.length > 0) {
-        summary += `. Environmental considerations include ${envFactors.slice(0, 2).join(" and ")}`;
+        summary += `. Key environmental considerations include ${envFactors.slice(0, 2).map(f => f.toLowerCase()).join(" and ")}`;
       }
     }
 
-    summary += ".";
     return summary;
   };
 
