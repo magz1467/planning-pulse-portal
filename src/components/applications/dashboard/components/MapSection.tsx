@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { useCallback } from "react";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -21,6 +22,11 @@ export const MapSection = ({
   onMarkerClick,
   onCenterChange,
 }: MapSectionProps) => {
+  const handleMarkerClick = useCallback((id: number | null) => {
+    console.log('MapSection handleMarkerClick:', id);
+    onMarkerClick(id);
+  }, [onMarkerClick]);
+
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   return (
@@ -37,7 +43,7 @@ export const MapSection = ({
           applications={applications}
           selectedId={selectedId}
           coordinates={coordinates}
-          onMarkerClick={onMarkerClick}
+          onMarkerClick={handleMarkerClick}
           onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
