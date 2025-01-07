@@ -42,12 +42,12 @@ export async function getApplicationsWithinRadius(
   }
 }
 
-export async function getApplicationById(id: string) {
+export async function getApplicationById(id: number) {
   try {
     const { data, error } = await supabase
       .from('applications')
       .select('*')
-      .eq('id', id)
+      .eq('application_id', id)
       .single();
 
     if (error) {
@@ -72,10 +72,10 @@ export async function getApplicationById(id: string) {
   }
 }
 
-export async function getApplicationComments(applicationId: string) {
+export async function getApplicationComments(applicationId: number) {
   try {
     const { data, error } = await supabase
-      .from('Comments')  // Fixed case sensitivity
+      .from('comments')  
       .select('*')
       .eq('application_id', applicationId)
       .order('created_at', { ascending: false });
@@ -102,15 +102,15 @@ export async function getApplicationComments(applicationId: string) {
   }
 }
 
-export async function addApplicationComment(applicationId: string, comment: string, userId: string) {
+export async function addApplicationComment(applicationId: number, comment: string, userId: string) {
   try {
     const { data, error } = await supabase
-      .from('Comments')  // Fixed case sensitivity
+      .from('comments')
       .insert([
         {
           application_id: applicationId,
           user_id: userId,
-          content: comment
+          comment: comment
         }
       ])
       .select()
