@@ -4,10 +4,11 @@ import { Loader2 } from "lucide-react";
 import { ScoreDisplay } from "./impact-score/ScoreDisplay";
 import { ImpactScoreBreakdown } from "./impact-score/ImpactScoreDetails";
 import { useImpactScore } from "@/hooks/use-impact-score";
+import { ImpactScoreData } from "./impact-score/types";
 
 interface EnvironmentalImpactDialProps {
   score?: number | null;
-  details?: Record<string, any>;
+  details?: ImpactScoreData;
   applicationId: number;
 }
 
