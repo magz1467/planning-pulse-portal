@@ -12,27 +12,31 @@ interface ImpactScoreBreakdownProps {
 export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ details }) => {
   console.log('ImpactScoreBreakdown - Received details:', details);
 
-  if (!details?.impact_scores) {
-    console.log('ImpactScoreBreakdown - No impact_scores found in details');
+  if (!details) {
+    console.log('ImpactScoreBreakdown - No details provided');
     return null;
   }
 
   // Calculate category scores from detailed breakdowns
   const categoryScores: Record<string, CategoryScore> = {};
   
-  if (details.impact_scores.Environmental) {
-    const envScore = Object.values(details.impact_scores.Environmental).reduce((a, b) => a + b, 0);
+  if (details.Environmental) {
+    const envScore = Object.values(details.Environmental).reduce((a, b) => a + b, 0);
     categoryScores.Environmental = {
-      score: envScore / Object.keys(details.impact_scores.Environmental).length,
-      details: `Based on analysis of air quality (${details.impact_scores.Environmental.air_quality}), noise (${details.impact_scores.Environmental.noise}), ecosystem (${details.impact_scores.Environmental.ecosystem}), biodiversity (${details.impact_scores.Environmental.biodiversity}), and water quality (${details.impact_scores.Environmental.water_quality}).`
+      score: envScore / Object.keys(details.Environmental).length,
+      details: `Based on analysis of ${Object.entries(details.Environmental)
+        .map(([key, value]) => `${key.replace(/_/g, ' ')} (${value})`)
+        .join(', ')}.`
     };
   }
 
-  if (details.impact_scores.Social) {
-    const socialScore = Object.values(details.impact_scores.Social).reduce((a, b) => a + b, 0);
+  if (details.Social) {
+    const socialScore = Object.values(details.Social).reduce((a, b) => a + b, 0);
     categoryScores.Social = {
-      score: socialScore / Object.keys(details.impact_scores.Social).length,
-      details: `Based on analysis of community (${details.impact_scores.Social.community}), cultural (${details.impact_scores.Social.cultural}), and economic (${details.impact_scores.Social.economic}) factors.`
+      score: socialScore / Object.keys(details.Social).length,
+      details: `Based on analysis of ${Object.entries(details.Social)
+        .map(([key, value]) => `${key.replace(/_/g, ' ')} (${value})`)
+        .join(', ')}.`
     };
   }
 

@@ -15,17 +15,22 @@ export interface ImpactScores {
     ecosystem: number;
     biodiversity: number;
     water_quality: number;
+    energy_efficiency?: number;
+    water_conservation?: number;
   };
   Social?: {
     community: number;
     cultural: number;
     economic: number;
+    local_customs?: number;
+    economic_activities?: number;
   };
   [key: string]: Record<string, number> | undefined;
 }
 
 export interface ImpactScoreData {
-  impact_scores: ImpactScores;
+  Environmental?: Record<string, number>;
+  Social?: Record<string, number>;
   key_concerns?: string[];
   recommendations?: string[];
   impacted_services?: {
