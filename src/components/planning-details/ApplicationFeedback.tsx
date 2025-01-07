@@ -1,55 +1,21 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ApplicationFeedbackProps {
-  feedback?: 'up' | 'down' | null;
+  feedback: 'up' | 'down' | null;
   onFeedback: (type: 'up' | 'down') => void;
-  applicationId: number;
+  feedbackStats: {
+    thumbsUp: number;
+    thumbsDown: number;
+  };
 }
 
 export const ApplicationFeedback = ({ 
-  feedback,
+  feedback, 
   onFeedback,
-  applicationId
+  feedbackStats 
 }: ApplicationFeedbackProps) => {
-  const [feedbackStats, setFeedbackStats] = useState({
-    thumbsUp: 0,
-    thumbsDown: 0
-  });
-
-  useEffect(() => {
-    const fetchFeedbackStats = async () => {
-      const { data: feedbackData } = await supabase
-        .rpc('get_application_feedback_stats', {
-          app_id: applicationId
-        });
-
-      if (feedbackData && feedbackData.length) {
-        const stats = {
-          thumbsUp: 0,
-          thumbsDown: 0
-        };
-        
-        feedbackData.forEach((item: { feedback_type: string, count: number }) => {
-          if (item.feedback_type === 'up') {
-            stats.thumbsUp = item.count;
-          } else if (item.feedback_type === 'down') {
-            stats.thumbsDown = item.count;
-          }
-        });
-
-        setFeedbackStats(stats);
-      }
-    };
-
-    if (applicationId) {
-      fetchFeedbackStats();
-    }
-  }, [applicationId]);
-
   return (
     <Card className="p-4 hover:border-primary transition-colors">
       <h3 className="font-semibold mb-4">Community Feedback</h3>

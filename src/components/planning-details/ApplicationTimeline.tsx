@@ -1,8 +1,8 @@
 import { Application } from "@/types/planning";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, Clock, AlertCircle } from "lucide-react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { format, isValid, parse } from "date-fns";
-import { getStatusColor } from "@/utils/statusColors";
 
 interface ApplicationTimelineProps {
   application: Application;
@@ -19,13 +19,6 @@ interface TimelineStage {
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return 'Not available';
   
-  // First try to parse the date directly
-  const directDate = new Date(dateStr);
-  if (isValid(directDate)) {
-    return format(directDate, 'dd MMM yyyy');
-  }
-  
-  // If direct parsing fails, try different formats
   const formats = [
     'dd/MM/yyyy',
     'yyyy-MM-dd',
@@ -40,6 +33,7 @@ const formatDate = (dateStr: string | null): string => {
     }
   }
 
+  console.warn(`Unable to parse date: ${dateStr}`);
   return 'Invalid date';
 };
 
@@ -60,13 +54,13 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
     const today = new Date();
     
     const validDate = application.valid_date ? 
-      new Date(application.valid_date) : null;
+      parse(application.valid_date, 'dd/MM/yyyy', new Date()) : null;
     
     const consultationEnd = application.last_date_consultation_comments ? 
-      new Date(application.last_date_consultation_comments) : null;
+      parse(application.last_date_consultation_comments, 'dd/MM/yyyy', new Date()) : null;
     
     const decisionDue = application.decisionDue ? 
-      new Date(application.decisionDue) : null;
+      parse(application.decisionDue, 'dd/MM/yyyy', new Date()) : null;
 
     const decisionStatus = getDecisionStatus(application.status);
 
@@ -109,42 +103,47 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
           {stages.map((stage, index) => (
             <div key={index} className="flex items-start relative">
               <div className="flex-shrink-0 relative z-10">
-                <div className={`
-                  w-8 h-8 rounded-full flex items-center justify-center
-                  ${stage.status === 'completed' ? 
-                    (stage.decisionStatus === 'approved' ? 'bg-green-100' :
-                     stage.decisionStatus === 'refused' ? 'bg-red-100' :
-                     'bg-green-100') : 
-                    stage.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'}
-                `}>
-                  {stage.status === 'completed' ? (
-                    <Check className={`w-5 h-5 ${
-                      stage.decisionStatus === 'approved' ? 'text-green-600' :
-                      stage.decisionStatus === 'refused' ? 'text-red-600' :
-                      'text-green-600'
-                    }`} />
-                  ) : stage.status === 'current' ? (
-                    <Clock className="w-5 h-5 text-blue-600" />
-                  ) : (
-                    <AlertCircle className="w-5 h-5 text-gray-400" />
-                  )}
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className={`
+                        w-8 h-8 rounded-full flex items-center justify-center
+                        ${stage.status === 'completed' ? 
+                          (stage.decisionStatus === 'approved' ? 'bg-green-100' :
+                           stage.decisionStatus === 'refused' ? 'bg-red-100' :
+                           'bg-green-100') : 
+                          stage.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'}
+                      `}>
+                        {stage.status === 'completed' ? (
+                          <Check className={`w-5 h-5 ${
+                            stage.decisionStatus === 'approved' ? 'text-green-600' :
+                            stage.decisionStatus === 'refused' ? 'text-red-600' :
+                            'text-green-600'
+                          }`} />
+                        ) : stage.status === 'current' ? (
+                          <Clock className="w-5 h-5 text-blue-600" />
+                        ) : (
+                          <AlertCircle className="w-5 h-5 text-gray-400" />
+                        )}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{stage.tooltip}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <div className="ml-4">
                 <h3 className="text-sm font-medium">{stage.label}</h3>
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm text-gray-500">
-                    {formatDate(stage.date)}
-                  </p>
-                  {stage.label === "Decision Due" && stage.decisionStatus && (
-                    <span className={`text-xs px-2 py-1 rounded-full w-fit ${
-                      stage.decisionStatus === 'approved' ? 'bg-green-100 text-green-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {stage.decisionStatus.charAt(0).toUpperCase() + stage.decisionStatus.slice(1)}
-                    </span>
-                  )}
-                </div>
+                <p className={`text-sm ${
+                  stage.decisionStatus === 'approved' ? 'text-green-600' :
+                  stage.decisionStatus === 'refused' ? 'text-red-600' :
+                  'text-gray-500'
+                }`}>
+                  {stage.decisionStatus ? 
+                    stage.decisionStatus.charAt(0).toUpperCase() + stage.decisionStatus.slice(1) :
+                    formatDate(stage.date)}
+                </p>
               </div>
             </div>
           ))}

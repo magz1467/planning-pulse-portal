@@ -65,38 +65,6 @@ export type Database = {
         }
         Relationships: []
       }
-      application_feedback: {
-        Row: {
-          application_id: number | null
-          created_at: string
-          feedback_type: string | null
-          id: number
-          user_id: string | null
-        }
-        Insert: {
-          application_id?: number | null
-          created_at?: string
-          feedback_type?: string | null
-          id?: number
-          user_id?: string | null
-        }
-        Update: {
-          application_id?: number | null
-          created_at?: string
-          feedback_type?: string | null
-          id?: number
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "application_feedback_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: false
-            referencedRelation: "applications"
-            referencedColumns: ["application_id"]
-          },
-        ]
-      }
       application_map_images: {
         Row: {
           application_id: number | null
@@ -1611,15 +1579,6 @@ export type Database = {
           "": string
         }
         Returns: unknown
-      }
-      get_application_feedback_stats: {
-        Args: {
-          app_id: number
-        }
-        Returns: {
-          feedback_type: string
-          count: number
-        }[]
       }
       get_applications_count_in_bounds: {
         Args: {
