@@ -13,6 +13,7 @@ interface TimelineStage {
   date: string | null;
   status: 'completed' | 'current' | 'upcoming';
   tooltip: string;
+  decisionStatus?: 'approved' | 'refused' | null;
 }
 
 const formatDate = (dateStr: string | null): string => {
@@ -36,6 +37,18 @@ const formatDate = (dateStr: string | null): string => {
   return 'Invalid date';
 };
 
+const getDecisionStatus = (status: string | null): 'approved' | 'refused' | null => {
+  if (!status) return null;
+  const statusLower = status.toLowerCase();
+  if (statusLower.includes('approved') || statusLower.includes('granted')) {
+    return 'approved';
+  }
+  if (statusLower.includes('refused') || statusLower.includes('rejected')) {
+    return 'refused';
+  }
+  return null;
+};
+
 export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) => {
   const getStages = (): TimelineStage[] => {
     const today = new Date();
@@ -49,14 +62,7 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
     const decisionDue = application.decisionDue ? 
       parse(application.decisionDue, 'dd/MM/yyyy', new Date()) : null;
 
-    console.log('Date parsing results:', {
-      validDate: application.valid_date,
-      parsedValidDate: validDate,
-      consultationEnd: application.last_date_consultation_comments,
-      parsedConsultationEnd: consultationEnd,
-      decisionDue: application.decisionDue,
-      parsedDecisionDue: decisionDue
-    });
+    const decisionStatus = getDecisionStatus(application.status);
 
     return [
       {
@@ -78,7 +84,10 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
         date: application.decisionDue,
         status: decisionDue ? 
           (isValid(decisionDue) && decisionDue < today ? 'completed' : 'upcoming') : 'upcoming',
-        tooltip: `Decision due by ${formatDate(application.decisionDue)}`
+        tooltip: decisionStatus ? 
+          `Application ${decisionStatus}` : 
+          `Decision due by ${formatDate(application.decisionDue)}`,
+        decisionStatus
       }
     ];
   };
@@ -86,26 +95,31 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
   const stages = getStages();
 
   return (
-    <div className="flex flex-col space-y-2 pt-6 pb-4"> {/* Changed space-y-4 to space-y-2 */}
+    <div className="flex flex-col space-y-2 pt-6 pb-4">
       <div className="relative">
-        {/* Timeline line positioned behind circles */}
-        <div className="absolute left-[15px] top-[24px] bottom-4 w-0.5 bg-gray-200 -z-10" /> {/* Adjusted top position */}
+        <div className="absolute left-[15px] top-[24px] bottom-4 w-0.5 bg-gray-200 -z-10" />
         
-        <div className="space-y-4"> {/* Changed from space-y-8 to space-y-4 */}
+        <div className="space-y-4">
           {stages.map((stage, index) => (
             <div key={index} className="flex items-start relative">
-              {/* Circle container with higher z-index */}
               <div className="flex-shrink-0 relative z-10">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
                       <div className={`
                         w-8 h-8 rounded-full flex items-center justify-center
-                        ${stage.status === 'completed' ? 'bg-green-100' : 
+                        ${stage.status === 'completed' ? 
+                          (stage.decisionStatus === 'approved' ? 'bg-green-100' :
+                           stage.decisionStatus === 'refused' ? 'bg-red-100' :
+                           'bg-green-100') : 
                           stage.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'}
                       `}>
                         {stage.status === 'completed' ? (
-                          <Check className="w-5 h-5 text-green-600" />
+                          <Check className={`w-5 h-5 ${
+                            stage.decisionStatus === 'approved' ? 'text-green-600' :
+                            stage.decisionStatus === 'refused' ? 'text-red-600' :
+                            'text-green-600'
+                          }`} />
                         ) : stage.status === 'current' ? (
                           <Clock className="w-5 h-5 text-blue-600" />
                         ) : (
@@ -121,7 +135,15 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
               </div>
               <div className="ml-4">
                 <h3 className="text-sm font-medium">{stage.label}</h3>
-                <p className="text-sm text-gray-500">{formatDate(stage.date)}</p>
+                <p className={`text-sm ${
+                  stage.decisionStatus === 'approved' ? 'text-green-600' :
+                  stage.decisionStatus === 'refused' ? 'text-red-600' :
+                  'text-gray-500'
+                }`}>
+                  {stage.decisionStatus ? 
+                    stage.decisionStatus.charAt(0).toUpperCase() + stage.decisionStatus.slice(1) :
+                    formatDate(stage.date)}
+                </p>
               </div>
             </div>
           ))}
