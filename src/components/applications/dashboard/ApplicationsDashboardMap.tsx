@@ -37,13 +37,17 @@ export const ApplicationsDashboardMap = () => {
     console.log('Selected ID state changed:', selectedId);
   }, [selectedId]);
 
-  // Mobile auto-selection effect
+  // Mobile auto-selection effect - only run on initial mount or when map view changes
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && isMapView) {
       console.log('Auto-selecting first application on mobile');
-      handleMarkerClick(filteredApplications[0].id);
+      // Add a small delay to prevent immediate re-render
+      const timer = setTimeout(() => {
+        handleMarkerClick(filteredApplications[0].id);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [filteredApplications, selectedId, handleMarkerClick, isMapView, isMobile]);
+  }, [isMapView]); // Only depend on isMapView changes
 
   return (
     <DashboardLayout
