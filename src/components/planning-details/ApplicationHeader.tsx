@@ -1,7 +1,4 @@
 import { Application } from "@/types/planning";
-import { Card } from "@/components/ui/card";
-import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
-import { getStatusColor } from "@/utils/statusColors";
 import { Timer } from "lucide-react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
@@ -10,30 +7,22 @@ interface ApplicationHeaderProps {
 }
 
 export const ApplicationHeader = ({ application }: ApplicationHeaderProps) => {
-  const isClosingSoon = application.last_date_consultation_comments
-    ? isWithinNextSevenDays(application.last_date_consultation_comments)
-    : false;
+  const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
 
   return (
-    <Card className="p-4 mb-4">
-      <div className="flex flex-col gap-2">
-        <ApplicationTitle
-          title={application.ai_title || application.description || ''}
-          className="text-xl font-semibold"
-        />
-        <div className="flex items-center gap-2">
-          <span className={`px-2 py-1 rounded text-sm ${getStatusColor(application.status)}`}>
-            {application.status}
+    <div>
+      <h2 className="text-xl font-semibold line-clamp-2 leading-tight">
+        {application.title || application.description}
+      </h2>
+      <div className="flex items-center gap-2 mt-1">
+        <p className="text-sm text-gray-600">{application.reference}</p>
+        {isClosingSoon && (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+            <Timer className="w-3 h-3 mr-1" />
+            Closing soon
           </span>
-          {isClosingSoon && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-sm bg-purple-100 text-purple-800">
-              <Timer className="w-4 h-4" />
-              Closing soon
-            </span>
-          )}
-        </div>
-        <p className="text-gray-600">{application.address}</p>
+        )}
       </div>
-    </Card>
+    </div>
   );
 };

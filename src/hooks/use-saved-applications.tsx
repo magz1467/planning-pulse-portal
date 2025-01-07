@@ -24,7 +24,7 @@ export const useSavedApplications = () => {
         throw error;
       }
 
-      setSavedApplications(data.map(item => Number(item.application_id)));
+      setSavedApplications(data.map(item => item.application_id));
     } catch (error: any) {
       console.error('Error fetching saved applications:', error);
       toast({
