@@ -45,7 +45,7 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
   return (
     <Card className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-lg">Environmental Impact Assessment</h3>
+        <h3 className="font-semibold text-lg">Estimated Impact</h3>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
@@ -60,7 +60,7 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className={`text-2xl font-bold ${getScoreColor(score)}`}>
+          <span className={`text-xl font-bold ${getScoreColor(score)}`}>
             {score}/100
           </span>
           <span className="text-sm text-muted-foreground">{getImpactText(score)}</span>
@@ -71,7 +71,7 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
       {details.Environmental && (
         <div>
           <h4 className="font-medium mb-2 text-sm">Environmental Factors</h4>
-          <div className="space-y-1">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
             {Object.entries(details.Environmental).map(([key, value]) => (
               <div key={key} className="flex justify-between text-sm">
                 <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</span>
@@ -85,7 +85,7 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
       {details.Social && (
         <div>
           <h4 className="font-medium mb-2 text-sm">Social Factors</h4>
-          <div className="space-y-1">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
             {Object.entries(details.Social).map(([key, value]) => (
               <div key={key} className="flex justify-between text-sm">
                 <span className="text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</span>
