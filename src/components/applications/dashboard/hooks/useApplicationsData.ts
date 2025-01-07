@@ -48,8 +48,8 @@ export const useApplicationsData = () => {
       if (error) {
         console.error('Error fetching applications:', error);
         toast({
-          title: 'Error fetching applications',
-          description: 'Please try again later',
+          title: "Error fetching applications",
+          description: error.message || 'Please try again later',
           variant: 'destructive',
         });
         setApplications([]);
@@ -81,20 +81,21 @@ export const useApplicationsData = () => {
         'Other': 0
       };
 
-      if (transformedApplications && transformedApplications.length > 0) {
-        transformedApplications.forEach(app => {
-          const status = app.status.toLowerCase();
-          if (status.includes('under consideration')) {
-            counts['Under Review']++;
-          } else if (status.includes('approved')) {
-            counts['Approved']++;
-          } else if (status.includes('declined')) {
-            counts['Declined']++;
-          } else {
-            counts['Other']++;
-          }
-        });
-      }
+      transformedApplications.forEach(app => {
+        const status = app.status.toLowerCase();
+        if (status.includes('under consideration')) {
+          counts['Under Review']++;
+        } else if (status.includes('approved')) {
+          counts['Approved']++;
+        } else if (status.includes('declined')) {
+          counts['Declined']++;
+        } else {
+          counts['Other']++;
+        }
+      });
+
+      setApplications(transformedApplications);
+      setStatusCounts(counts);
 
       // Get total count
       const { data: totalData, error: countError } = await supabase
@@ -111,14 +112,11 @@ export const useApplicationsData = () => {
         setTotalCount(totalData || 0);
       }
 
-      setApplications(transformedApplications);
-      setStatusCounts(counts);
-
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
       toast({
-        title: 'Error fetching applications',
-        description: 'Please try again later',
+        title: "Error fetching applications",
+        description: "Please try again later",
         variant: 'destructive',
       });
     } finally {
