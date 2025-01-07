@@ -29,6 +29,7 @@ export const useDashboardState = () => {
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [searchPoint, setSearchPoint] = useState<[number, number] | null>(null);
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   const { 
@@ -37,6 +38,15 @@ export const useDashboardState = () => {
     fetchApplicationsInRadius,
     statusCounts
   } = useApplicationsData();
+
+  // Auto-select first application on mobile only on initial load
+  useEffect(() => {
+    if (!hasAutoSelected && applications.length > 0 && window.innerWidth <= 768 && !selectedId) {
+      console.log('Auto-selecting first application on mobile - initial load only');
+      handleMarkerClick(applications[0].id);
+      setHasAutoSelected(true);
+    }
+  }, [applications, selectedId, hasAutoSelected, handleMarkerClick]);
 
   useEffect(() => {
     if (isSearching && !coordinates) {
