@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -13,7 +13,7 @@ interface MapSectionProps {
   onCenterChange?: (center: [number, number]) => void;
 }
 
-export const MapSection = ({
+export const MapSection = memo(({
   isMobile,
   isMapView,
   coordinates,
@@ -56,4 +56,6 @@ export const MapSection = ({
       </div>
     </div>
   );
-};
+});
+
+MapSection.displayName = 'MapSection';

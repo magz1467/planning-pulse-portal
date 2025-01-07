@@ -24,7 +24,6 @@ export const MapContainerComponent = memo(({
   const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
-    console.log('MapContainer - Coordinates changed:', coordinates);
     if (mapRef.current) {
       mapRef.current.setView(coordinates, 14);
       setTimeout(() => {
@@ -32,12 +31,6 @@ export const MapContainerComponent = memo(({
       }, 100);
     }
   }, [coordinates]);
-
-  console.log('MapContainer - Rendering with:', {
-    applicationsCount: applications.length,
-    selectedId,
-    coordinates
-  });
 
   const handleMarkerClick = (id: number) => {
     console.log('Marker clicked in MapContainer:', id);

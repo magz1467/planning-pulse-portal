@@ -1,5 +1,6 @@
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
+import { memo } from "react";
 
 interface MapViewProps {
   applications: Application[];
@@ -9,7 +10,7 @@ interface MapViewProps {
   onCenterChange?: (center: [number, number]) => void;
 }
 
-export const MapView = ({
+export const MapView = memo(({
   applications,
   selectedId,
   coordinates,
@@ -27,4 +28,6 @@ export const MapView = ({
       />
     </div>
   );
-};
+});
+
+MapView.displayName = 'MapView';
