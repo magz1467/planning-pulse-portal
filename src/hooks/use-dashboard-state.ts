@@ -11,7 +11,6 @@ import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 
 export const useDashboardState = () => {
-  // First, initialize all URL and router related hooks
   const { 
     initialPostcode, 
     initialTab, 
@@ -22,7 +21,6 @@ export const useDashboardState = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Then, initialize all state management hooks
   const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
@@ -32,7 +30,6 @@ export const useDashboardState = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchPoint, setSearchPoint] = useState<[number, number] | null>(null);
 
-  // Initialize data fetching hooks
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   const { 
     applications, 
@@ -41,12 +38,11 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
-  // URL params effect
   useEffect(() => {
     if (isSearching && !coordinates) {
       toast({
-        title: "Invalid location",
-        description: "We couldn't find that location. Please try another search.",
+        title: "Location Error",
+        description: "We couldn't find that location. Please check the postcode and try again.",
         variant: "destructive",
       });
       setIsSearching(false);
@@ -54,15 +50,23 @@ export const useDashboardState = () => {
       return;
     }
 
-    updateURLParams({
-      postcode,
-      tab: initialTab,
-      filter: activeFilters.status,
-      applicationId: selectedId
-    });
+    try {
+      updateURLParams({
+        postcode,
+        tab: initialTab,
+        filter: activeFilters.status,
+        applicationId: selectedId
+      });
+    } catch (error) {
+      console.error('URL update error:', error);
+      toast({
+        title: "Navigation Error",
+        description: "There was a problem updating the page URL. Please try refreshing the page.",
+        variant: "destructive",
+      });
+    }
   }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast]);
 
-  // Search logging
   const logSearch = async (loadTime: number) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -75,27 +79,32 @@ export const useDashboardState = () => {
       });
 
       if (error) {
-        console.error('Error logging search:', error);
+        console.error('Search logging error:', error);
+        toast({
+          title: "Analytics Error",
+          description: "Your search was processed but we couldn't log it. This won't affect your results.",
+          variant: "default",
+        });
       }
     } catch (error) {
-      console.error('Error logging search:', error);
+      console.error('Search logging error:', error);
     }
   };
 
-  // Postcode selection handler
   const handlePostcodeSelect = async (newPostcode: string) => {
-    if (!newPostcode) return;
+    if (!newPostcode) {
+      toast({
+        title: "Invalid Postcode",
+        description: "Please enter a valid postcode to search.",
+        variant: "destructive",
+      });
+      return;
+    }
     setIsSearching(true);
     setSearchStartTime(Date.now());
     setPostcode(newPostcode);
   };
 
-  // Sort handler
-  const handleSortChange = (sortType: SortType) => {
-    setActiveSort(sortType);
-  };
-
-  // Search effect
   const isInitialSearch = !searchPoint && coordinates;
   const isNewSearch = searchPoint && coordinates && 
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
@@ -105,15 +114,23 @@ export const useDashboardState = () => {
     
     if (isInitialSearch || isNewSearch) {
       console.log('Fetching applications with coordinates:', coordinates);
-      // Ensure we only use the first two elements of coordinates and explicitly type them
-      const [lat, lng] = coordinates;
-      const tuple: [number, number] = [lat, lng];
-      setSearchPoint(tuple);
-      fetchApplicationsInRadius(tuple, 1000);
+      try {
+        const [lat, lng] = coordinates;
+        const tuple: [number, number] = [lat, lng];
+        setSearchPoint(tuple);
+        fetchApplicationsInRadius(tuple, 1000);
+      } catch (error) {
+        console.error('Search error:', error);
+        toast({
+          title: "Search Failed",
+          description: "There was a problem fetching planning applications. Please try again or contact support if the issue persists.",
+          variant: "destructive",
+        });
+        setIsSearching(false);
+      }
     }
-  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius]);
+  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, toast]);
 
-  // Search performance logging
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
       const loadTime = (Date.now() - searchStartTime) / 1000;
@@ -123,7 +140,6 @@ export const useDashboardState = () => {
     }
   }, [isLoadingApps, isLoadingCoords, searchStartTime, postcode]);
 
-  // Filter applications
   const safeApplications = applications || [];
   const filteredApplications = useFilteredApplications(
     safeApplications,
@@ -131,7 +147,6 @@ export const useDashboardState = () => {
     activeSort
   );
 
-  // Initialize default status counts
   const defaultStatusCounts = {
     'Under Review': 0,
     'Approved': 0,
