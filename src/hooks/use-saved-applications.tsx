@@ -1,106 +1,88 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { SavedApplication } from '@/types/saved';
 
 export const useSavedApplications = () => {
   const [savedApplications, setSavedApplications] = useState<number[]>([]);
   const { toast } = useToast();
 
+  useEffect(() => {
+    fetchSavedApplications();
+  }, []);
+
   const fetchSavedApplications = async () => {
     try {
-      const { data: session } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session?.session?.user) {
+      if (!session) {
         return;
       }
 
       const { data, error } = await supabase
         .from('saved_applications')
         .select('application_id')
-        .eq('user_id', session.session.user.id);
+        .eq('user_id', session.user.id);
 
       if (error) {
-        throw error;
+        console.error('Error fetching saved applications:', error);
+        return;
       }
 
-      setSavedApplications(data.map(item => item.application_id));
-    } catch (error: any) {
-      console.error('Error fetching saved applications:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load saved applications",
-        variant: "destructive",
-      });
+      setSavedApplications(data.map(item => Number(item.application_id)));
+    } catch (error) {
+      console.error('Error in fetchSavedApplications:', error);
     }
   };
 
   const toggleSavedApplication = async (applicationId: number) => {
     try {
-      const { data: session } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session?.session?.user) {
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to save applications",
+          variant: "destructive"
+        });
         return;
       }
 
-      const isSaved = savedApplications.includes(applicationId);
-
-      if (isSaved) {
-        // Remove from saved
+      if (savedApplications.includes(applicationId)) {
         const { error } = await supabase
           .from('saved_applications')
           .delete()
-          .eq('user_id', session.session.user.id)
-          .eq('application_id', applicationId.toString());
+          .eq('user_id', session.user.id)
+          .eq('application_id', applicationId);
 
         if (error) throw error;
 
         setSavedApplications(prev => prev.filter(id => id !== applicationId));
       } else {
-        // First verify the application exists
-        const { data: applicationExists, error: checkError } = await supabase
-          .from('applications')
-          .select('application_id')
-          .eq('application_id', applicationId.toString())
-          .single();
-
-        if (checkError || !applicationExists) {
-          toast({
-            title: "Error",
-            description: "This application no longer exists",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Add to saved
         const { error } = await supabase
           .from('saved_applications')
-          .insert({
-            user_id: session.session.user.id,
-            application_id: applicationId
-          });
+          .insert([
+            { 
+              user_id: session.user.id,
+              application_id: applicationId
+            }
+          ]);
 
         if (error) throw error;
 
         setSavedApplications(prev => [...prev, applicationId]);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error toggling saved application:', error);
       toast({
         title: "Error",
-        description: "Failed to update saved applications",
-        variant: "destructive",
+        description: "There was a problem saving the application. Please try again.",
+        variant: "destructive"
       });
     }
   };
 
-  useEffect(() => {
-    fetchSavedApplications();
-  }, []);
-
   return {
     savedApplications,
-    toggleSavedApplication,
+    toggleSavedApplication
   };
 };

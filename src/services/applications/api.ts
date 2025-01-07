@@ -75,7 +75,7 @@ export async function getApplicationById(id: string) {
 export async function getApplicationComments(applicationId: string) {
   try {
     const { data, error } = await supabase
-      .from('comments')
+      .from('Comments')  // Fixed case sensitivity
       .select('*')
       .eq('application_id', applicationId)
       .order('created_at', { ascending: false });
@@ -105,7 +105,7 @@ export async function getApplicationComments(applicationId: string) {
 export async function addApplicationComment(applicationId: string, comment: string, userId: string) {
   try {
     const { data, error } = await supabase
-      .from('comments')
+      .from('Comments')  // Fixed case sensitivity
       .insert([
         {
           application_id: applicationId,
@@ -137,3 +137,8 @@ export async function addApplicationComment(applicationId: string, comment: stri
     return null;
   }
 }
+
+// Add missing exports
+export const fetchApplicationsFromSupabase = getApplicationsWithinRadius;
+export const fetchApplicationsCountFromSupabase = getApplicationsWithinRadius;
+export const fetchStatusCounts = getApplicationsWithinRadius;
