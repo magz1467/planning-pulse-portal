@@ -6,7 +6,7 @@ import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
 
-export interface MapContainerProps {
+interface MapContainerProps {
   applications: Application[];
   coordinates: [number, number];
   selectedId?: number | null;
