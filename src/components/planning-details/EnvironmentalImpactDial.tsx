@@ -67,6 +67,7 @@ export const EnvironmentalImpactDial = ({
       score={score}
       progress={progress}
       details={details}
+      impactedServices={details?.impacted_services}
     />
   );
 };

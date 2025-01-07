@@ -14,9 +14,13 @@ interface SimpleImpactScoreProps {
   score: number;
   progress: number;
   details?: ImpactScoreData;
+  impactedServices?: Record<string, {
+    impact: 'positive' | 'negative' | 'neutral';
+    details: string;
+  }>;
 }
 
-export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScoreProps) => {
+export const SimpleImpactScore = ({ score, progress, details, impactedServices }: SimpleImpactScoreProps) => {
   if (!details) return null;
 
   const getScoreColor = (score: number) => {
@@ -96,13 +100,13 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
         </div>
       )}
 
-      {details.impacted_services && Object.keys(details.impacted_services).length > 0 && (
+      {impactedServices && Object.keys(impactedServices).length > 0 && (
         <>
           <Separator />
           <div>
             <h4 className="font-medium mb-3">Impact on Local Services</h4>
             <div className="grid gap-3">
-              {Object.entries(details.impacted_services).map(([service, data]) => (
+              {Object.entries(impactedServices).map(([service, data]) => (
                 <div 
                   key={service} 
                   className="text-sm space-y-1"
