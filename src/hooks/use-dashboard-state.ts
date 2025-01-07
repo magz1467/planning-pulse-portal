@@ -39,14 +39,14 @@ export const useDashboardState = () => {
     statusCounts
   } = useApplicationsData();
 
-  // Auto-select first application on mobile only on initial load
+  // Auto-select first application on mobile only on initial load and only in map view
   useEffect(() => {
-    if (!hasAutoSelected && applications.length > 0 && window.innerWidth <= 768 && !selectedId) {
-      console.log('Auto-selecting first application on mobile - initial load only');
+    if (!hasAutoSelected && applications.length > 0 && window.innerWidth <= 768 && !selectedId && isMapView) {
+      console.log('Auto-selecting first application on mobile - map view only');
       handleMarkerClick(applications[0].id);
       setHasAutoSelected(true);
     }
-  }, [applications, selectedId, hasAutoSelected, handleMarkerClick]);
+  }, [applications, selectedId, hasAutoSelected, handleMarkerClick, isMapView]);
 
   useEffect(() => {
     if (isSearching && !coordinates) {
