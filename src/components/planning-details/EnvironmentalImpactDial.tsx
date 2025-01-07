@@ -13,7 +13,7 @@ export const EnvironmentalImpactDial = ({
   details,
   applicationId 
 }: EnvironmentalImpactDialProps) => {
-  const { progress } = useImpactScore(applicationId, score);
+  const { progress } = useImpactScore(applicationId, score, details);
 
   return (
     <Card className="p-6">
