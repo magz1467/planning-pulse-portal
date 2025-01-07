@@ -36,7 +36,8 @@ export const useApplicationsData = () => {
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        });
+        })
+        .timeout(30000); // 30 second timeout
 
       if (error) {
         console.error('Error fetching applications:', error);
@@ -45,6 +46,8 @@ export const useApplicationsData = () => {
           description: 'Please try again later',
           variant: 'destructive',
         });
+        setApplications([]);
+        setTotalCount(0);
         return;
       }
 
@@ -71,7 +74,8 @@ export const useApplicationsData = () => {
           center_lat: center[0],
           center_lng: center[1],
           radius_meters: radius
-        });
+        })
+        .timeout(15000); // 15 second timeout
 
       if (countsError) {
         console.error('Error fetching counts:', countsError);
@@ -100,7 +104,8 @@ export const useApplicationsData = () => {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
-        });
+        })
+        .timeout(15000); // 15 second timeout
 
       if (countError) {
         console.error('Error fetching count:', countError);
