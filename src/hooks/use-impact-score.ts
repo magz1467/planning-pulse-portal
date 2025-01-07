@@ -63,18 +63,23 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Impa
         
         console.log('useImpactScore - Setting new score and details:', {
           score: data.score,
-          details: data.details
+          details: data.details,
+          impacted_services: data.impacted_services
         });
 
         setScore(data.score);
-        setDetails(data.details);
+        setDetails({
+          ...data.details,
+          impacted_services: data.impacted_services
+        });
 
         // Save the score to the database
         const { error: updateError } = await supabase
           .from('applications')
           .update({
             impact_score: data.score,
-            impact_score_details: data.details
+            impact_score_details: data.details,
+            impacted_services: data.impacted_services
           })
           .eq('application_id', applicationId);
 
