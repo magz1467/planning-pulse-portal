@@ -7,6 +7,8 @@ import { useURLState } from "./use-url-state";
 import { useSelectionState } from "./use-selection-state";
 import { useFilterState } from "./use-filter-state";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "./use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const useDashboardState = () => {
   const { 
@@ -17,12 +19,15 @@ export const useDashboardState = () => {
     updateURLParams 
   } = useURLState();
 
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode);
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   
@@ -36,13 +41,24 @@ export const useDashboardState = () => {
   } = useApplicationsData();
 
   useEffect(() => {
+    if (isSearching && !coordinates) {
+      toast({
+        title: "Invalid location",
+        description: "We couldn't find that location. Please try another search.",
+        variant: "destructive",
+      });
+      setIsSearching(false);
+      navigate("/");
+      return;
+    }
+
     updateURLParams({
       postcode,
       tab: initialTab,
       filter: activeFilters.status,
       applicationId: selectedId
     });
-  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams]);
+  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast]);
 
   const logSearch = async (loadTime: number) => {
     try {
@@ -64,6 +80,7 @@ export const useDashboardState = () => {
   };
 
   const handlePostcodeSelect = async (newPostcode: string) => {
+    setIsSearching(true);
     setSearchStartTime(Date.now());
     setPostcode(newPostcode);
   };
@@ -92,6 +109,7 @@ export const useDashboardState = () => {
       const loadTime = (Date.now() - searchStartTime) / 1000; // Convert to seconds
       logSearch(loadTime);
       setSearchStartTime(null);
+      setIsSearching(false);
     }
   }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
