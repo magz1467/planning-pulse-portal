@@ -13,42 +13,51 @@ export async function calculateImpactScore(
   }
 
   try {
-    // Enhanced prompt to emphasize development scale and type
+    // Enhanced prompt to generate more specific analysis
     const prompt = `
-      Analyze this planning application with special consideration for development scale and type.
-      Rate each subcategory from 1-5 (1=minimal impact, 5=severe impact).
+      Analyze this specific planning application and provide a detailed impact assessment.
+      Consider the exact details, scale, and context of this development.
       
-      Key factors to consider:
-      - New buildings or major developments should receive higher impact scores (4-5)
-      - Minor alterations or domestic changes should receive lower impact scores (1-2)
-      - Consider the scale of new resident influx for residential developments
-      - Evaluate infrastructure strain from new developments
-      
-      Return a valid JSON object with no markdown formatting.
-      Format: {
-        "Environmental": {
-          "land_use": 1-5,
-          "biodiversity": 1-5,
-          "resource_consumption": 1-5,
-          "construction_impact": 1-5
-        },
-        "Social": {
-          "population_change": 1-5,
-          "community_services": 1-5,
-          "neighborhood_character": 1-5,
-          "housing_provision": 1-5
-        },
-        "Infrastructure": {
-          "transport_network": 1-5,
-          "utilities_demand": 1-5,
-          "public_services": 1-5
-        }
-      }
-      
-      Application details:
+      Application details to analyze:
       Description: ${application.description || 'N/A'}
       Type: ${application.development_type || application.application_type || 'N/A'}
+      Status: ${application.status || 'N/A'}
+      Location: ${application.site_name || ''} ${application.street_name || ''} ${application.locality || ''} ${application.postcode || ''}
       Additional details: ${JSON.stringify(application.application_details || {})}
+      
+      Provide a detailed analysis in JSON format with:
+      1. Specific impact scores (1-5) for each category based on this exact development
+      2. Detailed explanations referencing specific aspects of this development
+      3. Key concerns unique to this application
+      4. Tailored recommendations addressing the specific challenges
+      
+      Return a valid JSON object with no markdown formatting:
+      {
+        "category_scores": {
+          "environmental": {
+            "score": number,
+            "details": "Specific analysis referencing the development details"
+          },
+          "social": {
+            "score": number,
+            "details": "Specific analysis referencing the development details"
+          },
+          "infrastructure": {
+            "score": number,
+            "details": "Specific analysis referencing the development details"
+          }
+        },
+        "key_concerns": [
+          "Specific concern 1 referencing development details",
+          "Specific concern 2 referencing development details",
+          "Specific concern 3 referencing development details"
+        ],
+        "recommendations": [
+          "Specific recommendation 1 addressing development details",
+          "Specific recommendation 2 addressing development details",
+          "Specific recommendation 3 addressing development details"
+        ]
+      }
     `;
 
     console.log(`[Impact Score ${application.application_id}] Sending request to Perplexity API`);
@@ -64,7 +73,7 @@ export async function calculateImpactScore(
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores, no explanations or markdown.'
+            content: 'You are an expert urban planner and environmental impact assessor. Provide detailed, specific analysis referencing the exact details of each planning application. Avoid generic responses.'
           },
           {
             role: 'user',
@@ -110,70 +119,29 @@ export async function calculateImpactScore(
       const scores = JSON.parse(cleanContent);
       console.log(`[Impact Score ${application.application_id}] Parsed scores:`, scores);
       
-      // Updated weights to emphasize development impact
+      // Calculate weighted average for final score
       const weights = {
-        'Environmental': 0.35,  // 35% weight
-        'Social': 0.40,        // 40% weight - increased to emphasize population impact
-        'Infrastructure': 0.25 // 25% weight
+        'environmental': 0.35,
+        'social': 0.40,
+        'infrastructure': 0.25
       };
       
-      // Calculate weighted average for each category
-      const categoryScores: Record<string, number> = {};
-      let totalWeightedScore = 0;
-      let totalWeightsApplied = 0;
+      let totalScore = 0;
+      let totalWeights = 0;
 
-      for (const [category, subcategories] of Object.entries(scores)) {
-        let categoryTotal = 0;
-        let count = 0;
-        
-        for (const score of Object.values(subcategories as Record<string, number>)) {
-          categoryTotal += score as number;
-          count++;
-        }
-        
-        const categoryScore = Math.round((categoryTotal / count) * 20); // Convert to /100 scale
-        categoryScores[category] = categoryScore;
-        
+      Object.entries(scores.category_scores).forEach(([category, data]: [string, any]) => {
         const weight = weights[category as keyof typeof weights] || 0.33;
-        totalWeightedScore += categoryScore * weight;
-        totalWeightsApplied += weight;
-      }
+        totalScore += data.score * weight * 20; // Convert 1-5 scale to 0-100
+        totalWeights += weight;
+      });
 
-      // Calculate final weighted average
-      const normalizedScore = Math.round(totalWeightedScore / totalWeightsApplied);
-
-      // Prepare the details object with the calculated scores
-      const details = {
-        category_scores: {
-          environmental: {
-            score: categoryScores['Environmental'] || 0,
-            details: "Impact on local environment including biodiversity and resources"
-          },
-          social: {
-            score: categoryScores['Social'] || 0,
-            details: "Impact on local community and population changes"
-          },
-          infrastructure: {
-            score: categoryScores['Infrastructure'] || 0,
-            details: "Impact on local infrastructure and services"
-          }
-        },
-        key_concerns: [
-          "Scale of development and population change",
-          "Environmental sustainability",
-          "Infrastructure capacity"
-        ],
-        recommendations: [
-          "Consider development scale in relation to local area",
-          "Implement environmental mitigation measures",
-          "Assess infrastructure requirements"
-        ]
-      };
+      const normalizedScore = Math.round(totalScore / totalWeights);
 
       return {
         score: normalizedScore,
-        details: details
+        details: scores
       };
+
     } catch (parseError) {
       console.error(`[Impact Score ${application.application_id}] JSON Parse Error:`, {
         content: cleanContent,
