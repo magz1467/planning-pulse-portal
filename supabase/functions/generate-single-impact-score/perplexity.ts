@@ -16,15 +16,27 @@ export async function calculateImpactScore(
     const prompt = `
       Analyze this planning application and provide:
       1. Impact scores for each category (rate 1-5, 1=minimal impact, 5=severe impact)
-      2. Assessment of impact on local services (positive/negative/neutral)
+      2. Assessment of impact on local services based on the application details
       
       Return a valid JSON object with no markdown formatting.
       Format: {
-        "impact_scores": {"Environmental": {"air_quality": 3, "noise": 2}, "Social": {"community": 4}},
+        "impact_scores": {
+          "Environmental": {
+            "air_quality": <score>,
+            "noise": <score>,
+            "biodiversity": <score>
+          }, 
+          "Social": {
+            "community": <score>,
+            "accessibility": <score>
+          }
+        },
         "impacted_services": {
-          "Schools": {"impact": "negative", "details": "May increase pressure on local schools"},
-          "Health": {"impact": "neutral", "details": "No significant impact expected"},
-          "Transport": {"impact": "positive", "details": "New bus route proposed"}
+          "Schools": {"impact": "<positive/negative/neutral>", "details": "<specific details based on application>"},
+          "Health": {"impact": "<positive/negative/neutral>", "details": "<specific details based on application>"},
+          "Transport": {"impact": "<positive/negative/neutral>", "details": "<specific details based on application>"},
+          "Utilities": {"impact": "<positive/negative/neutral>", "details": "<specific details based on application>"},
+          "Community": {"impact": "<positive/negative/neutral>", "details": "<specific details based on application>"}
         }
       }
       
@@ -32,6 +44,8 @@ export async function calculateImpactScore(
       Description: ${application.description || 'N/A'}
       Type: ${application.development_type || application.application_type || 'N/A'}
       Additional details: ${JSON.stringify(application.application_details || {})}
+      Status: ${application.status || 'N/A'}
+      Location: ${application.site_name || ''} ${application.street_name || ''} ${application.locality || ''} ${application.postcode || ''}
     `;
 
     console.log(`[Impact Score ${application.application_id}] Sending request to Perplexity API`);
@@ -47,7 +61,7 @@ export async function calculateImpactScore(
         messages: [
           {
             role: 'system',
-            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores and impact assessments, no explanations or markdown.'
+            content: 'You are an expert in analyzing planning applications and their potential impacts. Return only a valid JSON object with numerical scores and impact assessments based on the actual application details provided. Be specific in your analysis and avoid generic responses.'
           },
           {
             role: 'user',
