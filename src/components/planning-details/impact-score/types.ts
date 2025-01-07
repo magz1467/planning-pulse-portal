@@ -32,8 +32,3 @@ export interface ImpactScoreData {
     };
   };
 }
-
-export interface ImpactCategory {
-  category: string;
-  scoreData: CategoryScore;
-}
