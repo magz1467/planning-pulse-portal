@@ -89,7 +89,7 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
   const stages = getStages();
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4 pt-6 pb-4"> {/* Added pt-6 for more top padding */}
       <div className="relative">
         {/* Timeline line - now positioned behind circles */}
         <div className="absolute left-[15px] top-[30px] bottom-4 w-0.5 bg-gray-200 -z-10" />
