@@ -22,7 +22,6 @@ export const PlanningApplicationDetails = ({
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const { toast } = useToast();
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
 
@@ -38,10 +37,6 @@ export const PlanningApplicationDetails = ({
   if (!application) return null;
 
   const isSaved = savedApplications.includes(application.id);
-  const feedbackStats = {
-    thumbsUp: feedback === 'up' ? 13 : 12,
-    thumbsDown: feedback === 'down' ? 4 : 3
-  };
 
   const handleSave = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -83,32 +78,16 @@ export const PlanningApplicationDetails = ({
     setShowFeedbackDialog(false);
   };
 
-  const handleFeedback = (type: 'up' | 'down') => {
-    setFeedback(prev => prev === type ? null : type);
-    
-    toast({
-      title: type === feedback ? "Feedback removed" : "Thank you for your feedback",
-      description: type === feedback 
-        ? "Your feedback has been removed"
-        : type === 'up' 
-          ? "We're glad this was helpful!" 
-          : "We'll work on improving this",
-    });
-  };
-
   return (
     <div className="p-6 space-y-4 pb-20">
       <DetailContent 
         application={application}
-        feedback={feedback}
-        handleFeedback={handleFeedback}
-        feedbackStats={feedbackStats}
       />
 
       <ActionButtons
         applicationId={application.id}
         isSaved={isSaved}
-        handleSave={handleSave}
+        onSave={handleSave}
         setShowEmailDialog={setShowEmailDialog}
         setShowFeedbackDialog={setShowFeedbackDialog}
       />

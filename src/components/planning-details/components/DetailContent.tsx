@@ -1,34 +1,31 @@
 import { Application } from "@/types/planning";
-import { ApplicationTimeline } from "../ApplicationTimeline";
-import { ApplicationDescription } from "../ApplicationDescription";
-import { ApplicationComments } from "../ApplicationComments";
-import { EnvironmentalImpactDial } from "../EnvironmentalImpactDial";
-import { ExpectedImpactAreas } from "../ExpectedImpactAreas";
+import { ApplicationImage } from "@/components/planning-details/ApplicationImage";
+import { ApplicationDescription } from "@/components/planning-details/ApplicationDescription";
+import { ApplicationTimeline } from "@/components/planning-details/ApplicationTimeline";
+import { ApplicationComments } from "@/components/planning-details/ApplicationComments";
+import { ApplicationFeedback } from "@/components/planning-details/ApplicationFeedback";
+import { ImpactScoreDetails } from "@/components/planning-details/impact-score/ImpactScoreDetails";
 
 interface DetailContentProps {
   application: Application;
 }
 
-export const DetailContent = ({ application }: DetailContentProps) => {
+export const DetailContent = ({
+  application,
+}: DetailContentProps) => {
   return (
     <div className="space-y-6">
-      <ApplicationTimeline application={application} />
+      <ApplicationImage application={application} />
       
       <ApplicationDescription application={application} />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <EnvironmentalImpactDial 
-          score={application.impact_score || null}
-          details={application.impact_score_details}
-          applicationId={application.id}
-        />
-        <ExpectedImpactAreas 
-          application={application}
-          impactedServices={application.impacted_services}
-        />
-      </div>
+      <ApplicationTimeline application={application} />
 
-      <ApplicationComments applicationId={application.id} />
+      <ImpactScoreDetails application={application} />
+      
+      <ApplicationComments application={application} />
+      
+      <ApplicationFeedback application={application} />
     </div>
   );
 };
