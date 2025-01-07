@@ -10,28 +10,33 @@ interface ImpactScoreBreakdownProps {
 }
 
 export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ details }) => {
-  if (!details?.impact_scores) return null;
+  console.log('ImpactScoreBreakdown - Received details:', details);
 
-  const { impact_scores, key_concerns, recommendations, impacted_services } = details;
+  if (!details?.impact_scores) {
+    console.log('ImpactScoreBreakdown - No impact_scores found in details');
+    return null;
+  }
 
   // Calculate category scores from detailed breakdowns
   const categoryScores: Record<string, CategoryScore> = {};
   
-  if (impact_scores.Environmental) {
-    const envScore = Object.values(impact_scores.Environmental).reduce((a, b) => a + b, 0);
+  if (details.impact_scores.Environmental) {
+    const envScore = Object.values(details.impact_scores.Environmental).reduce((a, b) => a + b, 0);
     categoryScores.Environmental = {
-      score: envScore / Object.keys(impact_scores.Environmental).length,
-      details: `Based on analysis of air quality (${impact_scores.Environmental.air_quality}), noise (${impact_scores.Environmental.noise}), ecosystem (${impact_scores.Environmental.ecosystem}), biodiversity (${impact_scores.Environmental.biodiversity}), and water quality (${impact_scores.Environmental.water_quality}).`
+      score: envScore / Object.keys(details.impact_scores.Environmental).length,
+      details: `Based on analysis of air quality (${details.impact_scores.Environmental.air_quality}), noise (${details.impact_scores.Environmental.noise}), ecosystem (${details.impact_scores.Environmental.ecosystem}), biodiversity (${details.impact_scores.Environmental.biodiversity}), and water quality (${details.impact_scores.Environmental.water_quality}).`
     };
   }
 
-  if (impact_scores.Social) {
-    const socialScore = Object.values(impact_scores.Social).reduce((a, b) => a + b, 0);
+  if (details.impact_scores.Social) {
+    const socialScore = Object.values(details.impact_scores.Social).reduce((a, b) => a + b, 0);
     categoryScores.Social = {
-      score: socialScore / Object.keys(impact_scores.Social).length,
-      details: `Based on analysis of community (${impact_scores.Social.community}), cultural (${impact_scores.Social.cultural}), and economic (${impact_scores.Social.economic}) factors.`
+      score: socialScore / Object.keys(details.impact_scores.Social).length,
+      details: `Based on analysis of community (${details.impact_scores.Social.community}), cultural (${details.impact_scores.Social.cultural}), and economic (${details.impact_scores.Social.economic}) factors.`
     };
   }
+
+  console.log('ImpactScoreBreakdown - Calculated category scores:', categoryScores);
 
   // Order categories for consistent display
   const orderedCategories = ['Environmental', 'Social', 'Infrastructure', 'Economic'];
@@ -67,11 +72,11 @@ export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ deta
         })}
 
         {/* Display impacted services analysis */}
-        {impacted_services && Object.keys(impacted_services).length > 0 && (
+        {details.impacted_services && Object.keys(details.impacted_services).length > 0 && (
           <Card className="p-4">
             <h3 className="font-semibold mb-4">Impact on Local Services</h3>
             <div className="grid grid-cols-2 gap-4">
-              {Object.entries(impacted_services).map(([service, { impact, details }]) => (
+              {Object.entries(details.impacted_services).map(([service, { impact, details }]) => (
                 <div 
                   key={service} 
                   className={`flex items-start gap-2 group transition-all ${
@@ -113,8 +118,8 @@ export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ deta
           </Card>
         )}
 
-        <ImpactList title="Key Concerns" items={key_concerns} />
-        <ImpactList title="Recommendations" items={recommendations} />
+        <ImpactList title="Key Concerns" items={details.key_concerns} />
+        <ImpactList title="Recommendations" items={details.recommendations} />
       </div>
     </ScrollArea>
   );

@@ -11,8 +11,15 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Impa
   const [details, setDetails] = useState<ImpactScoreData | undefined>(initialDetails);
   const { toast } = useToast();
 
+  console.log('useImpactScore - Initial state:', {
+    initialScore,
+    initialDetails,
+    applicationId
+  });
+
   useEffect(() => {
     // Reset state when applicationId changes
+    console.log('useImpactScore - Resetting state for applicationId:', applicationId);
     setScore(initialScore);
     setDetails(initialDetails);
     setProgress(0);
@@ -31,16 +38,16 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Impa
     setHasTriggered(true);
 
     try {
-      console.log('Calling generate-single-impact-score with applicationId:', applicationId);
+      console.log('useImpactScore - Calling generate-single-impact-score with applicationId:', applicationId);
       
       const { data, error } = await supabase.functions.invoke('generate-single-impact-score', {
         body: { applicationId }
       });
 
-      console.log('Response from generate-single-impact-score:', { data, error });
+      console.log('useImpactScore - Response from generate-single-impact-score:', { data, error });
 
       if (error) {
-        console.error('Supabase function error:', error);
+        console.error('useImpactScore - Supabase function error:', error);
         throw error;
       }
 
@@ -54,6 +61,11 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Impa
           description: "The application's impact score has been calculated and saved.",
         });
         
+        console.log('useImpactScore - Setting new score and details:', {
+          score: data.score,
+          details: data.details
+        });
+
         setScore(data.score);
         setDetails(data.details);
 
@@ -67,15 +79,15 @@ export const useImpactScore = (initialScore: number | null, initialDetails: Impa
           .eq('application_id', applicationId);
 
         if (updateError) {
-          console.error('Error saving impact score:', updateError);
+          console.error('useImpactScore - Error saving impact score:', updateError);
           throw updateError;
         }
       } else {
-        console.error('Failed to generate impact score:', data.error);
+        console.error('useImpactScore - Failed to generate impact score:', data.error);
         throw new Error(data.error || 'Failed to generate impact score');
       }
     } catch (error) {
-      console.error('Error generating impact score:', error);
+      console.error('useImpactScore - Error generating impact score:', error);
       toast({
         title: "Error",
         description: "Failed to generate impact score. Please try again later.",

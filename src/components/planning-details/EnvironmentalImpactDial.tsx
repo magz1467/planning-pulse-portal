@@ -17,6 +17,12 @@ export const EnvironmentalImpactDial = ({
   details: initialDetails, 
   applicationId 
 }: EnvironmentalImpactDialProps) => {
+  console.log('EnvironmentalImpactDial - Received props:', {
+    initialScore,
+    initialDetails,
+    applicationId
+  });
+
   const {
     progress,
     isLoading,
@@ -25,6 +31,14 @@ export const EnvironmentalImpactDial = ({
     details,
     generateScore
   } = useImpactScore(initialScore, initialDetails, applicationId);
+
+  console.log('EnvironmentalImpactDial - After useImpactScore:', {
+    progress,
+    isLoading,
+    hasTriggered,
+    score,
+    details
+  });
 
   if (!score) {
     return (
