@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ImpactScoreData } from "@/components/planning-details/impact-score/types";
 
-export const useImpactScore = (initialScore: number | null, initialDetails: Record<string, any> | undefined, applicationId: number) => {
+export const useImpactScore = (initialScore: number | null, initialDetails: ImpactScoreData | undefined, applicationId: number) => {
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [score, setScore] = useState<number | null>(initialScore);
-  const [details, setDetails] = useState(initialDetails);
+  const [details, setDetails] = useState<ImpactScoreData | undefined>(initialDetails);
   const { toast } = useToast();
 
   useEffect(() => {

@@ -8,22 +8,24 @@ export interface ImpactCategory {
   scoreData: CategoryScore;
 }
 
-export interface ImpactScoreData {
-  impact_scores: {
-    Environmental?: {
-      air_quality: number;
-      noise: number;
-      ecosystem: number;
-      biodiversity: number;
-      water_quality: number;
-    };
-    Social?: {
-      community: number;
-      cultural: number;
-      economic: number;
-    };
-    [key: string]: Record<string, number> | undefined;
+export interface ImpactScores {
+  Environmental?: {
+    air_quality: number;
+    noise: number;
+    ecosystem: number;
+    biodiversity: number;
+    water_quality: number;
   };
+  Social?: {
+    community: number;
+    cultural: number;
+    economic: number;
+  };
+  [key: string]: Record<string, number> | undefined;
+}
+
+export interface ImpactScoreData {
+  impact_scores: ImpactScores;
   key_concerns?: string[];
   recommendations?: string[];
   impacted_services?: {
