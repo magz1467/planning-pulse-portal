@@ -6,7 +6,7 @@ import { ImpactFactors } from "./components/ImpactFactors";
 import { ImpactedServices } from "./components/ImpactedServices";
 import { getScoreExplanation } from "./utils/scoreExplanations";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import { useState } from "react";
 
 interface SimpleImpactScoreProps {
@@ -46,11 +46,10 @@ export const SimpleImpactScore = ({
         impact: data.impact,
         details: data.details
       }))
-      .slice(0, 2); // Get top 2 most significant impacts
+      .slice(0, 2);
 
     let summary = `This development has ${positiveCount} positive and ${negativeCount} negative potential impacts`;
     
-    // Add specific impacts if available
     if (significantImpacts.length > 0) {
       summary += ", notably ";
       summary += significantImpacts
@@ -58,7 +57,6 @@ export const SimpleImpactScore = ({
         .join(" and ");
     }
     
-    // Add environmental context if available
     if (details.Environmental) {
       const envFactors = Object.keys(details.Environmental);
       if (envFactors.length > 0) {
@@ -98,24 +96,13 @@ export const SimpleImpactScore = ({
         <p className="text-sm text-gray-700">{getExecutiveSummary()}</p>
       </div>
 
-      {/* Display Environmental and Social Scores */}
-      {Object.keys(factorScores).length > 0 && (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-          {Object.entries(factorScores).map(([factor, score]) => (
-            <div key={factor} className="bg-white p-4 rounded-lg border">
-              <h4 className="font-medium text-sm text-gray-600">{factor} Impact</h4>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-2xl font-bold">
-                  {score.toFixed(1)}
-                </span>
-                <span className="text-sm text-gray-500">
-                  out of 5
-                </span>
-              </div>
-            </div>
-          ))}
+      {/* Display Environmental and Social Scores as inline text */}
+      {Object.entries(factorScores).map(([factor, score]) => (
+        <div key={factor} className="flex items-center gap-2 text-sm text-gray-600">
+          <Check className="h-4 w-4 text-emerald-500" />
+          <span>{factor} Impact Score: <span className="font-medium">{score.toFixed(1)}</span> out of 5</span>
         </div>
-      )}
+      ))}
 
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
