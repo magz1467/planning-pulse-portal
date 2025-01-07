@@ -28,16 +28,14 @@ export const useApplicationsData = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      // First try to get applications
-      const { data: applications, error } = await supabase
-        .rpc('get_applications_within_radius', {
+      const { data, error } = await supabase
+        .rpc('get_applications_with_counts', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        })
-        .timeout(30000); // 30 second timeout
+        });
 
       if (error) {
         console.error('Error fetching applications:', error);
@@ -51,67 +49,42 @@ export const useApplicationsData = () => {
         return;
       }
 
-      if (!applications) {
+      if (!data) {
         console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log(`📦 Received ${applications?.length || 0} applications from database`);
+      const { applications: appsData, total_count, status_counts } = data;
+      console.log(`📦 Received ${appsData?.length || 0} applications from database`);
 
-      const transformedApplications = applications
+      const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
       console.log('✨ Transformed applications:', transformedApplications?.length || 0);
 
       setApplications(transformedApplications || []);
+      setTotalCount(total_count || 0);
 
-      // Then get status counts
-      const { data: counts, error: countsError } = await supabase
-        .rpc('get_applications_status_counts', {
-          center_lat: center[0],
-          center_lng: center[1],
-          radius_meters: radius
-        })
-        .timeout(15000); // 15 second timeout
-
-      if (countsError) {
-        console.error('Error fetching counts:', countsError);
-      } else {
-        const formattedCounts = {
-          'Under Review': 0,
-          'Approved': 0,
-          'Declined': 0,
-          'Other': 0
-        };
-        
-        if (Array.isArray(counts)) {
-          counts.forEach((row: { status: string; count: number }) => {
-            if (row.status in formattedCounts) {
-              formattedCounts[row.status as keyof typeof formattedCounts] = row.count;
-            }
-          });
-        }
-        
-        setStatusCounts(formattedCounts);
+      // Format status counts
+      const formattedCounts = {
+        'Under Review': 0,
+        'Approved': 0,
+        'Declined': 0,
+        'Other': 0
+      };
+      
+      if (status_counts) {
+        Object.entries(status_counts).forEach(([status, count]) => {
+          if (status in formattedCounts) {
+            formattedCounts[status as keyof typeof formattedCounts] = count as number;
+          }
+        });
       }
-
-      // Finally get total count
-      const { data: countData, error: countError } = await supabase
-        .rpc('get_applications_count_within_radius', {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: radius
-        })
-        .timeout(15000); // 15 second timeout
-
-      if (countError) {
-        console.error('Error fetching count:', countError);
-      } else {
-        setTotalCount(countData || 0);
-      }
+      
+      setStatusCounts(formattedCounts);
 
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
