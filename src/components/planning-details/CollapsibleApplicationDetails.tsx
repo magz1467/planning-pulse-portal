@@ -17,8 +17,8 @@ export const CollapsibleApplicationDetails = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="px-6 py-2">
-      <CollapsibleTrigger className="flex w-full items-center justify-between">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="px-8 py-6">
+      <CollapsibleTrigger className="flex w-full items-center justify-between mb-2">
         <span className="text-sm font-medium">Application Details</span>
         <ChevronDown
           className={`h-4 w-4 transform transition-all duration-200 ${
@@ -26,8 +26,8 @@ export const CollapsibleApplicationDetails = ({
           }`}
         />
       </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-2 pt-2">
-        <div className="grid grid-cols-2 gap-2 text-sm">
+      <CollapsibleContent className="space-y-4 pt-4">
+        <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="text-gray-500">Reference</div>
           <div>{application.reference}</div>
 
