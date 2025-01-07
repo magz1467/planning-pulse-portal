@@ -35,7 +35,6 @@ export const useApplicationsData = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      // Get applications within radius
       const { data: apps, error } = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
@@ -66,14 +65,12 @@ export const useApplicationsData = () => {
 
       console.log(`📦 Received ${apps.length} applications from database`);
 
-      // Transform applications
       const transformedApplications = apps
         .map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
       console.log('✨ Transformed applications:', transformedApplications.length);
 
-      // Calculate status counts from applications
       const counts: StatusCounts = {
         'Under Review': 0,
         'Approved': 0,
@@ -97,7 +94,6 @@ export const useApplicationsData = () => {
       setApplications(transformedApplications);
       setStatusCounts(counts);
 
-      // Get total count
       const { data: totalData, error: countError } = await supabase
         .rpc('get_applications_count_within_radius', {
           center_lng: center[1],
@@ -116,7 +112,7 @@ export const useApplicationsData = () => {
       console.error('Failed to fetch applications:', error);
       toast({
         title: "Error fetching applications",
-        description: "Please try again later",
+        description: error.message || "Please try again later",
         variant: 'destructive',
       });
     } finally {
