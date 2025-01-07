@@ -1,21 +1,15 @@
 import { useState } from 'react';
 import { Application } from "@/types/planning";
 import { supabase } from "@/integrations/supabase/client";
-import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
 import { useToast } from '@/hooks/use-toast';
+import { transformApplicationData } from '@/utils/applicationTransforms';
 
 interface StatusCounts {
   'Under Review': number;
   'Approved': number;
   'Declined': number;
   'Other': number;
-}
-
-interface ApplicationsResponse {
-  applications: any[];
-  total_count: number;
-  status_counts: Record<string, number>;
 }
 
 export const useApplicationsData = () => {
@@ -41,14 +35,16 @@ export const useApplicationsData = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      const { data, error } = await supabase
-        .rpc<ApplicationsResponse>('get_applications_with_counts', {
+      // Get applications within radius
+      const { data: apps, error } = await supabase
+        .rpc('get_applications_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        });
+        })
+        .timeout(30000); // 30 second timeout
 
       if (error) {
         console.error('Error fetching applications:', error);
@@ -62,42 +58,55 @@ export const useApplicationsData = () => {
         return;
       }
 
-      if (!data) {
+      if (!apps) {
         console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      const { applications: appsData, total_count, status_counts } = data;
-      console.log(`📦 Received ${appsData?.length || 0} applications from database`);
+      console.log(`📦 Received ${apps?.length || 0} applications from database`);
 
-      const transformedApplications = appsData
+      // Transform applications
+      const transformedApplications = apps
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
       console.log('✨ Transformed applications:', transformedApplications?.length || 0);
 
-      setApplications(transformedApplications || []);
-      setTotalCount(total_count || 0);
-
-      // Format status counts
-      const formattedCounts: StatusCounts = {
+      // Calculate status counts from applications
+      const counts: StatusCounts = {
         'Under Review': 0,
         'Approved': 0,
         'Declined': 0,
         'Other': 0
       };
-      
-      if (status_counts) {
-        Object.entries(status_counts).forEach(([status, count]) => {
-          if (status in formattedCounts) {
-            formattedCounts[status as keyof StatusCounts] = count as number;
-          }
-        });
-      }
-      
-      setStatusCounts(formattedCounts);
+
+      transformedApplications.forEach(app => {
+        const status = app.status.toLowerCase();
+        if (status.includes('under consideration')) {
+          counts['Under Review']++;
+        } else if (status.includes('approved')) {
+          counts['Approved']++;
+        } else if (status.includes('declined')) {
+          counts['Declined']++;
+        } else {
+          counts['Other']++;
+        }
+      });
+
+      // Get total count
+      const { count: total } = await supabase
+        .rpc('get_applications_count_within_radius', {
+          center_lng: center[1],
+          center_lat: center[0],
+          radius_meters: radius
+        })
+        .single();
+
+      setApplications(transformedApplications || []);
+      setTotalCount(total || 0);
+      setStatusCounts(counts);
 
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
