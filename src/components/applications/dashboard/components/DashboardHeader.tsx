@@ -1,7 +1,9 @@
 import { Home } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const DashboardHeader = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="bg-white">
       <div className="container mx-auto px-4">
