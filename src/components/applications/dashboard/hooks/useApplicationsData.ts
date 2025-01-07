@@ -35,7 +35,7 @@ export const useApplicationsData = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      const { data: apps, error } = await supabase
+      const { data: apps, error, status } = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
@@ -94,18 +94,19 @@ export const useApplicationsData = () => {
       setApplications(transformedApplications);
       setStatusCounts(counts);
 
-      const { data: totalData, error: countError } = await supabase
+      // Get total count in a separate query
+      const countResult = await supabase
         .rpc('get_applications_count_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
         });
 
-      if (countError) {
-        console.error('Error fetching count:', countError);
+      if (countResult.error) {
+        console.error('Error fetching count:', countResult.error);
         setTotalCount(0);
       } else {
-        setTotalCount(totalData || 0);
+        setTotalCount(countResult.data || 0);
       }
 
     } catch (error: any) {
