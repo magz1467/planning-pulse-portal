@@ -4,7 +4,6 @@ import { ScoreHeader } from "./components/ScoreHeader";
 import { ScoreDisplay } from "./components/ScoreDisplay";
 import { ImpactFactors } from "./components/ImpactFactors";
 import { ImpactedServices } from "./components/ImpactedServices";
-import { getScoreExplanation } from "./utils/scoreExplanations";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, Check } from "lucide-react";
 import { useState } from "react";
@@ -32,7 +31,6 @@ export const SimpleImpactScore = ({
   
   if (!details) return null;
 
-  // Enhanced executive summary that includes more key features
   const getExecutiveSummary = () => {
     const positiveCount = Object.values(impactedServices || {}).filter(s => s.impact === "positive").length;
     const negativeCount = Object.values(impactedServices || {}).filter(s => s.impact === "negative").length;
@@ -50,38 +48,50 @@ export const SimpleImpactScore = ({
     let summary = '';
     
     // More conversational tone for the summary
-    if (positiveCount > negativeCount) {
-      summary = `Overall, this looks like a promising development with ${positiveCount} positive features`;
-      if (negativeCount > 0) {
-        summary += `, though there are ${negativeCount} aspects that need consideration`;
-      }
-    } else if (negativeCount > positiveCount) {
-      summary = `This development raises ${negativeCount} important concerns`;
-      if (positiveCount > 0) {
-        summary += `, although it does offer ${positiveCount} positive benefits`;
-      }
+    if (score >= 75) {
+      summary = "This looks like a really promising development! ";
+    } else if (score >= 50) {
+      summary = "Overall, this development has some interesting potential. ";
     } else {
-      summary = `This development has a balanced impact with ${positiveCount} positive and ${negativeCount} negative aspects`;
+      summary = "This development needs careful consideration. ";
     }
 
-    // Add specific impacts in a more conversational way
+    // Add impact context
+    if (positiveCount > negativeCount) {
+      summary += `It could bring ${positiveCount} key benefits to the area`;
+      if (negativeCount > 0) {
+        summary += `, though there are ${negativeCount} aspects we should keep an eye on`;
+      }
+    } else if (negativeCount > positiveCount) {
+      summary += `There are ${negativeCount} important concerns to consider`;
+      if (positiveCount > 0) {
+        summary += `, although it does offer ${positiveCount} potential benefits`;
+      }
+    } else {
+      summary += `It has a mixed impact with ${positiveCount} potential benefits and ${negativeCount} challenges to consider`;
+    }
+
+    // Add specific impacts in a conversational way
     if (significantImpacts.length > 0) {
-      summary += ". In particular, it ";
+      summary += ". Specifically, it ";
       const impactPhrases = significantImpacts.map(impact => {
         if (impact.impact === "positive") {
-          return `would benefit ${impact.service.toLowerCase()}`;
+          return `could improve ${impact.service.toLowerCase()}`;
         } else {
-          return `might affect ${impact.service.toLowerCase()}`;
+          return `might put pressure on ${impact.service.toLowerCase()}`;
         }
       });
       summary += impactPhrases.join(" and ");
     }
 
-    // Add environmental context in a more approachable way
+    // Add recommendations if environmental factors are high
     if (details.Environmental) {
-      const envFactors = Object.keys(details.Environmental);
-      if (envFactors.length > 0) {
-        summary += `. Key environmental considerations include ${envFactors.slice(0, 2).map(f => f.toLowerCase()).join(" and ")}`;
+      const highImpactFactors = Object.entries(details.Environmental)
+        .filter(([_, score]) => score >= 4)
+        .map(([factor]) => factor.toLowerCase());
+
+      if (highImpactFactors.length > 0) {
+        summary += `. Keep in mind that this development could have a significant impact on ${highImpactFactors.join(" and ")} - these areas will need careful monitoring`;
       }
     }
 
