@@ -105,10 +105,11 @@ export const useDashboardState = () => {
     
     if (isInitialSearch || isNewSearch) {
       console.log('Fetching applications with coordinates:', coordinates);
-      // Ensure we only use the first two elements of coordinates
+      // Ensure we only use the first two elements of coordinates and explicitly type them
       const [lat, lng] = coordinates;
-      setSearchPoint([lat, lng]);
-      fetchApplicationsInRadius([lat, lng], 1000);
+      const tuple: [number, number] = [lat, lng];
+      setSearchPoint(tuple);
+      fetchApplicationsInRadius(tuple, 1000);
     }
   }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius]);
 
