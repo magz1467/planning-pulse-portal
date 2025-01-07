@@ -29,7 +29,11 @@ export const DetailContent = ({
       
       <ApplicationComments applicationId={application.application_id} />
       
-      <ApplicationFeedback applicationId={application.application_id} />
+      <ApplicationFeedback 
+        applicationId={application.application_id}
+        feedback={null}
+        onFeedback={() => {}}
+      />
     </div>
   );
 };

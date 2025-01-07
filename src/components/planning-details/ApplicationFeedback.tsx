@@ -1,21 +1,52 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ApplicationFeedbackProps {
-  feedback: 'up' | 'down' | null;
+  feedback?: 'up' | 'down' | null;
   onFeedback: (type: 'up' | 'down') => void;
-  feedbackStats: {
-    thumbsUp: number;
-    thumbsDown: number;
-  };
+  applicationId: number;
 }
 
 export const ApplicationFeedback = ({ 
-  feedback, 
+  feedback,
   onFeedback,
-  feedbackStats 
+  applicationId
 }: ApplicationFeedbackProps) => {
+  const [feedbackStats, setFeedbackStats] = useState({
+    thumbsUp: 0,
+    thumbsDown: 0
+  });
+
+  useEffect(() => {
+    const fetchFeedbackStats = async () => {
+      const { data: upVotes } = await supabase
+        .from('application_feedback')
+        .select('count')
+        .eq('application_id', applicationId)
+        .eq('feedback_type', 'up')
+        .single();
+
+      const { data: downVotes } = await supabase
+        .from('application_feedback')
+        .select('count')
+        .eq('application_id', applicationId)
+        .eq('feedback_type', 'down')
+        .single();
+
+      setFeedbackStats({
+        thumbsUp: upVotes?.count || 0,
+        thumbsDown: downVotes?.count || 0
+      });
+    };
+
+    if (applicationId) {
+      fetchFeedbackStats();
+    }
+  }, [applicationId]);
+
   return (
     <Card className="p-4 hover:border-primary transition-colors">
       <h3 className="font-semibold mb-4">Community Feedback</h3>
