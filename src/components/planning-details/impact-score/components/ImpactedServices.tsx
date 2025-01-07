@@ -57,7 +57,9 @@ export const ImpactedServices = ({ services }: ImpactedServicesProps) => {
                 </div>
                 <div>
                   <span className="font-medium block">{service}</span>
-                  <p className="text-sm mt-1 text-gray-600">{data.details}</p>
+                  <p className="text-sm mt-1 text-gray-600">
+                    {data.details.length > 50 ? data.details.substring(0, 50) + '...' : data.details}
+                  </p>
                 </div>
               </div>
             </div>
