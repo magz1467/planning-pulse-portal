@@ -11,25 +11,25 @@ interface ImpactedServicesProps {
 }
 
 export const ImpactedServices = ({ services }: ImpactedServicesProps) => {
-  const getServiceImpactColor = (impact: string) => {
-    switch (impact) {
-      case "positive":
-        return "bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700";
-      case "negative":
-        return "bg-gradient-to-r from-rose-50 to-rose-100 text-rose-700";
-      default:
-        return "bg-gray-50 text-gray-600";
-    }
-  };
-
   const getServiceImpactIcon = (impact: string) => {
     switch (impact) {
       case "positive":
-        return "↑";
+        return "✓";
       case "negative":
-        return "↓";
+        return "!";
       default:
-        return "→";
+        return "•";
+    }
+  };
+
+  const getServiceImpactColor = (impact: string) => {
+    switch (impact) {
+      case "positive":
+        return "text-emerald-600 border-emerald-200";
+      case "negative":
+        return "text-rose-600 border-rose-200";
+      default:
+        return "text-gray-600 border-gray-200";
     }
   };
 
@@ -49,15 +49,17 @@ export const ImpactedServices = ({ services }: ImpactedServicesProps) => {
           {significantImpacts.map(([service, data]) => (
             <div
               key={service}
-              className={`rounded-lg p-4 ${getServiceImpactColor(data.impact)}`}
+              className={`rounded-lg border p-4 bg-white ${getServiceImpactColor(data.impact)}`}
             >
-              <div className="flex justify-between items-center">
-                <span className="font-medium">{service}</span>
-                <span className="text-lg font-bold">
+              <div className="flex items-start gap-3">
+                <div className={`rounded-full border h-6 w-6 flex items-center justify-center text-sm font-bold ${getServiceImpactColor(data.impact)}`}>
                   {getServiceImpactIcon(data.impact)}
-                </span>
+                </div>
+                <div>
+                  <span className="font-medium block">{service}</span>
+                  <p className="text-sm mt-1 text-gray-600">{data.details}</p>
+                </div>
               </div>
-              <p className="text-sm mt-1">{data.details}</p>
             </div>
           ))}
         </div>
