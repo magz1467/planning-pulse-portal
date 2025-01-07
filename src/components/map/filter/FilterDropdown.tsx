@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Application } from "@/types/planning";
-import { ReactNode } from "react";
+import { ReactNode, memo, useCallback } from "react";
 
 interface FilterDropdownProps {
   children: ReactNode;
@@ -29,7 +29,7 @@ const predefinedStatuses = [
   { label: "Other", value: "Other" }
 ];
 
-export const FilterDropdown = ({
+export const FilterDropdown = memo(({
   children,
   onFilterChange,
   activeFilters,
@@ -38,8 +38,11 @@ export const FilterDropdown = ({
   statusCounts,
   isLoading = false
 }: FilterDropdownProps) => {
-  console.log('FilterDropdown statusCounts:', statusCounts);
   const hasActiveFilters = Object.values(activeFilters).some(Boolean);
+
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
+    onFilterChange(filterType, value);
+  }, [onFilterChange]);
 
   return (
     <DropdownMenu>
@@ -53,9 +56,7 @@ export const FilterDropdown = ({
         {hasActiveFilters && (
           <>
             <DropdownMenuItem
-              onClick={() => {
-                onFilterChange("status", "");
-              }}
+              onClick={() => handleFilterChange("status", "")}
               className="text-blue-600 font-medium"
             >
               Clear filters
@@ -69,7 +70,7 @@ export const FilterDropdown = ({
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          onClick={() => onFilterChange("status", "")}
+          onClick={() => handleFilterChange("status", "")}
           className="justify-between"
         >
           All statuses
@@ -79,7 +80,7 @@ export const FilterDropdown = ({
         {predefinedStatuses.map((option) => (
           <DropdownMenuItem
             key={option.value}
-            onClick={() => onFilterChange("status", option.value)}
+            onClick={() => handleFilterChange("status", option.value)}
             className="justify-between"
           >
             <span>
@@ -91,4 +92,6 @@ export const FilterDropdown = ({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+});
+
+FilterDropdown.displayName = 'FilterDropdown';
