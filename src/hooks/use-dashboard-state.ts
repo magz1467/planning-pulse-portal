@@ -105,6 +105,11 @@ export const useDashboardState = () => {
     setPostcode(newPostcode);
   };
 
+  const handleSortChange = (sortType: SortType) => {
+    console.log('Changing sort to:', sortType);
+    setActiveSort(sortType);
+  };
+
   const isInitialSearch = !searchPoint && coordinates;
   const isNewSearch = searchPoint && coordinates && 
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
