@@ -8,17 +8,20 @@ import { useState } from "react";
 import { ExecutiveSummary } from "./components/ExecutiveSummary";
 import { FactorScores } from "./components/FactorScores";
 import { DetailedAnalysis } from "./components/DetailedAnalysis";
+import { Application } from "@/types/planning";
 
 interface SimpleImpactScoreProps {
   score: number;
   progress: number;
   details?: ImpactScoreData;
+  application?: Application;
 }
 
 export const SimpleImpactScore = ({
   score,
   progress,
   details,
+  application
 }: SimpleImpactScoreProps) => {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -51,6 +54,7 @@ export const SimpleImpactScore = ({
       <ExecutiveSummary 
         score={score}
         details={details}
+        application={application}
       />
 
       <FactorScores factorScores={factorScores} />
