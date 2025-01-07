@@ -1,7 +1,6 @@
+import React from 'react';
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, Info, ChevronDown } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CategoryScore {
   score: number;
@@ -9,149 +8,53 @@ interface CategoryScore {
 }
 
 interface ImpactScoreDetails {
-  category_scores?: {
-    environmental?: CategoryScore;
-    social?: CategoryScore;
-    infrastructure?: CategoryScore;
-  };
+  [category: string]: CategoryScore;
   key_concerns?: string[];
   recommendations?: string[];
-  impacted_services?: {
-    [key: string]: {
-      impact: 'positive' | 'negative' | 'neutral';
-      details: string;
-    };
-  };
 }
 
 interface ImpactScoreBreakdownProps {
-  details?: Record<string, any>;
+  details: ImpactScoreDetails | null;
 }
 
-const getCategoryIcon = (score: number) => {
-  if (score <= 30) return <CheckCircle className="h-5 w-5 text-green-500" />;
-  if (score >= 70) return <AlertTriangle className="h-5 w-5 text-red-500" />;
-  return <Info className="h-5 w-5 text-orange-500" />;
-};
-
-const getCategoryColor = (score: number) => {
-  if (score <= 30) return "text-green-700";
-  if (score >= 70) return "text-red-700";
-  return "text-orange-700";
-};
-
-const getImpactIcon = (impact: string) => {
-  switch (impact) {
-    case 'positive':
-      return <CheckCircle className="h-5 w-5 text-green-500" />;
-    case 'negative':
-      return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    default:
-      return <Info className="h-5 w-5 text-gray-500" />;
-  }
-};
-
-export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => {
+export const ImpactScoreDetails: React.FC<ImpactScoreBreakdownProps> = ({ details }) => {
   if (!details) return null;
 
-  // Filter out impacted_services from categories
-  const categories = Object.entries(details).filter(([key]) => 
-    key !== 'impacted_services' && 
-    key !== 'key_concerns' && 
-    key !== 'recommendations' &&
-    typeof details[key] === 'object'
-  );
-
-  const impactedServices = details.impacted_services || {};
-  const keyConcerns = details.key_concerns || [];
-  const recommendations = details.recommendations || [];
-
   return (
-    <div className="space-y-4">
-      {/* Category Scores */}
-      <div className="space-y-2">
-        <h4 className="font-medium">Category Scores</h4>
-        {categories.map(([category, scores]) => (
-          <Collapsible key={category}>
-            <CollapsibleTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-              >
-                <div className="flex items-center gap-2">
-                  {getCategoryIcon(Object.values(scores as Record<string, number>).reduce((acc, curr) => acc + curr, 0) / Object.keys(scores).length)}
-                  <span className={`font-medium capitalize`}>
-                    {category}
-                  </span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="ml-7 mt-2 space-y-1">
-                {Object.entries(scores as Record<string, number>).map(([subCategory, score]) => (
-                  <div key={subCategory} className="text-sm flex justify-between">
-                    <span className="capitalize">{subCategory.replace(/_/g, ' ')}</span>
-                    <span className={getCategoryColor(score)}>{score}/5</span>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        ))}
-      </div>
-
-      {/* Key Concerns */}
-      {keyConcerns.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-medium">Key Concerns</h4>
-          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-            {keyConcerns.map((concern, index) => (
-              <li key={index}>{concern}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Recommendations */}
-      {recommendations.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-medium">Recommendations</h4>
-          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-            {recommendations.map((recommendation, index) => (
-              <li key={index}>{recommendation}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Impacted Services */}
-      {Object.keys(impactedServices).length > 0 && (
-        <div className="space-y-2">
-          <h4 className="font-medium">Impact on Services</h4>
-          {Object.entries(impactedServices).map(([service, data]: [string, any]) => (
-            <Collapsible key={service}>
-              <CollapsibleTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className="w-full flex items-center justify-between p-0 h-auto hover:bg-transparent"
-                >
-                  <div className="flex items-center gap-2">
-                    {getImpactIcon(data.impact)}
-                    <span className="font-medium">{service}</span>
-                  </div>
-                  <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <div className="ml-7 mt-2">
-                  <p className="text-sm text-gray-600">{data.details}</p>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+    <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+      <div className="space-y-4">
+        {Object.entries(details)
+          .filter(([key]) => !['key_concerns', 'recommendations'].includes(key))
+          .map(([category, scoreData]) => (
+            <Card key={category} className="p-4">
+              <h3 className="font-semibold capitalize mb-2">{category.replace(/_/g, ' ')}</h3>
+              <p className="text-sm text-gray-600">Score: {scoreData.score}</p>
+              <p className="text-sm mt-2">{scoreData.details}</p>
+            </Card>
           ))}
-        </div>
-      )}
-    </div>
+
+        {details.key_concerns && details.key_concerns.length > 0 && (
+          <Card className="p-4">
+            <h3 className="font-semibold mb-2">Key Concerns</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              {details.key_concerns.map((concern, index) => (
+                <li key={index} className="text-sm">{concern}</li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {details.recommendations && details.recommendations.length > 0 && (
+          <Card className="p-4">
+            <h3 className="font-semibold mb-2">Recommendations</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              {details.recommendations.map((recommendation, index) => (
+                <li key={index} className="text-sm">{recommendation}</li>
+              ))}
+            </ul>
+          </Card>
+        )}
+      </div>
+    </ScrollArea>
   );
 };
