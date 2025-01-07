@@ -5,12 +5,25 @@ import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
 import { useToast } from '@/hooks/use-toast';
 
+interface StatusCounts {
+  'Under Review': number;
+  'Approved': number;
+  'Declined': number;
+  'Other': number;
+}
+
+interface ApplicationsResponse {
+  applications: any[];
+  total_count: number;
+  status_counts: Record<string, number>;
+}
+
 export const useApplicationsData = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [searchPoint, setSearchPoint] = useState<LatLngTuple | null>(null);
-  const [statusCounts, setStatusCounts] = useState<{[key: string]: number}>({
+  const [statusCounts, setStatusCounts] = useState<StatusCounts>({
     'Under Review': 0,
     'Approved': 0,
     'Declined': 0,
@@ -29,7 +42,7 @@ export const useApplicationsData = () => {
 
     try {
       const { data, error } = await supabase
-        .rpc('get_applications_with_counts', {
+        .rpc<ApplicationsResponse>('get_applications_with_counts', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius,
@@ -69,7 +82,7 @@ export const useApplicationsData = () => {
       setTotalCount(total_count || 0);
 
       // Format status counts
-      const formattedCounts = {
+      const formattedCounts: StatusCounts = {
         'Under Review': 0,
         'Approved': 0,
         'Declined': 0,
@@ -79,7 +92,7 @@ export const useApplicationsData = () => {
       if (status_counts) {
         Object.entries(status_counts).forEach(([status, count]) => {
           if (status in formattedCounts) {
-            formattedCounts[status as keyof typeof formattedCounts] = count as number;
+            formattedCounts[status as keyof StatusCounts] = count as number;
           }
         });
       }
