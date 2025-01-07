@@ -3,8 +3,9 @@ export interface CategoryScore {
   details: string;
 }
 
-export interface ImpactScoreDetails {
-  [key: string]: CategoryScore;
+export interface ImpactCategory {
+  category: string;
+  scoreData: CategoryScore;
 }
 
 export interface ImpactScoreData {
