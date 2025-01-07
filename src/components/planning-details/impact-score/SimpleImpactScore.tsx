@@ -20,9 +20,9 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
   if (!details) return null;
 
   const getScoreColor = (score: number) => {
-    if (score <= 30) return "text-green-600";
-    if (score <= 60) return "text-orange-600";
-    return "text-red-600";
+    if (score <= 30) return "text-emerald-600 dark:text-emerald-400";
+    if (score <= 60) return "text-amber-600 dark:text-amber-400";
+    return "text-rose-600 dark:text-rose-400";
   };
 
   const getImpactText = (score: number) => {
@@ -34,9 +34,9 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
   const getServiceImpactColor = (impact: string) => {
     switch (impact) {
       case 'positive':
-        return 'text-primary';
+        return 'text-emerald-600 dark:text-emerald-400';
       case 'negative':
-        return 'text-destructive';
+        return 'text-rose-600 dark:text-rose-400';
       default:
         return 'text-muted-foreground';
     }
@@ -52,7 +52,7 @@ export const SimpleImpactScore = ({ score, progress, details }: SimpleImpactScor
               <Info className="h-4 w-4 text-muted-foreground" />
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
-              <p className="text-sm">This score is generated using AI analysis of the planning application details. We evaluate potential impacts on air quality, noise, biodiversity, and community aspects on a scale of 1-5, then normalize to a 0-100 scale.</p>
+              <p className="text-sm">This score is generated using AI analysis of the planning application details. We evaluate potential impacts on air quality, noise, biodiversity, and community aspects on a scale of 1-5, then normalize to a 0-100 scale for easier understanding.</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
