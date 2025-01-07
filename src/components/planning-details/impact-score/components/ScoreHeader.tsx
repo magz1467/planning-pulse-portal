@@ -17,10 +17,9 @@ export const ScoreHeader = () => {
           </TooltipTrigger>
           <TooltipContent className="max-w-sm">
             <p className="text-sm">
-              This score is generated using AI analysis of the planning application
-              details. We evaluate potential impacts on air quality, noise,
-              biodiversity, and community aspects on a scale of 1-5, then normalize
-              to a 0-100 scale for easier understanding.
+              This score is calculated using real data from the planning application, 
+              analyzing potential impacts on air quality, noise, biodiversity, and community aspects. 
+              Our AI evaluates these factors on a scale of 1-5, then normalizes to 0-100 for easier understanding.
             </p>
           </TooltipContent>
         </Tooltip>
