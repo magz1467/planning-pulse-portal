@@ -43,8 +43,7 @@ export const useApplicationsData = () => {
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        })
-        .timeout(30000); // 30 second timeout
+        });
 
       if (error) {
         console.error('Error fetching applications:', error);
@@ -58,21 +57,21 @@ export const useApplicationsData = () => {
         return;
       }
 
-      if (!apps) {
+      if (!apps || !Array.isArray(apps)) {
         console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log(`📦 Received ${apps?.length || 0} applications from database`);
+      console.log(`📦 Received ${apps.length} applications from database`);
 
       // Transform applications
       const transformedApplications = apps
-        ?.map(app => transformApplicationData(app, center))
+        .map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
-      console.log('✨ Transformed applications:', transformedApplications?.length || 0);
+      console.log('✨ Transformed applications:', transformedApplications.length);
 
       // Calculate status counts from applications
       const counts: StatusCounts = {
@@ -82,30 +81,37 @@ export const useApplicationsData = () => {
         'Other': 0
       };
 
-      transformedApplications.forEach(app => {
-        const status = app.status.toLowerCase();
-        if (status.includes('under consideration')) {
-          counts['Under Review']++;
-        } else if (status.includes('approved')) {
-          counts['Approved']++;
-        } else if (status.includes('declined')) {
-          counts['Declined']++;
-        } else {
-          counts['Other']++;
-        }
-      });
+      if (transformedApplications && transformedApplications.length > 0) {
+        transformedApplications.forEach(app => {
+          const status = app.status.toLowerCase();
+          if (status.includes('under consideration')) {
+            counts['Under Review']++;
+          } else if (status.includes('approved')) {
+            counts['Approved']++;
+          } else if (status.includes('declined')) {
+            counts['Declined']++;
+          } else {
+            counts['Other']++;
+          }
+        });
+      }
 
       // Get total count
-      const { count: total } = await supabase
+      const { data: totalData, error: countError } = await supabase
         .rpc('get_applications_count_within_radius', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
-        })
-        .single();
+        });
 
-      setApplications(transformedApplications || []);
-      setTotalCount(total || 0);
+      if (countError) {
+        console.error('Error fetching count:', countError);
+        setTotalCount(0);
+      } else {
+        setTotalCount(totalData || 0);
+      }
+
+      setApplications(transformedApplications);
       setStatusCounts(counts);
 
     } catch (error: any) {
