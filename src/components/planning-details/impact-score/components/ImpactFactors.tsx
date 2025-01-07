@@ -3,14 +3,9 @@ import { Check } from "lucide-react";
 interface ImpactFactorsProps {
   factors: Record<string, number>;
   title: string;
-  getScoreExplanation: (category: string, value: number) => string;
 }
 
-export const ImpactFactors = ({ 
-  factors, 
-  title,
-  getScoreExplanation 
-}: ImpactFactorsProps) => {
+export const ImpactFactors = ({ factors, title }: ImpactFactorsProps) => {
   return (
     <div>
       <h4 className="font-medium mb-2 text-sm">{title}</h4>
