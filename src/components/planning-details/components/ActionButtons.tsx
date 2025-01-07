@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Bell, Heart, BookmarkIcon } from "lucide-react";
-import { useSavedApplications } from "@/hooks/use-saved-applications";
-import { useToast } from "@/hooks/use-toast";
+import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ActionButtonsProps {
   applicationId: number;

@@ -8,6 +8,7 @@ import { AuthRequiredDialog } from "./AuthRequiredDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { DetailContent } from "./planning-details/components/DetailContent";
 import { ActionButtons } from "./planning-details/components/ActionButtons";
+import { Link } from "react-router-dom";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
