@@ -4,16 +4,24 @@ export interface CategoryScore {
 }
 
 export interface ImpactScoreDetails {
-  [key: string]: CategoryScore | undefined;
+  [key: string]: CategoryScore;
 }
 
 export interface ImpactScoreData {
   impact_scores: {
-    environmental?: CategoryScore;
-    social?: CategoryScore;
-    infrastructure?: CategoryScore;
-    economic?: CategoryScore;
-    [key: string]: CategoryScore | undefined;
+    Environmental?: {
+      air_quality: number;
+      noise: number;
+      ecosystem: number;
+      biodiversity: number;
+      water_quality: number;
+    };
+    Social?: {
+      community: number;
+      cultural: number;
+      economic: number;
+    };
+    [key: string]: Record<string, number> | undefined;
   };
   key_concerns?: string[];
   recommendations?: string[];

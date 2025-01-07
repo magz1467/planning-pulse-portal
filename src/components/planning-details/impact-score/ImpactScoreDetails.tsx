@@ -14,9 +14,28 @@ export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ deta
 
   const { impact_scores, key_concerns, recommendations, impacted_services } = details;
 
+  // Calculate category scores from detailed breakdowns
+  const categoryScores: Record<string, CategoryScore> = {};
+  
+  if (impact_scores.Environmental) {
+    const envScore = Object.values(impact_scores.Environmental).reduce((a, b) => a + b, 0);
+    categoryScores.Environmental = {
+      score: envScore / Object.keys(impact_scores.Environmental).length,
+      details: `Based on analysis of air quality (${impact_scores.Environmental.air_quality}), noise (${impact_scores.Environmental.noise}), ecosystem (${impact_scores.Environmental.ecosystem}), biodiversity (${impact_scores.Environmental.biodiversity}), and water quality (${impact_scores.Environmental.water_quality}).`
+    };
+  }
+
+  if (impact_scores.Social) {
+    const socialScore = Object.values(impact_scores.Social).reduce((a, b) => a + b, 0);
+    categoryScores.Social = {
+      score: socialScore / Object.keys(impact_scores.Social).length,
+      details: `Based on analysis of community (${impact_scores.Social.community}), cultural (${impact_scores.Social.cultural}), and economic (${impact_scores.Social.economic}) factors.`
+    };
+  }
+
   // Order categories for consistent display
-  const orderedCategories = ['environmental', 'social', 'infrastructure', 'economic'];
-  const otherCategories = Object.keys(impact_scores).filter(
+  const orderedCategories = ['Environmental', 'Social', 'Infrastructure', 'Economic'];
+  const otherCategories = Object.keys(categoryScores).filter(
     cat => !orderedCategories.includes(cat)
   );
 
@@ -25,26 +44,24 @@ export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ deta
       <div className="space-y-4">
         {/* Display ordered categories first */}
         {orderedCategories.map(category => {
-          const scoreData = impact_scores[category];
-          if (!scoreData) return null;
+          if (!categoryScores[category]) return null;
           return (
             <ImpactCategoryCard 
               key={category}
               category={category}
-              scoreData={scoreData}
+              scoreData={categoryScores[category]}
             />
           );
         })}
 
         {/* Display any additional categories */}
         {otherCategories.map(category => {
-          const scoreData = impact_scores[category];
-          if (!scoreData) return null;
+          if (!categoryScores[category]) return null;
           return (
             <ImpactCategoryCard 
               key={category}
               category={category}
-              scoreData={scoreData}
+              scoreData={categoryScores[category]}
             />
           );
         })}
