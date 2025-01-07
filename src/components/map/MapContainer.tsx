@@ -12,7 +12,6 @@ export interface MapContainerProps {
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapContainerComponent = memo(({
@@ -21,7 +20,6 @@ export const MapContainerComponent = memo(({
   selectedId,
   onMarkerClick,
   onCenterChange,
-  onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
@@ -34,14 +32,6 @@ export const MapContainerComponent = memo(({
       }, 100);
     }
   }, [coordinates]);
-
-  useEffect(() => {
-    if (mapRef.current && onMapMove) {
-      mapRef.current.on('move', () => {
-        onMapMove(mapRef.current!);
-      });
-    }
-  }, [onMapMove]);
 
   console.log('MapContainer - Rendering with:', {
     applicationsCount: applications.length,
