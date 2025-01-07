@@ -25,7 +25,7 @@ export const MapSection = memo(({
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
     onMarkerClick(id);
-  }, [onMarkerClick]);
+  }, [onMarkerClick]); // Add onMarkerClick to dependencies
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
