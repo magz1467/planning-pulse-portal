@@ -133,11 +133,6 @@ export const PlanningApplicationDetails = ({
         applicationId={application.id}
       />
 
-      <ExpectedImpactAreas 
-        application={application} 
-        impactedServices={application.impacted_services}
-      />
-
       <ApplicationDescription application={application} />
       
       <ApplicationFeedback 
