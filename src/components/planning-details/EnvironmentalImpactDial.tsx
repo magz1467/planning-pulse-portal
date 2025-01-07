@@ -15,7 +15,7 @@ export const EnvironmentalImpactDial = ({
   details,
   applicationId 
 }: EnvironmentalImpactDialProps) => {
-  const { progress } = useImpactScore(applicationId);
+  const { progress } = useImpactScore(applicationId, score, details);
 
   return (
     <Card className="p-6">
@@ -23,7 +23,6 @@ export const EnvironmentalImpactDial = ({
         score={score} 
         progress={progress} 
         details={details}
-        application={details?.application}
       />
     </Card>
   );

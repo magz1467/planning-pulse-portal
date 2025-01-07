@@ -1,5 +1,4 @@
 import { Application } from "@/types/planning";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, Clock, AlertCircle } from "lucide-react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { format, isValid, parse } from "date-fns";
@@ -103,44 +102,31 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
           {stages.map((stage, index) => (
             <div key={index} className="flex items-start relative">
               <div className="flex-shrink-0 relative z-10">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center
-                        ${stage.status === 'completed' ? 
-                          (stage.decisionStatus === 'approved' ? 'bg-green-100' :
-                           stage.decisionStatus === 'refused' ? 'bg-red-100' :
-                           'bg-green-100') : 
-                          stage.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'}
-                      `}>
-                        {stage.status === 'completed' ? (
-                          <Check className={`w-5 h-5 ${
-                            stage.decisionStatus === 'approved' ? 'text-green-600' :
-                            stage.decisionStatus === 'refused' ? 'text-red-600' :
-                            'text-green-600'
-                          }`} />
-                        ) : stage.status === 'current' ? (
-                          <Clock className="w-5 h-5 text-blue-600" />
-                        ) : (
-                          <AlertCircle className="w-5 h-5 text-gray-400" />
-                        )}
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{stage.tooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <div className={`
+                  w-8 h-8 rounded-full flex items-center justify-center
+                  ${stage.status === 'completed' ? 
+                    (stage.decisionStatus === 'approved' ? 'bg-green-100' :
+                     stage.decisionStatus === 'refused' ? 'bg-red-100' :
+                     'bg-green-100') : 
+                    stage.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'}
+                `}>
+                  {stage.status === 'completed' ? (
+                    <Check className={`w-5 h-5 ${
+                      stage.decisionStatus === 'approved' ? 'text-green-600' :
+                      stage.decisionStatus === 'refused' ? 'text-red-600' :
+                      'text-green-600'
+                    }`} />
+                  ) : stage.status === 'current' ? (
+                    <Clock className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
               </div>
               <div className="ml-4">
                 <h3 className="text-sm font-medium">{stage.label}</h3>
                 <div className="flex flex-col gap-1">
-                  <p className={`text-sm ${
-                    stage.decisionStatus === 'approved' ? 'text-green-600' :
-                    stage.decisionStatus === 'refused' ? 'text-red-600' :
-                    'text-gray-500'
-                  }`}>
+                  <p className="text-sm text-gray-500">
                     {formatDate(stage.date)}
                   </p>
                   {stage.label === "Decision Due" && stage.decisionStatus && (
