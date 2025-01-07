@@ -1,107 +1,139 @@
-import { supabase } from "@/integrations/supabase/client";
-import { FetchApplicationsParams, ApplicationsResponse, ApplicationsError, StatusCounts } from './types';
-import { transformApplicationData } from '@/utils/applicationTransforms';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
-export const fetchApplicationsFromSupabase = async ({
-  center,
-  radiusInMeters,
-  pageSize = 100,
-  pageNumber = 0
-}: FetchApplicationsParams) => {
+export async function getApplicationsWithinRadius(
+  center_lat: number,
+  center_lng: number,
+  radius_meters: number,
+  page_size: number = 100,
+  page_number: number = 0
+) {
   try {
-    const { data: apps, error } = await supabase.rpc(
-      'get_applications_within_radius',
+    const { data, error } = await supabase.rpc(
+      'get_applications_with_counts',
       {
-        center_lat: center[0],
-        center_lng: center[1],
-        radius_meters: radiusInMeters,
-        page_size: pageSize,
-        page_number: pageNumber
+        center_lat,
+        center_lng,
+        radius_meters,
+        page_size,
+        page_number
       }
     );
 
     if (error) {
       console.error('Error fetching applications:', error);
-      throw error;
+      toast({
+        title: "Error fetching applications",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+      return null;
     }
 
-    if (!apps || !Array.isArray(apps)) {
-      throw new Error('Invalid response format from database');
-    }
-
-    return apps;
-
-  } catch (error: any) {
-    console.error('Error fetching applications:', error);
-    throw error;
+    return data;
+  } catch (error) {
+    console.error('Error in getApplicationsWithinRadius:', error);
+    toast({
+      title: "Error fetching applications",
+      description: "Please try again later",
+      variant: "destructive"
+    });
+    return null;
   }
-};
+}
 
-export const fetchApplicationsCountFromSupabase = async (
-  center: [number, number],
-  radiusInMeters: number
-): Promise<number> => {
+export async function getApplicationById(id: string) {
   try {
-    const { data, error } = await supabase.rpc(
-      'get_applications_count_within_radius',
-      {
-        center_lat: center[0],
-        center_lng: center[1],
-        radius_meters: radiusInMeters
-      }
-    );
+    const { data, error } = await supabase
+      .from('applications')
+      .select('*')
+      .eq('id', id)
+      .single();
 
     if (error) {
-      console.error('Error fetching count:', error);
-      throw error;
-    }
-    
-    return data || 0;
-  } catch (error) {
-    console.error('Error fetching count:', error);
-    return 0;
-  }
-};
-
-export const fetchStatusCounts = async (
-  center: [number, number],
-  radiusInMeters: number
-): Promise<StatusCounts> => {
-  try {
-    const { data, error } = await supabase.rpc(
-      'get_applications_status_counts',
-      {
-        center_lat: center[0],
-        center_lng: center[1],
-        radius_meters: radiusInMeters
-      }
-    );
-
-    if (error) throw error;
-
-    const counts: StatusCounts = {
-      'Under Review': 0,
-      'Approved': 0,
-      'Declined': 0,
-      'Other': 0
-    };
-
-    if (Array.isArray(data)) {
-      data.forEach((row: { status: string; count: number }) => {
-        if (row.status in counts) {
-          counts[row.status as keyof StatusCounts] = row.count;
-        }
+      console.error('Error fetching application:', error);
+      toast({
+        title: "Error fetching application",
+        description: "Please try again later",
+        variant: "destructive"
       });
+      return null;
     }
 
-    return counts;
+    return data;
   } catch (error) {
-    console.error('Error fetching status counts:', error);
-    return {
-      'Under Review': 0,
-      'Approved': 0,
-      'Declined': 0,
-      'Other': 0
-    };
+    console.error('Error in getApplicationById:', error);
+    toast({
+      title: "Error fetching application",
+      description: "Please try again later", 
+      variant: "destructive"
+    });
+    return null;
   }
-};
+}
+
+export async function getApplicationComments(applicationId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('application_id', applicationId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching comments:', error);
+      toast({
+        title: "Error fetching comments",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getApplicationComments:', error);
+    toast({
+      title: "Error fetching comments",
+      description: "Please try again later",
+      variant: "destructive"
+    });
+    return null;
+  }
+}
+
+export async function addApplicationComment(applicationId: string, comment: string, userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert([
+        {
+          application_id: applicationId,
+          user_id: userId,
+          content: comment
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error adding comment",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in addApplicationComment:', error);
+    toast({
+      title: "Error adding comment",
+      description: "Please try again later",
+      variant: "destructive"
+    });
+    return null;
+  }
+}
