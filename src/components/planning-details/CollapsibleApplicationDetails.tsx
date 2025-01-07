@@ -17,7 +17,7 @@ export const CollapsibleApplicationDetails = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="px-8 py-6">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="px-8 py-2">
       <CollapsibleTrigger className="flex w-full items-center justify-between mb-2">
         <span className="text-sm font-medium">Application Details</span>
         <ChevronDown
