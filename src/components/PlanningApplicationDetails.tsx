@@ -22,6 +22,7 @@ import { useSavedApplications } from "@/hooks/use-saved-applications";
 import { Link } from "react-router-dom";
 import { AuthRequiredDialog } from "./AuthRequiredDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { Separator } from "@/components/ui/separator";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -122,6 +123,7 @@ export const PlanningApplicationDetails = ({
       />
       <Card className="overflow-hidden">
         <ApplicationTimeline application={application} />
+        <Separator className="my-4" />
         <CollapsibleApplicationDetails application={application} />
       </Card>
       <ExpectedImpactAreas application={application} />
