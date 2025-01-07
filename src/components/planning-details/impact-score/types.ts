@@ -11,4 +11,16 @@ export interface ImpactScoreData {
       details: string;
     };
   };
+  key_concerns?: string[];
+  recommendations?: string[];
+}
+
+export interface CategoryScore {
+  score: number;
+  details: string;
+}
+
+export interface ImpactCategory {
+  category: string;
+  scoreData: CategoryScore;
 }

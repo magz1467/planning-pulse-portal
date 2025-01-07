@@ -28,7 +28,7 @@ export const ImpactCategoryCard = ({ category, scoreData }: ImpactCategory) => {
           {scoreData.score.toFixed(1)}/5 - {getScoreLabel(scoreData.score)}
         </Badge>
       </div>
-      <p className="text-sm leading-relaxed text-gray-600">
+      <p className="text-sm leading-relaxed text-muted-foreground">
         {scoreData.details}
       </p>
     </Card>
