@@ -70,6 +70,25 @@ export const SimpleImpactScore = ({
     return summary;
   };
 
+  // Calculate average scores for Environmental and Social factors
+  const getFactorScores = () => {
+    const scores: { [key: string]: number } = {};
+    
+    if (details.Environmental) {
+      const envValues = Object.values(details.Environmental);
+      scores.Environmental = envValues.reduce((a, b) => a + b, 0) / envValues.length;
+    }
+    
+    if (details.Social) {
+      const socialValues = Object.values(details.Social);
+      scores.Social = socialValues.reduce((a, b) => a + b, 0) / socialValues.length;
+    }
+    
+    return scores;
+  };
+
+  const factorScores = getFactorScores();
+
   return (
     <Card className="p-6 space-y-6">
       <ScoreHeader />
@@ -78,6 +97,25 @@ export const SimpleImpactScore = ({
       <div className="bg-slate-50 p-4 rounded-lg">
         <p className="text-sm text-gray-700">{getExecutiveSummary()}</p>
       </div>
+
+      {/* Display Environmental and Social Scores */}
+      {Object.keys(factorScores).length > 0 && (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+          {Object.entries(factorScores).map(([factor, score]) => (
+            <div key={factor} className="bg-white p-4 rounded-lg border">
+              <h4 className="font-medium text-sm text-gray-600">{factor} Impact</h4>
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-2xl font-bold">
+                  {score.toFixed(1)}
+                </span>
+                <span className="text-sm text-gray-500">
+                  out of 5
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
