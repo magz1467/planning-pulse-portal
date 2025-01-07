@@ -93,7 +93,7 @@ export const ImpactScoreBreakdown = ({ details }: ImpactScoreBreakdownProps) => 
       {/* Impacted Services */}
       {Object.keys(impactedServices).length > 0 && (
         <div className="space-y-2">
-          <h4 className="font-medium">Expected Service Impacts</h4>
+          <h4 className="font-medium">Impact on Services</h4>
           {Object.entries(impactedServices).map(([service, data]: [string, any]) => (
             <Collapsible key={service}>
               <CollapsibleTrigger asChild>
