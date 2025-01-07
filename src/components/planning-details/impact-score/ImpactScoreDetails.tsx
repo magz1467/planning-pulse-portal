@@ -10,7 +10,7 @@ interface ImpactScoreBreakdownProps {
 }
 
 export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ details }) => {
-  if (!details) return null;
+  if (!details?.impact_scores) return null;
 
   const { impact_scores, key_concerns, recommendations, impacted_services } = details;
 
