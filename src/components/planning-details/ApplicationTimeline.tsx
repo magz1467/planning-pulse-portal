@@ -3,6 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Check, Clock, AlertCircle } from "lucide-react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { format, isValid, parse } from "date-fns";
+import { getStatusColor } from "@/utils/statusColors";
 
 interface ApplicationTimelineProps {
   application: Application;
@@ -33,7 +34,6 @@ const formatDate = (dateStr: string | null): string => {
     }
   }
 
-  console.warn(`Unable to parse date: ${dateStr}`);
   return 'Invalid date';
 };
 
@@ -135,15 +135,23 @@ export const ApplicationTimeline = ({ application }: ApplicationTimelineProps) =
               </div>
               <div className="ml-4">
                 <h3 className="text-sm font-medium">{stage.label}</h3>
-                <p className={`text-sm ${
-                  stage.decisionStatus === 'approved' ? 'text-green-600' :
-                  stage.decisionStatus === 'refused' ? 'text-red-600' :
-                  'text-gray-500'
-                }`}>
-                  {stage.decisionStatus ? 
-                    stage.decisionStatus.charAt(0).toUpperCase() + stage.decisionStatus.slice(1) :
-                    formatDate(stage.date)}
-                </p>
+                <div className="flex flex-col gap-1">
+                  <p className={`text-sm ${
+                    stage.decisionStatus === 'approved' ? 'text-green-600' :
+                    stage.decisionStatus === 'refused' ? 'text-red-600' :
+                    'text-gray-500'
+                  }`}>
+                    {formatDate(stage.date)}
+                  </p>
+                  {stage.label === "Decision Due" && stage.decisionStatus && (
+                    <span className={`text-xs px-2 py-1 rounded-full w-fit ${
+                      stage.decisionStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {stage.decisionStatus.charAt(0).toUpperCase() + stage.decisionStatus.slice(1)}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           ))}
