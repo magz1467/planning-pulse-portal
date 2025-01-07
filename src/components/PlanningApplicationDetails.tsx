@@ -133,6 +133,13 @@ export const PlanningApplicationDetails = ({
         applicationId={application.id}
       />
 
+      {application.impact_score_details?.impacted_services && (
+        <ExpectedImpactAreas 
+          application={application}
+          impactedServices={application.impact_score_details.impacted_services}
+        />
+      )}
+
       <ApplicationDescription application={application} />
       
       <ApplicationFeedback 

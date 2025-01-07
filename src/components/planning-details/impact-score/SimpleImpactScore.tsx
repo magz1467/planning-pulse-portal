@@ -13,20 +13,12 @@ interface SimpleImpactScoreProps {
   score: number;
   progress: number;
   details?: ImpactScoreData;
-  impactedServices?: Record<
-    string,
-    {
-      impact: "positive" | "negative" | "neutral";
-      details: string;
-    }
-  >;
 }
 
 export const SimpleImpactScore = ({
   score,
   progress,
   details,
-  impactedServices,
 }: SimpleImpactScoreProps) => {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -59,7 +51,6 @@ export const SimpleImpactScore = ({
       <ExecutiveSummary 
         score={score}
         details={details}
-        impactedServices={impactedServices}
       />
 
       <FactorScores factorScores={factorScores} />
@@ -73,7 +64,6 @@ export const SimpleImpactScore = ({
         <CollapsibleContent className="pt-4">
           <DetailedAnalysis 
             details={details}
-            impactedServices={impactedServices}
           />
         </CollapsibleContent>
       </Collapsible>
