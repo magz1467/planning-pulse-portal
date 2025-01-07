@@ -39,15 +39,15 @@ export const ApplicationsDashboardMap = () => {
 
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
-    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading) {
-      console.log('Auto-selecting first application on mobile');
+    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
+      console.log('Auto-selecting first application on mobile - map view only');
       // Add a small delay to prevent immediate re-render
       const timer = setTimeout(() => {
         handleMarkerClick(filteredApplications[0].id);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick]);
+  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
 
   return (
     <DashboardLayout
