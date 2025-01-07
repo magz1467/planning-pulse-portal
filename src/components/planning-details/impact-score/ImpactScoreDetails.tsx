@@ -16,6 +16,12 @@ interface ImpactScoreDetails {
   };
   key_concerns?: string[];
   recommendations?: string[];
+  impacted_services?: {
+    [key: string]: {
+      impact: 'positive' | 'negative' | 'neutral';
+      details: string;
+    };
+  };
 }
 
 interface ImpactScoreBreakdownProps {
