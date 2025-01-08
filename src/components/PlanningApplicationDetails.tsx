@@ -12,7 +12,7 @@ import { ApplicationSharing } from "./planning-details/ApplicationSharing";
 import { CreatePetition } from "./planning-details/CreatePetition";
 import { ApplicationFeedback } from "./planning-details/ApplicationFeedback";
 import { Card } from "@/components/ui/card";
-import { Bell, Heart, BookmarkIcon } from "lucide-react";
+import { Bell, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -52,6 +52,7 @@ export const PlanningApplicationDetails = ({
   if (!application) return null;
 
   const isSaved = savedApplications.includes(application.id);
+
   const feedbackStats = {
     thumbsUp: feedback === 'up' ? 13 : 12,
     thumbsDown: feedback === 'down' ? 4 : 3
@@ -117,10 +118,20 @@ export const PlanningApplicationDetails = ({
       </div>
       
       <ApplicationImage application={application} />
-      <ApplicationSharing 
-        applicationId={application.id} 
-        reference={application.reference}
-      />
+      <div className="flex items-center justify-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleSave}
+          className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
+        >
+          <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+        </Button>
+        <ApplicationSharing 
+          applicationId={application.id} 
+          reference={application.reference}
+        />
+      </div>
       <Card className="overflow-hidden">
         <ApplicationTimeline application={application} />
         <Separator className="my-4" />
@@ -175,26 +186,6 @@ export const PlanningApplicationDetails = ({
           </div>
           <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
             Get feedback
-          </Button>
-        </div>
-      </Card>
-
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookmarkIcon className="h-5 w-5" />
-            <div>
-              <h3 className="font-semibold">Save for later</h3>
-              <p className="text-sm text-gray-600">Keep track of this application</p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSave}
-            className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
-          >
-            <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
           </Button>
         </div>
       </Card>
