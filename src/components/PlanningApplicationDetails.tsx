@@ -3,6 +3,7 @@ import { ApplicationHeader } from "./planning-details/ApplicationHeader";
 import { ApplicationImage } from "./planning-details/ApplicationImage";
 import { DetailsSections } from "./planning-details/DetailsSections";
 import { DetailsActions } from "./planning-details/DetailsActions";
+import { ProjectSummary } from "./applications/ProjectSummary";
 import { useEffect } from "react";
 
 interface PlanningApplicationDetailsProps {
@@ -29,6 +30,8 @@ export const PlanningApplicationDetails = ({
       </div>
       
       <ApplicationImage application={application} />
+      
+      <ProjectSummary applicationDetails={application.application_details} />
       
       <DetailsSections application={application} />
       
