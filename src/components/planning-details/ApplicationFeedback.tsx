@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Application } from "@/types/planning";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,6 +14,44 @@ export const ApplicationFeedback = ({ application }: ApplicationFeedbackProps) =
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const [feedbackStats, setFeedbackStats] = useState({ thumbsUp: 0, thumbsDown: 0 });
   const { toast } = useToast();
+
+  // Fetch initial feedback state and stats
+  useEffect(() => {
+    const fetchFeedbackState = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Get user's current feedback
+        const { data: existingFeedback } = await supabase
+          .from('application_feedback')
+          .select('feedback_type')
+          .eq('application_id', application.id)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (existingFeedback) {
+          setFeedback(existingFeedback.feedback_type as 'up' | 'down');
+        }
+
+        // Get feedback stats
+        const { data: stats } = await supabase
+          .rpc('get_application_feedback_stats', {
+            app_id: application.id
+          });
+
+        if (stats) {
+          const thumbsUp = stats.find(s => s.feedback_type === 'up')?.count || 0;
+          const thumbsDown = stats.find(s => s.feedback_type === 'down')?.count || 0;
+          setFeedbackStats({ thumbsUp, thumbsDown });
+        }
+      } catch (error) {
+        console.error('Error fetching feedback state:', error);
+      }
+    };
+
+    fetchFeedbackState();
+  }, [application.id]);
 
   const handleFeedback = async (type: 'up' | 'down') => {
     try {
@@ -28,13 +66,34 @@ export const ApplicationFeedback = ({ application }: ApplicationFeedbackProps) =
         return;
       }
 
-      const { error } = await supabase
+      // First check if feedback exists
+      const { data: existingFeedback } = await supabase
         .from('application_feedback')
-        .upsert({
-          application_id: application.id,
-          user_id: user.id,
-          feedback_type: type
-        });
+        .select('id')
+        .eq('application_id', application.id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      let error;
+      
+      if (existingFeedback) {
+        // Update existing feedback
+        const { error: updateError } = await supabase
+          .from('application_feedback')
+          .update({ feedback_type: type })
+          .eq('id', existingFeedback.id);
+        error = updateError;
+      } else {
+        // Insert new feedback
+        const { error: insertError } = await supabase
+          .from('application_feedback')
+          .insert({
+            application_id: application.id,
+            user_id: user.id,
+            feedback_type: type
+          });
+        error = insertError;
+      }
 
       if (error) throw error;
 
