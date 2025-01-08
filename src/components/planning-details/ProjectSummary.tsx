@@ -1,42 +1,34 @@
-import { Check, X } from "lucide-react";
+import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
+import { MapPin } from "lucide-react";
+import { getStatusColor, getStatusText } from "@/utils/statusColors";
+import { cn } from "@/lib/utils";
 
 interface ProjectSummaryProps {
-  applicationDetails: Record<string, any> | null;
+  application: Application;
 }
 
-export const ProjectSummary = ({ applicationDetails }: ProjectSummaryProps) => {
-  if (!applicationDetails) return null;
-
-  // Convert the details into a more readable format
-  const summaryItems = Object.entries(applicationDetails)
-    .filter(([key, value]) => value !== null && value !== undefined)
-    .map(([key, value]) => ({
-      label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-      value: typeof value === 'boolean' ? value : String(value)
-    }));
-
-  if (summaryItems.length === 0) return null;
-
+export const ProjectSummary = ({ application }: ProjectSummaryProps) => {
   return (
-    <Card className="p-4 mt-4">
-      <h3 className="font-semibold text-lg mb-3">Project Summary</h3>
-      <div className="space-y-2">
-        {summaryItems.map(({ label, value }) => (
-          <div key={label} className="flex items-center gap-2">
-            {typeof value === 'boolean' ? (
-              value ? (
-                <Check className="h-4 w-4 text-green-500" />
-              ) : (
-                <X className="h-4 w-4 text-red-500" />
-              )
-            ) : null}
-            <span className="text-gray-600">{label}:</span>
-            <span className="font-medium">
-              {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value}
-            </span>
+    <Card className="p-4">
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">
+            {application.ai_title || application.description}
+          </h2>
+          <div className="flex items-center gap-1 mt-1 text-gray-600">
+            <MapPin className="w-4 h-4" />
+            <p className="text-sm">{application.address}</p>
           </div>
-        ))}
+        </div>
+        <div className="flex items-center justify-between">
+          <span className={cn("text-sm px-2 py-1 rounded", getStatusColor(application.status))}>
+            {getStatusText(application.status)}
+          </span>
+          {application.distance && (
+            <span className="text-sm text-gray-500">{application.distance}</span>
+          )}
+        </div>
       </div>
     </Card>
   );

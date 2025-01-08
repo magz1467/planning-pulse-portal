@@ -1,18 +1,18 @@
 import { Card } from "@/components/ui/card";
-import { ImpactCategory } from "./types";
 import { Badge } from "@/components/ui/badge";
 
-export const ImpactCategoryCard = ({ category, scoreData }: ImpactCategory) => {
-  const getScoreColor = (score: number) => {
-    if (score <= 2) return 'bg-green-100 text-green-800 border-green-300';
-    if (score <= 3) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    return 'bg-red-100 text-red-800 border-red-300';
-  };
+interface ImpactCategoryProps {
+  category: string;
+  score: number;
+  maxScore: number;
+}
 
-  const getScoreLabel = (score: number) => {
-    if (score <= 2) return 'Low Impact';
-    if (score <= 3) return 'Medium Impact';
-    return 'High Impact';
+export const ImpactCategoryCard = ({ category, score, maxScore }: ImpactCategoryProps) => {
+  const getImpactLevel = (score: number, maxScore: number) => {
+    const percentage = (score / maxScore) * 100;
+    if (percentage >= 75) return 'High Impact';
+    if (percentage >= 50) return 'Medium Impact';
+    return 'Low Impact';
   };
 
   // Safely handle undefined category
@@ -33,15 +33,27 @@ export const ImpactCategoryCard = ({ category, scoreData }: ImpactCategory) => {
           {formattedCategory}
         </h3>
         <Badge 
-          variant="outline" 
-          className={`${getScoreColor(scoreData.score)} px-3 py-1`}
+          variant="outline"
+          className={cn(
+            score >= 75 ? "border-red-200 bg-red-100 text-red-800" :
+            score >= 50 ? "border-yellow-200 bg-yellow-100 text-yellow-800" :
+            "border-green-200 bg-green-100 text-green-800"
+          )}
         >
-          {scoreData.score.toFixed(1)}/5 - {getScoreLabel(scoreData.score)}
+          {getImpactLevel(score, maxScore)}
         </Badge>
       </div>
-      <p className="text-sm leading-relaxed text-muted-foreground">
-        {scoreData.details}
-      </p>
+      <div className="w-full bg-gray-200 rounded-full h-2.5">
+        <div
+          className={cn(
+            "h-2.5 rounded-full",
+            score >= 75 ? "bg-red-500" :
+            score >= 50 ? "bg-yellow-500" :
+            "bg-green-500"
+          )}
+          style={{ width: `${(score / maxScore) * 100}%` }}
+        />
+      </div>
     </Card>
   );
 };
