@@ -2,11 +2,12 @@ import { Application } from "@/types/planning";
 import { Timer } from "lucide-react";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
-interface ApplicationHeaderProps {
+export interface ApplicationHeaderProps {
   application: Application;
+  onClose?: () => void;  // Made optional since it's a new prop
 }
 
-export const ApplicationHeader = ({ application }: ApplicationHeaderProps) => {
+export const ApplicationHeader = ({ application, onClose }: ApplicationHeaderProps) => {
   const isClosingSoon = isWithinNextSevenDays(application.last_date_consultation_comments);
 
   return (

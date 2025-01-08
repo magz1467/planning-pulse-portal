@@ -22,7 +22,7 @@ export const PlanningApplicationDetails = ({
       <ProjectSummary applicationDetails={application.application_details} />
       <DetailsSections application={application} />
       <ApplicationFeedback application={application} />
-      <ApplicationComments application={application} />
+      <ApplicationComments applicationId={application.id} />
     </div>
   );
 };
