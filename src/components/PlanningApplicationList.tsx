@@ -7,6 +7,7 @@ import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { cn } from "@/lib/utils";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
+import { ProjectSummary } from "@/components/planning-details/ProjectSummary";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -67,6 +68,11 @@ export const PlanningApplicationList = ({
                   </div>
                   <span className="text-xs text-gray-500">{application.distance}</span>
                 </div>
+                {application.application_details && (
+                  <div className="mt-3">
+                    <ProjectSummary applicationDetails={application.application_details} />
+                  </div>
+                )}
               </div>
             </div>
           </div>
