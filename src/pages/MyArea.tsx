@@ -104,12 +104,25 @@ const MyArea = () => {
     if (!applications[currentIndex]) return;
 
     try {
+      // Get the current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save feedback",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('application_feedback')
         .insert([
           {
             application_id: applications[currentIndex].id,
-            feedback_type: liked ? 'like' : 'dislike'
+            feedback_type: liked ? 'like' : 'dislike',
+            user_id: user.id // Include the user_id in the insert
           }
         ]);
 
