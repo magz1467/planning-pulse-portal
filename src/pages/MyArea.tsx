@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCoordinates } from '@/hooks/use-coordinates';
+import { Database } from '@/integrations/supabase/types';
+
+type ApplicationResponse = Database['public']['Tables']['applications']['Row'];
 
 const MyArea = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -38,28 +41,34 @@ const MyArea = () => {
       if (error) throw error;
 
       // Transform the data to match the Application type
-      const transformedApplications: Application[] = data?.map(app => ({
-        id: app.application_id,
-        title: app.description || '',
-        address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
-        status: app.status || '',
-        reference: app.lpa_app_no || '',
-        description: app.description || '',
-        applicant: app.application_details?.applicant || '',
-        submissionDate: app.valid_date || '',
-        decisionDue: app.decision_target_date || '',
-        type: app.application_type || '',
-        ward: app.ward || '',
-        officer: app.application_details?.officer || '',
-        consultationEnd: app.last_date_consultation_comments || '',
-        image: app.image_map_url,
-        coordinates: app.centroid?.coordinates ? [app.centroid.coordinates[1], app.centroid.coordinates[0]] : [0, 0],
-        postcode: app.postcode || '',
-        ai_title: app.ai_title,
-        impact_score: app.impact_score,
-        impact_score_details: app.impact_score_details,
-        application_details: app.application_details
-      })) || [];
+      const transformedApplications: Application[] = data?.map((app: ApplicationResponse) => {
+        const appDetails = app.application_details as Record<string, any> | null;
+        const centroid = app.centroid as { coordinates: [number, number] } | null;
+        
+        return {
+          id: app.application_id,
+          title: app.description || '',
+          address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
+          status: app.status || '',
+          reference: app.lpa_app_no || '',
+          description: app.description || '',
+          applicant: appDetails?.applicant || '',
+          submissionDate: app.valid_date || '',
+          decisionDue: app.decision_target_date || '',
+          type: app.application_type || '',
+          ward: app.ward || '',
+          officer: appDetails?.officer || '',
+          consultationEnd: app.last_date_consultation_comments || '',
+          image: app.image_map_url || undefined,
+          coordinates: centroid?.coordinates ? [centroid.coordinates[1], centroid.coordinates[0]] : [0, 0],
+          postcode: app.postcode || '',
+          ai_title: app.ai_title || undefined,
+          impact_score: app.impact_score || null,
+          impact_score_details: app.impact_score_details as Record<string, any> || {},
+          application_details: appDetails || null,
+          impacted_services: app.impacted_services as Record<string, any> || {}
+        };
+      }) || [];
 
       setApplications(transformedApplications);
       setCurrentIndex(0);
