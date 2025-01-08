@@ -15,11 +15,22 @@ export const ImpactCategoryCard = ({ category, scoreData }: ImpactCategory) => {
     return 'High Impact';
   };
 
+  // Safely handle undefined category
+  if (!category) {
+    return null;
+  }
+
+  // Format category name by replacing underscores with spaces and capitalizing
+  const formattedCategory = category
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
   return (
     <Card className="p-6 space-y-4 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold capitalize">
-          {category.replace(/_/g, ' ')}
+        <h3 className="text-lg font-semibold">
+          {formattedCategory}
         </h3>
         <Badge 
           variant="outline" 
