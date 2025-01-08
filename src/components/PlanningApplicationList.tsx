@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Timer } from "lucide-react";
+import { MapPin, Timer, X } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
@@ -41,6 +41,16 @@ export const PlanningApplicationList = ({
             className="relative py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => onSelectApplication(application.id)}
           >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectApplication(null);
+              }}
+              className="absolute top-2 right-2 z-10 p-2 hover:bg-gray-100 rounded-full"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
+            
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <ImageResolver
