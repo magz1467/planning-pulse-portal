@@ -1,0 +1,135 @@
+import { Application } from "@/types/planning";
+import { Card } from "@/components/ui/card";
+import { Bell, Heart, BookmarkIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { EmailDialog } from "../EmailDialog";
+import { FeedbackEmailDialog } from "../FeedbackEmailDialog";
+import { useSavedApplications } from "@/hooks/use-saved-applications";
+import { Link } from "react-router-dom";
+import { AuthRequiredDialog } from "../AuthRequiredDialog";
+import { supabase } from "@/integrations/supabase/client";
+
+interface DetailsActionsProps {
+  application: Application;
+}
+
+export const DetailsActions = ({ application }: DetailsActionsProps) => {
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const { toast } = useToast();
+  const { savedApplications, toggleSavedApplication } = useSavedApplications();
+  
+  const isSaved = savedApplications.includes(application.id);
+
+  const handleSave = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      setShowAuthDialog(true);
+      return;
+    }
+
+    toggleSavedApplication(application.id);
+    toast({
+      title: isSaved ? "Application removed" : "Application saved",
+      description: isSaved 
+        ? "The application has been removed from your saved list" 
+        : "The application has been added to your saved list. View all your saved applications.",
+      action: !isSaved ? (
+        <Link to="/saved" className="text-primary hover:underline">
+          View saved
+        </Link>
+      ) : undefined
+    });
+  };
+
+  const handleEmailSubmit = (radius: string) => {
+    toast({
+      title: "Notification setup",
+      description: `We'll notify you when a decision is made on this application.`,
+      duration: 5000,
+    });
+    setShowEmailDialog(false);
+  };
+
+  const handleFeedbackEmailSubmit = (email: string) => {
+    toast({
+      title: "Developer verification pending",
+      description: "We'll verify your email and send you access to view all feedback for this application.",
+      duration: 5000,
+    });
+    setShowFeedbackDialog(false);
+  };
+
+  return (
+    <>
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bell className="h-5 w-5 text-primary" />
+            <div>
+              <h3 className="font-semibold">Get Decision Updates</h3>
+              <p className="text-sm text-gray-600">We'll notify you when this application is decided</p>
+            </div>
+          </div>
+          <Button onClick={() => setShowEmailDialog(true)}>
+            Get notified
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold">Is this your development?</h3>
+            <p className="text-sm text-gray-600">Click here to verify and see full feedback</p>
+          </div>
+          <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
+            Get feedback
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <BookmarkIcon className="h-5 w-5" />
+            <div>
+              <h3 className="font-semibold">Save for later</h3>
+              <p className="text-sm text-gray-600">Keep track of this application</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSave}
+            className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
+          >
+            <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+          </Button>
+        </div>
+      </Card>
+
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
+        postcode={application?.postcode || ''}
+      />
+
+      <FeedbackEmailDialog
+        open={showFeedbackDialog}
+        onOpenChange={setShowFeedbackDialog}
+        onSubmit={handleFeedbackEmailSubmit}
+      />
+
+      <AuthRequiredDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+      />
+    </>
+  );
+};
