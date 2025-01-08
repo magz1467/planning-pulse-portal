@@ -14,13 +14,31 @@ export const ScrapingGeneration = () => {
     setError(null);
     
     try {
+      // First get a real application to test with
+      const { data: applications, error: fetchError } = await supabase
+        .from('applications')
+        .select('*')
+        .not('url_planning_app', 'is', null)
+        .limit(1)
+        .single();
+
+      if (fetchError) {
+        throw new Error('Could not find a valid application to test scraping with');
+      }
+
+      if (!applications?.url_planning_app) {
+        throw new Error('No application found with a valid planning portal URL');
+      }
+
+      console.log('Testing scrape with application:', applications);
+
       const { data, error: functionError } = await supabase.functions.invoke('scrape-planning-portal', {
         body: { 
-          url: "https://example-planning-portal.com/application/123",
-          applicationId: 123,
-          lpaAppNo: "TEST/123",
-          lpaName: "Test Council",
-          description: "Test planning application"
+          url: applications.url_planning_app,
+          applicationId: applications.application_id,
+          lpaAppNo: applications.lpa_app_no,
+          lpaName: applications.lpa_name,
+          description: applications.description
         }
       });
 
@@ -72,7 +90,7 @@ export const ScrapingGeneration = () => {
       </Button>
       
       <p className="mt-2 text-sm text-muted-foreground">
-        Click to test the planning portal scraping functionality
+        Click to test the planning portal scraping functionality using a real application
       </p>
     </div>
   );
