@@ -31,7 +31,6 @@ export interface Application {
       details: string;
     };
   };
-  application_details?: Record<string, any> | null;
 }
 
 export interface Comment {

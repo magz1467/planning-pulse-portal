@@ -1,19 +1,19 @@
 import { Share2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Application } from "@/types/planning";
 
 interface ApplicationSharingProps {
-  application: Application;
+  applicationId: number;
+  reference: string;
 }
 
-export const ApplicationSharing = ({ application }: ApplicationSharingProps) => {
+export const ApplicationSharing = ({ applicationId, reference }: ApplicationSharingProps) => {
   const { toast } = useToast();
 
   const getShareUrl = () => {
     const baseUrl = window.location.origin + window.location.pathname;
     const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set('application', application.id.toString());
+    searchParams.set('application', applicationId.toString());
     return `${baseUrl}?${searchParams.toString()}`;
   };
 
@@ -38,7 +38,7 @@ export const ApplicationSharing = ({ application }: ApplicationSharingProps) => 
 
   const handleWhatsAppShare = () => {
     const url = getShareUrl();
-    const text = `Check out this planning application (ref: ${application.reference}): ${url}`;
+    const text = `Check out this planning application (ref: ${reference}): ${url}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
