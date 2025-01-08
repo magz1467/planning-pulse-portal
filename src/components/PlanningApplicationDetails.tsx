@@ -122,11 +122,6 @@ export const PlanningApplicationDetails = ({
         applicationId={application.id} 
         reference={application.reference}
       />
-
-      {application.application_details && Object.keys(application.application_details).length > 0 && (
-        <ProjectSummary applicationDetails={application.application_details} />
-      )}
-
       <Card className="overflow-hidden">
         <ApplicationTimeline application={application} />
         <Separator className="my-4" />
@@ -134,6 +129,8 @@ export const PlanningApplicationDetails = ({
       </Card>
 
       <ApplicationDescription application={application} />
+      
+      <ProjectSummary applicationDetails={application.application_details} />
       
       <EnvironmentalImpactDial 
         score={application.impact_score} 

@@ -1,14 +1,14 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./mobile/FullScreenDetails";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { EmptyState } from "./mobile/EmptyState";
 import { MiniCard } from "./mobile/MiniCard";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
   selectedId: number | null;
-  onSelectApplication: (id: number | null) => void;
+  onSelectApplication: (id: number) => void;
 }
 
 export const MobileApplicationCards = ({
@@ -54,12 +54,11 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (selectedApp) {
+  if (selectedApp && !showFullDetails) {
     return (
       <MiniCard
         application={selectedApp}
         onClick={() => setShowFullDetails(true)}
-        onClose={() => onSelectApplication(null)}
       />
     );
   }

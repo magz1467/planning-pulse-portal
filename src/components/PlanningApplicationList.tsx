@@ -1,13 +1,12 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Timer, X } from "lucide-react";
+import { MapPin, Timer } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { cn } from "@/lib/utils";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
-import { ProjectSummary } from "@/components/planning-details/ProjectSummary";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -29,28 +28,12 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
-        console.log('Application details for ID:', application.id, {
-          hasDetails: !!application.application_details,
-          detailsLength: application.application_details ? Object.keys(application.application_details).length : 0,
-          details: application.application_details
-        });
-
         return (
           <div
             key={application.id}
-            className="relative py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => onSelectApplication(application.id)}
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onSelectApplication(null);
-              }}
-              className="absolute top-2 right-2 z-10 p-2 hover:bg-gray-100 rounded-full"
-            >
-              <X className="h-4 w-4 text-gray-500" />
-            </button>
-            
             <div className="flex gap-3">
               <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <ImageResolver
@@ -84,11 +67,6 @@ export const PlanningApplicationList = ({
                   </div>
                   <span className="text-xs text-gray-500">{application.distance}</span>
                 </div>
-                {application.application_details && Object.keys(application.application_details).length > 0 && (
-                  <div className="mt-3">
-                    <ProjectSummary applicationDetails={application.application_details} />
-                  </div>
-                )}
               </div>
             </div>
           </div>
