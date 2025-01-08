@@ -120,12 +120,12 @@ export const PlanningApplicationDetails = ({
       <ApplicationImage application={application} />
       <div className="flex items-center justify-center gap-2">
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="sm"
           onClick={handleSave}
-          className={`${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
+          className={`flex items-center gap-2 ${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
         >
-          <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
+          <Heart className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
         </Button>
         <ApplicationSharing 
           applicationId={application.id} 
