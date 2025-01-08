@@ -1,10 +1,10 @@
 import { Application } from "@/types/planning";
-import { ApplicationHeader } from "./ApplicationHeader";
-import { ApplicationImage } from "./ApplicationImage";
-import { ProjectSummary } from "./ProjectSummary";
-import { DetailsSections } from "./DetailsSections";
-import { ApplicationFeedback } from "./ApplicationFeedback";
-import { ApplicationComments } from "./ApplicationComments";
+import { ApplicationHeader } from "./planning-details/ApplicationHeader";
+import { ApplicationImage } from "./planning-details/ApplicationImage";
+import { ProjectSummary } from "./planning-details/ProjectSummary";
+import { DetailsSections } from "./planning-details/DetailsSections";
+import { ApplicationFeedback } from "./planning-details/ApplicationFeedback";
+import { ApplicationComments } from "./planning-details/ApplicationComments";
 
 interface PlanningApplicationDetailsProps {
   application: Application;
