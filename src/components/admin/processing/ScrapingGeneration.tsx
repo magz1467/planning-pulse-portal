@@ -13,23 +13,30 @@ export const ScrapingGeneration = () => {
       const { data, error } = await supabase.functions.invoke('scrape-planning-portal', {
         body: { 
           url: "https://example-planning-portal.com/application/123",
-          applicationId: 123
+          applicationId: 123,
+          lpaAppNo: "TEST/123",
+          lpaName: "Test Council",
+          description: "Test planning application"
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Function error:', error);
+        throw error;
+      }
 
+      console.log('Scraping response:', data);
+      
       toast({
         title: "Success",
         description: "Scraping completed successfully",
       });
 
-      console.log('Scraping response:', data);
     } catch (error) {
       console.error('Scraping error:', error);
       toast({
         title: "Error",
-        description: "Failed to scrape planning portal",
+        description: error.message || "Failed to scrape planning portal",
         variant: "destructive",
       });
     } finally {
