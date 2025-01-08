@@ -16,6 +16,8 @@ export const ProjectSummary = ({ applicationDetails }: ProjectSummaryProps) => {
       value: typeof value === 'boolean' ? value : String(value)
     }));
 
+  if (summaryItems.length === 0) return null;
+
   return (
     <Card className="p-4 mt-4">
       <h3 className="font-semibold text-lg mb-3">Project Summary</h3>
