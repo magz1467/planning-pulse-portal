@@ -11,6 +11,7 @@ import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
 import { ApplicationSharing } from "./planning-details/ApplicationSharing";
 import { CreatePetition } from "./planning-details/CreatePetition";
 import { ApplicationFeedback } from "./planning-details/ApplicationFeedback";
+import { ProjectSummary } from "./planning-details/ProjectSummary";
 import { Card } from "@/components/ui/card";
 import { Bell, Heart, BookmarkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -126,6 +127,10 @@ export const PlanningApplicationDetails = ({
         <Separator className="my-4" />
         <CollapsibleApplicationDetails application={application} />
       </Card>
+
+      <ApplicationDescription application={application} />
+      
+      <ProjectSummary applicationDetails={application.application_details} />
       
       <EnvironmentalImpactDial 
         score={application.impact_score} 
@@ -139,14 +144,6 @@ export const PlanningApplicationDetails = ({
           impactedServices={application.impact_score_details.impacted_services}
         />
       )}
-
-      <ApplicationDescription application={application} />
-      
-      <ApplicationFeedback 
-        feedback={feedback}
-        onFeedback={handleFeedback}
-        feedbackStats={feedbackStats}
-      />
 
       <ApplicationComments applicationId={application.id} />
       <CreatePetition applicationId={application.id} />
