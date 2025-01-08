@@ -29,9 +29,9 @@ export const PlanningApplicationList = ({
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
         return (
-          <div
+          <Card
             key={application.id}
-            className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            className="p-4 cursor-pointer hover:bg-gray-50 transition-colors border-0 rounded-none"
             onClick={() => onSelectApplication(application.id)}
           >
             <div className="flex gap-3">
@@ -55,7 +55,7 @@ export const PlanningApplicationList = ({
                 </div>
                 <div className="flex justify-between items-center mt-2">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
+                    <span className={cn("text-xs px-2 py-1 rounded", getStatusColor(application.status))}>
                       {getStatusText(application.status)}
                     </span>
                     {isClosingSoon && (
@@ -69,9 +69,9 @@ export const PlanningApplicationList = ({
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         );
       })}
     </div>
   );
-}
+};
