@@ -72,7 +72,8 @@ export const transformApplicationData = (
     image_map_url: app.image_map_url || null,
     last_date_consultation_comments: app.last_date_consultation_comments || null,
     valid_date: app.valid_date || null,
-    centroid: app.centroid || null
+    centroid: app.centroid || null,
+    application_details: app.application_details || null // Add this line to include application_details
   };
 
   console.log('✅ Transformed application:', {
