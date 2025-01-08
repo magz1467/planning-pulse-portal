@@ -68,7 +68,7 @@ export const PlanningApplicationList = ({
                   </div>
                   <span className="text-xs text-gray-500">{application.distance}</span>
                 </div>
-                {application.application_details && (
+                {application.application_details && Object.keys(application.application_details).length > 0 && (
                   <div className="mt-3">
                     <ProjectSummary applicationDetails={application.application_details} />
                   </div>
