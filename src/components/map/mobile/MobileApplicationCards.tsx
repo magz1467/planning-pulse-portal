@@ -8,7 +8,7 @@ import { MiniCard } from "./MiniCard";
 interface MobileApplicationCardsProps {
   applications: Application[];
   selectedId: number | null;
-  onSelectApplication: (id: number) => void;
+  onSelectApplication: (id: number | null) => void;
 }
 
 export const MobileApplicationCards = ({
@@ -19,17 +19,12 @@ export const MobileApplicationCards = ({
   const [showFullDetails, setShowFullDetails] = useState(false);
   const { toast } = useToast();
 
+  // Reset full details view when selectedId changes
   useEffect(() => {
-    console.log('MobileApplicationCards - Component mounted/updated:', {
-      applicationsCount: applications.length,
-      selectedId,
-      showFullDetails
-    });
-
     if (selectedId === null) {
       setShowFullDetails(false);
     }
-  }, [selectedId, applications.length]);
+  }, [selectedId]);
 
   const handleCommentSubmit = (content: string) => {
     console.log("New comment:", content);
@@ -40,11 +35,6 @@ export const MobileApplicationCards = ({
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
-  console.log('MobileApplicationCards - Selected application:', {
-    selectedId,
-    selectedApp,
-    applicationsAvailable: applications.length > 0
-  });
 
   if (!applications.length) {
     console.log('MobileApplicationCards - No applications available');
@@ -67,7 +57,7 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (selectedApp && !showFullDetails) {
+  if (selectedApp) {
     console.log('MobileApplicationCards - Showing mini card for application:', selectedApp.id);
     return (
       <MiniCard
@@ -77,6 +67,5 @@ export const MobileApplicationCards = ({
     );
   }
 
-  console.log('MobileApplicationCards - No content to display');
   return null;
 };
