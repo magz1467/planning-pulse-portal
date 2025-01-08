@@ -65,6 +65,56 @@ export type Database = {
         }
         Relationships: []
       }
+      application_additional_details: {
+        Row: {
+          application_id: number | null
+          committee_notes: string[] | null
+          created_at: string
+          description: string | null
+          id: number
+          last_scraped_at: string | null
+          lpa_app_no: string | null
+          lpa_name: string | null
+          other_links: Json | null
+          site_plan_link: string[] | null
+          url_planning_app: string | null
+        }
+        Insert: {
+          application_id?: number | null
+          committee_notes?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: number
+          last_scraped_at?: string | null
+          lpa_app_no?: string | null
+          lpa_name?: string | null
+          other_links?: Json | null
+          site_plan_link?: string[] | null
+          url_planning_app?: string | null
+        }
+        Update: {
+          application_id?: number | null
+          committee_notes?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: number
+          last_scraped_at?: string | null
+          lpa_app_no?: string | null
+          lpa_name?: string | null
+          other_links?: Json | null
+          site_plan_link?: string[] | null
+          url_planning_app?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_additional_details_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["application_id"]
+          },
+        ]
+      }
       application_feedback: {
         Row: {
           application_id: number | null
