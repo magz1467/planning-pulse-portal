@@ -1,6 +1,5 @@
 import { Application } from "@/types/planning";
-import { Timer, X } from "lucide-react";
-import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { X } from "lucide-react";
 import { ImageResolver } from "./components/ImageResolver";
 import { StatusBadge } from "./components/StatusBadge";
 import { LocationInfo } from "./components/LocationInfo";
@@ -45,13 +44,11 @@ export const MiniCard = ({ application, onClick, onClose }: MiniCardProps) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <ApplicationTitle 
-              title={application.ai_title || application.description || ''} 
-              className="line-clamp-2 text-sm font-semibold text-primary"
-            />
+            <h3 className="line-clamp-2 text-sm font-semibold text-primary">
+              {application.ai_title || application.description || ''}
+            </h3>
             {isClosingSoon && (
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                <Timer className="w-3 h-3 mr-1" />
                 Closing soon
               </span>
             )}
