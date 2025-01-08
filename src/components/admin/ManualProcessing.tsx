@@ -3,6 +3,7 @@ import { TitleGeneration } from "./processing/TitleGeneration";
 import { MapGeneration } from "./processing/MapGeneration";
 import { ImpactScoreGeneration } from "./processing/ImpactScoreGeneration";
 import { OnlineDescriptionGeneration } from "./processing/OnlineDescriptionGeneration";
+import { ScrapingGeneration } from "./processing/ScrapingGeneration";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -39,6 +40,10 @@ export const ManualProcessing = ({
       <Separator className="my-6" />
 
       <OnlineDescriptionGeneration />
+
+      <Separator className="my-6" />
+      
+      <ScrapingGeneration />
     </div>
   );
 };
