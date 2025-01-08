@@ -22,6 +22,7 @@ import Cookies from './pages/Cookies';
 import Admin from './pages/Admin';
 import Admin2 from './pages/Admin2';
 import Verify from './pages/verify';
+import MyArea from './pages/MyArea';
 
 // Content pages
 import PlanningBasics from './pages/content/PlanningBasics';
@@ -62,6 +63,7 @@ const App = () => {
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin2" element={<Admin2 />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/myarea" element={<MyArea />} />
         
         {/* Content pages */}
         <Route path="/content/planning-basics" element={<PlanningBasics />} />
