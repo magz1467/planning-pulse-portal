@@ -6,62 +6,45 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Chatbot = () => {
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
+  const [response, setResponse] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!message || (!email && !phone)) {
-      toast({
-        title: "Error",
-        description: "Please provide a message and either an email or phone number for us to contact you.",
-        variant: "destructive",
-      });
-      return;
-    }
+    setIsLoading(true);
 
     try {
-      // Save to database
-      const { error } = await supabase
-        .from('contact_requests')
-        .insert([
-          {
-            email,
-            phone,
-            message
-          }
-        ]);
+      // Get visible applications from your state management
+      // This is just an example - you'll need to integrate with your actual application state
+      const { data: applications, error } = await supabase
+        .from('applications')
+        .select('*')
+        .limit(10);
 
       if (error) throw error;
 
-      // Notify admin via email
-      const { error: notifyError } = await supabase.functions.invoke('notify-contact', {
-        body: { email, phone, message }
+      const { data, error: functionError } = await supabase.functions.invoke('analyze-applications', {
+        body: { 
+          applications,
+          query: message 
+        }
       });
 
-      if (notifyError) {
-        console.error('Error notifying admin:', notifyError);
-      }
+      if (functionError) throw functionError;
 
-      toast({
-        title: "Message sent",
-        description: "Thank you for your message. A member of our team will contact you soon.",
-      });
-
-      // Reset form
-      setEmail("");
-      setPhone("");
+      setResponse(data.analysis);
       setMessage("");
     } catch (error) {
-      console.error('Error submitting contact form:', error);
+      console.error('Error:', error);
       toast({
         title: "Error",
-        description: "There was a problem sending your message. Please try again.",
+        description: "Failed to analyze applications. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,30 +52,22 @@ export const Chatbot = () => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Input
-          type="email"
-          placeholder="Your email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <div className="text-xs text-gray-500">
-          Or provide your phone number below
-        </div>
-        <Input
-          type="tel"
-          placeholder="Your phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          type="text"
+          placeholder="Ask about planning applications in this area..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          disabled={isLoading}
         />
       </div>
-      <Textarea
-        placeholder="Type your message here..."
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        required
-        className="min-h-[100px]"
-      />
-      <Button type="submit" className="w-full">
-        Send Message
+      {response && (
+        <Textarea
+          value={response}
+          readOnly
+          className="min-h-[100px]"
+        />
+      )}
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Analyzing..." : "Ask AI Assistant"}
       </Button>
     </form>
   );
