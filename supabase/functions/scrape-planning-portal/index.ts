@@ -21,11 +21,11 @@ serve(async (req) => {
         ...corsHeaders,
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
       }
-    })
+    });
   }
 
   try {
-    const { url, applicationId, lpaAppNo, lpaName, description } = await req.json()
+    const { url, applicationId, lpaAppNo, lpaName, description } = await req.json();
 
     if (!url || !applicationId) {
       return new Response(
@@ -37,10 +37,10 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
           status: 400 
         }
-      )
+      );
     }
 
-    console.log(`Starting scraping for application ${applicationId} at URL: ${url}`)
+    console.log(`Starting scraping for application ${applicationId} at URL: ${url}`);
 
     // Fetch the planning portal page with a timeout
     const controller = new AbortController();
@@ -55,57 +55,57 @@ serve(async (req) => {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch URL: ${response.statusText}`)
+        throw new Error(`Failed to fetch URL: ${response.statusText}`);
       }
 
-      const html = await response.text()
+      const html = await response.text();
       clearTimeout(timeout);
 
-      const $ = cheerio.load(html)
+      const $ = cheerio.load(html);
 
       // Initialize result structure
       const result: ScrapingResult = {
         sitePlanLinks: [],
         committeeNotes: [],
         otherLinks: {}
-      }
+      };
 
       // Find and categorize links
       $('a').each((_, element) => {
-        const link = $(element)
-        const href = link.attr('href')
-        const text = link.text().toLowerCase().trim()
+        const link = $(element);
+        const href = link.attr('href');
+        const text = link.text().toLowerCase().trim();
 
-        if (!href) return
+        if (!href) return;
 
         try {
           // Normalize URL
-          const fullUrl = href.startsWith('http') ? href : new URL(href, url).toString()
+          const fullUrl = href.startsWith('http') ? href : new URL(href, url).toString();
 
           // Categorize based on text content
           if (text.includes('site plan') || text.includes('location plan')) {
-            result.sitePlanLinks.push(fullUrl)
+            result.sitePlanLinks.push(fullUrl);
           } else if (text.includes('committee') || text.includes('meeting notes')) {
-            result.committeeNotes.push(fullUrl)
+            result.committeeNotes.push(fullUrl);
           } else if (text.includes('document') || text.includes('pdf') || text.includes('plan')) {
-            const key = `doc_${Object.keys(result.otherLinks).length + 1}`
+            const key = `doc_${Object.keys(result.otherLinks).length + 1}`;
             result.otherLinks[key] = {
               url: fullUrl,
               description: text
-            }
+            };
           }
         } catch (urlError) {
-          console.error('Error processing URL:', urlError)
+          console.error('Error processing URL:', urlError);
         }
-      })
+      });
 
-      console.log(`Found ${result.sitePlanLinks.length} site plans, ${result.committeeNotes.length} committee notes, and ${Object.keys(result.otherLinks).length} other documents`)
+      console.log(`Found ${result.sitePlanLinks.length} site plans, ${result.committeeNotes.length} committee notes, and ${Object.keys(result.otherLinks).length} other documents`);
 
       // Store results in Supabase
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      )
+      );
 
       const { data, error } = await supabase
         .from('application_additional_details')
@@ -122,11 +122,11 @@ serve(async (req) => {
         }, {
           onConflict: 'application_id'
         })
-        .select()
+        .select();
 
       if (error) {
-        console.error('Error storing results:', error)
-        throw error
+        console.error('Error storing results:', error);
+        throw error;
       }
 
       return new Response(
@@ -142,7 +142,7 @@ serve(async (req) => {
           },
           status: 200
         }
-      )
+      );
 
     } catch (fetchError) {
       clearTimeout(timeout);
@@ -153,7 +153,7 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('Error in scraping function:', error)
+    console.error('Error in scraping function:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Failed to scrape planning portal',
@@ -163,6 +163,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 
       }
-    )
+    );
   }
-})
+});

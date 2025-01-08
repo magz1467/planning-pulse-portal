@@ -27,6 +27,10 @@ export const ScrapingGeneration = () => {
 
       console.log('Scraping response:', data);
       
+      if (!data) {
+        throw new Error('No data returned from scraping function');
+      }
+
       toast({
         title: "Success",
         description: "Scraping completed successfully",
