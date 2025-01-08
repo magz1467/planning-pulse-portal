@@ -29,6 +29,12 @@ export const PlanningApplicationList = ({
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
 
+        console.log('Application details for ID:', application.id, {
+          hasDetails: !!application.application_details,
+          detailsLength: application.application_details ? Object.keys(application.application_details).length : 0,
+          details: application.application_details
+        });
+
         return (
           <div
             key={application.id}
