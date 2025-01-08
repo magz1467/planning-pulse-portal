@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
 
@@ -37,12 +37,10 @@ export const MobileApplicationCards = ({
   const selectedApp = applications.find(app => app.id === selectedId);
 
   if (!applications.length) {
-    console.log('MobileApplicationCards - No applications available');
     return <EmptyState />;
   }
 
   if (showFullDetails && selectedApp) {
-    console.log('MobileApplicationCards - Showing full details for application:', selectedApp.id);
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
@@ -58,11 +56,11 @@ export const MobileApplicationCards = ({
   }
 
   if (selectedApp) {
-    console.log('MobileApplicationCards - Showing mini card for application:', selectedApp.id);
     return (
       <MiniCard
         application={selectedApp}
         onClick={() => setShowFullDetails(true)}
+        onClose={() => onSelectApplication(null)}
       />
     );
   }

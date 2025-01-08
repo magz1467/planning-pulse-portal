@@ -4,21 +4,35 @@ import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { ImageResolver } from "./components/ImageResolver";
 import { StatusBadge } from "./components/StatusBadge";
 import { LocationInfo } from "./components/LocationInfo";
+import { Button } from "@/components/ui/button";
 
 interface MiniCardProps {
   application: Application;
   onClick: () => void;
+  onClose: () => void;
 }
 
-export const MiniCard = ({ application, onClick }: MiniCardProps) => {
+export const MiniCard = ({ application, onClick, onClose }: MiniCardProps) => {
   const isClosingSoon = application.last_date_consultation_comments;
 
   return (
     <div 
-      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
+      className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300 relative"
       onClick={onClick}
       style={{ zIndex: 1500 }}
     >
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-2 top-2 z-50"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      >
+        <X className="h-4 w-4" />
+      </Button>
+      
       <div className="flex gap-4 items-center">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <ImageResolver
