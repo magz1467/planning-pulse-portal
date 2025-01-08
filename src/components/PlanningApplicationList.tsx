@@ -38,7 +38,7 @@ export const PlanningApplicationList = ({
         return (
           <div
             key={application.id}
-            className="py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            className="relative py-3 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => onSelectApplication(application.id)}
           >
             <div className="flex gap-3">
