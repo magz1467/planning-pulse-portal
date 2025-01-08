@@ -37,7 +37,31 @@ const MyArea = () => {
 
       if (error) throw error;
 
-      setApplications(data || []);
+      // Transform the data to match the Application type
+      const transformedApplications: Application[] = data?.map(app => ({
+        id: app.application_id,
+        title: app.description || '',
+        address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
+        status: app.status || '',
+        reference: app.lpa_app_no || '',
+        description: app.description || '',
+        applicant: app.application_details?.applicant || '',
+        submissionDate: app.valid_date || '',
+        decisionDue: app.decision_target_date || '',
+        type: app.application_type || '',
+        ward: app.ward || '',
+        officer: app.application_details?.officer || '',
+        consultationEnd: app.last_date_consultation_comments || '',
+        image: app.image_map_url,
+        coordinates: app.centroid?.coordinates ? [app.centroid.coordinates[1], app.centroid.coordinates[0]] : [0, 0],
+        postcode: app.postcode || '',
+        ai_title: app.ai_title,
+        impact_score: app.impact_score,
+        impact_score_details: app.impact_score_details,
+        application_details: app.application_details
+      })) || [];
+
+      setApplications(transformedApplications);
       setCurrentIndex(0);
     } catch (error) {
       console.error('Error fetching applications:', error);
