@@ -19,7 +19,7 @@ export const PlanningApplicationDetails = ({
     <div className="flex flex-col space-y-4 p-4">
       <ApplicationHeader application={application} onClose={onClose} />
       <ApplicationImage application={application} />
-      <ProjectSummary applicationDetails={application.application_details} />
+      <ProjectSummary application={application} />
       <DetailsSections application={application} />
       <ApplicationFeedback application={application} />
       <ApplicationComments applicationId={application.id} />

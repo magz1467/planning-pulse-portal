@@ -1,3 +1,4 @@
+import { Application } from "@/types/planning";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ImpactCategoryCard } from "./ImpactCategory";
 import { ImpactList } from "./ImpactList";
@@ -6,15 +7,14 @@ import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-interface ImpactScoreBreakdownProps {
-  details: ImpactScoreData | null;
+interface ImpactScoreDetailsProps {
+  application: Application;
 }
 
-export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ details }) => {
-  console.log('ImpactScoreBreakdown - Received details:', details);
+export const ImpactScoreDetails = ({ application }: ImpactScoreDetailsProps) => {
+  const details = application.impact_score_details;
 
   if (!details) {
-    console.log('ImpactScoreBreakdown - No details provided');
     return null;
   }
 
