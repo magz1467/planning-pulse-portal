@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
+import { ProjectSummary } from "@/components/planning-details/ProjectSummary";
 
 interface FullScreenDetailsProps {
   application: Application;
@@ -28,10 +29,15 @@ export const FullScreenDetails = ({
       </div>
 
       <div className="flex-1 overflow-y-auto overscroll-contain">
-        <PlanningApplicationDetails
-          application={application}
-          onClose={onClose}
-        />
+        <div className="p-4 space-y-4">
+          <PlanningApplicationDetails
+            application={application}
+            onClose={onClose}
+          />
+          {application.application_details && (
+            <ProjectSummary applicationDetails={application.application_details} />
+          )}
+        </div>
       </div>
     </div>
   );
