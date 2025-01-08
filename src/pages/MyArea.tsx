@@ -17,7 +17,7 @@ const MyArea = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [postcode, setPostcode] = useState('');
   const [showChatbot, setShowChatbot] = useState(false);
-  const { coordinates } = useCoordinates(postcode);
+  const { coordinates, isLoading: isLoadingCoordinates } = useCoordinates(postcode);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -33,12 +33,22 @@ const MyArea = () => {
       const { data, error } = await supabase.rpc('get_applications_within_radius', {
         center_lng: coordinates[1],
         center_lat: coordinates[0],
-        radius_meters: 500,
+        radius_meters: 1000, // Set a default radius of 1km
         page_size: 100,
         page_number: 0
       });
 
       if (error) throw error;
+
+      if (!data || data.length === 0) {
+        toast({
+          title: "No applications found",
+          description: "No planning applications found in this area. Try a different postcode or increase the search radius.",
+          variant: "default",
+        });
+        setApplications([]);
+        return;
+      }
 
       // Transform the data to match the Application type
       const transformedApplications: Application[] = data?.map((app: ApplicationResponse) => {
@@ -69,6 +79,14 @@ const MyArea = () => {
           impacted_services: app.impacted_services as Record<string, any> || {}
         };
       }) || [];
+
+      if (transformedApplications.length > 0) {
+        toast({
+          title: "Applications found",
+          description: `Found ${transformedApplications.length} applications in your area`,
+          variant: "default",
+        });
+      }
 
       setApplications(transformedApplications);
       setCurrentIndex(0);
@@ -128,6 +146,10 @@ const MyArea = () => {
               placeholder="Enter your postcode"
               className="w-full"
             />
+          </div>
+        ) : isLoadingCoordinates ? (
+          <div className="text-center">
+            <p>Loading applications...</p>
           </div>
         ) : applications.length === 0 ? (
           <div className="text-center">
