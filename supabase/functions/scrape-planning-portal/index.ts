@@ -16,7 +16,12 @@ interface ScrapingResult {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      }
+    })
   }
 
   try {
@@ -24,8 +29,14 @@ serve(async (req) => {
 
     if (!url || !applicationId) {
       return new Response(
-        JSON.stringify({ error: 'Missing required parameters' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        JSON.stringify({ 
+          error: 'Missing required parameters',
+          details: 'url and applicationId are required'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
       )
     }
 
@@ -123,7 +134,14 @@ serve(async (req) => {
           message: 'Scraping completed successfully',
           data: data[0]
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          },
+          status: 200
+        }
       )
 
     } catch (fetchError) {
