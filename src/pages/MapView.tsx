@@ -13,6 +13,7 @@ const MapView = () => {
 
   useEffect(() => {
     const fetchTrialData = async () => {
+      console.log('Fetching trial data...');
       const { data, error } = await supabase
         .from('trial_application_data')
         .select('*');
@@ -21,6 +22,8 @@ const MapView = () => {
         console.error('Error fetching trial data:', error);
         return;
       }
+
+      console.log('Received trial data:', data);
 
       // Transform the data to match the Application type
       const transformedData = (data as TrialApplicationData[]).map((item) => ({
@@ -32,6 +35,7 @@ const MapView = () => {
         description: item.description || '',
         submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
         coordinates: item.location?.coordinates ? 
+          // Note: Leaflet uses [lat, lng] format, so we need to swap the coordinates
           [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
           [51.5074, -0.1278] as [number, number],
         postcode: 'N/A',
@@ -53,6 +57,7 @@ const MapView = () => {
         impacted_services: undefined
       }));
 
+      console.log('Transformed data:', transformedData);
       setApplications(transformedData);
     };
 
