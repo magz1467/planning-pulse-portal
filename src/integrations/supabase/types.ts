@@ -724,6 +724,48 @@ export type Database = {
         }
         Relationships: []
       }
+      trial_application_data: {
+        Row: {
+          address: string | null
+          application_reference: string | null
+          created_at: string
+          decision_date: string | null
+          description: string | null
+          id: number
+          location: unknown | null
+          raw_data: Json | null
+          source_url: string | null
+          status: string | null
+          submission_date: string | null
+        }
+        Insert: {
+          address?: string | null
+          application_reference?: string | null
+          created_at?: string
+          decision_date?: string | null
+          description?: string | null
+          id?: number
+          location?: unknown | null
+          raw_data?: Json | null
+          source_url?: string | null
+          status?: string | null
+          submission_date?: string | null
+        }
+        Update: {
+          address?: string | null
+          application_reference?: string | null
+          created_at?: string
+          decision_date?: string | null
+          description?: string | null
+          id?: number
+          location?: unknown | null
+          raw_data?: Json | null
+          source_url?: string | null
+          status?: string | null
+          submission_date?: string | null
+        }
+        Relationships: []
+      }
       user_activity: {
         Row: {
           created_at: string
