@@ -19,8 +19,9 @@ interface PlanningApplication {
 }
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
@@ -44,6 +45,7 @@ Deno.serve(async (req) => {
     )
 
     if (!response.ok) {
+      console.error('WFS API Error:', response.status, await response.text())
       throw new Error(`Failed to fetch data: ${response.statusText}`)
     }
 
@@ -69,6 +71,7 @@ Deno.serve(async (req) => {
       .insert(applications)
 
     if (error) {
+      console.error('Supabase insert error:', error)
       throw error
     }
 
