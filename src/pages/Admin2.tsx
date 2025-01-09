@@ -10,9 +10,13 @@ export default function Admin2() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [processingBatchSize, setProcessingBatchSize] = useState<number | null>(null);
   const [totalAITitles, setTotalAITitles] = useState<number | null>(null);
+  const [trialData, setTrialData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     fetchTotalAITitles();
+    fetchTrialData();
   }, []);
 
   const fetchTotalAITitles = async () => {
@@ -22,6 +26,31 @@ export default function Admin2() {
       .not('ai_title', 'is', null);
     
     setTotalAITitles(count);
+  };
+
+  const fetchTrialData = async () => {
+    try {
+      setLoading(true);
+      
+      // First fetch the trial data
+      const { data: response, error: fetchError } = await supabase.functions.invoke('fetch-trial-data');
+      
+      if (fetchError) throw fetchError;
+
+      // Then get the data from the table
+      const { data: applications, error: dbError } = await supabase
+        .from('trial_application_data')
+        .select('*');
+
+      if (dbError) throw dbError;
+      
+      setTrialData(applications || []);
+    } catch (err: any) {
+      console.error('Error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGenerateTitles = async (batchSize: number) => {
@@ -89,6 +118,40 @@ export default function Admin2() {
           processingBatchSize={processingBatchSize}
           onGenerate={handleGenerateTitles}
         />
+
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Trial Planning Applications Data</h2>
+          {loading && <div className="p-4">Loading trial data...</div>}
+          {error && <div className="p-4 text-red-500">Error loading trial data: {error}</div>}
+          {!loading && !error && (
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-4 py-2 border">Reference</th>
+                    <th className="px-4 py-2 border">Description</th>
+                    <th className="px-4 py-2 border">Status</th>
+                    <th className="px-4 py-2 border">Address</th>
+                    <th className="px-4 py-2 border">Submission Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trialData.map((app) => (
+                    <tr key={app.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-2 border">{app.application_reference}</td>
+                      <td className="px-4 py-2 border">{app.description}</td>
+                      <td className="px-4 py-2 border">{app.status}</td>
+                      <td className="px-4 py-2 border">{app.address}</td>
+                      <td className="px-4 py-2 border">
+                        {app.submission_date && new Date(app.submission_date).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
