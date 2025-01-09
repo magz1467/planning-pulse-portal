@@ -3,10 +3,12 @@ import { MapContent } from "@/components/map/MapContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Application } from "@/types/planning";
+import { TrialApplicationData } from "@/types/trial";
 
 const MapView = () => {
   const isMobile = useIsMobile();
-  const [applications, setApplications] = useState<any[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const MapView = () => {
       }
 
       // Transform the data to match the Application type
-      const transformedData = data.map((item, index) => ({
+      const transformedData = (data as TrialApplicationData[]).map((item) => ({
         id: item.id,
         title: item.description || 'No description available',
         address: item.address || 'No address available',
