@@ -5,6 +5,10 @@ import { MapSection } from "./MapSection";
 import { SidebarSection } from "./SidebarSection";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Application } from "@/types/planning";
+import { Chatbot } from "@/components/Chatbot";
+import { Button } from "@/components/ui/button";
+import { MessageSquare } from "lucide-react";
+import { useState } from "react";
 
 interface DashboardLayoutProps {
   selectedId: number | null;
@@ -50,6 +54,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   handleSortChange,
 }) => {
   const isMobile = useIsMobile();
+  const [showChatbot, setShowChatbot] = useState(false);
 
   const handleClose = () => {
     handleMarkerClick(null);
@@ -115,6 +120,24 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       </div>
 
       {isLoading && <LoadingOverlay />}
+
+      {/* Chatbot Toggle Button */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button
+          onClick={() => setShowChatbot(!showChatbot)}
+          size="icon"
+          className="h-12 w-12 rounded-full shadow-lg"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </Button>
+      </div>
+
+      {/* Chatbot Panel */}
+      {showChatbot && (
+        <div className="fixed bottom-20 right-4 w-96 bg-white rounded-lg shadow-xl z-50 p-4">
+          <Chatbot />
+        </div>
+      )}
     </div>
   );
 };
