@@ -35,6 +35,22 @@ const MapView = () => {
           [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
           [51.5074, -0.1278] as [number, number],
         postcode: 'N/A',
+        // Adding required properties from Application type with default values
+        applicant: 'Not specified',
+        decisionDue: '',
+        type: 'Planning Application',
+        ward: 'Not specified',
+        officer: 'Not assigned',
+        consultationEnd: '',
+        image: undefined,
+        image_map_url: undefined,
+        ai_title: undefined,
+        last_date_consultation_comments: undefined,
+        valid_date: undefined,
+        centroid: undefined,
+        impact_score: null,
+        impact_score_details: undefined,
+        impacted_services: undefined
       }));
 
       setApplications(transformedData);
