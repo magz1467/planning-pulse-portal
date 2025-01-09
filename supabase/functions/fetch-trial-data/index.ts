@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
 
     // Fetch data from WFS
     const response = await fetch(
-      `${WFS_URL}?service=WFS&version=2.0.0&request=GetFeature&typeName=LandHawk:PlanningApplication&outputFormat=application/json&count=100`,
+      `${WFS_URL}?service=WFS&version=2.0.0&request=GetFeature&typeName=LandHawk:PlanningApplication&outputFormat=application/json&count=25`,
       {
         headers: {
           'Authorization': `Basic ${credentials}`
