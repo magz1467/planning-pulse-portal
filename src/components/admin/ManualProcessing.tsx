@@ -30,13 +30,23 @@ export const ManualProcessing = ({
         description: "This may take a few minutes",
       });
 
-      const { data, error } = await supabase.functions.invoke('fetch-trial-data');
+      const { data, error } = await supabase.functions.invoke('fetch-trial-data', {
+        method: 'POST', // Explicitly set method
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw error;
+      }
+
+      console.log('Edge function response:', data);
 
       toast({
         title: "Success!",
-        description: "Landhawk data has been fetched and stored",
+        description: data?.message || "Landhawk data has been fetched and stored",
       });
     } catch (error) {
       console.error('Error fetching Landhawk data:', error);
