@@ -1,28 +1,16 @@
 import { Application } from "@/types/planning";
-import { ApplicationHeader } from "./planning-details/ApplicationHeader";
-import { ApplicationImage } from "./planning-details/ApplicationImage";
-import { ApplicationTimeline } from "./planning-details/ApplicationTimeline";
-import { CollapsibleApplicationDetails } from "./planning-details/CollapsibleApplicationDetails";
-import { ApplicationDescription } from "./planning-details/ApplicationDescription";
-import { ApplicationComments } from "./planning-details/ApplicationComments";
-import { ExpectedImpactAreas } from "./planning-details/ExpectedImpactAreas";
-import { EnvironmentalImpactDial } from "./planning-details/EnvironmentalImpactDial";
-import { ApplicationDocuments } from "./planning-details/ApplicationDocuments";
-import { ApplicationSharing } from "./planning-details/ApplicationSharing";
-import { CreatePetition } from "./planning-details/CreatePetition";
-import { ApplicationFeedback } from "./planning-details/ApplicationFeedback";
-import { Card } from "@/components/ui/card";
-import { Bell, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
-import { useSavedApplications } from "@/hooks/use-saved-applications";
-import { Link } from "react-router-dom";
 import { AuthRequiredDialog } from "./AuthRequiredDialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ApplicationMetadata } from "./planning-details/ApplicationMetadata";
+import { ApplicationActions } from "./planning-details/ApplicationActions";
+import { ApplicationContent } from "./planning-details/ApplicationContent";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -113,63 +101,25 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div className="p-6 space-y-4 pb-20">
-      <div className="flex justify-between items-start">
-        <ApplicationHeader application={application} />
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowEmailDialog(true)}
-          className="text-primary hover:text-primary/80"
-        >
-          <Bell className="h-5 w-5" />
-        </Button>
-      </div>
+      <ApplicationMetadata 
+        application={application}
+        onShowEmailDialog={() => setShowEmailDialog(true)}
+      />
       
-      <ApplicationImage application={application} />
-      <div className="flex items-center justify-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleSave}
-          className={`flex items-center gap-2 ${isSaved ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-600'}`}
-        >
-          <Heart className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
-        </Button>
-        <ApplicationSharing 
-          applicationId={application.id} 
-          reference={application.reference}
-        />
-      </div>
-      <Card className="overflow-hidden">
-        <ApplicationTimeline application={application} />
-        <Separator className="my-4" />
-        <CollapsibleApplicationDetails application={application} />
-      </Card>
-      
-      <EnvironmentalImpactDial 
-        score={application.impact_score} 
-        details={application.impact_score_details}
+      <ApplicationActions 
         applicationId={application.id}
+        reference={application.reference}
+        isSaved={isSaved}
+        onSave={handleSave}
+        onShowEmailDialog={() => setShowEmailDialog(true)}
       />
 
-      {application.impact_score_details?.impacted_services && (
-        <ExpectedImpactAreas 
-          application={application}
-          impactedServices={application.impact_score_details.impacted_services}
-        />
-      )}
-
-      <ApplicationDescription application={application} />
-      
-      <ApplicationFeedback 
+      <ApplicationContent 
+        application={application}
         feedback={feedback}
-        onFeedback={handleFeedback}
         feedbackStats={feedbackStats}
+        onFeedback={handleFeedback}
       />
-
-      <ApplicationComments applicationId={application.id} />
-      <CreatePetition applicationId={application.id} />
-      <ApplicationDocuments />
 
       <Card className="p-4">
         <div className="flex items-center justify-between">
