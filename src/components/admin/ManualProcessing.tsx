@@ -26,6 +26,7 @@ export const ManualProcessing = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching500, setIsFetching500] = useState(false);
   const [isFetchingAll, setIsFetchingAll] = useState(false);
+  const [isFetchingLandhawk, setIsFetchingLandhawk] = useState(false);
 
   const handleFetchLandhawkData = async () => {
     try {
@@ -143,6 +144,44 @@ export const ManualProcessing = ({
     }
   };
 
+  const handleFetchFromLandhawk = async () => {
+    try {
+      setIsFetchingLandhawk(true);
+      toast({
+        title: "Fetching from Landhawk API...",
+        description: "This may take a few minutes",
+      });
+
+      const { data, error } = await supabase.functions.invoke('fetch-landhawk-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (error) {
+        console.error('Error from Landhawk edge function:', error);
+        throw error;
+      }
+
+      console.log('Landhawk edge function response:', data);
+
+      toast({
+        title: "Success!",
+        description: data?.message || "Successfully fetched data from Landhawk API",
+      });
+    } catch (error: any) {
+      console.error('Error fetching from Landhawk:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch from Landhawk API. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFetchingLandhawk(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Manual Processing</h2>
@@ -156,7 +195,7 @@ export const ManualProcessing = ({
             disabled={isLoading}
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-            {isLoading ? 'Fetching...' : 'Fetch Landhawk Data'}
+            {isLoading ? 'Fetching...' : 'Fetch Trial Data'}
           </Button>
           <Button 
             onClick={handleFetch500More}
@@ -173,6 +212,14 @@ export const ManualProcessing = ({
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isFetchingAll ? 'animate-spin' : ''}`} />
             {isFetchingAll ? 'Fetching All...' : 'Fetch All Available Records'}
+          </Button>
+          <Button 
+            onClick={handleFetchFromLandhawk}
+            className="w-full sm:w-auto"
+            disabled={isFetchingLandhawk}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isFetchingLandhawk ? 'animate-spin' : ''}`} />
+            {isFetchingLandhawk ? 'Fetching...' : 'Fetch From Landhawk API'}
           </Button>
         </div>
       </div>
