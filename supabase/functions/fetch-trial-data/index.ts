@@ -39,7 +39,18 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     // Get the limit from the request body if provided
-    const { limit } = await req.json().catch(() => ({ limit: 100 }))
+    let limit = 100; // Default limit
+    if (req.method === 'POST') {
+      try {
+        const body = await req.json();
+        if (body && typeof body.limit === 'number') {
+          limit = body.limit;
+        }
+      } catch (e) {
+        console.log('No request body or invalid JSON, using default limit:', limit);
+      }
+    }
+    
     console.log(`Fetching ${limit} records from Landhawk WFS API`)
 
     // Fetch data from Landhawk WFS API
@@ -64,8 +75,7 @@ Deno.serve(async (req) => {
     })
 
     if (!response.ok) {
-      console.error('Landhawk API error:', response.statusText)
-      throw new Error(`Landhawk API error: ${response.statusText}`)
+      throw new Error(`Landhawk API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json()
@@ -89,14 +99,16 @@ Deno.serve(async (req) => {
       raw_data: feature.properties
     }))
 
-    // Clear existing data
-    const { error: deleteError } = await supabase
-      .from('trial_application_data')
-      .delete()
-      .neq('id', 0) // Delete all records
+    // Clear existing data if this is not a "fetch more" operation
+    if (!req.method === 'POST' || !limit) {
+      const { error: deleteError } = await supabase
+        .from('trial_application_data')
+        .delete()
+        .neq('id', 0) // Delete all records
 
-    if (deleteError) {
-      throw deleteError
+      if (deleteError) {
+        throw deleteError
+      }
     }
 
     // Insert the new data
@@ -123,7 +135,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400 
+        status: 200 // Return 200 even for errors, but include error message in response
       }
     )
   }
