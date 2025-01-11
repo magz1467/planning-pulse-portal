@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
       typeName: 'LandHawk:PlanningApplication',
       outputFormat: 'application/json',
       srsName: 'EPSG:4326',
-      count: '100' // Limit to 100 records for trial data
+      count: '100' // Back to 100 records for trial data
     })
 
     const fullUrl = `${wfsUrl}?${params}`
