@@ -47,12 +47,15 @@ serve(async (req) => {
     const fullUrl = `${wfsUrl}?${params}`
     console.log('Fetching data from Landhawk WFS API:', fullUrl)
     
-    const authString = btoa(`${LANDHAWK_API_KEY}:${LANDHAWK_API_KEY}`)
+    // Create base64 encoded credentials
+    const credentials = `${LANDHAWK_API_KEY}:${LANDHAWK_API_KEY}`;
+    const base64Credentials = btoa(credentials);
 
     const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Basic ${authString}`,
+        'Authorization': `Basic ${base64Credentials}`,
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     })
@@ -60,7 +63,7 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Landhawk API error:', errorText)
-      throw new Error(`Failed to fetch data: ${errorText}`)
+      throw new Error(`Failed to fetch data: ${response.status} - ${errorText}`)
     }
 
     const data = await response.json()
@@ -70,44 +73,54 @@ serve(async (req) => {
     let errorCount = 0
 
     // Process each feature and insert into trial_application_data
-    for (const feature of data.features || []) {
-      try {
-        const { properties, geometry } = feature
+    if (data.features && Array.isArray(data.features)) {
+      for (const feature of data.features) {
+        try {
+          const { properties, geometry } = feature
+          
+          if (!properties) {
+            console.warn('Skipping feature without properties')
+            continue
+          }
 
-        const applicationData = {
-          application_reference: properties.reference || null,
-          description: properties.proposal || null,
-          status: properties.status || null,
-          decision_date: properties.decision?.decision_date || null,
-          submission_date: properties.created_at || null,
-          location: geometry, // This is already in GeoJSON format
-          raw_data: properties,
-          source_url: properties.url || null,
-          address: properties.site?.address || null,
-          url: properties.url || null,
-          ward: properties.site?.ward || null,
-          consultation_end_date: properties.consultation?.end_date || null,
-          decision_details: properties.decision || null,
-          application_type: properties.type || null,
-          applicant_name: properties.applicant?.name || null,
-          agent_details: properties.agent || null,
-          constraints: properties.constraints || null
-        }
+          const applicationData = {
+            application_reference: properties.reference || null,
+            description: properties.proposal || null,
+            status: properties.status || null,
+            decision_date: properties.decision?.decision_date || null,
+            submission_date: properties.created_at || null,
+            location: geometry, // This is already in GeoJSON format
+            raw_data: properties,
+            source_url: properties.url || null,
+            address: properties.site?.address || null,
+            url: properties.url || null,
+            ward: properties.site?.ward || null,
+            consultation_end_date: properties.consultation?.end_date || null,
+            decision_details: properties.decision || null,
+            application_type: properties.type || null,
+            applicant_name: properties.applicant?.name || null,
+            agent_details: properties.agent || null,
+            constraints: properties.constraints || null
+          }
 
-        const { error } = await supabase
-          .from('trial_application_data')
-          .insert([applicationData])
+          const { error } = await supabase
+            .from('trial_application_data')
+            .insert([applicationData])
 
-        if (error) {
-          console.error('Error inserting record:', error)
+          if (error) {
+            console.error('Error inserting record:', error)
+            errorCount++
+          } else {
+            successCount++
+          }
+        } catch (error) {
+          console.error('Error processing feature:', error)
           errorCount++
-        } else {
-          successCount++
         }
-      } catch (error) {
-        console.error('Error processing feature:', error)
-        errorCount++
       }
+    } else {
+      console.error('Invalid data format received:', data)
+      throw new Error('Invalid data format received from Landhawk API')
     }
 
     console.log(`Data insertion complete. Successfully inserted: ${successCount}, Errors: ${errorCount}`)
