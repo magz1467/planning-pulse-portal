@@ -31,25 +31,26 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log('Starting to fetch Landhawk data...')
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    // Fetch 500 applications from Landhawk API
+    // Fetch real data from Landhawk API
+    console.log('Making request to Landhawk API...')
     const response = await fetch('https://api.landhawk.uk/v1/applications', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${LANDHAWK_API_KEY}`,
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        limit: 500,
-      })
-    });
+      }
+    })
 
     if (!response.ok) {
+      console.error('Landhawk API error:', response.statusText)
       throw new Error(`Landhawk API error: ${response.statusText}`)
     }
 
     const data = await response.json()
+    console.log(`Received ${data.length} applications from Landhawk`)
 
     // Insert the data into our trial_application_data table
     const { error } = await supabase
@@ -72,15 +73,18 @@ Deno.serve(async (req) => {
       })))
 
     if (error) {
+      console.error('Error inserting data:', error)
       throw error
     }
 
+    console.log('Successfully inserted data into trial_application_data')
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
 
   } catch (error) {
+    console.error('Function error:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
