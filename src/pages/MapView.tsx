@@ -93,9 +93,10 @@ const MapView = () => {
         });
       } finally {
         // Only set loading to false after everything is complete
+        // Increased timeout to allow map to properly initialize
         setTimeout(() => {
           setIsLoading(false);
-        }, 1000);
+        }, 2500); // Increased from 1000ms to 2500ms
       }
     };
 
