@@ -34,6 +34,10 @@ Deno.serve(async (req) => {
     console.log('Starting to fetch Landhawk data...')
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+    if (!LANDHAWK_API_KEY) {
+      throw new Error('LANDHAWK_API_KEY is not configured')
+    }
+
     // Fetch real data from Landhawk API
     console.log('Making request to Landhawk API...')
     const response = await fetch('https://api.landhawk.uk/v1/applications', {
@@ -52,7 +56,17 @@ Deno.serve(async (req) => {
     const data = await response.json()
     console.log(`Received ${data.length} applications from Landhawk`)
 
-    // Insert the data into our trial_application_data table
+    // Clear existing data
+    const { error: deleteError } = await supabase
+      .from('trial_application_data')
+      .delete()
+      .neq('id', 0) // Delete all records
+
+    if (deleteError) {
+      throw deleteError
+    }
+
+    // Insert the new data
     const { error } = await supabase
       .from('trial_application_data')
       .insert(data.map((app: LandhawkResponse) => ({
@@ -69,25 +83,27 @@ Deno.serve(async (req) => {
         applicant_name: app.applicant_name,
         agent_details: app.agent_details,
         constraints: app.constraints,
-        raw_data: app // Store the complete response
+        raw_data: app.raw_data // Store the complete response
       })))
 
     if (error) {
-      console.error('Error inserting data:', error)
       throw error
     }
 
     console.log('Successfully inserted data into trial_application_data')
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    })
+    return new Response(
+      JSON.stringify({ success: true, message: 'Data fetched and stored successfully' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
 
   } catch (error) {
     console.error('Function error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400 
+      }
+    )
   }
 })
