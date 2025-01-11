@@ -46,11 +46,9 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
             <p className="text-sm text-gray-600">Rally support</p>
           </div>
         </div>
-        <div className="flex-shrink-0">
-          <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            Start →
-          </span>
-        </div>
+        <span className="text-primary text-sm font-medium">
+          Start →
+        </span>
       </Button>
 
       <Dialog open={showReasons} onOpenChange={setShowReasons}>
