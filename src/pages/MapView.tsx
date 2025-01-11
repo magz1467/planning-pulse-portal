@@ -92,7 +92,10 @@ const MapView = () => {
           variant: "destructive"
         });
       } finally {
-        setIsLoading(false);
+        // Only set loading to false after everything is complete
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
       }
     };
 
