@@ -1,8 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const LANDHAWK_USERNAME = 'makemyhousegreen_trial'
-const LANDHAWK_PASSWORD = 'RC3U09O8XKXYP5ML'
+const LANDHAWK_USERNAME = Deno.env.get('LANDHAWK_USERNAME') ?? ''
+const LANDHAWK_PASSWORD = Deno.env.get('LANDHAWK_PASSWORD') ?? ''
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
@@ -16,6 +16,11 @@ Deno.serve(async (req) => {
 
   try {
     console.log('Starting to fetch Landhawk data...')
+    
+    if (!LANDHAWK_USERNAME || !LANDHAWK_PASSWORD) {
+      throw new Error('Landhawk credentials not configured')
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     // Fetch data from Landhawk WFS API
@@ -43,7 +48,21 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Landhawk API error response:', errorText)
-      throw new Error(`Landhawk API error: ${response.status} ${response.statusText}\nDetails: ${errorText}`)
+      
+      // Return a more structured error response
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to fetch Landhawk data',
+          details: errorText,
+          status: response.status,
+          success: false,
+          features: [] // Return empty features array for graceful degradation
+        }), 
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 // Return 200 to allow client to handle the error
+        }
+      )
     }
 
     const data = await response.json()
@@ -54,7 +73,10 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify(data), // Return the full GeoJSON response
+      JSON.stringify({
+        ...data,
+        success: true
+      }), 
       { 
         headers: { 
           ...corsHeaders, 
@@ -68,11 +90,12 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        success: false
+        success: false,
+        features: [] // Return empty features array for graceful degradation
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 // Return 200 even for errors, but include error message in response
+        status: 200 // Return 200 to allow client to handle the error
       }
     )
   }
