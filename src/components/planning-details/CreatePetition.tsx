@@ -11,7 +11,6 @@ interface CreatePetitionProps {
 
 export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [showPetitionForm, setShowPetitionForm] = useState(false);
 
   const handleReasonToggle = (reasonId: string) => {
@@ -23,41 +22,23 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   };
 
   return (
-    <Card className="p-4 border-2 border-primary/20 shadow-lg animate-fade-in hover:border-primary/40 transition-colors duration-300">
-      <div className="bg-primary/5 -m-4 mb-4 p-4 border-b">
+    <Card className="p-4 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-colors duration-300">
+      <Button
+        variant="ghost"
+        className="w-full flex items-center justify-between group"
+        onClick={() => setShowPetitionForm(true)}
+      >
         <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold text-lg text-primary">Create a Petition</h3>
+          <div className="text-left">
+            <h3 className="font-semibold text-lg text-primary">Create a Petition</h3>
+            <p className="text-sm text-gray-600">Start a petition to gather support from other residents</p>
+          </div>
         </div>
-        <p className="text-sm text-gray-600 mt-1">
-          Start a petition to gather support from other residents
-        </p>
-      </div>
-
-      <Button
-        variant="outline"
-        className="w-full justify-start"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        {isExpanded ? "Hide reasons" : "Select reasons for petition"}
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-primary text-sm">
+          Click to start →
+        </div>
       </Button>
-
-      {isExpanded && (
-        <div className="mt-4 space-y-3">
-          <PetitionReasons 
-            selectedReasons={selectedReasons}
-            onReasonToggle={handleReasonToggle}
-          />
-          
-          <Button 
-            className="w-full mt-4"
-            disabled={selectedReasons.length === 0}
-            onClick={() => setShowPetitionForm(true)}
-          >
-            Create Petition
-          </Button>
-        </div>
-      )}
 
       <PetitionForm
         open={showPetitionForm}
