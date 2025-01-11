@@ -62,10 +62,11 @@ Deno.serve(async (req) => {
       typeName: 'LandHawk:PlanningApplication',
       outputFormat: 'application/json',
       srsName: 'EPSG:4326',
-      count: limit.toString()
+      count: limit.toString(),
+      startIndex: '0'  // Add this to ensure we start from the beginning
     })
 
-    console.log('Making request to Landhawk WFS API...')
+    console.log('Making request to Landhawk WFS API with URL:', `${wfsUrl}?${params}`)
     const response = await fetch(`${wfsUrl}?${params}`, {
       method: 'GET',
       headers: {
@@ -75,11 +76,17 @@ Deno.serve(async (req) => {
     })
 
     if (!response.ok) {
-      throw new Error(`Landhawk API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Landhawk API error response:', errorText);
+      throw new Error(`Landhawk API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json()
     console.log(`Received ${data.features?.length || 0} applications from Landhawk`)
+
+    if (!data.features || !Array.isArray(data.features)) {
+      throw new Error('Invalid response format from Landhawk API: missing features array');
+    }
 
     // Transform GeoJSON features to our expected format
     const transformedData = data.features.map((feature: any) => ({
@@ -99,25 +106,27 @@ Deno.serve(async (req) => {
       raw_data: feature.properties
     }))
 
-    // Clear existing data if this is not a "fetch more" operation
-    if (!req.method === 'POST' || !limit) {
+    // Only clear existing data if this is not a "fetch more" operation
+    if (req.method !== 'POST' || !limit) {
+      console.log('Clearing existing data...');
       const { error: deleteError } = await supabase
         .from('trial_application_data')
         .delete()
         .neq('id', 0) // Delete all records
 
       if (deleteError) {
-        throw deleteError
+        throw deleteError;
       }
     }
 
     // Insert the new data
+    console.log(`Inserting ${transformedData.length} records into trial_application_data`);
     const { error } = await supabase
       .from('trial_application_data')
       .insert(transformedData)
 
     if (error) {
-      throw error
+      throw error;
     }
 
     console.log('Successfully inserted data into trial_application_data')
