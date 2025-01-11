@@ -1,8 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const LANDHAWK_USERNAME = Deno.env.get('LANDHAWK_USERNAME') ?? ''
-const LANDHAWK_PASSWORD = Deno.env.get('LANDHAWK_PASSWORD') ?? ''
+const LANDHAWK_USERNAME = 'makemyhousegreen_trial'
+const LANDHAWK_PASSWORD = 'RC3U09O8XKXYP5ML'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
@@ -17,10 +17,6 @@ Deno.serve(async (req) => {
   try {
     console.log('Starting to fetch Landhawk data...')
     
-    if (!LANDHAWK_USERNAME || !LANDHAWK_PASSWORD) {
-      throw new Error('Landhawk credentials not configured')
-    }
-
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
     // Fetch data from Landhawk WFS API
