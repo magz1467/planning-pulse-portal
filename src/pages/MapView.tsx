@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Application } from "@/types/planning";
 import { TrialApplicationData } from "@/types/trial";
-import { transformApplicationData } from "@/utils/applicationTransforms";
 import { toast } from "@/components/ui/use-toast";
 
 const MapView = () => {
@@ -20,8 +19,7 @@ const MapView = () => {
       setIsLoading(true);
       
       try {
-        // Call the Landhawk edge function
-        const { data, error } = await supabase.functions.invoke('fetch-trial-data', {
+        const { data: response, error } = await supabase.functions.invoke('fetch-trial-data', {
           body: {
             bbox: '-0.5,51.3,-0.1,51.5' // London area
           }
@@ -37,35 +35,37 @@ const MapView = () => {
           return;
         }
 
-        console.log('📦 Received Landhawk data:', data?.length || 0, 'records');
+        // Check if response has the expected structure
+        const data = response?.features || [];
+        console.log('📦 Received Landhawk data:', data.length || 0, 'records');
 
         // Transform the data to match the Application type
-        const transformedData = (data as TrialApplicationData[]).map((item) => {
-          console.log('🔄 Processing item:', item.id, 'Location:', item.location);
+        const transformedData = data.map((item: any) => {
+          console.log('🔄 Processing item:', item.id, 'Location:', item.geometry);
           
-          if (!item.location?.coordinates) {
+          if (!item.geometry?.coordinates) {
             console.warn('⚠️ Missing coordinates for item:', item.id);
             return null;
           }
 
           return {
-            id: item.id,
-            title: item.description || 'No description available',
-            address: item.address || 'No address available',
-            status: item.status || 'Under Review',
-            reference: item.application_reference || '',
-            description: item.description || '',
-            submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
-            coordinates: item.location?.coordinates ? 
-              [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
+            id: item.id || Math.random(),
+            title: item.properties?.description || 'No description available',
+            address: item.properties?.address || 'No address available',
+            status: item.properties?.status || 'Under Review',
+            reference: item.properties?.application_reference || '',
+            description: item.properties?.description || '',
+            submissionDate: item.properties?.submission_date ? new Date(item.properties.submission_date).toISOString() : '',
+            coordinates: item.geometry?.coordinates ? 
+              [item.geometry.coordinates[1], item.geometry.coordinates[0]] as [number, number] :
               [51.5074, -0.1278] as [number, number],
             postcode: 'N/A',
-            applicant: item.applicant_name || 'Not specified',
-            decisionDue: item.decision_date?.toString() || '',
-            type: item.application_type || 'Planning Application',
-            ward: item.ward || 'Not specified',
+            applicant: item.properties?.applicant_name || 'Not specified',
+            decisionDue: item.properties?.decision_date?.toString() || '',
+            type: item.properties?.application_type || 'Planning Application',
+            ward: item.properties?.ward || 'Not specified',
             officer: 'Not assigned',
-            consultationEnd: item.consultation_end_date?.toString() || '',
+            consultationEnd: item.properties?.consultation_end_date?.toString() || '',
             image: undefined,
             image_map_url: undefined,
             ai_title: undefined,
