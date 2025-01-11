@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { LoadingOverlay } from "@/components/applications/dashboard/components/LoadingOverlay";
 
 interface MapContentProps {
   applications: Application[];
@@ -10,6 +11,7 @@ interface MapContentProps {
   isMapView: boolean;
   onMarkerClick: (id: number | null) => void;
   onCenterChange?: (center: [number, number]) => void;
+  isLoading?: boolean;
 }
 
 export const MapContent = ({
@@ -20,11 +22,13 @@ export const MapContent = ({
   isMapView,
   onMarkerClick,
   onCenterChange,
+  isLoading = false,
 }: MapContentProps) => {
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   return (
     <div className="flex-1 relative h-full">
+      {isLoading && <LoadingOverlay />}
       <div 
         className="absolute inset-0"
         style={{ 
