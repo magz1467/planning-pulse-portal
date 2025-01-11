@@ -38,6 +38,10 @@ Deno.serve(async (req) => {
     console.log('Starting to fetch Landhawk data...')
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+    // Get the limit from the request body if provided
+    const { limit } = await req.json().catch(() => ({ limit: 100 }))
+    console.log(`Fetching ${limit} records from Landhawk WFS API`)
+
     // Fetch data from Landhawk WFS API
     const wfsUrl = 'https://api.emapsite.com/dataservice/api/WFS'
     const params = new URLSearchParams({
@@ -47,7 +51,7 @@ Deno.serve(async (req) => {
       typeName: 'LandHawk:PlanningApplication',
       outputFormat: 'application/json',
       srsName: 'EPSG:4326',
-      count: '100' // Limit to 100 records for testing
+      count: limit.toString()
     })
 
     console.log('Making request to Landhawk WFS API...')
@@ -106,7 +110,10 @@ Deno.serve(async (req) => {
 
     console.log('Successfully inserted data into trial_application_data')
     return new Response(
-      JSON.stringify({ success: true, message: 'Data fetched and stored successfully' }),
+      JSON.stringify({ 
+        success: true, 
+        message: `Successfully fetched and stored ${transformedData.length} records` 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
