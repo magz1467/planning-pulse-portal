@@ -27,6 +27,7 @@ export const MapContainerComponent = memo(({
 
   useEffect(() => {
     if (mapRef.current) {
+      console.log('🗺️ Setting map view to coordinates:', coordinates);
       mapRef.current.setView(coordinates, 14);
       setTimeout(() => {
         mapRef.current?.invalidateSize();
@@ -55,8 +56,8 @@ export const MapContainerComponent = memo(({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer 
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
         <SearchLocationPin position={coordinates} />
