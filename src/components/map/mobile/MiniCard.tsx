@@ -19,7 +19,8 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     console.log('MiniCard - Rendering with application:', {
       id: application.id,
       hasImage: !!application.image,
-      hasMapUrl: !!application.image_map_url
+      hasMapUrl: !!application.image_map_url,
+      type: application.application_type_full
     });
   }, [application]);
 
