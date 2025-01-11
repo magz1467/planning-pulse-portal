@@ -5,6 +5,7 @@ import { ImageResolver } from "./components/ImageResolver";
 import { StatusBadge } from "./components/StatusBadge";
 import { LocationInfo } from "./components/LocationInfo";
 import { useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface MiniCardProps {
   application: Application;
@@ -39,11 +40,16 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2 flex-wrap">
             <ApplicationTitle 
               title={application.ai_title || application.description || ''} 
               className="line-clamp-2 text-sm font-semibold text-primary"
             />
+            {application.application_type_full && (
+              <Badge variant="outline" className="text-xs whitespace-nowrap">
+                {application.application_type_full}
+              </Badge>
+            )}
             {isClosingSoon && (
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                 <Timer className="w-3 h-3 mr-1" />
