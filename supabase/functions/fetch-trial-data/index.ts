@@ -40,18 +40,23 @@ Deno.serve(async (req) => {
 
     // Get the limit from the request body if provided
     let limit = 100; // Default limit
+    let startIndex = 0; // Default start index
+    
     if (req.method === 'POST') {
       try {
         const body = await req.json();
         if (body && typeof body.limit === 'number') {
           limit = body.limit;
         }
+        if (body && typeof body.startIndex === 'number') {
+          startIndex = body.startIndex;
+        }
       } catch (e) {
-        console.log('No request body or invalid JSON, using default limit:', limit);
+        console.log('No request body or invalid JSON, using defaults:', { limit, startIndex });
       }
     }
     
-    console.log(`Fetching ${limit} records from Landhawk WFS API`)
+    console.log(`Fetching ${limit} records from Landhawk WFS API starting at index ${startIndex}`)
 
     // Fetch data from Landhawk WFS API
     const wfsUrl = 'https://api.emapsite.com/dataservice/api/WFS'
@@ -63,11 +68,13 @@ Deno.serve(async (req) => {
       outputFormat: 'application/json',
       srsName: 'EPSG:4326',
       count: limit.toString(),
-      startIndex: '0'  // Add this to ensure we start from the beginning
+      startIndex: startIndex.toString()
     })
 
-    console.log('Making request to Landhawk WFS API with URL:', `${wfsUrl}?${params}`)
-    const response = await fetch(`${wfsUrl}?${params}`, {
+    const fullUrl = `${wfsUrl}?${params}`;
+    console.log('Making request to Landhawk WFS API with URL:', fullUrl)
+    
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
         'Authorization': `Basic ${btoa(`${LANDHAWK_USERNAME}:${LANDHAWK_PASSWORD}`)}`,
@@ -78,7 +85,7 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Landhawk API error response:', errorText);
-      throw new Error(`Landhawk API error: ${response.status} ${response.statusText} - ${errorText}`);
+      throw new Error(`Landhawk API error: ${response.status} ${response.statusText}\nDetails: ${errorText}`);
     }
 
     const data = await response.json()
@@ -107,7 +114,7 @@ Deno.serve(async (req) => {
     }))
 
     // Only clear existing data if this is not a "fetch more" operation
-    if (req.method !== 'POST' || !limit) {
+    if (req.method !== 'POST' || startIndex === 0) {
       console.log('Clearing existing data...');
       const { error: deleteError } = await supabase
         .from('trial_application_data')
@@ -115,6 +122,7 @@ Deno.serve(async (req) => {
         .neq('id', 0) // Delete all records
 
       if (deleteError) {
+        console.error('Error deleting existing data:', deleteError);
         throw deleteError;
       }
     }
@@ -126,6 +134,7 @@ Deno.serve(async (req) => {
       .insert(transformedData)
 
     if (error) {
+      console.error('Error inserting data:', error);
       throw error;
     }
 
@@ -133,7 +142,8 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Successfully fetched and stored ${transformedData.length} records` 
+        message: `Successfully fetched and stored ${transformedData.length} records`,
+        count: transformedData.length
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
@@ -141,7 +151,10 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Function error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        success: false
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 // Return 200 even for errors, but include error message in response
