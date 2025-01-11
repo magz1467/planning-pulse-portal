@@ -6,6 +6,7 @@ import Mission from "@/components/Mission";
 import { Stats } from "@/components/Stats";
 import StayUpToDate from "@/components/StayUpToDate";
 import GetInTouch from "@/components/GetInTouch";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -19,6 +20,7 @@ const Index = () => {
         <StayUpToDate />
         <GetInTouch />
       </main>
+      <Footer />
     </div>
   );
 };
