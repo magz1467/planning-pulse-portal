@@ -30,39 +30,39 @@ export const ManualProcessing = ({
 
   const handleFetchLandhawkData = async () => {
     try {
-      setIsLoading(true);
+      setIsFetchingLandhawk(true);
       toast({
-        title: "Fetching Landhawk data...",
+        title: "Fetching from Landhawk API...",
         description: "This may take a few minutes",
       });
 
-      const { data, error } = await supabase.functions.invoke('fetch-trial-data', {
+      const { data, error } = await supabase.functions.invoke('fetch-landhawk-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
+        }
       });
       
       if (error) {
-        console.error('Error from edge function:', error);
+        console.error('Error from Landhawk edge function:', error);
         throw error;
       }
 
-      console.log('Edge function response:', data);
+      console.log('Landhawk edge function response:', data);
 
       toast({
         title: "Success!",
-        description: data?.message || "Landhawk data has been fetched and stored",
+        description: data?.message || "Successfully fetched data from Landhawk API",
       });
     } catch (error: any) {
-      console.error('Error fetching Landhawk data:', error);
+      console.error('Error fetching from Landhawk:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch Landhawk data. Please try again.",
+        description: "Failed to fetch from Landhawk API. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsFetchingLandhawk(false);
     }
   };
 
