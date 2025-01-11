@@ -1,27 +1,28 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
-interface PlanningApplication {
-  application_reference: string;
-  description: string;
-  status: string;
-  decision_date?: string;
-  submission_date?: string;
+const LANDHAWK_API_KEY = Deno.env.get('LANDHAWK_API_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
+const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+
+interface LandhawkResponse {
+  application_reference: string | null;
+  description: string | null;
+  status: string | null;
+  decision_date: string | null;
+  submission_date: string | null;
   location: {
     type: string;
     coordinates: [number, number];
-  };
-  address: string;
+  } | null;
+  address: string | null;
+  ward: string | null;
+  consultation_end_date: string | null;
+  application_type: string | null;
+  applicant_name: string | null;
+  agent_details: any | null;
+  constraints: any | null;
   raw_data: any;
-  source_url: string | null;
-  url?: string;
-  ward?: string;
-  consultation_end_date?: string;
-  decision_details?: any;
-  application_type?: string;
-  applicant_name?: string;
-  agent_details?: any;
-  constraints?: any;
 }
 
 Deno.serve(async (req) => {
@@ -30,115 +31,59 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('🔍 Fetching trial planning application data from Landhawk API...')
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    // TODO: Replace with actual Landhawk API call once we have the API key
-    // For now using sample data structure matching Landhawk's format
-    const applications: PlanningApplication[] = [
-      {
-        application_reference: 'APP/2024/001',
-        description: 'Construction of a new three-storey residential building comprising 6 apartments',
-        status: 'Under Review',
-        submission_date: '2024-01-09',
-        decision_date: null,
-        location: {
-          type: 'Point',
-          coordinates: [-0.118092, 51.509865]
-        },
-        address: '123 Example Street, London',
-        url: 'https://example.com/planning/APP2024001',
-        ward: 'Bloomsbury',
-        consultation_end_date: '2024-01-30',
-        application_type: 'Full Planning Permission',
-        applicant_name: 'John Smith',
-        agent_details: {
-          name: 'Planning Consultants Ltd',
-          address: '456 Business Ave, London'
-        },
-        constraints: {
-          conservation_area: true,
-          listed_building: false
-        },
-        raw_data: {},
-        source_url: null
-      }
-    ];
-
-    // Generate more sample applications with varying locations around London
-    const additionalApplications = Array.from({ length: 17 }, (_, i) => ({
-      ...applications[0],
-      application_reference: `APP/2024/${String(i + 2).padStart(3, '0')}`,
-      location: {
-        type: 'Point',
-        coordinates: [
-          -0.127758 + (Math.random() - 0.5) * 0.1, // Longitude variation
-          51.507351 + (Math.random() - 0.5) * 0.1  // Latitude variation
-        ]
+    // Fetch 500 applications from Landhawk API
+    const response = await fetch('https://api.landhawk.uk/v1/applications', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${LANDHAWK_API_KEY}`,
+        'Content-Type': 'application/json'
       },
-      status: ['Under Review', 'Approved', 'Declined'][Math.floor(Math.random() * 3)],
-      consultation_end_date: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      ward: 'Bloomsbury'
-    }));
+      body: JSON.stringify({
+        limit: 500,
+      })
+    })
 
-    const allApplications = [...applications, ...additionalApplications];
-
-    // Insert into Supabase
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
-    console.log(`📥 Inserting ${allApplications.length} applications from Landhawk...`)
-
-    for (const app of allApplications) {
-      const { error } = await supabaseClient
-        .from('trial_application_data')
-        .upsert({
-          application_reference: app.application_reference,
-          description: app.description,
-          status: app.status,
-          decision_date: app.decision_date,
-          submission_date: app.submission_date,
-          location: app.location,
-          address: app.address,
-          raw_data: app.raw_data,
-          source_url: app.source_url,
-          url: app.url,
-          ward: app.ward,
-          consultation_end_date: app.consultation_end_date,
-          decision_details: app.decision_details,
-          application_type: app.application_type,
-          applicant_name: app.applicant_name,
-          agent_details: app.agent_details,
-          constraints: app.constraints
-        }, {
-          onConflict: 'application_reference'
-        })
-
-      if (error) {
-        console.error('Error inserting application:', error)
-        throw error
-      }
+    if (!response.ok) {
+      throw new Error(`Landhawk API error: ${response.statusText}`)
     }
 
-    console.log('✅ Successfully inserted trial data from Landhawk')
+    const data = await response.json()
 
-    return new Response(
-      JSON.stringify({ success: true, count: allApplications.length }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      },
-    )
+    // Insert the data into our trial_application_data table
+    const { error } = await supabase
+      .from('trial_application_data')
+      .insert(data.map((app: LandhawkResponse) => ({
+        application_reference: app.application_reference,
+        description: app.description,
+        status: app.status,
+        decision_date: app.decision_date,
+        submission_date: app.submission_date,
+        location: app.location,
+        address: app.address,
+        ward: app.ward,
+        consultation_end_date: app.consultation_end_date,
+        application_type: app.application_type,
+        applicant_name: app.applicant_name,
+        agent_details: app.agent_details,
+        constraints: app.constraints,
+        raw_data: app // Store the complete response
+      })))
+
+    if (error) {
+      throw error
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    })
 
   } catch (error) {
-    console.error('Error:', error)
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      },
-    )
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    })
   }
 })
