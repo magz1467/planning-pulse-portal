@@ -20,7 +20,7 @@ export const MobileApplicationCards = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log('MobileApplicationCards - Component mounted/updated:', {
+    console.log('📱 MobileApplicationCards - Component mounted/updated:', {
       applicationsCount: applications.length,
       selectedId,
       showFullDetails
@@ -32,7 +32,7 @@ export const MobileApplicationCards = ({
   }, [selectedId, applications.length]);
 
   const handleCommentSubmit = (content: string) => {
-    console.log("New comment:", content);
+    console.log("💬 New comment:", content);
     toast({
       title: "Comment Submitted",
       description: "Your comment has been recorded",
@@ -40,19 +40,19 @@ export const MobileApplicationCards = ({
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
-  console.log('MobileApplicationCards - Selected application:', {
+  console.log('📱 MobileApplicationCards - Selected application:', {
     selectedId,
     selectedApp,
     applicationsAvailable: applications.length > 0
   });
 
   if (!applications.length) {
-    console.log('MobileApplicationCards - No applications available');
+    console.log('📱 MobileApplicationCards - No applications available');
     return <EmptyState />;
   }
 
   if (showFullDetails && selectedApp) {
-    console.log('MobileApplicationCards - Showing full details for application:', selectedApp.id);
+    console.log('📱 MobileApplicationCards - Showing full details for application:', selectedApp.id);
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
@@ -68,7 +68,7 @@ export const MobileApplicationCards = ({
   }
 
   if (selectedApp && !showFullDetails) {
-    console.log('MobileApplicationCards - Showing mini card for application:', selectedApp.id);
+    console.log('📱 MobileApplicationCards - Showing mini card for application:', selectedApp.id);
     return (
       <MiniCard
         application={selectedApp}
@@ -77,6 +77,6 @@ export const MobileApplicationCards = ({
     );
   }
 
-  console.log('MobileApplicationCards - No content to display');
+  console.log('📱 MobileApplicationCards - No content to display');
   return null;
 };

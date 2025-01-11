@@ -24,7 +24,19 @@ export const MapContent = ({
   onCenterChange,
   isLoading = false,
 }: MapContentProps) => {
-  if (!coordinates || (!isMobile && !isMapView)) return null;
+  console.log('🗺️ MapContent rendering:', {
+    applicationsCount: applications.length,
+    selectedId,
+    coordinates,
+    isMobile,
+    isMapView,
+    isLoading
+  });
+
+  if (!coordinates || (!isMobile && !isMapView)) {
+    console.log('⚠️ MapContent early return - missing coordinates or view conditions not met');
+    return null;
+  }
 
   return (
     <div className="flex-1 relative h-full">
