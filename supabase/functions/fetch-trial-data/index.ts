@@ -1,6 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
+const LANDHAWK_USERNAME = 'makemyhousegreen_trial'
+const LANDHAWK_PASSWORD = 'RC3U09O8XKXYP5ML'
 const LANDHAWK_API_KEY = Deno.env.get('LANDHAWK_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -27,23 +29,30 @@ interface LandhawkResponse {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
     console.log('Starting to fetch Landhawk data...')
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    if (!LANDHAWK_API_KEY) {
-      throw new Error('LANDHAWK_API_KEY is not configured')
-    }
+    // Fetch data from Landhawk WFS API
+    const wfsUrl = 'https://api.emapsite.com/dataservice/api/WFS'
+    const params = new URLSearchParams({
+      service: 'WFS',
+      version: '2.0.0',
+      request: 'GetFeature',
+      typeName: 'LandHawk:PlanningApplication',
+      outputFormat: 'application/json',
+      srsName: 'EPSG:4326',
+      count: '100' // Limit to 100 records for testing
+    })
 
-    // Fetch real data from Landhawk API
-    console.log('Making request to Landhawk API...')
-    const response = await fetch('https://api.landhawk.uk/v1/applications', {
+    console.log('Making request to Landhawk WFS API...')
+    const response = await fetch(`${wfsUrl}?${params}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${LANDHAWK_API_KEY}`,
+        'Authorization': `Basic ${btoa(`${LANDHAWK_USERNAME}:${LANDHAWK_PASSWORD}`)}`,
         'Content-Type': 'application/json'
       }
     })
@@ -54,7 +63,25 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json()
-    console.log(`Received ${data.length} applications from Landhawk`)
+    console.log(`Received ${data.features?.length || 0} applications from Landhawk`)
+
+    // Transform GeoJSON features to our expected format
+    const transformedData = data.features.map((feature: any) => ({
+      application_reference: feature.properties.reference || null,
+      description: feature.properties.description || null,
+      status: feature.properties.status || null,
+      decision_date: feature.properties.decision_date || null,
+      submission_date: feature.properties.submission_date || null,
+      location: feature.geometry || null,
+      address: feature.properties.address || null,
+      ward: feature.properties.ward || null,
+      consultation_end_date: feature.properties.consultation_end_date || null,
+      application_type: feature.properties.application_type || null,
+      applicant_name: feature.properties.applicant_name || null,
+      agent_details: feature.properties.agent_details || null,
+      constraints: feature.properties.constraints || null,
+      raw_data: feature.properties
+    }))
 
     // Clear existing data
     const { error: deleteError } = await supabase
@@ -69,22 +96,7 @@ Deno.serve(async (req) => {
     // Insert the new data
     const { error } = await supabase
       .from('trial_application_data')
-      .insert(data.map((app: LandhawkResponse) => ({
-        application_reference: app.application_reference,
-        description: app.description,
-        status: app.status,
-        decision_date: app.decision_date,
-        submission_date: app.submission_date,
-        location: app.location,
-        address: app.address,
-        ward: app.ward,
-        consultation_end_date: app.consultation_end_date,
-        application_type: app.application_type,
-        applicant_name: app.applicant_name,
-        agent_details: app.agent_details,
-        constraints: app.constraints,
-        raw_data: app.raw_data // Store the complete response
-      })))
+      .insert(transformedData)
 
     if (error) {
       throw error
