@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Application } from "@/types/planning";
 import { TrialApplicationData } from "@/types/trial";
 import { transformApplicationData } from "@/utils/applicationTransforms";
+import { toast } from "@/components/ui/use-toast";
 
 const MapView = () => {
   const isMobile = useIsMobile();
@@ -25,6 +26,11 @@ const MapView = () => {
 
         if (error) {
           console.error('Error fetching trial data:', error);
+          toast({
+            title: "Error loading applications",
+            description: "Please try again later",
+            variant: "destructive"
+          });
           return;
         }
 
@@ -66,6 +72,11 @@ const MapView = () => {
         setApplications(transformedData);
       } catch (error) {
         console.error('Error in fetchTrialData:', error);
+        toast({
+          title: "Error loading applications",
+          description: "Please try again later",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
