@@ -22,22 +22,24 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   };
 
   return (
-    <Card className="p-4 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-colors duration-300">
+    <Card className="p-4 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-all duration-300">
       <Button
         variant="ghost"
-        className="w-full flex items-center justify-between group"
+        className="w-full flex items-center justify-between group hover:bg-primary/5"
         onClick={() => setShowPetitionForm(true)}
       >
-        <div className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-3">
+          <div className="bg-primary/10 p-2 rounded-full">
+            <FileText className="h-5 w-5 text-primary" />
+          </div>
           <div className="text-left">
-            <h3 className="font-semibold text-lg text-primary">Create a Petition</h3>
-            <p className="text-sm text-gray-600">Start a petition to gather support from other residents</p>
+            <h3 className="font-semibold text-lg text-primary">Create Petition</h3>
+            <p className="text-sm text-gray-600">Rally support from residents</p>
           </div>
         </div>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-primary text-sm">
-          Click to start →
-        </div>
+        <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          Start now →
+        </span>
       </Button>
 
       <PetitionForm
