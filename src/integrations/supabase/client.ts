@@ -1,14 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types';
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://jposqxdboetyioymfswd.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impwb3NxeGRib2V0eWlveW1mc3dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0NTYxMjAsImV4cCI6MjA1MDAzMjEyMH0.7PnkmUV4fWBReUXyCMj7Z_f6XH7eY8t2WRfoRcOwhbY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+if (!supabaseUrl) throw new Error('Missing VITE_SUPABASE_URL')
+if (!supabaseAnonKey) throw new Error('Missing VITE_SUPABASE_ANON_KEY')
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
+    persistSession: true,
+    detectSessionInUrl: true
   }
-});
+})
