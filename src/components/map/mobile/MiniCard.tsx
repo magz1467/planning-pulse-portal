@@ -24,6 +24,18 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     });
   }, [application]);
 
+  const getDisplayType = (type: string | undefined) => {
+    if (!type) return null;
+    const lowerType = type.toLowerCase();
+    
+    if (lowerType.includes('tree')) return 'Tree';
+    if (lowerType.includes('householder')) return 'Domestic';
+    if (lowerType.includes('full planning permission')) return 'Development';
+    return null;
+  };
+
+  const displayType = getDisplayType(application.application_type_full);
+
   return (
     <div 
       className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl p-4 cursor-pointer animate-in slide-in-from-bottom duration-300"
@@ -46,9 +58,9 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
               title={application.ai_title || application.description || ''} 
               className="line-clamp-2 text-sm font-semibold text-primary"
             />
-            {application.application_type_full && (
+            {displayType && (
               <Badge variant="outline" className="text-xs whitespace-nowrap">
-                {application.application_type_full}
+                {displayType}
               </Badge>
             )}
             {isClosingSoon && (
