@@ -13,4 +13,12 @@ export interface TrialApplicationData {
   raw_data: any;
   source_url: string | null;
   address: string | null;
+  url: string | null;
+  ward: string | null;
+  consultation_end_date: string | null;
+  decision_details: any | null;
+  application_type: string | null;
+  applicant_name: string | null;
+  agent_details: any | null;
+  constraints: any | null;
 }
