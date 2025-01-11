@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -22,16 +23,18 @@ export const ManualProcessing = ({
 }: ManualProcessingProps) => {
   const batchSizes = [50, 100, 250, 500];
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFetchLandhawkData = async () => {
     try {
+      setIsLoading(true);
       toast({
         title: "Fetching Landhawk data...",
         description: "This may take a few minutes",
       });
 
       const { data, error } = await supabase.functions.invoke('fetch-trial-data', {
-        method: 'POST', // Explicitly set method
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -55,6 +58,8 @@ export const ManualProcessing = ({
         description: "Failed to fetch Landhawk data. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,9 +72,10 @@ export const ManualProcessing = ({
         <Button 
           onClick={handleFetchLandhawkData}
           className="w-full sm:w-auto"
+          disabled={isLoading}
         >
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Fetch Landhawk Data
+          <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? 'Fetching...' : 'Fetch Landhawk Data'}
         </Button>
       </div>
 
