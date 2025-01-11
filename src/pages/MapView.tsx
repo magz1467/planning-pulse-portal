@@ -15,17 +15,20 @@ const MapView = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTrialData = async () => {
-      console.log('🔍 Starting to fetch trial data...');
+    const fetchLandhawkData = async () => {
+      console.log('🔍 Starting to fetch Landhawk data...');
       setIsLoading(true);
       
       try {
-        const { data, error } = await supabase
-          .from('trial_application_data')
-          .select('*');
+        // Call the Landhawk edge function
+        const { data, error } = await supabase.functions.invoke('fetch-trial-data', {
+          body: {
+            bbox: '-0.5,51.3,-0.1,51.5' // London area
+          }
+        });
 
         if (error) {
-          console.error('❌ Error fetching trial data:', error);
+          console.error('❌ Error fetching Landhawk data:', error);
           toast({
             title: "Error loading applications",
             description: "Please try again later",
@@ -34,7 +37,7 @@ const MapView = () => {
           return;
         }
 
-        console.log('📦 Received trial data:', data?.length || 0, 'records');
+        console.log('📦 Received Landhawk data:', data?.length || 0, 'records');
 
         // Transform the data to match the Application type
         const transformedData = (data as TrialApplicationData[]).map((item) => {
@@ -54,11 +57,9 @@ const MapView = () => {
             description: item.description || '',
             submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
             coordinates: item.location?.coordinates ? 
-              // Note: Leaflet uses [lat, lng] format, so we need to swap the coordinates
               [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
               [51.5074, -0.1278] as [number, number],
             postcode: 'N/A',
-            // Adding required properties from Application type with default values
             applicant: item.applicant_name || 'Not specified',
             decisionDue: item.decision_date?.toString() || '',
             type: item.application_type || 'Planning Application',
@@ -85,22 +86,20 @@ const MapView = () => {
 
         setApplications(transformedData);
       } catch (error) {
-        console.error('💥 Error in fetchTrialData:', error);
+        console.error('💥 Error in fetchLandhawkData:', error);
         toast({
           title: "Error loading applications",
           description: "Please try again later",
           variant: "destructive"
         });
       } finally {
-        // Only set loading to false after everything is complete
-        // Increased timeout to allow map to properly initialize
         setTimeout(() => {
           setIsLoading(false);
-        }, 2500); // Increased from 1000ms to 2500ms
+        }, 2500);
       }
     };
 
-    fetchTrialData();
+    fetchLandhawkData();
   }, []);
   
   return (
