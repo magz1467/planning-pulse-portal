@@ -4,7 +4,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Application } from "@/types/planning";
-import { TrialApplicationData } from "@/types/trial";
 import { toast } from "@/components/ui/use-toast";
 
 const MapView = () => {
