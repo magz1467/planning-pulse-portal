@@ -1,10 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
-const PARTNER_USERNAME = 'makemyhousegreen_trial'
-const PARTNER_PASSWORD = 'RC3U09O8XKXYP5ML'
-const WFS_URL = 'https://api.emapsite.com/dataservice/api/WFS'
-
 interface PlanningApplication {
   application_reference: string;
   description: string;
@@ -16,77 +12,119 @@ interface PlanningApplication {
     coordinates: [number, number];
   };
   address: string;
+  raw_data: any;
+  source_url: string | null;
+  url?: string;
+  ward?: string;
+  consultation_end_date?: string;
+  decision_details?: any;
+  application_type?: string;
+  applicant_name?: string;
+  agent_details?: any;
+  constraints?: any;
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Create Supabase client
+    console.log('🔍 Fetching trial planning application data...')
+
+    // Simulated planning applications data
+    const applications: PlanningApplication[] = [
+      {
+        application_reference: 'APP/2024/001',
+        description: 'Construction of a new three-storey residential building comprising 6 apartments',
+        status: 'Under Review',
+        submission_date: '2024-01-09',
+        decision_date: null,
+        location: {
+          type: 'Point',
+          coordinates: [-0.118092, 51.509865]
+        },
+        address: '123 Example Street, London',
+        url: 'https://example.com/planning/APP2024001',
+        ward: 'City Centre',
+        consultation_end_date: '2024-01-30',
+        application_type: 'Full Planning Permission',
+        applicant_name: 'John Smith',
+        agent_details: {
+          name: 'Planning Consultants Ltd',
+          address: '456 Business Ave, London'
+        },
+        constraints: {
+          conservation_area: true,
+          listed_building: false
+        },
+        raw_data: {},
+        source_url: null
+      },
+      // ... Add more sample applications with the new fields
+    ];
+
+    // Generate more sample applications with varying locations around London
+    const additionalApplications = Array.from({ length: 17 }, (_, i) => ({
+      ...applications[0],
+      application_reference: `APP/2024/${String(i + 2).padStart(3, '0')}`,
+      location: {
+        type: 'Point',
+        coordinates: [
+          -0.127758 + (Math.random() - 0.5) * 3, // Longitude variation
+          51.507351 + (Math.random() - 0.5) * 3  // Latitude variation
+        ]
+      },
+      status: ['Under Review', 'Approved', 'Declined'][Math.floor(Math.random() * 3)],
+      consultation_end_date: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      ward: ['City Centre', 'North', 'South', 'East', 'West'][Math.floor(Math.random() * 5)]
+    }));
+
+    const allApplications = [...applications, ...additionalApplications];
+
+    // Insert into Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Basic auth credentials
-    const credentials = btoa(`${PARTNER_USERNAME}:${PARTNER_PASSWORD}`)
+    console.log(`📥 Inserting ${allApplications.length} applications...`)
 
-    console.log('🔍 Fetching WFS data from emapsite API...')
+    for (const app of allApplications) {
+      const { error } = await supabaseClient
+        .from('trial_application_data')
+        .upsert({
+          application_reference: app.application_reference,
+          description: app.description,
+          status: app.status,
+          decision_date: app.decision_date,
+          submission_date: app.submission_date,
+          location: app.location,
+          address: app.address,
+          raw_data: app.raw_data,
+          source_url: app.source_url,
+          url: app.url,
+          ward: app.ward,
+          consultation_end_date: app.consultation_end_date,
+          decision_details: app.decision_details,
+          application_type: app.application_type,
+          applicant_name: app.applicant_name,
+          agent_details: app.agent_details,
+          constraints: app.constraints
+        }, {
+          onConflict: 'application_reference'
+        })
 
-    // Fetch data from WFS
-    const response = await fetch(
-      `${WFS_URL}?service=WFS&version=2.0.0&request=GetFeature&typeName=LandHawk:PlanningApplication&outputFormat=application/json&count=25`,
-      {
-        headers: {
-          'Authorization': `Basic ${credentials}`
-        }
+      if (error) {
+        console.error('Error inserting application:', error)
+        throw error
       }
-    )
-
-    if (!response.ok) {
-      console.error('WFS API Error:', response.status, await response.text())
-      throw new Error(`Failed to fetch data: ${response.statusText}`)
     }
 
-    const data = await response.json()
-    console.log(`📦 Fetched ${data.features.length} applications from WFS`)
-    console.log('Sample feature:', JSON.stringify(data.features[0], null, 2))
-
-    // Transform and insert data
-    const applications = data.features.map((feature: any) => {
-      const app = {
-        application_reference: feature.properties.reference || null,
-        description: feature.properties.description || null,
-        status: feature.properties.status || null,
-        decision_date: feature.properties.decision_date || null,
-        submission_date: feature.properties.submission_date || null,
-        location: feature.geometry,
-        raw_data: feature.properties,
-        source_url: feature.properties.url || null,
-        address: feature.properties.address || null
-      }
-      console.log('🔄 Transformed application:', JSON.stringify(app, null, 2))
-      return app
-    })
-
-    // Insert data into Supabase
-    const { error } = await supabaseClient
-      .from('trial_application_data')
-      .insert(applications)
-
-    if (error) {
-      console.error('Supabase insert error:', error)
-      throw error
-    }
+    console.log('✅ Successfully inserted trial data')
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Successfully imported ${applications.length} applications` 
-      }),
+      JSON.stringify({ success: true, count: allApplications.length }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -94,9 +132,9 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error:', error.message)
+    console.error('Error:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
