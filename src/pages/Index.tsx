@@ -19,7 +19,7 @@ const Index = () => {
         description: "Getting the latest planning applications from Landhawk",
       });
 
-      const { data, error } = await supabase.functions.invoke('fetch-trial-data');
+      const { data, error } = await supabase.functions.invoke('populate-trial-data');
       
       if (error) throw error;
 
