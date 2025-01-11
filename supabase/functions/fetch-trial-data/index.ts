@@ -34,6 +34,8 @@ Deno.serve(async (req) => {
     // Basic auth credentials
     const credentials = btoa(`${PARTNER_USERNAME}:${PARTNER_PASSWORD}`)
 
+    console.log('🔍 Fetching WFS data from emapsite API...')
+
     // Fetch data from WFS
     const response = await fetch(
       `${WFS_URL}?service=WFS&version=2.0.0&request=GetFeature&typeName=LandHawk:PlanningApplication&outputFormat=application/json&count=25`,
@@ -50,20 +52,25 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json()
-    console.log(`Fetched ${data.features.length} applications from WFS`)
+    console.log(`📦 Fetched ${data.features.length} applications from WFS`)
+    console.log('Sample feature:', JSON.stringify(data.features[0], null, 2))
 
     // Transform and insert data
-    const applications = data.features.map((feature: any) => ({
-      application_reference: feature.properties.reference || null,
-      description: feature.properties.description || null,
-      status: feature.properties.status || null,
-      decision_date: feature.properties.decision_date || null,
-      submission_date: feature.properties.submission_date || null,
-      location: feature.geometry,
-      raw_data: feature.properties,
-      source_url: feature.properties.url || null,
-      address: feature.properties.address || null
-    }))
+    const applications = data.features.map((feature: any) => {
+      const app = {
+        application_reference: feature.properties.reference || null,
+        description: feature.properties.description || null,
+        status: feature.properties.status || null,
+        decision_date: feature.properties.decision_date || null,
+        submission_date: feature.properties.submission_date || null,
+        location: feature.geometry,
+        raw_data: feature.properties,
+        source_url: feature.properties.url || null,
+        address: feature.properties.address || null
+      }
+      console.log('🔄 Transformed application:', JSON.stringify(app, null, 2))
+      return app
+    })
 
     // Insert data into Supabase
     const { error } = await supabaseClient
