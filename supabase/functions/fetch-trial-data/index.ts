@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         limit: 500,
       })
-    })
+    });
 
     if (!response.ok) {
       throw new Error(`Landhawk API error: ${response.statusText}`)
