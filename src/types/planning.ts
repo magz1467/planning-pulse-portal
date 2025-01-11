@@ -31,6 +31,7 @@ export interface Application {
       details: string;
     };
   };
+  application_type_full?: string;
 }
 
 export interface Comment {
