@@ -25,6 +25,7 @@ export const ManualProcessing = ({
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching500, setIsFetching500] = useState(false);
+  const [isFetchingAll, setIsFetchingAll] = useState(false);
 
   const handleFetchLandhawkData = async () => {
     try {
@@ -103,6 +104,45 @@ export const ManualProcessing = ({
     }
   };
 
+  const handleFetchAllAvailable = async () => {
+    try {
+      setIsFetchingAll(true);
+      toast({
+        title: "Fetching all available records...",
+        description: "This may take several minutes",
+      });
+
+      const { data, error } = await supabase.functions.invoke('fetch-trial-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: { fetchAll: true }
+      });
+      
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw error;
+      }
+
+      console.log('Edge function response for all records:', data);
+
+      toast({
+        title: "Success!",
+        description: "All available records have been fetched and stored",
+      });
+    } catch (error: any) {
+      console.error('Error fetching all records:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch all records. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsFetchingAll(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Manual Processing</h2>
@@ -125,6 +165,14 @@ export const ManualProcessing = ({
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isFetching500 ? 'animate-spin' : ''}`} />
             {isFetching500 ? 'Fetching 500...' : 'Fetch 500 More Records'}
+          </Button>
+          <Button 
+            onClick={handleFetchAllAvailable}
+            className="w-full sm:w-auto"
+            disabled={isFetchingAll}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isFetchingAll ? 'animate-spin' : ''}`} />
+            {isFetchingAll ? 'Fetching All...' : 'Fetch All Available Records'}
           </Button>
         </div>
       </div>
