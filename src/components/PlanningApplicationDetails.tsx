@@ -115,6 +115,14 @@ export const PlanningApplicationDetails = ({
     <div className="p-6 space-y-4 pb-20">
       <div className="flex justify-between items-start">
         <ApplicationHeader application={application} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowEmailDialog(true)}
+          className="text-primary hover:text-primary/80"
+        >
+          <Bell className="h-5 w-5" />
+        </Button>
       </div>
       
       <ApplicationImage application={application} />
@@ -162,21 +170,6 @@ export const PlanningApplicationDetails = ({
       <ApplicationComments applicationId={application.id} />
       <CreatePetition applicationId={application.id} />
       <ApplicationDocuments />
-
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary" />
-            <div>
-              <h3 className="font-semibold">Get Decision Updates</h3>
-              <p className="text-sm text-gray-600">We'll notify you when this application is decided</p>
-            </div>
-          </div>
-          <Button onClick={() => setShowEmailDialog(true)}>
-            Get notified
-          </Button>
-        </div>
-      </Card>
 
       <Card className="p-4">
         <div className="flex items-center justify-between">
