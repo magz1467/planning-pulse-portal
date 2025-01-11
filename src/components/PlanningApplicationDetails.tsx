@@ -1,6 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useSavedApplications } from "@/hooks/use-saved-applications";
 import { EmailDialog } from "./EmailDialog";
 import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
 import { AuthRequiredDialog } from "./AuthRequiredDialog";
