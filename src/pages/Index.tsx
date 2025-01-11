@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
-import { Features } from "@/components/Features";
-import { Services } from "@/components/Services";
-import { Mission } from "@/components/Mission";
+import Features from "@/components/Features";
+import Services from "@/components/Services";
+import Mission from "@/components/Mission";
 import { Stats } from "@/components/Stats";
-import { StayUpToDate } from "@/components/StayUpToDate";
-import { GetInTouch } from "@/components/GetInTouch";
+import StayUpToDate from "@/components/StayUpToDate";
+import GetInTouch from "@/components/GetInTouch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
