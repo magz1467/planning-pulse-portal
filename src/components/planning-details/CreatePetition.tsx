@@ -34,12 +34,14 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-lg text-primary">Create Petition</h3>
-            <p className="text-sm text-gray-600">Rally support from residents</p>
+            <p className="text-sm text-gray-600">Rally support</p>
           </div>
         </div>
-        <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          Start now →
-        </span>
+        <div className="flex-shrink-0">
+          <span className="text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Start →
+          </span>
+        </div>
       </Button>
 
       <PetitionForm
