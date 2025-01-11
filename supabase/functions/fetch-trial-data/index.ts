@@ -3,7 +3,6 @@ import { corsHeaders } from '../_shared/cors.ts'
 
 const LANDHAWK_USERNAME = 'makemyhousegreen_trial'
 const LANDHAWK_PASSWORD = 'RC3U09O8XKXYP5ML'
-const LANDHAWK_API_KEY = Deno.env.get('LANDHAWK_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
 
