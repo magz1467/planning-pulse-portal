@@ -51,7 +51,7 @@ export const ManualProcessing = ({
         title: "Success!",
         description: data?.message || "Landhawk data has been fetched and stored",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching Landhawk data:', error);
       toast({
         title: "Error",
