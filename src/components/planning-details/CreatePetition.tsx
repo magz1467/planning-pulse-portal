@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
-import { PetitionForm } from "./PetitionForm";
 import { PetitionReasons } from "./petition/PetitionReasons";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { PetitionSharing } from "./petition/PetitionSharing";
 
 interface CreatePetitionProps {
   applicationId: number;
@@ -12,8 +12,8 @@ interface CreatePetitionProps {
 
 export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
-  const [showPetitionForm, setShowPetitionForm] = useState(false);
   const [showReasons, setShowReasons] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleReasonToggle = (reasonId: string) => {
     setSelectedReasons(current =>
@@ -26,7 +26,7 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   const handleContinue = () => {
     if (selectedReasons.length > 0) {
       setShowReasons(false);
-      setShowPetitionForm(true);
+      setShowSuccess(true);
     }
   };
 
@@ -72,12 +72,20 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
         </DialogContent>
       </Dialog>
 
-      <PetitionForm
-        open={showPetitionForm}
-        onOpenChange={setShowPetitionForm}
-        applicationId={applicationId}
-        selectedReasons={selectedReasons}
-      />
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-[425px]">
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Petition Created Successfully! 🎉</h2>
+            <p className="text-sm text-gray-600">
+              Thank you for creating this petition! Share it with others to increase its impact.
+            </p>
+            <PetitionSharing applicationId={applicationId} />
+            <Button onClick={() => setShowSuccess(false)} className="w-full mt-4">
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
