@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('Starting to fetch Landhawk data...')
+    console.log('Testing Landhawk API access...')
     
     const wfsUrl = 'https://api.emapsite.com/dataservice/api/WFS'
     const params = new URLSearchParams({
@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     })
 
     const fullUrl = `${wfsUrl}?${params}`
-    console.log('Making request to Landhawk WFS API with URL:', fullUrl)
+    console.log('Making test request to Landhawk WFS API with URL:', fullUrl)
     
     const authString = btoa(`${LANDHAWK_USERNAME}:${LANDHAWK_PASSWORD}`)
     console.log('Using auth string:', authString)
@@ -45,12 +45,13 @@ Deno.serve(async (req) => {
     }
 
     const data = await response.json()
-    console.log(`Received ${data.features?.length || 0} applications from Landhawk`)
+    console.log(`API test successful. Received ${data.features?.length || 0} features`)
 
     return new Response(
       JSON.stringify({
-        ...data,
-        success: true
+        success: true,
+        message: 'API access test successful',
+        featureCount: data.features?.length || 0
       }), 
       { 
         headers: { 
@@ -61,11 +62,12 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Function error:', error)
+    console.error('API test failed:', error)
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        success: false
+        success: false,
+        message: 'API access test failed'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
