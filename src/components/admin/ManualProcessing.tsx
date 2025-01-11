@@ -4,6 +4,10 @@ import { MapGeneration } from "./processing/MapGeneration";
 import { ImpactScoreGeneration } from "./processing/ImpactScoreGeneration";
 import { OnlineDescriptionGeneration } from "./processing/OnlineDescriptionGeneration";
 import { ScrapingGeneration } from "./processing/ScrapingGeneration";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -17,10 +21,49 @@ export const ManualProcessing = ({
   onGenerate 
 }: ManualProcessingProps) => {
   const batchSizes = [50, 100, 250, 500];
+  const { toast } = useToast();
+
+  const handleFetchLandhawkData = async () => {
+    try {
+      toast({
+        title: "Fetching Landhawk data...",
+        description: "This may take a few minutes",
+      });
+
+      const { data, error } = await supabase.functions.invoke('fetch-trial-data');
+      
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Landhawk data has been fetched and stored",
+      });
+    } catch (error) {
+      console.error('Error fetching Landhawk data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch Landhawk data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Manual Processing</h2>
+      
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Landhawk Data</h3>
+        <Button 
+          onClick={handleFetchLandhawkData}
+          className="w-full sm:w-auto"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Fetch Landhawk Data
+        </Button>
+      </div>
+
+      <Separator className="my-6" />
       
       <TitleGeneration 
         isGenerating={isGenerating}
