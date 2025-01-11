@@ -59,12 +59,12 @@ const MapView = () => {
               [51.5074, -0.1278] as [number, number],
             postcode: 'N/A',
             // Adding required properties from Application type with default values
-            applicant: 'Not specified',
-            decisionDue: item.decision_date || '',
-            type: 'Planning Application',
-            ward: (item.raw_data as any)?.ward || 'Not specified',
+            applicant: item.applicant_name || 'Not specified',
+            decisionDue: item.decision_date?.toString() || '',
+            type: item.application_type || 'Planning Application',
+            ward: item.ward || 'Not specified',
             officer: 'Not assigned',
-            consultationEnd: (item.raw_data as any)?.consultationEndDate || '',
+            consultationEnd: item.consultation_end_date?.toString() || '',
             image: undefined,
             image_map_url: undefined,
             ai_title: undefined,
@@ -74,7 +74,7 @@ const MapView = () => {
             impact_score: null,
             impact_score_details: undefined,
             impacted_services: undefined
-          };
+          } as Application;
         }).filter((app): app is Application => app !== null);
 
         console.log('✨ Transformed data:', {
