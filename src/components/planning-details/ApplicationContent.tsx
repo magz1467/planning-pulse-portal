@@ -1,16 +1,10 @@
 import { Application } from "@/types/planning";
-import { ApplicationTimeline } from "./ApplicationTimeline";
-import { CollapsibleApplicationDetails } from "./CollapsibleApplicationDetails";
 import { ApplicationDescription } from "./ApplicationDescription";
-import { ApplicationComments } from "./ApplicationComments";
-import { ExpectedImpactAreas } from "./ExpectedImpactAreas";
-import { EnvironmentalImpactDial } from "./EnvironmentalImpactDial";
-import { ApplicationDocuments } from "./ApplicationDocuments";
-import { CreatePetition } from "./CreatePetition";
 import { ApplicationFeedback } from "./ApplicationFeedback";
-import { ProjectedCost } from "./ProjectedCost";
+import { ApplicationTimeline } from "./ApplicationTimeline";
+import { ApplicationComments } from "./ApplicationComments";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { ImpactScoreDetails } from "./impact-score/ImpactScoreDetails";
 
 interface ApplicationContentProps {
   application: Application;
@@ -28,48 +22,29 @@ export const ApplicationContent = ({
   feedbackStats,
   onFeedback,
 }: ApplicationContentProps) => {
-  const projectedCost = application.application_details?.projected_cost_of_works;
-  const visualizations = application.image_link?.visualizations;
-
   return (
-    <>
-      <Card className="overflow-hidden">
-        <ApplicationTimeline application={application} />
-        <Separator className="my-4" />
-        <CollapsibleApplicationDetails application={application} />
+    <div className="space-y-4">
+      <Card className="p-4">
+        <ApplicationDescription application={application} />
       </Card>
-      
-      {projectedCost && (
-        <ProjectedCost 
-          cost={projectedCost} 
-          visualizations={visualizations}
-        />
-      )}
 
-      <EnvironmentalImpactDial 
-        score={application.impact_score} 
-        details={application.impact_score_details}
-        applicationId={application.id}
-      />
-
-      {application.impact_score_details?.impacted_services && (
-        <ExpectedImpactAreas 
-          application={application}
-          impactedServices={application.impact_score_details.impacted_services}
-        />
-      )}
-
-      <ApplicationDescription application={application} />
-      
-      <ApplicationFeedback 
+      <ApplicationFeedback
         feedback={feedback}
-        onFeedback={onFeedback}
         feedbackStats={feedbackStats}
+        onFeedback={onFeedback}
       />
 
-      <ApplicationComments applicationId={application.id} />
-      <CreatePetition applicationId={application.id} />
-      <ApplicationDocuments />
-    </>
+      {application.impact_score !== null && application.impact_score_details && (
+        <ImpactScoreDetails
+          score={application.impact_score}
+          details={application.impact_score_details}
+          impactedServices={application.impacted_services}
+        />
+      )}
+
+      <ApplicationTimeline application={application} />
+      
+      <ApplicationComments application={application} />
+    </div>
   );
 };
