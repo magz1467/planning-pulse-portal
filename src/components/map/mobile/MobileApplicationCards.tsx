@@ -59,7 +59,7 @@ export const MobileApplicationCards = ({
           application={selectedApp}
           onClose={() => {
             setShowFullDetails(false);
-            onSelectApplication(null);
+            onSelectApplication(selectedId);
           }}
           onCommentSubmit={handleCommentSubmit}
         />
@@ -67,16 +67,17 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (selectedApp && !showFullDetails) {
+  if (selectedApp) {
     console.log('📱 MobileApplicationCards - Showing mini card for application:', selectedApp.id);
     return (
-      <MiniCard
-        application={selectedApp}
-        onClick={() => setShowFullDetails(true)}
-      />
+      <div className="absolute bottom-0 left-0 right-0 p-4 z-50">
+        <MiniCard
+          application={selectedApp}
+          onClick={() => setShowFullDetails(true)}
+        />
+      </div>
     );
   }
 
-  console.log('📱 MobileApplicationCards - No content to display');
   return null;
 };

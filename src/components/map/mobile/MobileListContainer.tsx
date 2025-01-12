@@ -4,9 +4,13 @@ import { getStatusColor } from "@/utils/statusColors";
 import { useRef, useEffect } from "react";
 import { MiniCard } from "./MiniCard";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
+import { Bell, X } from "lucide-react";
+import { useState } from "react";
+import { ImageResolver } from "./components/ImageResolver";
+import { StatusBadge } from "./components/StatusBadge";
 import { cn } from "@/lib/utils";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 
 interface MobileListContainerProps {
   applications: any[];
@@ -28,6 +32,7 @@ export const MobileListContainer = ({
   onClose,
 }: MobileListContainerProps) => {
   const detailsContainerRef = useRef<HTMLDivElement>(null);
+  const [showAlerts, setShowAlerts] = useState(true);
 
   useEffect(() => {
     if (detailsContainerRef.current) {
@@ -59,23 +64,33 @@ export const MobileListContainer = ({
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-4 bg-white border-b">
-            <div className="bg-primary/5 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Bell className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Stay informed about new planning applications near {postcode}
-              </p>
+          {showAlerts && (
+            <div className="p-4 bg-white border-b relative">
               <Button 
-                className="w-full"
-                onClick={onShowEmailDialog}
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-2 top-2 h-8 w-8"
+                onClick={() => setShowAlerts(false)}
               >
-                Get Alerts
+                <X className="h-4 w-4" />
               </Button>
+              <div className="bg-primary/5 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bell className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Stay informed about new planning applications near {postcode}
+                </p>
+                <Button 
+                  className="w-full"
+                  onClick={onShowEmailDialog}
+                >
+                  Get Alerts
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
           <div className="p-4 space-y-4">
             {applications.map((app) => (
               <div
@@ -84,15 +99,14 @@ export const MobileListContainer = ({
                 onClick={() => onSelectApplication(app.id)}
               >
                 <div className="flex gap-4">
-                  {app.image && (
-                    <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
-                      <img
-                        src={app.image}
-                        alt={app.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
+                  <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    <ImageResolver
+                      imageMapUrl={app.image_map_url}
+                      image={app.image}
+                      title={app.title || app.description || ''}
+                      applicationId={app.id}
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <ApplicationTitle 
                       title={app.ai_title || app.description || ''} 
@@ -100,9 +114,11 @@ export const MobileListContainer = ({
                     />
                     <p className="text-sm text-gray-600 mt-1 truncate">{app.address}</p>
                     <div className="flex justify-between items-center mt-2">
-                      <span className={`text-xs px-2 py-1 rounded ${getStatusColor(app.status)}`}>
-                        {app.status}
-                      </span>
+                      <ApplicationBadges
+                        status={app.status}
+                        lastDateConsultationComments={app.last_date_consultation_comments}
+                        class3={app.class_3}
+                      />
                       <span className="text-xs text-gray-500">{app.distance}</span>
                     </div>
                   </div>
