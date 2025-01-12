@@ -1,36 +1,37 @@
 export interface Application {
   id: number;
-  title: string;
+  title?: string;
   address: string;
   status: string;
   distance?: string;
-  reference: string;
-  description: string;
-  applicant: string;
-  submissionDate: string;
-  decisionDue: string;
-  type: string;
-  ward: string;
-  officer: string;
-  consultationEnd: string;
+  reference?: string;
+  description?: string;
+  applicant?: string;
+  submissionDate?: string;
+  decisionDue?: string;
+  type?: string;
+  ward?: string;
+  officer?: string;
+  consultationEnd?: string;
   image?: string;
-  image_map_url?: string;
-  coordinates: [number, number];
-  postcode: string;
+  coordinates?: [number, number];
   ai_title?: string;
-  last_date_consultation_comments?: string;
-  valid_date?: string;
-  centroid?: {
-    coordinates: [number, number];
-  };
+  postcode?: string;
   impact_score?: number | null;
-  impact_score_details?: Record<string, any>;
-  impacted_services?: {
-    [key: string]: {
-      impact: 'positive' | 'negative' | 'neutral';
-      details: string;
+  impact_score_details?: {
+    key_concerns?: string[];
+    category_scores?: {
+      social?: { score: number; details: string };
+      environmental?: { score: number; details: string };
+      infrastructure?: { score: number; details: string };
     };
+    recommendations?: string[];
   };
+  image_map_url?: string | null;
+  last_date_consultation_comments?: string | null;
+  valid_date?: string | null;
+  centroid?: any;
+  impacted_services?: any;
   application_type_full?: string;
   class_3?: string | null;
 }
