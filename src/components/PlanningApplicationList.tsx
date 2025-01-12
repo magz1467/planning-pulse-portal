@@ -57,8 +57,8 @@ export const PlanningApplicationList = ({
                   <MapPin className="w-3 h-3" />
                   <p className="text-sm truncate">{application.address}</p>
                 </div>
-                <div className="flex flex-col gap-2 mt-2">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-1.5 mt-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
                       {getStatusText(application.status)}
                     </span>
@@ -68,12 +68,11 @@ export const PlanningApplicationList = ({
                         Closing soon
                       </span>
                     )}
+                    {application.class_3 && (
+                      <ClassificationBadge classification={application.class_3} />
+                    )}
                   </div>
-                  {/* Classification badge now on its own line for better visibility */}
-                  <div className="flex items-center">
-                    <ClassificationBadge classification={application.class_3} />
-                  </div>
-                  <span className="text-xs text-gray-500 mt-1">{application.distance}</span>
+                  <span className="text-xs text-gray-500">{application.distance}</span>
                 </div>
               </div>
             </div>
