@@ -1,52 +1,55 @@
 import { Badge } from "@/components/ui/badge";
-import { Building2, House, TreeDeciduous, Factory } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Building2, Factory, Leaf, Home } from "lucide-react";
 
 interface ClassificationBadgeProps {
   classification: string | null;
   className?: string;
 }
 
-export const ClassificationBadge = ({ classification, className }: ClassificationBadgeProps) => {
+export const ClassificationBadge = ({ classification, className = "" }: ClassificationBadgeProps) => {
   if (!classification) return null;
-  
-  const classMap: Record<string, { icon: any; label: string; color: string }> = {
-    'residential': { 
-      icon: House, 
-      label: 'Residential',
-      color: 'bg-blue-100 text-blue-800'
-    },
-    'commercial': { 
-      icon: Building2, 
-      label: 'Commercial',
-      color: 'bg-purple-100 text-purple-800'
-    },
-    'environmental': { 
-      icon: TreeDeciduous, 
-      label: 'Environmental',
-      color: 'bg-green-100 text-green-800'
-    },
-    'industrial': { 
-      icon: Factory, 
-      label: 'Industrial',
-      color: 'bg-orange-100 text-orange-800'
+
+  const getClassificationDetails = (classification: string) => {
+    const normalizedClass = classification.toLowerCase();
+    
+    switch (normalizedClass) {
+      case 'residential':
+        return {
+          icon: Home,
+          color: 'bg-blue-100 text-blue-800'
+        };
+      case 'commercial':
+        return {
+          icon: Building2,
+          color: 'bg-purple-100 text-purple-800'
+        };
+      case 'environmental':
+        return {
+          icon: Leaf,
+          color: 'bg-green-100 text-green-800'
+        };
+      case 'industrial':
+        return {
+          icon: Factory,
+          color: 'bg-orange-100 text-orange-800'
+        };
+      default:
+        return null;
     }
   };
 
-  const lowerClass = classification.toLowerCase();
-  const details = classMap[lowerClass];
-  
+  const details = getClassificationDetails(classification);
   if (!details) return null;
 
   const Icon = details.icon;
 
   return (
     <Badge 
-      className={cn(details.color, "inline-flex items-center gap-1", className)}
-      variant="secondary"
+      className={`flex items-center gap-1 ${details.color} ${className}`}
+      variant="outline"
     >
       <Icon className="w-3 h-3" />
-      {details.label}
+      <span className="capitalize">{classification}</span>
     </Badge>
   );
 };
