@@ -9,10 +9,10 @@ const corsHeaders = {
 }
 
 interface Application {
-  application_id: number
-  centroid: { lat: number; lon: number }
-  description: string
-  impact_score: number
+  application_id: number;
+  centroid: { lat: number; lon: number };
+  description: string;
+  impact_score: number;
 }
 
 serve(async (req) => {
@@ -23,19 +23,28 @@ serve(async (req) => {
 
   try {
     const { applications } = await req.json()
-    console.log('Generating visualizations for applications:', applications)
+    console.log('Received request to generate visualizations for applications:', applications)
+
+    if (!applications || !Array.isArray(applications)) {
+      throw new Error('Invalid or missing applications array')
+    }
 
     const results = []
 
     for (const app of applications.slice(0, 10)) {
+      console.log('Processing application:', app.application_id)
+      
       // Basic Map Visualization
       const mapViz = await generateMapVisualization(app)
+      console.log('Generated map visualization for application:', app.application_id)
       
       // Impact Visualization  
       const impactViz = await generateImpactVisualization(app)
+      console.log('Generated impact visualization for application:', app.application_id)
       
       // Development Type Visualization
       const devTypeViz = await generateDevTypeVisualization(app)
+      console.log('Generated development type visualization for application:', app.application_id)
 
       results.push({
         application_id: app.application_id,
@@ -46,6 +55,8 @@ serve(async (req) => {
         }
       })
     }
+
+    console.log('Successfully generated all visualizations')
 
     return new Response(
       JSON.stringify({ 
@@ -79,6 +90,7 @@ serve(async (req) => {
 })
 
 async function generateMapVisualization(app: Application) {
+  console.log('Generating map visualization with data:', app)
   const width = 600
   const height = 400
   const canvas = createCanvas(width, height)
@@ -108,6 +120,7 @@ async function generateMapVisualization(app: Application) {
 }
 
 async function generateImpactVisualization(app: Application) {
+  console.log('Generating impact visualization with data:', app)
   const width = 600
   const height = 400
   const canvas = createCanvas(width, height)
@@ -147,6 +160,7 @@ async function generateImpactVisualization(app: Application) {
 }
 
 async function generateDevTypeVisualization(app: Application) {
+  console.log('Generating development type visualization with data:', app)
   const width = 600
   const height = 400
   const canvas = createCanvas(width, height)

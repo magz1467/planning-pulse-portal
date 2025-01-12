@@ -34,23 +34,30 @@ export const MapSection = memo(({
   useEffect(() => {
     const generateVisualizations = async () => {
       try {
+        console.log('Attempting to generate visualizations for applications:', applications.slice(0, 10));
+        
         const { data, error } = await supabase.functions.invoke('generate-d3-examples', {
           body: { applications: applications.slice(0, 10) }
         });
 
         if (error) {
           console.error('Error generating visualizations:', error);
+          console.error('Error details:', error.message);
           return;
         }
 
-        console.log('Generated visualizations:', data);
-      } catch (error) {
+        console.log('Successfully generated visualizations:', data);
+      } catch (error: any) {
         console.error('Error calling visualization function:', error);
+        console.error('Error details:', error.message);
       }
     };
 
     if (applications.length > 0) {
+      console.log('Applications available, calling generateVisualizations');
       generateVisualizations();
+    } else {
+      console.log('No applications available yet');
     }
   }, [applications]);
 
