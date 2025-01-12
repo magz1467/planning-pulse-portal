@@ -46,12 +46,6 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
 
   return (
     <Card className="p-4">
-      {application.image && (
-        <div className="mb-4">
-          <ApplicationImage application={application} />
-        </div>
-      )}
-      
       <div className="flex flex-col w-full mb-4">
         <div className="flex items-center justify-between w-full gap-4">
           <div className="flex-1 min-w-0">
@@ -80,6 +74,13 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
           </Button>
         </div>
       </div>
+      
+      {application.image && (
+        <div className="mb-4">
+          <ApplicationImage application={application} />
+        </div>
+      )}
+      
       <div className="text-sm text-gray-500">
         <p className="mb-1">Submitted: {application.submissionDate}</p>
         <p className="mb-1">Decision due: {application.decisionDue}</p>
