@@ -1,15 +1,31 @@
 import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Bell } from "lucide-react";
-import { ApplicationImage } from "./ApplicationImage";
+import { Badge } from "@/components/ui/badge";
+import { MapPin } from "lucide-react";
 
 interface ApplicationMetadataProps {
   application: Application;
   onShowEmailDialog: () => void;
 }
 
-export const ApplicationMetadata = ({ application, onShowEmailDialog }: ApplicationMetadataProps) => {
+export const ApplicationMetadata = ({
+  application,
+  onShowEmailDialog,
+}: ApplicationMetadataProps) => {
+  const getClassificationColor = (classification: string | null) => {
+    if (!classification) return "bg-gray-100 text-gray-800";
+    
+    const classMap: Record<string, string> = {
+      'residential': 'bg-blue-100 text-blue-800',
+      'commercial': 'bg-purple-100 text-purple-800',
+      'environmental': 'bg-green-100 text-green-800',
+      'industrial': 'bg-orange-100 text-orange-800'
+    };
+
+    return classMap[classification.toLowerCase()] || "bg-gray-100 text-gray-800";
+  };
+
   return (
     <Card className="p-4">
       <div className="w-full mb-4">
@@ -18,22 +34,26 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2 flex-shrink-0"
+              className="w-full sm:w-auto"
               onClick={onShowEmailDialog}
             >
-              <Bell className="w-4 h-4" />
               Get updates
             </Button>
           </div>
           <h2 className="text-xl font-semibold break-words">{application.title || application.description}</h2>
+          <div className="flex items-center gap-2">
+            {application.class_3 && (
+              <Badge className={`${getClassificationColor(application.class_3)}`}>
+                {application.class_3}
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-gray-600">
+            <MapPin className="w-4 h-4" />
+            <p className="text-sm">{application.address}</p>
+          </div>
         </div>
       </div>
-      
-      {application.image && (
-        <div className="mb-4">
-          <ApplicationImage application={application} />
-        </div>
-      )}
     </Card>
   );
 };
