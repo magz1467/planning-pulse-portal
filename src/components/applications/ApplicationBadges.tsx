@@ -33,14 +33,16 @@ export const ApplicationBadges = ({
     );
   }
 
-  // Classification badge
-  if (class3 && typeof class3 === 'string' && class3.toLowerCase() !== 'undefined') {
-    badges.push(
-      <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
-        {class3}
-      </Badge>
-    );
-  }
+  // Classification badge - always show with default value
+  const classificationText = class3 && typeof class3 === 'string' && class3.toLowerCase() !== 'undefined'
+    ? class3
+    : 'Miscellaneous';
+
+  badges.push(
+    <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
+      {classificationText}
+    </Badge>
+  );
 
   return (
     <div className="flex flex-wrap items-center gap-2">
