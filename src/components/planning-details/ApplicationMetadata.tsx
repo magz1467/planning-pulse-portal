@@ -2,7 +2,7 @@ import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
+import { MapPin, Bell } from "lucide-react";
 import { ApplicationImage } from "./ApplicationImage";
 
 interface ApplicationMetadataProps {
@@ -31,11 +31,12 @@ export const ApplicationMetadata = ({
     <Card className="p-4">
       <div className="w-full mb-4">
         <div className="flex flex-col w-full gap-2">
-          <div className="flex justify-end mb-2">
+          <div className="flex items-center justify-between mb-2">
+            <Bell className="h-5 w-5 text-gray-500" />
             <Button
               variant="outline"
               size="sm"
-              className="w-full sm:w-auto"
+              className="ml-2"
               onClick={onShowEmailDialog}
             >
               Get updates
