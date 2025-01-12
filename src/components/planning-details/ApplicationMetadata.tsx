@@ -40,7 +40,7 @@ export const ApplicationMetadata = ({
               Get updates
             </Button>
           </div>
-          <h2 className="text-xl font-semibold break-words">{application.title || application.description}</h2>
+          <h2 className="text-xl font-semibold break-words line-clamp-2">{application.title || application.description}</h2>
           <div className="flex items-center gap-2">
             {application.class_3 && (
               <Badge className={`${getClassificationColor(application.class_3)}`}>
