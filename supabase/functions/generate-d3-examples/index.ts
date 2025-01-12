@@ -41,17 +41,17 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey)
     const results = []
 
+    // Process only first 10 applications
     for (const app of applications.slice(0, 10)) {
       console.log('Processing application:', app.application_id)
       
       try {
-        // Get nearest images from Mapillary
+        // Get nearest image from Mapillary
         const { lon, lat } = app.centroid
         const radius = 50 // meters
-        const limit = 10 // number of images to fetch per location
 
         const mapillaryResponse = await fetch(
-          `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=${limit}&radius=${radius}&closeto=${lon},${lat}`,
+          `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=1&radius=${radius}&closeto=${lon},${lat}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -65,14 +65,14 @@ serve(async (req) => {
 
         const mapillaryData = await mapillaryResponse.json()
         const images = mapillaryData.data || []
-        const imageUrls = images.map((img: any) => img.thumb_2048_url)
+        const imageUrl = images[0]?.thumb_2048_url
 
-        // Update the applications table with the visualization URLs
+        // Update the applications table with the visualization URL
         const { error: updateError } = await supabase
           .from('applications')
           .update({ 
             image_link: { 
-              visualizations: imageUrls 
+              visualization: imageUrl 
             }
           })
           .eq('application_id', app.application_id)
@@ -82,10 +82,10 @@ serve(async (req) => {
           throw updateError
         }
 
-        console.log(`Successfully generated visualizations for application ${app.application_id}:`, imageUrls)
+        console.log(`Successfully generated visualization for application ${app.application_id}:`, imageUrl)
         results.push({
           application_id: app.application_id,
-          visualizations: imageUrls
+          visualization: imageUrl
         })
 
       } catch (error) {
