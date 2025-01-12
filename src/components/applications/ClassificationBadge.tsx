@@ -5,33 +5,27 @@ interface ClassificationBadgeProps {
   className?: string;
 }
 
-export const ClassificationBadge = ({ classification, className = "" }: ClassificationBadgeProps) => {
-  // Add more detailed logging
-  console.log('ClassificationBadge - Raw input:', classification);
-
+export const ClassificationBadge = ({ classification }: ClassificationBadgeProps) => {
+  // If no classification provided, don't render anything
   if (!classification) {
-    console.log('ClassificationBadge - No classification provided');
+    console.log('ClassificationBadge: No classification provided');
     return null;
   }
 
-  // Handle both string and object formats
-  const classificationValue = typeof classification === 'string' ? 
-    classification : 
-    classification.value;
+  // Get the display value
+  const displayValue = typeof classification === 'string' 
+    ? classification 
+    : classification.value;
 
-  console.log('ClassificationBadge - Processed value:', classificationValue);
-
-  // Only return null if the actual value is undefined or "undefined"
-  if (!classificationValue || classificationValue === 'undefined') {
-    console.log('ClassificationBadge - Invalid value, not rendering');
+  // Only render if we have a valid display value
+  if (!displayValue || displayValue === 'undefined') {
+    console.log('ClassificationBadge: Invalid display value:', displayValue);
     return null;
   }
 
   return (
-    <div className="inline-flex items-center bg-blue-50 px-2.5 py-0.5 rounded-md">
-      <span className="text-xs font-medium text-blue-700">
-        {classificationValue}
-      </span>
-    </div>
+    <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
+      {displayValue}
+    </Badge>
   );
 };
