@@ -1,6 +1,6 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const MapGeneration = () => {
@@ -11,13 +11,13 @@ export const MapGeneration = () => {
   const handleGenerateMaps = async () => {
     try {
       setIsGeneratingMaps(true);
-      console.log('Starting map generation process...');
+      console.log('Starting map generation...');
       
-      // Get 10 applications that don't have visualizations yet
+      // Get 10 applications that don't have maps yet
       const { data: applications, error: fetchError } = await supabase
         .from('applications')
         .select('application_id, centroid')
-        .is('image_link', null)
+        .is('image_map_url', null)
         .limit(10);
 
       if (fetchError) {
@@ -27,17 +27,17 @@ export const MapGeneration = () => {
       if (!applications?.length) {
         toast({
           title: "No applications to process",
-          description: "All applications already have visualizations",
+          description: "All applications already have maps",
         });
         return;
       }
 
       toast({
-        title: "Generating static maps",
+        title: "Generating maps",
         description: `Processing ${applications.length} applications`,
       });
 
-      const { data, error } = await supabase.functions.invoke('generate-static-map', {
+      const { data, error } = await supabase.functions.invoke('generate-static-maps-manual', {
         body: { applications }
       });
 
@@ -50,14 +50,14 @@ export const MapGeneration = () => {
       
       toast({
         title: "Success!",
-        description: `Generated visualizations for ${data.images.length} applications`,
+        description: `Generated maps for ${applications.length} applications`,
       });
 
     } catch (error) {
       console.error('Error generating maps:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate static maps",
+        description: error instanceof Error ? error.message : "Failed to generate maps",
         variant: "destructive",
       });
     } finally {
