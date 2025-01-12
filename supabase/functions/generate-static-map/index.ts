@@ -45,13 +45,26 @@ serve(async (req) => {
         const pitch = 60 // Add pitch for 3D effect
         const bearing = 45 // Add bearing for angled view
         
-        // Using satellite-v9 style with 3D buildings and terrain
-        const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
+        // Generate multiple views with different angles and zooms
+        const views = [
+          { pitch: 60, bearing: 45, zoom: 17 },
+          { pitch: 45, bearing: 0, zoom: 16 },
+          { pitch: 30, bearing: 90, zoom: 18 },
+          { pitch: 0, bearing: 0, zoom: 17 },
+        ]
 
-        // Update the applications table directly with the image URL
+        const staticMapUrls = views.map(view => 
+          `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${view.zoom},${view.bearing},${view.pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
+        )
+
+        // Update the applications table with the visualization URLs
         const { error: updateError } = await supabase
           .from('applications')
-          .update({ image_map_url: staticMapUrl })
+          .update({ 
+            image_link: { 
+              visualizations: staticMapUrls 
+            }
+          })
           .eq('application_id', app.application_id)
 
         if (updateError) {
@@ -59,10 +72,10 @@ serve(async (req) => {
           throw updateError
         }
 
-        console.log(`Updated image URL for application ${app.application_id}`)
+        console.log(`Updated visualizations for application ${app.application_id}`)
         return {
           application_id: app.application_id,
-          image_url: staticMapUrl
+          visualizations: staticMapUrls
         }
       })
     )

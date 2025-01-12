@@ -7,7 +7,9 @@ export interface Comment {
   parent_id?: number;
   upvotes?: number;
   downvotes?: number;
-  user_email?: string;
+  user?: {
+    username?: string;
+  };
   profiles?: {
     username?: string;
   };
@@ -21,23 +23,30 @@ export interface Application {
   distance?: string;
   reference: string;
   description: string;
-  applicant: string;
-  submissionDate: string;
-  decisionDue: string;
-  type: string;
-  ward: string;
-  officer: string;
-  consultationEnd: string;
+  applicant?: string;
+  submissionDate?: string;
+  decisionDue?: string;
+  type?: string;
+  ward?: string;
+  officer?: string;
+  consultationEnd?: string;
   image?: string;
-  image_map_url?: string;
-  coordinates: [number, number];
-  postcode: string;
+  coordinates?: [number, number];
   ai_title?: string;
-  last_date_consultation_comments?: string;
-  valid_date?: string;
-  centroid?: {
-    coordinates: [number, number];
-  };
+  postcode?: string;
   impact_score?: number | null;
   impact_score_details?: Record<string, any>;
+  image_map_url?: string | null;
+  last_date_consultation_comments?: string | null;
+  valid_date?: string | null;
+  centroid?: any;
+  impacted_services?: any;
+  application_type_full?: string;
+  class_3?: string | null;
+  image_link?: {
+    visualizations?: string[];
+  };
+  application_details?: {
+    projected_cost_of_works?: string | number;
+  };
 }
