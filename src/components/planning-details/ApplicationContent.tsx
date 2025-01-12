@@ -29,6 +29,7 @@ export const ApplicationContent = ({
   onFeedback,
 }: ApplicationContentProps) => {
   const projectedCost = application.application_details?.projected_cost_of_works;
+  const visualizations = application.image_link?.visualizations;
 
   return (
     <>
@@ -39,7 +40,10 @@ export const ApplicationContent = ({
       </Card>
       
       {projectedCost && (
-        <ProjectedCost cost={projectedCost} />
+        <ProjectedCost 
+          cost={projectedCost} 
+          visualizations={visualizations}
+        />
       )}
 
       <EnvironmentalImpactDial 
