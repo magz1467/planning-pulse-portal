@@ -6,6 +6,7 @@ import { StatusBadge } from "./components/StatusBadge";
 import { LocationInfo } from "./components/LocationInfo";
 import { useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { ClassificationBadge } from "@/components/applications/ClassificationBadge";
 
 interface MiniCardProps {
   application: Application;
@@ -72,7 +73,10 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           </div>
           <LocationInfo address={application.address} />
           <div className="flex items-center justify-between mt-2">
-            <StatusBadge status={application.status} />
+            <div className="flex items-center gap-2">
+              <StatusBadge status={application.status} />
+              <ClassificationBadge classification={application.class_3} />
+            </div>
             <span className="text-xs text-gray-500">
               {application.distance}
             </span>
