@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,7 +48,7 @@ serve(async (req) => {
         // Get nearest images from Mapillary
         const { lon, lat } = app.centroid
         const radius = 50 // meters
-        const limit = 5 // number of images to fetch
+        const limit = 10 // number of images to fetch per location
 
         const mapillaryResponse = await fetch(
           `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=${limit}&radius=${radius}&closeto=${lon},${lat}`,
@@ -81,7 +82,7 @@ serve(async (req) => {
           throw updateError
         }
 
-        console.log(`Successfully generated visualizations for application ${app.application_id}`)
+        console.log(`Successfully generated visualizations for application ${app.application_id}:`, imageUrls)
         results.push({
           application_id: app.application_id,
           visualizations: imageUrls
