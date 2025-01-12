@@ -44,18 +44,12 @@ export const PlanningApplicationList = ({
     }
 
     // Classification badge
-    if (application.class_3) {
-      const displayValue = typeof application.class_3 === 'string' 
-        ? application.class_3 
-        : application.class_3?.value;
-
-      if (displayValue && displayValue !== 'undefined') {
-        badges.push(
-          <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
-            {displayValue}
-          </Badge>
-        );
-      }
+    if (application.class_3 && application.class_3 !== 'undefined') {
+      badges.push(
+        <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
+          {application.class_3}
+        </Badge>
+      );
     }
 
     return badges;

@@ -44,22 +44,4 @@ export interface Application {
     };
   };
   application_type_full?: string;
-  class_3?: string | { _type: string; value: string } | null;
-}
-
-export interface Comment {
-  id: number;
-  created_at: string;
-  comment: string;
-  user_id?: string;
-  application_id?: number;
-  parent_id?: number;
-  upvotes?: number;
-  downvotes?: number;
-  user?: {
-    username?: string;
-  };
-  profiles?: {
-    username?: string;
-  };
-}
+  class_3?: string | null;
