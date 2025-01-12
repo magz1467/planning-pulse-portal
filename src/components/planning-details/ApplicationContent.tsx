@@ -44,7 +44,7 @@ export const ApplicationContent = ({
 
       <ApplicationTimeline application={application} />
       
-      <ApplicationComments application={application} />
+      <ApplicationComments applicationId={application.application_id} />
     </div>
   );
 };
