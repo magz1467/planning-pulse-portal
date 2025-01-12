@@ -44,7 +44,7 @@ export interface Application {
     };
   };
   application_type_full?: string;
-  class_3?: string | null;
+  class_3?: string | { _type: string; value: string } | null;
 }
 
 export interface Comment {
