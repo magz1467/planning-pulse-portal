@@ -18,10 +18,10 @@ serve(async (req) => {
 
   try {
     const { applications } = await req.json()
-    const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
+    const mapillaryToken = Deno.env.get('MAPILLARY_API_KEY')
     
-    if (!mapboxToken) {
-      throw new Error('MAPBOX_PUBLIC_TOKEN not found')
+    if (!mapillaryToken) {
+      throw new Error('MAPILLARY_API_KEY not found')
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -37,48 +37,55 @@ serve(async (req) => {
 
     const results = await Promise.all(
       processedApplications.map(async (app: Application) => {
-        // Generate new static map image
-        const [lng, lat] = app.coordinates
-        const width = 800
-        const height = 600
-        
-        // Generate 10 different views with varying angles and zooms
-        const views = [
-          { pitch: 60, bearing: 45, zoom: 17 },
-          { pitch: 45, bearing: 0, zoom: 16 },
-          { pitch: 30, bearing: 90, zoom: 18 },
-          { pitch: 0, bearing: 0, zoom: 17 },
-          { pitch: 75, bearing: 180, zoom: 17 },
-          { pitch: 15, bearing: 135, zoom: 16 },
-          { pitch: 45, bearing: 225, zoom: 18 },
-          { pitch: 30, bearing: 270, zoom: 17 },
-          { pitch: 60, bearing: 315, zoom: 16 },
-          { pitch: 0, bearing: 180, zoom: 18 }
-        ]
+        try {
+          // Get nearest images from Mapillary
+          const [lng, lat] = app.coordinates
+          const radius = 50 // meters
+          const limit = 5 // number of images to fetch
 
-        const staticMapUrls = views.map(view => 
-          `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${view.zoom},${view.bearing},${view.pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
-        )
-
-        // Update the applications table with the visualization URLs
-        const { error: updateError } = await supabase
-          .from('applications')
-          .update({ 
-            image_link: { 
-              visualizations: staticMapUrls 
+          const mapillaryResponse = await fetch(
+            `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=${limit}&radius=${radius}&closeto=${lng},${lat}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              }
             }
-          })
-          .eq('application_id', app.application_id)
+          )
 
-        if (updateError) {
-          console.error(`Error updating application ${app.application_id}:`, updateError)
-          throw updateError
-        }
+          if (!mapillaryResponse.ok) {
+            throw new Error(`Mapillary API error: ${mapillaryResponse.statusText}`)
+          }
 
-        console.log(`Updated visualizations for application ${app.application_id}`)
-        return {
-          application_id: app.application_id,
-          visualizations: staticMapUrls
+          const mapillaryData = await mapillaryResponse.json()
+          const images = mapillaryData.data || []
+          const imageUrls = images.map((img: any) => img.thumb_2048_url)
+
+          // Update the applications table with the visualization URLs
+          const { error: updateError } = await supabase
+            .from('applications')
+            .update({ 
+              image_link: { 
+                visualizations: imageUrls 
+              }
+            })
+            .eq('application_id', app.application_id)
+
+          if (updateError) {
+            console.error(`Error updating application ${app.application_id}:`, updateError)
+            throw updateError
+          }
+
+          console.log(`Updated visualizations for application ${app.application_id}`)
+          return {
+            application_id: app.application_id,
+            visualizations: imageUrls
+          }
+        } catch (error) {
+          console.error(`Error processing application ${app.application_id}:`, error)
+          return {
+            application_id: app.application_id,
+            error: error.message
+          }
         }
       })
     )
