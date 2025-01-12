@@ -45,6 +45,14 @@ export const ApplicationBadges = ({
     emoji = '🌳 ';
   } else if (lowerClass.includes('home extension') || lowerClass.includes('extension')) {
     emoji = '🏠 ';
+  } else if (lowerClass.includes('amendment')) {
+    emoji = '📄 ';
+  } else if (lowerClass.includes('certificate')) {
+    emoji = '📜 ';
+  } else if (lowerClass.includes('landscaping')) {
+    emoji = '🌱 ';
+  } else if (lowerClass.includes('redevelopment')) {
+    emoji = '👷 ';
   }
 
   badges.push(
