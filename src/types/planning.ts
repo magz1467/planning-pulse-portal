@@ -4,6 +4,7 @@ export interface Application {
     title?: string;
     address: string;
     status: string;
+    distance: string;
     reference?: string;
     description?: string;
     applicant?: string;
