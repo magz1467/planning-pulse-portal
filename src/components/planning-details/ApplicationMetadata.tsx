@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
+import { ApplicationImage } from "./ApplicationImage";
 
 interface ApplicationMetadataProps {
   application: Application;
@@ -54,6 +55,7 @@ export const ApplicationMetadata = ({
           </div>
         </div>
       </div>
+      <ApplicationImage application={application} />
     </Card>
   );
 };
