@@ -28,11 +28,10 @@ export const ClassificationBadge = ({ classification, className = "" }: Classifi
   }
 
   return (
-    <Badge 
-      className={`${className} bg-blue-100 text-blue-800 hover:bg-blue-200 z-50`}
-      variant="outline"
+    <span 
+      className={`${className} inline-flex items-center text-xs font-medium text-blue-800 bg-blue-100 px-2 py-0.5 rounded`}
     >
       {classificationValue}
-    </Badge>
+    </span>
   );
 };
