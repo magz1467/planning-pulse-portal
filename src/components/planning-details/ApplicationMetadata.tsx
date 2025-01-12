@@ -53,7 +53,7 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
       )}
       
       <div className="flex justify-between items-start mb-4">
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}>
               {getStatusText(application.status)}
@@ -65,13 +65,13 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
               </span>
             )}
           </div>
-          <h2 className="text-xl font-semibold mb-2">{application.title || application.description}</h2>
+          <h2 className="text-xl font-semibold mb-2 break-words">{application.title || application.description}</h2>
           <h2 className="text-sm font-medium text-gray-900">Reference: {application.reference}</h2>
         </div>
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 ml-4 flex-shrink-0"
           onClick={onShowEmailDialog}
         >
           <Bell className="w-4 h-4" />
