@@ -1,5 +1,6 @@
 export interface Application {
   id: number;
+  application_id: number;
   title: string | null;
   address: string;
   status: string;
@@ -37,6 +38,9 @@ export interface Comment {
   upvotes: number;
   downvotes: number;
   user_email?: string;
+  user?: {
+    username?: string;
+  };
 }
 
 export interface ApplicationFeedback {

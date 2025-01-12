@@ -18,6 +18,12 @@ export const useComments = (applicationId: number) => {
           setCurrentUserId(session.session.user.id);
         }
 
+        // Only fetch if applicationId is defined
+        if (typeof applicationId === 'undefined') {
+          setComments([]);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('Comments')
           .select('*, user:user_id (username)')
