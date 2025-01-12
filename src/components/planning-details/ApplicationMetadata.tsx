@@ -34,12 +34,6 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
           <ApplicationImage application={application} />
         </div>
       )}
-      
-      <div className="text-sm text-gray-500">
-        <p className="mb-1">Submitted: {application.submissionDate}</p>
-        <p className="mb-1">Decision due: {application.decisionDue}</p>
-        <p>Type: {application.type}</p>
-      </div>
     </Card>
   );
 };
