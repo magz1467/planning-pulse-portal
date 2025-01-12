@@ -34,7 +34,7 @@ export const ApplicationBadges = ({
   }
 
   // Classification badge
-  if (class3 && class3 !== 'undefined') {
+  if (class3 && typeof class3 === 'string' && class3.toLowerCase() !== 'undefined') {
     badges.push(
       <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
         {class3}
