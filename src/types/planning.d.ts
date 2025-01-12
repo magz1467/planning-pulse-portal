@@ -1,5 +1,6 @@
 export interface Application {
   id: number;
+  application_id: number; // Added this field
   title?: string;
   address: string;
   status: string;
