@@ -1,12 +1,10 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Timer } from "lucide-react";
-import { getStatusColor, getStatusText } from "@/utils/statusColors";
+import { MapPin } from "lucide-react";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
-import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
-import { Badge } from "@/components/ui/badge";
+import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -21,39 +19,6 @@ export const PlanningApplicationList = ({
   activeSort
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
-
-  const renderBadges = (application: Application) => {
-    const badges = [];
-
-    // Status badge
-    badges.push(
-      <span key="status" className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
-        {getStatusText(application.status)}
-      </span>
-    );
-
-    // Closing soon badge
-    if (application.last_date_consultation_comments && 
-        isWithinNextSevenDays(application.last_date_consultation_comments)) {
-      badges.push(
-        <span key="closing" className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
-          <Timer className="w-3 h-3" />
-          Closing soon
-        </span>
-      );
-    }
-
-    // Classification badge
-    if (application.class_3 && application.class_3 !== 'undefined') {
-      badges.push(
-        <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
-          {application.class_3}
-        </Badge>
-      );
-    }
-
-    return badges;
-  };
 
   return (
     <div className="divide-y">
@@ -83,9 +48,11 @@ export const PlanningApplicationList = ({
                 <p className="text-sm truncate">{application.address}</p>
               </div>
               <div className="flex flex-col gap-1.5 mt-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  {renderBadges(application)}
-                </div>
+                <ApplicationBadges
+                  status={application.status}
+                  lastDateConsultationComments={application.last_date_consultation_comments}
+                  class3={application.class_3}
+                />
                 <span className="text-xs text-gray-500">{application.distance}</span>
               </div>
             </div>
@@ -94,4 +61,4 @@ export const PlanningApplicationList = ({
       ))}
     </div>
   );
-}
+};
