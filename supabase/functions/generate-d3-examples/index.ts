@@ -62,6 +62,8 @@ serve(async (req) => {
         const { lon, lat } = app.centroid
         const radius = 50 // meters
 
+        console.log(`Fetching Mapillary image for coordinates: lon=${lon}, lat=${lat}, radius=${radius}`)
+
         const mapillaryResponse = await fetch(
           `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=1&radius=${radius}&closeto=${lon},${lat}`,
           {
@@ -91,7 +93,9 @@ serve(async (req) => {
         }
 
         // Update the applications table with the visualization URL
-        const { error: updateError } = await supabase
+        console.log(`Updating application ${app.application_id} with image URL:`, imageUrl)
+        
+        const { data: updateData, error: updateError } = await supabase
           .from('applications')
           .update({ 
             image_link: { 
@@ -100,11 +104,14 @@ serve(async (req) => {
             }
           })
           .eq('application_id', app.application_id)
+          .select()
 
         if (updateError) {
           console.error(`Error updating application ${app.application_id}:`, updateError)
           throw updateError
         }
+
+        console.log(`Update response for application ${app.application_id}:`, updateData)
 
         console.log(`Successfully generated visualization for application ${app.application_id}:`, imageUrl)
         results.push({

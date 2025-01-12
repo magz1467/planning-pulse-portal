@@ -46,11 +46,3 @@ export interface Comment {
     username?: string;
   };
 }
-
-export interface ApplicationFeedback {
-  id: number;
-  application_id: number;
-  user_id: string;
-  feedback_type: string;
-  created_at: string;
-}
