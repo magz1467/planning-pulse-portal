@@ -41,14 +41,12 @@ export const FilterBar = ({
   const isMobile = useIsMobile();
   const [localActiveSort, setLocalActiveSort] = useState<SortType>(activeSort);
 
-  // Memoize the filter change handler
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     if (onFilterChange) {
       onFilterChange(filterType, value);
     }
   }, [onFilterChange]);
 
-  // Memoize the sort change handler
   const handleSortChange = useCallback((sortType: SortType) => {
     setLocalActiveSort(sortType);
     if (onSortChange) {
@@ -56,19 +54,16 @@ export const FilterBar = ({
     }
   }, [onSortChange]);
 
-  // Update local sort state when prop changes
   useEffect(() => {
     setLocalActiveSort(activeSort);
   }, [activeSort]);
 
-  // Memoize the sort button text
   const sortButtonText = useMemo(() => {
     if (localActiveSort === 'closingSoon') return 'Closing Soon';
     if (localActiveSort === 'newest') return 'Newest';
     return 'Sort';
   }, [localActiveSort]);
 
-  // Add error logging
   useEffect(() => {
     console.log('FilterBar render state:', {
       activeFilters,
@@ -92,19 +87,21 @@ export const FilterBar = ({
         </ErrorBoundary>
 
         <ErrorBoundary>
-          <SortDropdown
-            activeSort={localActiveSort}
-            onSortChange={handleSortChange}
-          >
-            <Button 
-              variant="outline" 
-              size={isMobile ? "sm" : "default"}
-              className="flex items-center gap-2 z-50"
+          <div className="flex items-center h-full">
+            <SortDropdown
+              activeSort={localActiveSort}
+              onSortChange={handleSortChange}
             >
-              <ArrowUpDown className="h-4 w-4" />
-              {sortButtonText}
-            </Button>
-          </SortDropdown>
+              <Button 
+                variant="outline" 
+                size={isMobile ? "sm" : "default"}
+                className="flex items-center gap-2"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                {sortButtonText}
+              </Button>
+            </SortDropdown>
+          </div>
         </ErrorBoundary>
       </div>
 
