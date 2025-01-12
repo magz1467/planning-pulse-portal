@@ -1,32 +1,80 @@
 import { Application } from "@/types/planning";
-import { ApplicationHeader } from "./ApplicationHeader";
-import { ApplicationImage } from "./ApplicationImage";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Bell, Building2, House, TreeDeciduous, Factory } from "lucide-react";
+import { getStatusColor, getStatusText } from "@/utils/statusColors";
 
 interface ApplicationMetadataProps {
   application: Application;
   onShowEmailDialog: () => void;
 }
 
-export const ApplicationMetadata = ({ 
-  application,
-  onShowEmailDialog,
-}: ApplicationMetadataProps) => {
+const getClassificationDetails = (classification: string | null) => {
+  if (!classification) return null;
+  
+  const classMap: Record<string, { icon: any; label: string; color: string }> = {
+    'residential': { 
+      icon: House, 
+      label: 'Residential',
+      color: 'bg-blue-100 text-blue-800'
+    },
+    'commercial': { 
+      icon: Building2, 
+      label: 'Commercial',
+      color: 'bg-purple-100 text-purple-800'
+    },
+    'environmental': { 
+      icon: TreeDeciduous, 
+      label: 'Environmental',
+      color: 'bg-green-100 text-green-800'
+    },
+    'industrial': { 
+      icon: Factory, 
+      label: 'Industrial',
+      color: 'bg-orange-100 text-orange-800'
+    }
+  };
+
+  const lowerClass = classification.toLowerCase();
+  return classMap[lowerClass] || null;
+};
+
+export const ApplicationMetadata = ({ application, onShowEmailDialog }: ApplicationMetadataProps) => {
+  const classDetails = getClassificationDetails(application.class_3);
+
   return (
-    <>
-      <div className="flex justify-between items-start">
-        <ApplicationHeader application={application} />
+    <Card className="p-4">
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}>
+              {getStatusText(application.status)}
+            </span>
+            {classDetails && (
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${classDetails.color}`}>
+                <classDetails.icon className="w-3 h-3" />
+                {classDetails.label}
+              </span>
+            )}
+          </div>
+          <h2 className="text-sm font-medium text-gray-900">Reference: {application.reference}</h2>
+        </div>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
           onClick={onShowEmailDialog}
-          className="text-primary hover:text-primary/80"
         >
-          <Bell className="h-5 w-5" />
+          <Bell className="w-4 h-4" />
+          Get updates
         </Button>
       </div>
-      <ApplicationImage application={application} />
-    </>
+      <div className="text-sm text-gray-500">
+        <p className="mb-1">Submitted: {application.submissionDate}</p>
+        <p className="mb-1">Decision due: {application.decisionDue}</p>
+        <p>Type: {application.type}</p>
+      </div>
+    </Card>
   );
 };

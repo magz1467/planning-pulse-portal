@@ -1,12 +1,13 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Timer } from "lucide-react";
+import { MapPin, Timer, Building2, House, TreeDeciduous, Factory } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { cn } from "@/lib/utils";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
+import { Badge } from "@/components/ui/badge";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -14,6 +15,36 @@ interface PlanningApplicationListProps {
   onSelectApplication: (id: number | null) => void;
   activeSort?: SortType;
 }
+
+const getClassificationDetails = (classification: string | null) => {
+  if (!classification) return null;
+  
+  const classMap: Record<string, { icon: any; label: string; color: string }> = {
+    'residential': { 
+      icon: House, 
+      label: 'Residential',
+      color: 'bg-blue-100 text-blue-800'
+    },
+    'commercial': { 
+      icon: Building2, 
+      label: 'Commercial',
+      color: 'bg-purple-100 text-purple-800'
+    },
+    'environmental': { 
+      icon: TreeDeciduous, 
+      label: 'Environmental',
+      color: 'bg-green-100 text-green-800'
+    },
+    'industrial': { 
+      icon: Factory, 
+      label: 'Industrial',
+      color: 'bg-orange-100 text-orange-800'
+    }
+  };
+
+  const lowerClass = classification.toLowerCase();
+  return classMap[lowerClass] || null;
+};
 
 export const PlanningApplicationList = ({
   applications,
@@ -27,6 +58,8 @@ export const PlanningApplicationList = ({
       {sortedApplications.map((application) => {
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
+        
+        const classDetails = getClassificationDetails(application.class_3);
 
         return (
           <div
@@ -62,6 +95,12 @@ export const PlanningApplicationList = ({
                       <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
                         <Timer className="w-3 h-3" />
                         Closing soon
+                      </span>
+                    )}
+                    {classDetails && (
+                      <span className={cn("inline-flex items-center gap-1 text-xs px-2 py-1 rounded", classDetails.color)}>
+                        <classDetails.icon className="w-3 h-3" />
+                        {classDetails.label}
                       </span>
                     )}
                   </div>
