@@ -30,13 +30,19 @@ export const PlanningApplicationDetails = ({
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
 
   useEffect(() => {
+    console.log('PlanningApplicationDetails - Application Data:', {
+      id: application?.id,
+      class_3: application?.class_3,
+      title: application?.title
+    });
+    
     return () => {
       setShowEmailDialog(false);
       setShowFeedbackDialog(false);
       setShowAuthDialog(false);
       document.body.style.overflow = '';
     };
-  }, []);
+  }, [application]);
 
   if (!application) return null;
 

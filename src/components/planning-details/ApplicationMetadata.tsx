@@ -14,6 +14,12 @@ export const ApplicationMetadata = ({
   application,
   onShowEmailDialog,
 }: ApplicationMetadataProps) => {
+  console.log('ApplicationMetadata - Rendering with:', {
+    id: application.id,
+    class_3: application.class_3,
+    title: application.title
+  });
+
   const getClassificationColor = (classification: string | null) => {
     if (!classification) return "bg-gray-100 text-gray-800";
     

@@ -40,13 +40,21 @@ export const useApplicationsFetch = () => {
         return;
       }
 
-      console.log(`📦 Received ${applications?.length || 0} applications from database`);
+      console.log(`📦 Raw applications data:`, applications.map(app => ({
+        id: app.id,
+        class_3: app.class_3,
+        title: app.title
+      })));
 
       const transformedApplications = applications
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
-      console.log('✨ Transformed applications:', transformedApplications?.length || 0);
+      console.log('✨ Transformed applications:', transformedApplications.map(app => ({
+        id: app.id,
+        class_3: app.class_3,
+        title: app.title
+      })));
 
       setApplications(transformedApplications || []);
 
