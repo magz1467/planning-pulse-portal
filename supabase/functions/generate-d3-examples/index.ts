@@ -9,7 +9,6 @@ const corsHeaders = {
 interface Application {
   application_id: number;
   centroid: { lat: number; lon: number };
-  description: string;
 }
 
 serve(async (req) => {
@@ -24,6 +23,19 @@ serve(async (req) => {
 
     if (!applications || !Array.isArray(applications)) {
       throw new Error('Invalid or missing applications array')
+    }
+
+    // Validate applications data
+    const validApplications = applications.filter(app => {
+      if (!app.application_id || !app.centroid) {
+        console.log('Skipping invalid application:', app)
+        return false
+      }
+      return true
+    })
+
+    if (validApplications.length === 0) {
+      throw new Error('No valid applications to process')
     }
 
     const mapillaryToken = Deno.env.get('MAPILLARY_API_KEY')
@@ -41,8 +53,8 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey)
     const results = []
 
-    // Process only first 10 applications
-    for (const app of applications.slice(0, 10)) {
+    // Process only valid applications
+    for (const app of validApplications) {
       console.log('Processing application:', app.application_id)
       
       try {
@@ -64,8 +76,19 @@ serve(async (req) => {
         }
 
         const mapillaryData = await mapillaryResponse.json()
+        console.log('Mapillary response:', mapillaryData)
+        
         const images = mapillaryData.data || []
         const imageUrl = images[0]?.thumb_2048_url
+
+        if (!imageUrl) {
+          console.log(`No image found for application ${app.application_id}`)
+          results.push({
+            application_id: app.application_id,
+            error: 'No image found in this location'
+          })
+          continue
+        }
 
         // Update the applications table with the visualization URL
         const { error: updateError } = await supabase
@@ -98,7 +121,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('Successfully generated all visualizations')
+    console.log('Successfully processed all applications:', results)
 
     return new Response(
       JSON.stringify({ 

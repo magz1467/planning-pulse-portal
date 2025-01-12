@@ -75,6 +75,7 @@ export const MapGeneration = () => {
         .from('applications')
         .select('application_id, centroid')
         .is('image_link', null)
+        .not('centroid', 'is', null)  // Only get applications with valid centroid
         .limit(10);
 
       if (fetchError) {
@@ -88,6 +89,8 @@ export const MapGeneration = () => {
         });
         return;
       }
+
+      console.log('Applications to process:', applications);
 
       toast({
         title: "Generating D3 examples",
