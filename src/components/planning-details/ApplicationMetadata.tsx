@@ -46,32 +46,32 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
 
   return (
     <Card className="p-4">
-      <div className="flex flex-col w-full mb-4">
-        <div className="flex items-center justify-between w-full gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}>
-                {getStatusText(application.status)}
+      <div className="w-full mb-4">
+        <div className="flex flex-col w-full gap-2">
+          <div className="flex flex-wrap gap-2">
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(application.status)}`}>
+              {getStatusText(application.status)}
+            </span>
+            {classDetails && (
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${classDetails.color}`}>
+                <classDetails.icon className="w-3 h-3" />
+                {classDetails.label}
               </span>
-              {classDetails && (
-                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${classDetails.color}`}>
-                  <classDetails.icon className="w-3 h-3" />
-                  {classDetails.label}
-                </span>
-              )}
-            </div>
-            <h2 className="text-xl font-semibold mb-2 break-words">{application.title || application.description}</h2>
-            <h2 className="text-sm font-medium text-gray-900">Reference: {application.reference}</h2>
+            )}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2 flex-shrink-0"
-            onClick={onShowEmailDialog}
-          >
-            <Bell className="w-4 h-4" />
-            Get updates
-          </Button>
+          <h2 className="text-xl font-semibold break-words">{application.title || application.description}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-gray-900">Reference: {application.reference}</h2>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 flex-shrink-0"
+              onClick={onShowEmailDialog}
+            >
+              <Bell className="w-4 h-4" />
+              Get updates
+            </Button>
+          </div>
         </div>
       </div>
       
