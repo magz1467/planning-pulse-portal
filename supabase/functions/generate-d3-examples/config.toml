@@ -1,3 +1,1 @@
 project_id = "jposqxdboetyioymfswd"
-[functions.generate-d3-examples]
-verify_jwt = false
