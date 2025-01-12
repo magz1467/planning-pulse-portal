@@ -14,8 +14,7 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
     <Card className="p-4">
       <div className="w-full mb-4">
         <div className="flex flex-col w-full gap-2">
-          <h2 className="text-xl font-semibold break-words">{application.title || application.description}</h2>
-          <div className="flex items-center justify-between">
+          <div className="flex justify-end mb-2">
             <Button
               variant="outline"
               size="sm"
@@ -26,6 +25,7 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
               Get updates
             </Button>
           </div>
+          <h2 className="text-xl font-semibold break-words">{application.title || application.description}</h2>
         </div>
       </div>
       
