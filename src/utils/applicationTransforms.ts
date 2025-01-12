@@ -8,6 +8,8 @@ export const transformApplicationData = (
   imageUrl = '/placeholder.svg'
 ): Application | null => {
   console.group(`🔄 Transforming application ${app.application_id}`);
+  console.log('Raw application data:', app);
+  
   const geomObj = app.geom;
   let coordinates: [number, number] | null = null;
 
@@ -48,8 +50,14 @@ export const transformApplicationData = (
     details: app.impact_score_details
   });
 
-  // Log raw class_3 value for debugging
-  console.log('Raw Class 3 Value:', app.class_3);
+  // Detailed logging for class_3
+  console.log('Raw application class_3:', {
+    value: app.class_3,
+    type: typeof app.class_3,
+    isNull: app.class_3 === null,
+    isUndefined: app.class_3 === undefined,
+    stringValue: String(app.class_3)
+  });
 
   const application: Application = {
     id: app.application_id,
@@ -78,7 +86,7 @@ export const transformApplicationData = (
     last_date_consultation_comments: app.last_date_consultation_comments || null,
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
-    class_3: app.class_3 === null || app.class_3 === undefined ? 'Miscellaneous' : app.class_3
+    class_3: app.class_3 === null || app.class_3 === undefined || app.class_3 === 'undefined' ? 'Miscellaneous' : app.class_3
   };
 
   console.log('✅ Transformed application:', {
