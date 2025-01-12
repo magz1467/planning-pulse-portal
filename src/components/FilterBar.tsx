@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -53,6 +53,13 @@ export const FilterBar = ({
     }
   }, [onSortChange]);
 
+  // Memoize the sort button text
+  const sortButtonText = useMemo(() => {
+    if (activeSort === 'closingSoon') return 'Closing Soon';
+    if (activeSort === 'newest') return 'Newest';
+    return 'Sort';
+  }, [activeSort]);
+
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">
@@ -74,8 +81,7 @@ export const FilterBar = ({
             className="flex items-center gap-2"
           >
             <ArrowUpDown className="h-4 w-4" />
-            {activeSort === 'closingSoon' ? 'Closing Soon' : 
-             activeSort === 'newest' ? 'Newest' : 'Sort'}
+            {sortButtonText}
           </Button>
         </SortDropdown>
       </div>
