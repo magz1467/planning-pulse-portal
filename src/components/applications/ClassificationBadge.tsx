@@ -2,15 +2,22 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, Factory, Leaf, Home } from "lucide-react";
 
 interface ClassificationBadgeProps {
-  classification: string | null;
+  classification: string | { _type: string; value: string } | null;
   className?: string;
 }
 
 export const ClassificationBadge = ({ classification, className = "" }: ClassificationBadgeProps) => {
   if (!classification) return null;
 
-  const getClassificationDetails = (classification: string) => {
-    const normalizedClass = classification.toLowerCase();
+  // Handle both string and object formats
+  const classificationValue = typeof classification === 'string' ? 
+    classification : 
+    classification.value;
+
+  if (classificationValue === 'undefined') return null;
+  
+  const getClassificationDetails = (classificationStr: string) => {
+    const normalizedClass = classificationStr.toLowerCase();
     
     switch (normalizedClass) {
       case 'residential':
@@ -38,7 +45,7 @@ export const ClassificationBadge = ({ classification, className = "" }: Classifi
     }
   };
 
-  const details = getClassificationDetails(classification);
+  const details = getClassificationDetails(classificationValue);
   if (!details) return null;
 
   const Icon = details.icon;
@@ -49,7 +56,7 @@ export const ClassificationBadge = ({ classification, className = "" }: Classifi
       variant="outline"
     >
       <Icon className="w-3 h-3" />
-      <span className="capitalize">{classification}</span>
+      <span className="capitalize">{classificationValue}</span>
     </Badge>
   );
 };
