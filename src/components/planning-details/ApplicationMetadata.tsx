@@ -16,7 +16,6 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
         <div className="flex flex-col w-full gap-2">
           <h2 className="text-xl font-semibold break-words">{application.title || application.description}</h2>
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-gray-900">Reference: {application.reference}</h2>
             <Button
               variant="outline"
               size="sm"
