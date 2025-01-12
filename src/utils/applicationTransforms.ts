@@ -46,6 +46,11 @@ export const transformApplicationData = (
     details: app.impact_score_details
   });
 
+  // Log class_3 data for debugging
+  console.log('Class 3 Data:', {
+    class_3: app.class_3
+  });
+
   const application: Application = {
     id: app.application_id,
     title: app.description || '',
@@ -72,14 +77,16 @@ export const transformApplicationData = (
     image_map_url: app.image_map_url || null,
     last_date_consultation_comments: app.last_date_consultation_comments || null,
     valid_date: app.valid_date || null,
-    centroid: app.centroid || null
+    centroid: app.centroid || null,
+    class_3: app.class_3 || null
   };
 
   console.log('✅ Transformed application:', {
     id: application.id,
     coordinates: application.coordinates,
     distance: application.distance,
-    impact_score: application.impact_score
+    impact_score: application.impact_score,
+    class_3: application.class_3
   });
   console.groupEnd();
   return application;
