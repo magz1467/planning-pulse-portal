@@ -41,16 +41,19 @@ serve(async (req) => {
         const [lng, lat] = app.coordinates
         const width = 800
         const height = 600
-        const zoom = 17
-        const pitch = 60 // Add pitch for 3D effect
-        const bearing = 45 // Add bearing for angled view
         
-        // Generate multiple views with different angles and zooms
+        // Generate 10 different views with varying angles and zooms
         const views = [
           { pitch: 60, bearing: 45, zoom: 17 },
           { pitch: 45, bearing: 0, zoom: 16 },
           { pitch: 30, bearing: 90, zoom: 18 },
           { pitch: 0, bearing: 0, zoom: 17 },
+          { pitch: 75, bearing: 180, zoom: 17 },
+          { pitch: 15, bearing: 135, zoom: 16 },
+          { pitch: 45, bearing: 225, zoom: 18 },
+          { pitch: 30, bearing: 270, zoom: 17 },
+          { pitch: 60, bearing: 315, zoom: 16 },
+          { pitch: 0, bearing: 180, zoom: 18 }
         ]
 
         const staticMapUrls = views.map(view => 

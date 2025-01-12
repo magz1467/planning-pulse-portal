@@ -46,7 +46,4 @@ export interface Application {
   image_link?: {
     visualizations?: string[];
   };
-  application_details?: {
-    projected_cost_of_works?: string | number;
-  };
 }
