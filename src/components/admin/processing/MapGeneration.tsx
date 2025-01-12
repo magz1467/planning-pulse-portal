@@ -70,12 +70,15 @@ export const MapGeneration = () => {
       setIsGeneratingD3(true);
       console.log('Starting D3 examples generation...');
       
-      // Get 10 applications that don't have visualizations yet
+      // Get 10 applications that don't have visualizations yet and have valid centroids
       const { data: applications, error: fetchError } = await supabase
         .from('applications')
         .select('application_id, centroid')
         .is('image_link', null)
-        .not('centroid', 'is', null)  // Only get applications with valid centroid
+        .not('centroid', 'is', null)
+        .neq('centroid', '{}') // Ensure centroid is not an empty object
+        .filter('centroid->lat', 'not.is', null) // Ensure lat exists and is not null
+        .filter('centroid->lon', 'not.is', null) // Ensure lon exists and is not null
         .limit(10);
 
       if (fetchError) {
@@ -85,20 +88,43 @@ export const MapGeneration = () => {
       if (!applications?.length) {
         toast({
           title: "No applications to process",
-          description: "All applications already have visualizations",
+          description: "All applications already have visualizations or no valid centroids found",
         });
         return;
       }
 
-      console.log('Applications to process:', applications);
+      // Validate centroid data before sending
+      const validApplications = applications.filter(app => {
+        const hasValidCentroid = app.centroid && 
+                               typeof app.centroid === 'object' &&
+                               'lat' in app.centroid &&
+                               'lon' in app.centroid &&
+                               app.centroid.lat !== null &&
+                               app.centroid.lon !== null;
+        
+        if (!hasValidCentroid) {
+          console.warn('Invalid centroid data for application:', app);
+        }
+        return hasValidCentroid;
+      });
+
+      if (!validApplications.length) {
+        toast({
+          title: "No valid applications",
+          description: "No applications with valid coordinate data found",
+        });
+        return;
+      }
+
+      console.log('Valid applications to process:', validApplications);
 
       toast({
         title: "Generating D3 examples",
-        description: `Processing ${applications.length} applications`,
+        description: `Processing ${validApplications.length} applications`,
       });
 
       const { data, error } = await supabase.functions.invoke('generate-d3-examples', {
-        body: { applications }
+        body: { applications: validApplications }
       });
 
       if (error) {
