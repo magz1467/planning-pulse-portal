@@ -19,6 +19,8 @@ export const transformApplicationData = (
     console.log('📍 Coordinates extracted:', coordinates);
   } else {
     console.warn('⚠️ Missing or invalid geometry for application:', app.application_id);
+    console.groupEnd();
+    return null;
   }
 
   if (!coordinates) {
@@ -47,7 +49,7 @@ export const transformApplicationData = (
   });
 
   // Log raw class_3 value for debugging
-  console.log('Raw Class 3 Value:', class_3);
+  console.log('Raw Class 3 Value:', app.class_3);
 
   const application: Application = {
     id: app.application_id,
@@ -76,7 +78,7 @@ export const transformApplicationData = (
     last_date_consultation_comments: app.last_date_consultation_comments || null,
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
-    class_3: class_3 || 'Miscellaneous'
+    class_3: app.class_3 === null || app.class_3 === undefined ? 'Miscellaneous' : app.class_3
   };
 
   console.log('✅ Transformed application:', {
