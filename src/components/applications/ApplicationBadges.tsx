@@ -39,7 +39,7 @@ export const ApplicationBadges = ({
     : 'Miscellaneous';
 
   // Add emoji based on classification
-  let emoji = '';
+  let emoji = '🔄 ';  // Default emoji for miscellaneous
   const lowerClass = classificationText.toLowerCase();
   if (lowerClass.includes('tree')) {
     emoji = '🌳 ';
