@@ -6,20 +6,38 @@ import { supabase } from "@/integrations/supabase/client";
 export const MapGeneration = () => {
   const { toast } = useToast();
   const [isGeneratingMaps, setIsGeneratingMaps] = useState(false);
-  const [mapBatchSize, setMapBatchSize] = useState(100);
 
   const handleGenerateMaps = async () => {
     try {
       setIsGeneratingMaps(true);
       console.log('Starting map generation process...');
       
+      // Get 10 applications that don't have visualizations yet
+      const { data: applications, error: fetchError } = await supabase
+        .from('applications')
+        .select('application_id, centroid')
+        .is('image_link', null)
+        .limit(10);
+
+      if (fetchError) {
+        throw new Error(`Failed to fetch applications: ${fetchError.message}`);
+      }
+
+      if (!applications?.length) {
+        toast({
+          title: "No applications to process",
+          description: "All applications already have visualizations",
+        });
+        return;
+      }
+
       toast({
         title: "Generating static maps",
-        description: `This may take a few minutes for up to ${mapBatchSize} applications`,
+        description: `Processing ${applications.length} applications`,
       });
 
-      const { data, error } = await supabase.functions.invoke('generate-static-maps-manual', {
-        body: { batch_size: mapBatchSize }
+      const { data, error } = await supabase.functions.invoke('generate-static-map', {
+        body: { applications }
       });
 
       if (error) {
@@ -31,14 +49,14 @@ export const MapGeneration = () => {
       
       toast({
         title: "Success!",
-        description: `Generated ${data.success} static maps. ${data.errors} failed.`,
+        description: `Generated visualizations for ${data.images.length} applications`,
       });
 
     } catch (error) {
       console.error('Error generating maps:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate static maps. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to generate static maps",
         variant: "destructive",
       });
     } finally {
@@ -48,32 +66,15 @@ export const MapGeneration = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4">
-        <Button
-          onClick={() => {
-            setMapBatchSize(100);
-            handleGenerateMaps();
-          }}
-          className="flex-1 md:flex-none"
-          disabled={isGeneratingMaps}
-        >
-          {isGeneratingMaps && mapBatchSize === 100 ? "Generating Maps..." : "Generate 100 Maps"}
-        </Button>
-
-        <Button
-          onClick={() => {
-            setMapBatchSize(500);
-            handleGenerateMaps();
-          }}
-          className="flex-1 md:flex-none"
-          disabled={isGeneratingMaps}
-          variant="secondary"
-        >
-          {isGeneratingMaps && mapBatchSize === 500 ? "Generating Maps..." : "Generate 500 Maps"}
-        </Button>
-      </div>
+      <Button
+        onClick={handleGenerateMaps}
+        className="w-full md:w-auto"
+        disabled={isGeneratingMaps}
+      >
+        {isGeneratingMaps ? "Generating Maps..." : "Generate Maps for 10 Applications"}
+      </Button>
       <p className="text-sm text-muted-foreground">
-        Click to generate static map images for applications that don't have them yet. Choose between processing 100 or 500 applications at a time.
+        Click to generate static map visualizations for up to 10 applications that don't have them yet.
       </p>
     </div>
   );
