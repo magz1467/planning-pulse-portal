@@ -72,7 +72,8 @@ serve(async (req) => {
           .from('applications')
           .update({ 
             image_link: { 
-              visualization: imageUrl 
+              mapillary: imageUrl,
+              generated_at: new Date().toISOString()
             }
           })
           .eq('application_id', app.application_id)
