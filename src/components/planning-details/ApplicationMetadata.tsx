@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell, Building2, House, TreeDeciduous, Factory } from "lucide-react";
 import { getStatusColor, getStatusText } from "@/utils/statusColors";
+import { ApplicationImage } from "./ApplicationImage";
 
 interface ApplicationMetadataProps {
   application: Application;
@@ -45,6 +46,12 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
 
   return (
     <Card className="p-4">
+      {application.image && (
+        <div className="mb-4">
+          <ApplicationImage application={application} />
+        </div>
+      )}
+      
       <div className="flex justify-between items-start mb-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -58,6 +65,7 @@ export const ApplicationMetadata = ({ application, onShowEmailDialog }: Applicat
               </span>
             )}
           </div>
+          <h2 className="text-xl font-semibold mb-2">{application.title || application.description}</h2>
           <h2 className="text-sm font-medium text-gray-900">Reference: {application.reference}</h2>
         </div>
         <Button
