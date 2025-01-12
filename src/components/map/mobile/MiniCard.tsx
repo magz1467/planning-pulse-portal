@@ -31,14 +31,12 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
             {application.ai_title || application.description}
           </h3>
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">{application.address}</p>
-          <div className="flex justify-between items-center mt-2">
-            <div className="flex gap-2">
-              <StatusBadge status={application.status} />
-              {application.class_3 && (
-                <ClassificationBadge classification={application.class_3} />
-              )}
-            </div>
-            <span className="text-xs text-gray-500">{application.distance}</span>
+          <div className="flex items-center gap-2 mt-2">
+            <StatusBadge status={application.status} />
+            {application.class_3 && (
+              <ClassificationBadge classification={application.class_3} />
+            )}
+            <span className="text-xs text-gray-500 ml-auto">{application.distance}</span>
           </div>
         </div>
       </div>
