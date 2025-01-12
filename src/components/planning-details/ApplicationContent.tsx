@@ -8,6 +8,7 @@ import { EnvironmentalImpactDial } from "./EnvironmentalImpactDial";
 import { ApplicationDocuments } from "./ApplicationDocuments";
 import { CreatePetition } from "./CreatePetition";
 import { ApplicationFeedback } from "./ApplicationFeedback";
+import { ProjectedCost } from "./ProjectedCost";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
@@ -27,6 +28,8 @@ export const ApplicationContent = ({
   feedbackStats,
   onFeedback,
 }: ApplicationContentProps) => {
+  const projectedCost = application.application_details?.projected_cost_of_works;
+
   return (
     <>
       <Card className="overflow-hidden">
@@ -35,6 +38,10 @@ export const ApplicationContent = ({
         <CollapsibleApplicationDetails application={application} />
       </Card>
       
+      {projectedCost && (
+        <ProjectedCost cost={projectedCost} />
+      )}
+
       <EnvironmentalImpactDial 
         score={application.impact_score} 
         details={application.impact_score_details}
