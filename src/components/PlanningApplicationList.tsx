@@ -47,7 +47,7 @@ export const PlanningApplicationList = ({
     if (application.class_3) {
       const displayValue = typeof application.class_3 === 'string' 
         ? application.class_3 
-        : application.class_3.value;
+        : application.class_3?.value;
 
       if (displayValue && displayValue !== 'undefined') {
         badges.push(
