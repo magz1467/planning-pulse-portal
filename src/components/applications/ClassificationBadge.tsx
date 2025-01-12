@@ -13,13 +13,23 @@ export const ClassificationBadge = ({ classification, className = "" }: Classifi
     classification : 
     classification.value;
 
-  if (classificationValue === 'undefined') return null;
+  // Add more detailed logging
+  console.log('ClassificationBadge input:', { 
+    classification,
+    classificationValue,
+    type: typeof classification,
+    className 
+  });
 
-  console.log('ClassificationBadge rendering:', { classificationValue, className });
+  // Only return null if the actual value is undefined or "undefined"
+  if (!classificationValue || classificationValue === 'undefined') {
+    console.log('ClassificationBadge: Skipping render due to undefined value');
+    return null;
+  }
 
   return (
     <Badge 
-      className={`${className} bg-blue-100 text-blue-800`}
+      className={`${className} bg-blue-100 text-blue-800 hover:bg-blue-200 z-50`}
       variant="outline"
     >
       {classificationValue}
