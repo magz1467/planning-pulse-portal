@@ -46,26 +46,8 @@ export const transformApplicationData = (
     details: app.impact_score_details
   });
 
-  // Log class_3 data for debugging
-  console.log('Raw Class 3 Data:', {
-    raw_class_3: app.class_3,
-    type: typeof app.class_3
-  });
-
-  // Handle class_3 value - ensure it's properly extracted from the database value
-  let classificationValue = null;
-  if (app.class_3) {
-    // Check if it's a JSON string that needs parsing
-    try {
-      const parsed = JSON.parse(app.class_3);
-      classificationValue = typeof parsed === 'object' && parsed.value ? parsed.value : parsed;
-    } catch (e) {
-      // If it's not JSON, use the raw value
-      classificationValue = app.class_3;
-    }
-  }
-
-  console.log('Processed Class 3 Value:', classificationValue);
+  // Log raw class_3 value for debugging
+  console.log('Raw Class 3 Value:', app.class_3);
 
   const application: Application = {
     id: app.application_id,
@@ -94,7 +76,7 @@ export const transformApplicationData = (
     last_date_consultation_comments: app.last_date_consultation_comments || null,
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
-    class_3: classificationValue
+    class_3: app.class_3 || 'Miscellaneous'
   };
 
   console.log('✅ Transformed application:', {
