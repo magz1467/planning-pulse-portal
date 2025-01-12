@@ -6,32 +6,32 @@ interface ClassificationBadgeProps {
 }
 
 export const ClassificationBadge = ({ classification, className = "" }: ClassificationBadgeProps) => {
-  if (!classification) return null;
+  // Add more detailed logging
+  console.log('ClassificationBadge - Raw input:', classification);
+
+  if (!classification) {
+    console.log('ClassificationBadge - No classification provided');
+    return null;
+  }
 
   // Handle both string and object formats
   const classificationValue = typeof classification === 'string' ? 
     classification : 
     classification.value;
 
-  // Add more detailed logging
-  console.log('ClassificationBadge input:', { 
-    classification,
-    classificationValue,
-    type: typeof classification,
-    className 
-  });
+  console.log('ClassificationBadge - Processed value:', classificationValue);
 
   // Only return null if the actual value is undefined or "undefined"
   if (!classificationValue || classificationValue === 'undefined') {
-    console.log('ClassificationBadge: Skipping render due to undefined value');
+    console.log('ClassificationBadge - Invalid value, not rendering');
     return null;
   }
 
   return (
-    <span 
-      className={`${className} inline-flex items-center text-xs font-medium text-blue-800 bg-blue-100 px-2 py-0.5 rounded`}
-    >
-      {classificationValue}
-    </span>
+    <div className="inline-flex items-center bg-blue-50 px-2.5 py-0.5 rounded-md">
+      <span className="text-xs font-medium text-blue-700">
+        {classificationValue}
+      </span>
+    </div>
   );
 };
