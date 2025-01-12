@@ -26,12 +26,23 @@ export interface Application {
       infrastructure?: { score: number; details: string };
     };
     recommendations?: string[];
+    impacted_services?: {
+      [key: string]: {
+        impact: 'positive' | 'negative' | 'neutral';
+        details: string;
+      };
+    };
   };
   image_map_url?: string | null;
   last_date_consultation_comments?: string | null;
   valid_date?: string | null;
   centroid?: any;
-  impacted_services?: any;
+  impacted_services?: {
+    [key: string]: {
+      impact: 'positive' | 'negative' | 'neutral';
+      details: string;
+    };
+  };
   application_type_full?: string;
   class_3?: string | null;
 }
