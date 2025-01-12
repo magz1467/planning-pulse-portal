@@ -38,9 +38,18 @@ export const ApplicationBadges = ({
     ? class3
     : 'Miscellaneous';
 
+  // Add emoji based on classification
+  let emoji = '';
+  const lowerClass = classificationText.toLowerCase();
+  if (lowerClass.includes('tree')) {
+    emoji = '🌳 ';
+  } else if (lowerClass.includes('home extension') || lowerClass.includes('extension')) {
+    emoji = '🏠 ';
+  }
+
   badges.push(
     <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
-      {classificationText}
+      {emoji}{classificationText}
     </Badge>
   );
 
