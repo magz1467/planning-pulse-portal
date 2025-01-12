@@ -22,11 +22,15 @@ export const PlanningApplicationList = ({
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
 
+  console.log('PlanningApplicationList - Rendering applications:', applications.length);
+
   return (
     <div className="divide-y">
       {sortedApplications.map((application) => {
         const isClosingSoon = application.last_date_consultation_comments ? 
           isWithinNextSevenDays(application.last_date_consultation_comments) : false;
+
+        console.log('Application class_3:', application.class_3);
 
         return (
           <div
@@ -54,7 +58,7 @@ export const PlanningApplicationList = ({
                   <p className="text-sm truncate">{application.address}</p>
                 </div>
                 <div className="flex justify-between items-center mt-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 z-10">
                     <span className={`text-xs px-2 py-1 rounded ${getStatusColor(application.status)}`}>
                       {getStatusText(application.status)}
                     </span>

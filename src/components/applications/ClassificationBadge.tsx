@@ -15,6 +15,8 @@ export const ClassificationBadge = ({ classification, className = "" }: Classifi
 
   if (classificationValue === 'undefined') return null;
 
+  console.log('ClassificationBadge rendering:', { classificationValue, className });
+
   return (
     <Badge 
       className={`${className} bg-blue-100 text-blue-800`}
