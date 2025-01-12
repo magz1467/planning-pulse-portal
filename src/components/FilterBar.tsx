@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -38,6 +39,7 @@ export const FilterBar = ({
   statusCounts
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
+  const [localActiveSort, setLocalActiveSort] = useState<SortType>(activeSort);
 
   // Memoize the filter change handler
   const handleFilterChange = useCallback((filterType: string, value: string) => {
@@ -48,42 +50,62 @@ export const FilterBar = ({
 
   // Memoize the sort change handler
   const handleSortChange = useCallback((sortType: SortType) => {
+    setLocalActiveSort(sortType);
     if (onSortChange) {
       onSortChange(sortType);
     }
   }, [onSortChange]);
 
+  // Update local sort state when prop changes
+  useEffect(() => {
+    setLocalActiveSort(activeSort);
+  }, [activeSort]);
+
   // Memoize the sort button text
   const sortButtonText = useMemo(() => {
-    if (activeSort === 'closingSoon') return 'Closing Soon';
-    if (activeSort === 'newest') return 'Newest';
+    if (localActiveSort === 'closingSoon') return 'Closing Soon';
+    if (localActiveSort === 'newest') return 'Newest';
     return 'Sort';
-  }, [activeSort]);
+  }, [localActiveSort]);
+
+  // Add error logging
+  useEffect(() => {
+    console.log('FilterBar render state:', {
+      activeFilters,
+      activeSort: localActiveSort,
+      applications: applications?.length,
+      statusCounts
+    });
+  }, [activeFilters, localActiveSort, applications, statusCounts]);
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">
-        <StatusFilter
-          onFilterChange={handleFilterChange}
-          activeFilters={activeFilters}
-          isMobile={isMobile}
-          applications={applications}
-          statusCounts={statusCounts}
-        />
+        <ErrorBoundary>
+          <StatusFilter
+            onFilterChange={handleFilterChange}
+            activeFilters={activeFilters}
+            isMobile={isMobile}
+            applications={applications}
+            statusCounts={statusCounts}
+          />
+        </ErrorBoundary>
 
-        <SortDropdown
-          activeSort={activeSort}
-          onSortChange={handleSortChange}
-        >
-          <Button 
-            variant="outline" 
-            size={isMobile ? "sm" : "default"}
-            className="flex items-center gap-2"
+        <ErrorBoundary>
+          <SortDropdown
+            activeSort={localActiveSort}
+            onSortChange={handleSortChange}
           >
-            <ArrowUpDown className="h-4 w-4" />
-            {sortButtonText}
-          </Button>
-        </SortDropdown>
+            <Button 
+              variant="outline" 
+              size={isMobile ? "sm" : "default"}
+              className="flex items-center gap-2 z-50"
+            >
+              <ArrowUpDown className="h-4 w-4" />
+              {sortButtonText}
+            </Button>
+          </SortDropdown>
+        </ErrorBoundary>
       </div>
 
       {isMobile && onToggleView && (
