@@ -27,12 +27,19 @@ serve(async (req) => {
 
     // Validate applications data
     const validApplications = applications.filter(app => {
-      if (!app.application_id || !app.centroid) {
+      const hasValidCentroid = app.centroid && 
+                             typeof app.centroid === 'object' &&
+                             'lat' in app.centroid &&
+                             'lon' in app.centroid &&
+                             app.centroid.lat !== null &&
+                             app.centroid.lon !== null;
+      
+      if (!hasValidCentroid) {
         console.log('Skipping invalid application:', app)
-        return false
+        return false;
       }
-      return true
-    })
+      return true;
+    });
 
     if (validApplications.length === 0) {
       throw new Error('No valid applications to process')

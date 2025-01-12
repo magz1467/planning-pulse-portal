@@ -1,54 +1,36 @@
 export interface Application {
   id: number;
-  application_id: number; // Added this field
+  application_id: number;
   title?: string;
   address: string;
   status: string;
-  distance?: string;
-  reference?: string;
-  description?: string;
-  applicant?: string;
-  submissionDate?: string;
-  decisionDue?: string;
-  type?: string;
-  ward?: string;
-  officer?: string;
-  consultationEnd?: string;
+  reference: string;
+  description: string;
+  submissionDate: string;
+  coordinates: [number, number];
+  postcode: string;
+  applicant: string;
+  decisionDue: string;
+  type: string;
+  ward: string;
+  officer: string;
+  consultationEnd: string;
   image?: string;
-  coordinates?: [number, number];
+  image_map_url?: string;
   ai_title?: string;
-  postcode?: string;
-  impact_score?: number | null;
-  impact_score_details?: {
-    key_concerns?: string[];
-    category_scores?: {
-      social?: { score: number; details: string };
-      environmental?: { score: number; details: string };
-      infrastructure?: { score: number; details: string };
-    };
-    recommendations?: string[];
-    impacted_services?: {
-      [key: string]: {
-        impact: 'positive' | 'negative' | 'neutral';
-        details: string;
-      };
-    };
+  last_date_consultation_comments?: string;
+  valid_date?: string;
+  centroid?: {
+    lat: number;
+    lon: number;
   };
-  image_map_url?: string | null;
-  last_date_consultation_comments?: string | null;
-  valid_date?: string | null;
-  centroid?: any;
-  impacted_services?: {
-    [key: string]: {
-      impact: 'positive' | 'negative' | 'neutral';
-      details: string;
-    };
-  };
-  application_type_full?: string;
-  class_3?: string | null;
+  impact_score: number | null;
+  impact_score_details?: any;
+  impacted_services?: any;
   image_link?: {
-    visualizations?: string[];
-  };
+    mapillary?: string;
+    generated_at?: string;
+  } | null;
 }
 
 export interface Comment {
@@ -61,9 +43,6 @@ export interface Comment {
   upvotes?: number;
   downvotes?: number;
   user_email?: string;
-  user?: {
-    username?: string;
-  };
 }
 
 export interface ApplicationFeedback {
