@@ -11,9 +11,11 @@ export const transformApplicationData = (app: any, center?: LatLngTuple): Applic
       app.centroid.lon || 0
     ] : undefined;
 
-    const distance = center && coordinates ? 
-      calculateDistance(center[0], center[1], coordinates[0], coordinates[1]) : 
-      undefined;
+    let distance = 'N/A';
+    if (center && coordinates) {
+      const distanceValue = calculateDistance(center[0], center[1], coordinates[0], coordinates[1]);
+      distance = typeof distanceValue === 'number' ? `${distanceValue.toFixed(1)} km` : 'N/A';
+    }
 
     return {
       id: app.id,
@@ -21,7 +23,7 @@ export const transformApplicationData = (app: any, center?: LatLngTuple): Applic
       title: app.ai_title || app.title,
       address: `${[app.site_name, app.street_name, app.locality, app.postcode].filter(Boolean).join(', ')}`,
       status: app.status || 'Unknown',
-      distance: distance,
+      distance,
       reference: app.lpa_app_no,
       description: app.description,
       applicant: app.applicant,

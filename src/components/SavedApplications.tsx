@@ -48,6 +48,7 @@ export const SavedApplications = ({ applications, onSelectApplication }: SavedAp
       // Transform the data to match the Application type
       const transformedData: Application[] = data?.map(app => ({
         id: app.application_id,
+        application_id: app.application_id,
         title: app.description || '',
         address: `${app.site_name || ''} ${app.street_name || ''} ${app.locality || ''} ${app.postcode || ''}`.trim(),
         status: app.status || '',
