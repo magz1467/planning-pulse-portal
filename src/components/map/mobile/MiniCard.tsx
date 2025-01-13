@@ -38,6 +38,7 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
             image={application.image}
             title={application.title || application.description || ''}
             applicationId={application.id}
+            coordinates={application.coordinates}
           />
         </div>
         <div className="flex-1 min-w-0">
