@@ -24,6 +24,18 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
     return 'bg-green-50 text-green-600';
   };
 
+  // Log the score processing
+  const displayScore = application.final_impact_score !== null ? 
+    Math.round(application.final_impact_score) : 
+    'N/A';
+  
+  console.log('MiniCard - Score Processing:', {
+    raw_score: application.final_impact_score,
+    display_score: displayScore,
+    is_null: application.final_impact_score === null,
+    type: typeof application.final_impact_score
+  });
+
   return (
     <div
       className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-4 ${
@@ -57,7 +69,7 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
             <span className={`text-xs px-2 py-1 rounded-full ${getScoreColor(application.final_impact_score)}`}>
               <span>Impact Score: </span>
               <span className="font-medium">
-                {application.final_impact_score !== null ? Math.round(application.final_impact_score) : 'N/A'}
+                {displayScore}
               </span>
             </span>
           </div>

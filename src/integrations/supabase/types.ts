@@ -928,6 +928,21 @@ export type Database = {
         }
         Relationships: []
       }
+      temp_updates: {
+        Row: {
+          application_id: number
+          class_3: string | null
+        }
+        Insert: {
+          application_id: number
+          class_3?: string | null
+        }
+        Update: {
+          application_id?: number
+          class_3?: string | null
+        }
+        Relationships: []
+      }
       trial_application_data: {
         Row: {
           address: string | null
