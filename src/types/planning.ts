@@ -45,6 +45,7 @@ export interface Application {
   };
   application_type_full?: string;
   class_3?: string | null;
+  final_impact_score?: number | null;
 }
 
 export interface Comment {

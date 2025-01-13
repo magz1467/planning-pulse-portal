@@ -38,6 +38,14 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
             )}
             <span className="text-xs text-gray-500 ml-auto">{application.distance}</span>
           </div>
+          <div className="mt-2 text-sm">
+            <span className="text-gray-600">Impact Score: </span>
+            <span className="font-medium">
+              {application.final_impact_score !== null 
+                ? application.final_impact_score 
+                : 'null'}
+            </span>
+          </div>
         </div>
       </div>
     </div>

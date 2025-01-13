@@ -60,6 +60,14 @@ export const ApplicationMetadata = ({
             <MapPin className="w-4 h-4" />
             <p className="text-sm">{application.address}</p>
           </div>
+          <div className="mt-2">
+            <span className="text-gray-600">Impact Score: </span>
+            <span className="font-medium">
+              {application.final_impact_score !== null 
+                ? application.final_impact_score 
+                : 'null'}
+            </span>
+          </div>
         </div>
       </div>
       <ApplicationImage application={application} />

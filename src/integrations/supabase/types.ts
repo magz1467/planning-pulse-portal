@@ -209,6 +209,7 @@ export type Database = {
           description: string | null
           development_type: string | null
           epc_number: string | null
+          final_impact_score: number | null
           geom: unknown | null
           id: string
           image_link: Json | null
@@ -274,6 +275,7 @@ export type Database = {
           description?: string | null
           development_type?: string | null
           epc_number?: string | null
+          final_impact_score?: number | null
           geom?: unknown | null
           id: string
           image_link?: Json | null
@@ -339,6 +341,7 @@ export type Database = {
           description?: string | null
           development_type?: string | null
           epc_number?: string | null
+          final_impact_score?: number | null
           geom?: unknown | null
           id?: string
           image_link?: Json | null
@@ -1999,6 +2002,7 @@ export type Database = {
           description: string | null
           development_type: string | null
           epc_number: string | null
+          final_impact_score: number | null
           geom: unknown | null
           id: string
           image_link: Json | null
@@ -2098,6 +2102,7 @@ export type Database = {
           description: string | null
           development_type: string | null
           epc_number: string | null
+          final_impact_score: number | null
           geom: unknown | null
           id: string
           image_link: Json | null
