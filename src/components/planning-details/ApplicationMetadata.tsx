@@ -18,14 +18,22 @@ export const ApplicationMetadata = ({
     });
   }, [application]);
 
+  const getScoreColor = (score: number | null) => {
+    if (!score) return 'bg-gray-100';
+    if (score >= 70) return 'bg-red-50 text-red-600';
+    if (score >= 50) return 'bg-orange-50 text-orange-600';
+    if (score >= 30) return 'bg-yellow-50 text-yellow-600';
+    return 'bg-green-50 text-green-600';
+  };
+
   return (
     <div className="space-y-4">
       <div>
         <h2 className="text-2xl font-semibold">{application.title}</h2>
         <p className="text-gray-600">{application.reference}</p>
-        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100">
-          <span className="text-sm font-medium text-gray-700">Impact Score:</span>
-          <span className={`text-sm font-semibold ${application.final_impact_score ? 'text-primary' : 'text-gray-500'}`}>
+        <div className={`mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full ${getScoreColor(application.final_impact_score)}`}>
+          <span className="text-sm font-medium">Impact Score:</span>
+          <span className="text-sm font-semibold">
             {application.final_impact_score ?? 'Not available'}
           </span>
         </div>

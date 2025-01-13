@@ -16,6 +16,14 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
     title: application.title || application.description || ''
   });
 
+  const getScoreColor = (score: number | null) => {
+    if (!score) return 'bg-gray-100 text-gray-500';
+    if (score >= 70) return 'bg-red-50 text-red-600';
+    if (score >= 50) return 'bg-orange-50 text-orange-600';
+    if (score >= 30) return 'bg-yellow-50 text-yellow-600';
+    return 'bg-green-50 text-green-600';
+  };
+
   return (
     <div
       className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-4 ${
@@ -45,9 +53,9 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
             <span className="text-xs text-gray-500 ml-auto">{application.distance}</span>
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="text-xs px-2 py-1 rounded-full bg-gray-100">
-              <span className="text-gray-600">Impact Score: </span>
-              <span className={`font-medium ${application.final_impact_score ? 'text-primary' : 'text-gray-500'}`}>
+            <span className={`text-xs px-2 py-1 rounded-full ${getScoreColor(application.final_impact_score)}`}>
+              <span>Impact Score: </span>
+              <span className="font-medium">
                 {application.final_impact_score ?? 'N/A'}
               </span>
             </span>
