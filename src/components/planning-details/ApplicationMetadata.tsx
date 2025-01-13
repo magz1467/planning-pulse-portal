@@ -1,27 +1,24 @@
-import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSavedApplications } from "@/hooks/use-saved-applications";
-import { EmailDialog } from "./EmailDialog";
-import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
-import { AuthRequiredDialog } from "./AuthRequiredDialog";
+import { EmailDialog } from "@/components/EmailDialog";
+import { FeedbackEmailDialog } from "@/components/FeedbackEmailDialog";
+import { AuthRequiredDialog } from "@/components/AuthRequiredDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ApplicationMetadata } from "./planning-details/ApplicationMetadata";
-import { ApplicationActions } from "./planning-details/ApplicationActions";
-import { ApplicationContent } from "./planning-details/ApplicationContent";
+import { Application } from "@/types/planning";
 
-interface PlanningApplicationDetailsProps {
-  application?: Application;
+interface ApplicationMetadataProps {
+  application: Application;
   onClose: () => void;
 }
 
-export const PlanningApplicationDetails = ({
+export const PlanningApplicationDetails = ({ 
   application,
   onClose,
-}: PlanningApplicationDetailsProps) => {
+}: ApplicationMetadataProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -108,37 +105,14 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div className="p-6 space-y-4 pb-20">
-      <ApplicationMetadata 
-        application={application}
-        onShowEmailDialog={() => setShowEmailDialog(true)}
-      />
-      
-      <ApplicationActions 
-        applicationId={application.id}
-        reference={application.reference}
-        isSaved={isSaved}
-        onSave={handleSave}
-        onShowEmailDialog={() => setShowEmailDialog(true)}
-      />
-
-      <ApplicationContent 
-        application={application}
-        feedback={feedback}
-        feedbackStats={feedbackStats}
-        onFeedback={handleFeedback}
-      />
-
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold">Is this your development?</h3>
-            <p className="text-sm text-gray-600">Click here to verify and see full feedback</p>
-          </div>
-          <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
-            Get feedback
-          </Button>
+      <div className="space-y-4">
+        {/* Application metadata section */}
+        <div>
+          <h2 className="text-2xl font-semibold">{application.title}</h2>
+          <p className="text-gray-600">{application.reference}</p>
+          <p className="text-gray-600">Final Impact Score: {application.final_impact_score ?? 'null'}</p>
         </div>
-      </Card>
+      </div>
 
       <EmailDialog 
         open={showEmailDialog}
