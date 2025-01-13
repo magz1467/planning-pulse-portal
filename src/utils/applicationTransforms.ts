@@ -53,6 +53,15 @@ export const transformApplicationData = (
     raw_value: app.final_impact_score
   });
 
+  // Parse final_impact_score carefully
+  let finalImpactScore: number | null = null;
+  if (app.final_impact_score !== null && app.final_impact_score !== undefined) {
+    const parsed = parseFloat(app.final_impact_score);
+    if (!isNaN(parsed)) {
+      finalImpactScore = parsed;
+    }
+  }
+
   const application: Application = {
     id: app.application_id,
     title: app.description || '',
@@ -81,7 +90,7 @@ export const transformApplicationData = (
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
     class_3: app.class_3 === null || app.class_3 === undefined || app.class_3 === 'undefined' ? 'Miscellaneous' : app.class_3,
-    final_impact_score: app.final_impact_score === null ? null : Number(app.final_impact_score)
+    final_impact_score: finalImpactScore
   };
 
   console.log('✅ Transformed application:', {
