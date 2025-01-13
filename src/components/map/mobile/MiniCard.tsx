@@ -10,6 +10,12 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) => {
+  console.log('MiniCard - Application Data:', {
+    id: application.id,
+    final_impact_score: application.final_impact_score,
+    title: application.title || application.description || ''
+  });
+
   return (
     <div
       className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-4 ${
