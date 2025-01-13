@@ -1,5 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import * as d3 from 'https://cdn.skypack.dev/d3@7'
+import { geoMercator } from 'https://cdn.skypack.dev/d3-geo@3'
+import { createCanvas } from 'https://deno.land/x/canvas/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,8 +9,10 @@ const corsHeaders = {
 }
 
 interface Application {
-  application_id: number;
-  centroid: { lat: number; lon: number };
+  application_id: number
+  centroid: { lat: number; lon: number }
+  description: string
+  impact_score: number
 }
 
 serve(async (req) => {
@@ -19,123 +23,29 @@ serve(async (req) => {
 
   try {
     const { applications } = await req.json()
-    console.log('Received request to generate visualizations for applications:', applications)
+    console.log('Generating visualizations for applications:', applications)
 
-    if (!applications || !Array.isArray(applications)) {
-      throw new Error('Invalid or missing applications array')
-    }
-
-    // Validate applications data
-    const validApplications = applications.filter(app => {
-      const hasValidCentroid = app.centroid && 
-                             typeof app.centroid === 'object' &&
-                             'lat' in app.centroid &&
-                             'lon' in app.centroid &&
-                             app.centroid.lat !== null &&
-                             app.centroid.lon !== null;
-      
-      if (!hasValidCentroid) {
-        console.log('Skipping invalid application:', app)
-        return false;
-      }
-      return true;
-    });
-
-    if (validApplications.length === 0) {
-      throw new Error('No valid applications to process')
-    }
-
-    const mapillaryToken = Deno.env.get('MAPILLARY_API_KEY')
-    if (!mapillaryToken) {
-      throw new Error('MAPILLARY_API_KEY not found')
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase credentials not found')
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey)
     const results = []
 
-    // Process only valid applications
-    for (const app of validApplications) {
-      console.log('Processing application:', app.application_id)
+    for (const app of applications.slice(0, 10)) {
+      // Basic Map Visualization
+      const mapViz = await generateMapVisualization(app)
       
-      try {
-        // Get nearest image from Mapillary
-        const { lon, lat } = app.centroid
-        const radius = 50 // meters
+      // Impact Visualization  
+      const impactViz = await generateImpactVisualization(app)
+      
+      // Development Type Visualization
+      const devTypeViz = await generateDevTypeVisualization(app)
 
-        console.log(`Fetching Mapillary image for coordinates: lon=${lon}, lat=${lat}, radius=${radius}`)
-
-        const mapillaryResponse = await fetch(
-          `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=1&radius=${radius}&closeto=${lon},${lat}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          }
-        )
-
-        if (!mapillaryResponse.ok) {
-          throw new Error(`Mapillary API error: ${mapillaryResponse.statusText}`)
+      results.push({
+        application_id: app.application_id,
+        visualizations: {
+          map: mapViz,
+          impact: impactViz, 
+          development: devTypeViz
         }
-
-        const mapillaryData = await mapillaryResponse.json()
-        console.log('Mapillary response:', mapillaryData)
-        
-        const images = mapillaryData.data || []
-        const imageUrl = images[0]?.thumb_2048_url
-
-        if (!imageUrl) {
-          console.log(`No image found for application ${app.application_id}`)
-          results.push({
-            application_id: app.application_id,
-            error: 'No image found in this location'
-          })
-          continue
-        }
-
-        // Update the applications table with the visualization URL
-        console.log(`Updating application ${app.application_id} with image URL:`, imageUrl)
-        
-        const { data: updateData, error: updateError } = await supabase
-          .from('applications')
-          .update({ 
-            image_link: { 
-              mapillary: imageUrl,
-              generated_at: new Date().toISOString()
-            }
-          })
-          .eq('application_id', app.application_id)
-          .select()
-
-        if (updateError) {
-          console.error(`Error updating application ${app.application_id}:`, updateError)
-          throw updateError
-        }
-
-        console.log(`Update response for application ${app.application_id}:`, updateData)
-
-        console.log(`Successfully generated visualization for application ${app.application_id}:`, imageUrl)
-        results.push({
-          application_id: app.application_id,
-          visualization: imageUrl
-        })
-
-      } catch (error) {
-        console.error('Error processing application:', error)
-        results.push({
-          application_id: app.application_id,
-          error: error.message
-        })
-      }
+      })
     }
-
-    console.log('Successfully processed all applications:', results)
 
     return new Response(
       JSON.stringify({ 
@@ -167,3 +77,109 @@ serve(async (req) => {
     )
   }
 })
+
+async function generateMapVisualization(app: Application) {
+  const width = 600
+  const height = 400
+  const canvas = createCanvas(width, height)
+  const context = canvas.getContext('2d')
+
+  // Create base map
+  const projection = geoMercator()
+    .center([app.centroid.lon, app.centroid.lat])
+    .scale(300000)
+    .translate([width / 2, height / 2])
+
+  // Add background
+  context.fillStyle = '#f8fafc'
+  context.fillRect(0, 0, width, height)
+
+  // Draw application location
+  const [x, y] = projection([app.centroid.lon, app.centroid.lat])
+  context.beginPath()
+  context.arc(x, y, 8, 0, 2 * Math.PI)
+  context.fillStyle = '#ef4444'
+  context.fill()
+  context.strokeStyle = '#ffffff'
+  context.lineWidth = 2
+  context.stroke()
+
+  return canvas.toDataURL()
+}
+
+async function generateImpactVisualization(app: Application) {
+  const width = 600
+  const height = 400
+  const canvas = createCanvas(width, height)
+  const context = canvas.getContext('2d')
+
+  // Background
+  context.fillStyle = '#f8fafc'
+  context.fillRect(0, 0, width, height)
+
+  // Impact radius circles
+  const center = { x: width/2, y: height/2 }
+  const impactScore = app.impact_score || 50
+  const maxRadius = Math.min(width, height) * 0.4
+  
+  // Draw concentric circles
+  const circles = 3
+  for (let i = circles; i > 0; i--) {
+    const radius = (maxRadius / circles) * i
+    const alpha = 0.2 - (i * 0.05)
+    
+    context.beginPath()
+    context.arc(center.x, center.y, radius, 0, 2 * Math.PI)
+    context.fillStyle = `rgba(239, 68, 68, ${alpha})`
+    context.fill()
+  }
+
+  // Center point
+  context.beginPath()
+  context.arc(center.x, center.y, 8, 0, 2 * Math.PI)
+  context.fillStyle = '#ef4444'
+  context.fill()
+  context.strokeStyle = '#ffffff'
+  context.lineWidth = 2
+  context.stroke()
+
+  return canvas.toDataURL()
+}
+
+async function generateDevTypeVisualization(app: Application) {
+  const width = 600
+  const height = 400
+  const canvas = createCanvas(width, height)
+  const context = canvas.getContext('2d')
+
+  // Background
+  context.fillStyle = '#f8fafc'
+  context.fillRect(0, 0, width, height)
+
+  // Simple building outline based on description
+  const buildingHeight = height * 0.6
+  const buildingWidth = width * 0.4
+  const x = (width - buildingWidth) / 2
+  const y = height - buildingHeight
+
+  // Building shape
+  context.beginPath()
+  context.rect(x, y, buildingWidth, buildingHeight)
+  context.fillStyle = '#ef4444'
+  context.fill()
+  context.strokeStyle = '#ffffff'
+  context.lineWidth = 2
+  context.stroke()
+
+  // Roof
+  context.beginPath()
+  context.moveTo(x - 20, y)
+  context.lineTo(x + buildingWidth/2, y - 40)
+  context.lineTo(x + buildingWidth + 20, y)
+  context.fillStyle = '#dc2626'
+  context.fill()
+  context.strokeStyle = '#ffffff'
+  context.stroke()
+
+  return canvas.toDataURL()
+}

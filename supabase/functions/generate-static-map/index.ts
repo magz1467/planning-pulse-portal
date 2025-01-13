@@ -18,10 +18,10 @@ serve(async (req) => {
 
   try {
     const { applications } = await req.json()
-    const mapillaryToken = Deno.env.get('MAPILLARY_API_KEY')
+    const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
     
-    if (!mapillaryToken) {
-      throw new Error('MAPILLARY_API_KEY not found')
+    if (!mapboxToken) {
+      throw new Error('MAPBOX_PUBLIC_TOKEN not found')
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -37,55 +37,32 @@ serve(async (req) => {
 
     const results = await Promise.all(
       processedApplications.map(async (app: Application) => {
-        try {
-          // Get nearest images from Mapillary
-          const [lng, lat] = app.coordinates
-          const radius = 50 // meters
-          const limit = 5 // number of images to fetch
+        // Generate new static map image
+        const [lng, lat] = app.coordinates
+        const width = 800
+        const height = 600
+        const zoom = 17
+        const pitch = 60 // Add pitch for 3D effect
+        const bearing = 45 // Add bearing for angled view
+        
+        // Using satellite-v9 style with 3D buildings and terrain
+        const staticMapUrl = `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${zoom},${bearing},${pitch}/${width}x${height}@2x?access_token=${mapboxToken}&logo=false`
 
-          const mapillaryResponse = await fetch(
-            `https://graph.mapillary.com/images?access_token=${mapillaryToken}&fields=id,thumb_2048_url&limit=${limit}&radius=${radius}&closeto=${lng},${lat}`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              }
-            }
-          )
+        // Update the applications table directly with the image URL
+        const { error: updateError } = await supabase
+          .from('applications')
+          .update({ image_map_url: staticMapUrl })
+          .eq('application_id', app.application_id)
 
-          if (!mapillaryResponse.ok) {
-            throw new Error(`Mapillary API error: ${mapillaryResponse.statusText}`)
-          }
+        if (updateError) {
+          console.error(`Error updating application ${app.application_id}:`, updateError)
+          throw updateError
+        }
 
-          const mapillaryData = await mapillaryResponse.json()
-          const images = mapillaryData.data || []
-          const imageUrls = images.map((img: any) => img.thumb_2048_url)
-
-          // Update the applications table with the visualization URLs
-          const { error: updateError } = await supabase
-            .from('applications')
-            .update({ 
-              image_link: { 
-                visualizations: imageUrls 
-              }
-            })
-            .eq('application_id', app.application_id)
-
-          if (updateError) {
-            console.error(`Error updating application ${app.application_id}:`, updateError)
-            throw updateError
-          }
-
-          console.log(`Updated visualizations for application ${app.application_id}`)
-          return {
-            application_id: app.application_id,
-            visualizations: imageUrls
-          }
-        } catch (error) {
-          console.error(`Error processing application ${app.application_id}:`, error)
-          return {
-            application_id: app.application_id,
-            error: error.message
-          }
+        console.log(`Updated image URL for application ${app.application_id}`)
+        return {
+          application_id: app.application_id,
+          image_url: staticMapUrl
         }
       })
     )

@@ -1,10 +1,15 @@
 import { Application } from "@/types/planning";
-import { ApplicationDescription } from "./ApplicationDescription";
-import { ApplicationFeedback } from "./ApplicationFeedback";
 import { ApplicationTimeline } from "./ApplicationTimeline";
+import { CollapsibleApplicationDetails } from "./CollapsibleApplicationDetails";
+import { ApplicationDescription } from "./ApplicationDescription";
 import { ApplicationComments } from "./ApplicationComments";
+import { ExpectedImpactAreas } from "./ExpectedImpactAreas";
+import { EnvironmentalImpactDial } from "./EnvironmentalImpactDial";
+import { ApplicationDocuments } from "./ApplicationDocuments";
+import { CreatePetition } from "./CreatePetition";
+import { ApplicationFeedback } from "./ApplicationFeedback";
 import { Card } from "@/components/ui/card";
-import { ImpactScoreDetails } from "./impact-score/ImpactScoreDetails";
+import { Separator } from "@/components/ui/separator";
 
 interface ApplicationContentProps {
   application: Application;
@@ -23,28 +28,37 @@ export const ApplicationContent = ({
   onFeedback,
 }: ApplicationContentProps) => {
   return (
-    <div className="space-y-4">
-      <Card className="p-4">
-        <ApplicationDescription application={application} />
+    <>
+      <Card className="overflow-hidden">
+        <ApplicationTimeline application={application} />
+        <Separator className="my-4" />
+        <CollapsibleApplicationDetails application={application} />
       </Card>
-
-      <ApplicationFeedback
-        feedback={feedback}
-        feedbackStats={feedbackStats}
-        onFeedback={onFeedback}
+      
+      <EnvironmentalImpactDial 
+        score={application.impact_score} 
+        details={application.impact_score_details}
+        applicationId={application.id}
       />
 
-      {application.impact_score !== null && application.impact_score_details && (
-        <ImpactScoreDetails
-          score={application.impact_score}
-          details={application.impact_score_details}
-          impactedServices={application.impacted_services}
+      {application.impact_score_details?.impacted_services && (
+        <ExpectedImpactAreas 
+          application={application}
+          impactedServices={application.impact_score_details.impacted_services}
         />
       )}
 
-      <ApplicationTimeline application={application} />
+      <ApplicationDescription application={application} />
       
-      <ApplicationComments applicationId={application.application_id} />
-    </div>
+      <ApplicationFeedback 
+        feedback={feedback}
+        onFeedback={onFeedback}
+        feedbackStats={feedbackStats}
+      />
+
+      <ApplicationComments applicationId={application.id} />
+      <CreatePetition applicationId={application.id} />
+      <ApplicationDocuments />
+    </>
   );
 };

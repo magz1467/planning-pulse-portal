@@ -1,8 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { useCallback, memo, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useCallback, memo } from "react";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -29,37 +28,7 @@ export const MapSection = memo(({
     setTimeout(() => {
       onMarkerClick(id);
     }, 0);
-  }, [onMarkerClick]);
-
-  useEffect(() => {
-    const generateVisualizations = async () => {
-      try {
-        console.log('Attempting to generate visualizations for applications:', applications.slice(0, 10));
-        
-        const { data, error } = await supabase.functions.invoke('generate-d3-examples', {
-          body: { applications: applications.slice(0, 10) }
-        });
-
-        if (error) {
-          console.error('Error generating visualizations:', error);
-          console.error('Error details:', error.message);
-          return;
-        }
-
-        console.log('Successfully generated visualizations:', data);
-      } catch (error: any) {
-        console.error('Error calling visualization function:', error);
-        console.error('Error details:', error.message);
-      }
-    };
-
-    if (applications.length > 0) {
-      console.log('Applications available, calling generateVisualizations');
-      generateVisualizations();
-    } else {
-      console.log('No applications available yet');
-    }
-  }, [applications]);
+  }, [onMarkerClick]); // Add onMarkerClick to dependencies
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 

@@ -6,17 +6,15 @@ import { Card } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-interface ImpactScoreDetailsProps {
-  score?: number;
+interface ImpactScoreBreakdownProps {
   details: ImpactScoreData | null;
-  impactedServices?: Record<string, { impact: 'positive' | 'negative' | 'neutral'; details: string; }>;
 }
 
-export const ImpactScoreDetails: React.FC<ImpactScoreDetailsProps> = ({ score, details, impactedServices }) => {
-  console.log('ImpactScoreDetails - Received details:', details);
+export const ImpactScoreBreakdown: React.FC<ImpactScoreBreakdownProps> = ({ details }) => {
+  console.log('ImpactScoreBreakdown - Received details:', details);
 
   if (!details) {
-    console.log('ImpactScoreDetails - No details provided');
+    console.log('ImpactScoreBreakdown - No details provided');
     return null;
   }
 
@@ -77,13 +75,13 @@ export const ImpactScoreDetails: React.FC<ImpactScoreDetailsProps> = ({ score, d
         </div>
 
         {/* Impacted Services Analysis */}
-        {impactedServices && Object.keys(impactedServices).length > 0 && (
+        {details.impacted_services && Object.keys(details.impacted_services).length > 0 && (
           <>
             <Separator className="my-6" />
             <Card className="p-6">
               <h3 className="font-semibold text-lg mb-4">Impact on Local Services</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(impactedServices).map(([service, { impact, details }]) => (
+                {Object.entries(details.impacted_services).map(([service, { impact, details }]) => (
                   <div 
                     key={service} 
                     className={`flex items-start gap-3 p-4 rounded-lg transition-all ${
