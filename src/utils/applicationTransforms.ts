@@ -48,16 +48,9 @@ export const transformApplicationData = (
   console.log('Impact Score Data:', {
     score: app.impact_score,
     final_score: app.final_impact_score,
-    details: app.impact_score_details
-  });
-
-  // Detailed logging for class_3
-  console.log('Raw application class_3:', {
-    value: app.class_3,
-    type: typeof app.class_3,
-    isNull: app.class_3 === null,
-    isUndefined: app.class_3 === undefined,
-    stringValue: String(app.class_3)
+    details: app.impact_score_details,
+    raw_final_score: typeof app.final_impact_score,
+    raw_value: app.final_impact_score
   });
 
   const application: Application = {
@@ -88,7 +81,7 @@ export const transformApplicationData = (
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
     class_3: app.class_3 === null || app.class_3 === undefined || app.class_3 === 'undefined' ? 'Miscellaneous' : app.class_3,
-    final_impact_score: app.final_impact_score !== null ? Number(app.final_impact_score) : null
+    final_impact_score: app.final_impact_score === null ? null : Number(app.final_impact_score)
   };
 
   console.log('✅ Transformed application:', {
