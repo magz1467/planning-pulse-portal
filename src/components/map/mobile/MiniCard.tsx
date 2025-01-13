@@ -26,7 +26,7 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
 
   // Log the score processing
   const displayScore = application.final_impact_score !== null ? 
-    application.final_impact_score : // Score is already rounded in transformApplicationData
+    Math.round(application.final_impact_score) : // Score is already rounded in transformApplicationData
     'N/A';
   
   console.log('MiniCard - Score Processing:', {
