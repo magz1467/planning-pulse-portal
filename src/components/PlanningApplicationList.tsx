@@ -16,9 +16,21 @@ interface PlanningApplicationListProps {
 export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
-  activeSort
+  activeSort,
+  postcode
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
+
+  console.log('PlanningApplicationList - Rendering with applications:', applications?.length);
+
+  if (!applications?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <p className="text-gray-500 mb-2">No planning applications found</p>
+        <p className="text-sm text-gray-400">Try adjusting your search criteria</p>
+      </div>
+    );
+  }
 
   return (
     <div className="divide-y">
