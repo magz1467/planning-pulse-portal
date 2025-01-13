@@ -13,7 +13,7 @@ export const transformApplicationData = (app: any, center?: LatLngTuple): Applic
 
     let distance = 'N/A';
     if (center && coordinates) {
-      const distanceValue = calculateDistance(center[0], center[1], coordinates[0], coordinates[1]);
+      const distanceValue = calculateDistance(coordinates[0], coordinates[1], center[0], center[1]);
       distance = typeof distanceValue === 'number' ? `${distanceValue.toFixed(1)} km` : 'N/A';
     }
 
