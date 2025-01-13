@@ -58,10 +58,11 @@ export const transformApplicationData = (
   if (app.final_impact_score !== null && app.final_impact_score !== undefined) {
     const parsed = parseFloat(app.final_impact_score);
     if (!isNaN(parsed)) {
-      finalImpactScore = parsed;
-      console.log('✅ Successfully parsed final_impact_score:', {
+      finalImpactScore = Math.round(parsed); // Round the score here
+      console.log('✅ Successfully parsed and rounded final_impact_score:', {
         original: app.final_impact_score,
-        parsed: finalImpactScore
+        parsed: parsed,
+        rounded: finalImpactScore
       });
     } else {
       console.warn('⚠️ Failed to parse final_impact_score:', app.final_impact_score);
