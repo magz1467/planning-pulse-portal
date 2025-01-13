@@ -47,6 +47,7 @@ export const transformApplicationData = (
   // Log impact score data for debugging
   console.log('Impact Score Data:', {
     score: app.impact_score,
+    final_score: app.final_impact_score,
     details: app.impact_score_details
   });
 
@@ -86,7 +87,8 @@ export const transformApplicationData = (
     last_date_consultation_comments: app.last_date_consultation_comments || null,
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
-    class_3: app.class_3 === null || app.class_3 === undefined || app.class_3 === 'undefined' ? 'Miscellaneous' : app.class_3
+    class_3: app.class_3 === null || app.class_3 === undefined || app.class_3 === 'undefined' ? 'Miscellaneous' : app.class_3,
+    final_impact_score: app.final_impact_score !== null ? Number(app.final_impact_score) : null
   };
 
   console.log('✅ Transformed application:', {
@@ -94,6 +96,7 @@ export const transformApplicationData = (
     coordinates: application.coordinates,
     distance: application.distance,
     impact_score: application.impact_score,
+    final_impact_score: application.final_impact_score,
     class_3: application.class_3
   });
   console.groupEnd();
