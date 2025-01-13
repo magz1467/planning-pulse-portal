@@ -1,13 +1,4 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useSavedApplications } from "@/hooks/use-saved-applications";
-import { EmailDialog } from "@/components/EmailDialog";
-import { FeedbackEmailDialog } from "@/components/FeedbackEmailDialog";
-import { AuthRequiredDialog } from "@/components/AuthRequiredDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { Application } from "@/types/planning";
 
 interface ApplicationMetadataProps {
@@ -32,7 +23,12 @@ export const ApplicationMetadata = ({
       <div>
         <h2 className="text-2xl font-semibold">{application.title}</h2>
         <p className="text-gray-600">{application.reference}</p>
-        <p className="text-gray-600">Final Impact Score: {application.final_impact_score ?? 'null'}</p>
+        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100">
+          <span className="text-sm font-medium text-gray-700">Impact Score:</span>
+          <span className={`text-sm font-semibold ${application.final_impact_score ? 'text-primary' : 'text-gray-500'}`}>
+            {application.final_impact_score ?? 'Not available'}
+          </span>
+        </div>
       </div>
     </div>
   );
