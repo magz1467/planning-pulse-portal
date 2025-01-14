@@ -1,7 +1,8 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { useCallback, memo } from "react";
+import { useCallback, memo, useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -28,7 +29,29 @@ export const MapSection = memo(({
     setTimeout(() => {
       onMarkerClick(id);
     }, 0);
-  }, [onMarkerClick]); // Add onMarkerClick to dependencies
+  }, [onMarkerClick]);
+
+  // Handle WebSocket errors gracefully
+  useEffect(() => {
+    const handleWebSocketError = (error: Event) => {
+      console.warn('WebSocket connection error:', error);
+      toast({
+        title: "Connection Issue",
+        description: "Having trouble maintaining connection. Will retry automatically.",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener('error', (event) => {
+      if (event.message.includes('WebSocket')) {
+        handleWebSocketError(event);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('error', handleWebSocketError);
+    };
+  }, []);
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
