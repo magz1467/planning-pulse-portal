@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
@@ -24,7 +25,7 @@ interface FilterBarContentProps {
   isMobile: boolean;
 }
 
-export const FilterBarContent = ({
+export const FilterBarContent = memo(({
   onFilterChange,
   onSortChange,
   activeFilters = {},
@@ -68,4 +69,6 @@ export const FilterBarContent = ({
       </ErrorBoundary>
     </div>
   );
-};
+});
+
+FilterBarContent.displayName = 'FilterBarContent';
