@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Application } from "@/types/planning";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 
 interface ApplicationMetadataProps {
   application: Application;
@@ -29,7 +30,9 @@ export const ApplicationMetadata = ({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-semibold">{application.title}</h2>
+        <h2 className="text-2xl font-semibold">
+          <ApplicationTitle title={application.engaging_title || application.title || application.reference} />
+        </h2>
         <p className="text-gray-600">{application.reference}</p>
         <div className={`mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full ${getScoreColor(application.final_impact_score)}`}>
           <span className="text-sm font-medium">Impact Score:</span>
