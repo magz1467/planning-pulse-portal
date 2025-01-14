@@ -162,16 +162,18 @@ export const PlanningApplicationDetails = ({
           application={application}
           onShowEmailDialog={() => setShowEmailDialog(true)}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleRegenerateTitle}
-          disabled={isRegenerating || !application.description}
-          className="ml-2 text-xs"
-        >
-          <Wand2 className="w-3 h-3 mr-1" />
-          {isRegenerating ? 'Regenerating...' : 'Regenerate Title'}
-        </Button>
+        {!application.ai_title && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRegenerateTitle}
+            disabled={isRegenerating || !application.description}
+            className="ml-2 text-xs"
+          >
+            <Wand2 className="w-3 h-3 mr-1" />
+            {isRegenerating ? 'Regenerating...' : 'Regenerate Title'}
+          </Button>
+        )}
       </div>
       
       <ApplicationActions 
