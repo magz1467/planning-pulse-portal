@@ -42,11 +42,11 @@ serve(async (req) => {
             - MUST be exactly 6 words or less
             - Use active, exciting verbs
             - Focus on the positive impact
-            - Make it sound aspirational
             - Avoid technical terms completely
             - Start with action words when possible
             - If it's residential, make it sound homey
             - If it's commercial, emphasize community benefit
+            - Never use all capital letters
             
             Templates to follow:
             Residential: "[Action] [Type] for [Location]"
@@ -75,8 +75,22 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    const title = data.choices[0].message.content.trim()
+    let title = data.choices[0].message.content.trim()
     console.log('Generated title:', title)
+
+    // Transform text case if needed
+    const isAllCaps = (str: string) => str === str.toUpperCase() && str !== str.toLowerCase();
+    
+    if (isAllCaps(title)) {
+      // Split into words and transform each
+      title = title.split(' ').map(word => {
+        // Skip short words that might be acronyms (like UK, US, etc)
+        if (word.length <= 3) return word;
+        
+        // Transform the word to title case
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }).join(' ');
+    }
 
     // Validate the title meets our requirements
     const words = title.split(' ')
