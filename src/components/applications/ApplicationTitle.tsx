@@ -10,6 +10,11 @@ const isAllCaps = (str: string) => {
 };
 
 const transformText = (text: string) => {
+  // Don't transform text if it contains emojis
+  if (text.match(/[\p{Emoji}]/u)) {
+    return text;
+  }
+  
   if (!isAllCaps(text)) return text;
   
   // Split into words and transform each
