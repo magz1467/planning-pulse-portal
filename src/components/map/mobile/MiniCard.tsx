@@ -33,7 +33,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             <ApplicationBadges
               status={application.status}
               lastDateConsultationComments={application.last_date_consultation_comments}
-              impactScore={application.impact_score}
+              impactScore={application.final_impact_score}
             />
             <span className="text-xs text-gray-500">{application.distance}</span>
           </div>
