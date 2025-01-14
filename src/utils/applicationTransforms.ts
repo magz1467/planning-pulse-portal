@@ -97,7 +97,8 @@ export const transformApplicationData = (
     valid_date: app.valid_date || null,
     centroid: app.centroid || null,
     class_3: app.class_3 === null || app.class_3 === undefined || app.class_3 === 'undefined' ? 'Miscellaneous' : app.class_3,
-    final_impact_score: finalImpactScore
+    final_impact_score: finalImpactScore,
+    engaging_title: app.engaging_title || null
   };
 
   console.log('✅ Transformed application:', {
@@ -106,7 +107,8 @@ export const transformApplicationData = (
     distance: application.distance,
     impact_score: application.impact_score,
     final_impact_score: application.final_impact_score,
-    class_3: application.class_3
+    class_3: application.class_3,
+    engaging_title: application.engaging_title
   });
   console.groupEnd();
   return application;

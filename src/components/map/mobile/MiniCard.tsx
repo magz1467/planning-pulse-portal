@@ -13,7 +13,8 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
   console.log('MiniCard - Application Data:', {
     id: application.id,
     final_impact_score: application.final_impact_score,
-    title: application.title || application.description || ''
+    title: application.title || application.description || '',
+    engaging_title: application.engaging_title
   });
 
   const getScoreColor = (score: number | null) => {
@@ -36,6 +37,9 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
     type: typeof application.final_impact_score
   });
 
+  // Use engaging_title if available, otherwise fall back to ai_title or description
+  const displayTitle = application.engaging_title || application.ai_title || application.description;
+
   return (
     <div
       className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-4 ${
@@ -48,14 +52,14 @@ export const MiniCard = ({ application, isSelected, onClick }: MiniCardProps) =>
           <ImageResolver
             imageMapUrl={application.image_map_url}
             image={application.image}
-            title={application.title || application.description || ''}
+            title={displayTitle || ''}
             applicationId={application.id}
             coordinates={application.coordinates}
           />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-primary truncate">
-            {application.ai_title || application.description}
+            {displayTitle}
           </h3>
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">{application.address}</p>
           <div className="flex flex-col gap-2 mt-2">
