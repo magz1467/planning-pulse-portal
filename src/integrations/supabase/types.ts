@@ -147,6 +147,21 @@ export type Database = {
           },
         ]
       }
+      application_impact_scores: {
+        Row: {
+          application_id: number | null
+          final_impact_score: number | null
+        }
+        Insert: {
+          application_id?: number | null
+          final_impact_score?: number | null
+        }
+        Update: {
+          application_id?: number | null
+          final_impact_score?: number | null
+        }
+        Relationships: []
+      }
       application_map_images: {
         Row: {
           application_id: number | null

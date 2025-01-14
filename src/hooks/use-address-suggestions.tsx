@@ -27,49 +27,48 @@ export const useAddressSuggestions = (search: string) => {
       if (!debouncedSearch || debouncedSearch.length < 2) return [];
       
       try {
-        // If search includes numbers (likely a postcode), try postcode lookup first
-        if (/\d/.test(debouncedSearch)) {
-          const postcodeResponse = await fetch(
-            `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
-          );
-          
-          if (!postcodeResponse.ok) {
-            if (postcodeResponse.status === 404) {
-              return []; // No results found
-            }
+        // First try the autocomplete endpoint for partial postcodes
+        const autocompleteResponse = await fetch(
+          `https://api.postcodes.io/postcodes/${encodeURIComponent(debouncedSearch)}/autocomplete`
+        );
+        
+        if (!autocompleteResponse.ok) {
+          if (autocompleteResponse.status !== 404) {
             throw new Error('Postcode API error');
           }
-
-          const postcodeData = await postcodeResponse.json();
-          
-          if (postcodeData.result) {
-            const detailsPromises = postcodeData.result.map(async (postcode: string) => {
-              const detailsResponse = await fetch(
-                `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
-              );
-              
-              if (!detailsResponse.ok) {
-                return null;
-              }
-
-              const details = await detailsResponse.json();
-              
-              if (details.result) {
-                return {
-                  ...details.result,
-                  postcode: details.result.postcode,
-                  address: `${details.result.admin_ward}, ${details.result.parish || ''} ${details.result.admin_district}, ${details.result.postcode}`.trim()
-                };
-              }
-              return null;
-            });
-            
-            const results = await Promise.all(detailsPromises);
-            return results.filter(Boolean);
-          }
+          return []; // No results found
         }
 
-        // If no postcode results or search doesn't include numbers, try general address search
+        const autocompleteData = await autocompleteResponse.json();
+        
+        if (autocompleteData.result) {
+          // Fetch details for each suggested postcode
+          const detailsPromises = autocompleteData.result.map(async (postcode: string) => {
+            const detailsResponse = await fetch(
+              `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+            );
+            
+            if (!detailsResponse.ok) {
+              return null;
+            }
+
+            const details = await detailsResponse.json();
+            
+            if (details.result) {
+              return {
+                ...details.result,
+                postcode: details.result.postcode,
+                address: `${details.result.admin_ward}, ${details.result.parish || ''} ${details.result.admin_district}, ${details.result.postcode}`.trim()
+              };
+            }
+            return null;
+          });
+          
+          const results = await Promise.all(detailsPromises);
+          return results.filter(Boolean);
+        }
+
+        // If no autocomplete results or search doesn't include numbers, try general address search
         const generalResponse = await fetch(
           `https://api.postcodes.io/postcodes?q=${encodeURIComponent(debouncedSearch)}`
         );
