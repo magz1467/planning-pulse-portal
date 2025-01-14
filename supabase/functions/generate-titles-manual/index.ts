@@ -29,7 +29,7 @@ serve(async (req) => {
     // Get applications without AI titles
     const { data: applications, error: fetchError } = await supabase
       .from('applications')
-      .select('application_id, description')
+      .select('application_id, description, application_type')
       .is('ai_title', null)
       .not('description', 'is', null)
       .limit(limit);
@@ -71,28 +71,36 @@ serve(async (req) => {
             messages: [
               {
                 role: 'system',
-                content: `You are a creative and engaging writer who makes planning applications sound interesting and relatable.
-                Your task is to create catchy, conversational titles that capture attention while being informative.
+                content: `You are a creative writer who makes planning applications sound exciting and relatable.
+                Your task is to create catchy, engaging titles that capture attention while being informative.
+                
                 Rules:
-                - Keep it under 8 words
-                - Use everyday language, no technical terms
-                - Make it sound exciting but factual
-                - Focus on the impact/change
-                - Add personality but stay professional
-                - Use active voice
-                - If it's a home improvement, make it sound aspirational
-                - If it's a business change, emphasize the community benefit
+                - MUST be exactly 6 words or less
+                - Use active, exciting verbs
+                - Focus on the positive impact
+                - Make it sound aspirational
+                - Avoid technical terms completely
+                - Start with action words when possible
+                - If it's residential, make it sound homey
+                - If it's commercial, emphasize community benefit
+                
+                Templates to follow:
+                Residential: "[Action] [Type] for [Location]"
+                Commercial: "New [Business] Coming to [Location]"
+                Extension: "[Direction] Extension Creates [Benefit]"
+                
                 Examples:
-                "Cozy new coffee shop coming to High Street"
-                "Family home growing with modern extension"
-                "Historic building transforms into community hub"`
+                "Cozy Family Extension in Richmond"
+                "Modern Shop Transforms Local Corner"
+                "Rear Extension Adds Dream Kitchen"
+                "New Café Brightens High Street"`
               },
               {
                 role: 'user',
-                content: `Create a short, engaging title for this planning application: ${app.description}`
+                content: `Create a short, engaging 6-word title for this planning application. Type: ${app.application_type}. Description: ${app.description}`
               }
             ],
-            temperature: 0.7, // Increased for more creative outputs
+            temperature: 0.7,
             max_tokens: 100
           }),
         });
