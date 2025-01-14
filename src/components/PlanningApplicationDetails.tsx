@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { ApplicationMetadata } from "./planning-details/ApplicationMetadata";
 import { ApplicationActions } from "./planning-details/ApplicationActions";
 import { ApplicationContent } from "./planning-details/ApplicationContent";
+import { Wand2 } from "lucide-react";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -26,6 +27,7 @@ export const PlanningApplicationDetails = ({
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const { toast } = useToast();
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
 
@@ -106,12 +108,71 @@ export const PlanningApplicationDetails = ({
     });
   };
 
+  const handleRegenerateTitle = async () => {
+    if (!application.description) {
+      toast({
+        title: "Cannot regenerate title",
+        description: "No description available to generate title from",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsRegenerating(true);
+    try {
+      const response = await supabase.functions.invoke('generate-listing-header', {
+        body: { description: application.description }
+      });
+
+      if (response.error) throw response.error;
+
+      const { header } = response.data;
+
+      const { error: updateError } = await supabase
+        .from('applications')
+        .update({ ai_title: header })
+        .eq('application_id', application.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Title regenerated",
+        description: "The application title has been updated successfully"
+      });
+
+      // Force a reload of the page to show the new title
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Error regenerating title:', error);
+      toast({
+        title: "Error regenerating title",
+        description: "There was a problem updating the title. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-4 pb-20">
-      <ApplicationMetadata 
-        application={application}
-        onShowEmailDialog={() => setShowEmailDialog(true)}
-      />
+      <div className="flex justify-between items-start">
+        <ApplicationMetadata 
+          application={application}
+          onShowEmailDialog={() => setShowEmailDialog(true)}
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRegenerateTitle}
+          disabled={isRegenerating || !application.description}
+          className="ml-2 text-xs"
+        >
+          <Wand2 className="w-3 h-3 mr-1" />
+          {isRegenerating ? 'Regenerating...' : 'Regenerate Title'}
+        </Button>
+      </div>
       
       <ApplicationActions 
         applicationId={application.id}
