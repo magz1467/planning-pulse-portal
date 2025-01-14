@@ -158,17 +158,19 @@ export const PlanningApplicationDetails = ({
   return (
     <div className="p-6 space-y-4 pb-20">
       <div className="flex justify-between items-start">
-        <ApplicationMetadata 
-          application={application}
-          onShowEmailDialog={() => setShowEmailDialog(true)}
-        />
+        <div className="flex-1">
+          <ApplicationMetadata 
+            application={application}
+            onShowEmailDialog={() => setShowEmailDialog(true)}
+          />
+        </div>
         {!application.ai_title && (
           <Button
             variant="outline"
             size="sm"
             onClick={handleRegenerateTitle}
             disabled={isRegenerating || !application.description}
-            className="ml-2 text-xs"
+            className="whitespace-nowrap text-xs"
           >
             <Wand2 className="w-3 h-3 mr-1" />
             {isRegenerating ? 'Regenerating...' : 'Regenerate Title'}
