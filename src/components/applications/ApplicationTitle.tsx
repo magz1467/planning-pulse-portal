@@ -28,6 +28,8 @@ const transformText = (text: string) => {
 };
 
 export const ApplicationTitle = ({ title, className }: ApplicationTitleProps) => {
+  console.log('ApplicationTitle - Rendering title:', title); // Add logging
+  
   return (
     <h3 
       className={cn(
