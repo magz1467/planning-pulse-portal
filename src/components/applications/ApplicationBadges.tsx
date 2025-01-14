@@ -6,13 +6,13 @@ import { isWithinNextSevenDays } from "@/utils/dateUtils";
 interface ApplicationBadgesProps {
   status: string;
   lastDateConsultationComments?: string | null;
-  class3?: string | null;
+  impactScore?: number | null;
 }
 
 export const ApplicationBadges = ({
   status,
   lastDateConsultationComments,
-  class3
+  impactScore
 }: ApplicationBadgesProps) => {
   const badges = [];
 
@@ -33,33 +33,25 @@ export const ApplicationBadges = ({
     );
   }
 
-  // Classification badge - always show with default value
-  const classificationText = class3 && typeof class3 === 'string' && class3.toLowerCase() !== 'undefined'
-    ? class3
-    : 'Miscellaneous';
+  // Impact score badge
+  if (impactScore !== null && impactScore !== undefined) {
+    let impactColor = "bg-green-100 text-green-800";
+    let impactText = "Low Impact";
+    
+    if (impactScore >= 70) {
+      impactColor = "bg-red-100 text-red-800";
+      impactText = "High Impact";
+    } else if (impactScore >= 30) {
+      impactColor = "bg-orange-100 text-orange-800";
+      impactText = "Medium Impact";
+    }
 
-  // Add emoji based on classification
-  let emoji = '🔄 ';  // Default emoji for miscellaneous
-  const lowerClass = classificationText.toLowerCase();
-  if (lowerClass.includes('tree')) {
-    emoji = '🌳 ';
-  } else if (lowerClass.includes('home extension') || lowerClass.includes('extension')) {
-    emoji = '🏠 ';
-  } else if (lowerClass.includes('amendment')) {
-    emoji = '📄 ';
-  } else if (lowerClass.includes('certificate')) {
-    emoji = '📜 ';
-  } else if (lowerClass.includes('landscaping')) {
-    emoji = '🌱 ';
-  } else if (lowerClass.includes('redevelopment')) {
-    emoji = '👷 ';
+    badges.push(
+      <Badge key="impact" variant="secondary" className={`text-xs ${impactColor}`}>
+        {impactText} ({impactScore})
+      </Badge>
+    );
   }
-
-  badges.push(
-    <Badge key="classification" variant="secondary" className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100">
-      {emoji}{classificationText}
-    </Badge>
-  );
 
   return (
     <div className="flex flex-wrap items-center gap-2">
