@@ -59,14 +59,18 @@ serve(async (req) => {
             "New Café Brings Life to High Street"
             "Rear Extension Adds Dream Kitchen Space"
             "Cozy Cottages Transform Local Neighborhood"
-            "Family Homes Build Community in Chelsea"`
+            "Family Homes Build Community in Chelsea"
+            
+            For solar panels and sustainable projects use:
+            "Green Energy Brings Sustainability to [Location]"
+            "Solar Power Creates Clean Future Here"`
           },
           {
             role: 'user',
-            content: `Create a short, engaging title (max 6 words) following the strict templates above for this planning application: ${description}`
+            content: `Create a short, engaging title (max 6 words) following the strict templates above for this planning application: ${description}. This is about solar panels, so focus on sustainability and green energy benefits.`
           }
         ],
-        temperature: 0.7,
+        temperature: 0.3, // Reduced temperature for more consistent outputs
         max_tokens: 100
       }),
     })
