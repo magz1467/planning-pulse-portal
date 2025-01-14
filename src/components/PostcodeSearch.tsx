@@ -28,13 +28,6 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
     setSearch(postcode);
     setOpen(false);
     await onSelect(postcode);
-    // Only submit the form after the state has been updated
-    setTimeout(() => {
-      const form = document.querySelector('form');
-      if (form) {
-        form.requestSubmit();
-      }
-    }, 0);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +37,12 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
       setOpen(true);
     } else {
       setOpen(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (search) {
+      onSelect(search);
     }
   };
 
@@ -63,7 +62,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
           size="icon" 
           variant="ghost" 
           className="absolute right-1 top-1/2 -translate-y-1/2"
-          onClick={() => search && onSelect(search)}
+          onClick={handleSubmit}
         >
           <Search className="h-4 w-4" />
         </Button>
