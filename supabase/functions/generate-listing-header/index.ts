@@ -38,30 +38,32 @@ serve(async (req) => {
             content: `You are a creative writer who makes planning applications sound exciting and relatable.
             Your task is to create catchy, engaging titles that capture attention while being informative.
             
-            Rules:
+            STRICT RULES - ALL MUST BE FOLLOWED:
             - MUST be exactly 6 words or less
-            - Use active, exciting verbs
-            - Focus on the positive impact
-            - Avoid technical terms completely
-            - Start with action words when possible
-            - If it's residential, make it sound homey
-            - If it's commercial, emphasize community benefit
-            - Never use all capital letters
+            - MUST use one of the templates below
+            - MUST use active, exciting verbs (e.g. "transforms", "creates", "brings")
+            - MUST focus on positive community impact
+            - MUST avoid technical terms completely
+            - MUST start with action words
+            - MUST be in Title Case (not ALL CAPS)
+            - If residential, MUST sound homey and welcoming
+            - If commercial, MUST emphasize community benefit
             
-            Templates to follow:
-            Residential: "[Action] [Type] for [Location]"
-            Commercial: "New [Business] Coming to [Location]"
-            Extension: "[Direction] Extension Creates [Benefit]"
+            STRICT TEMPLATES TO USE:
+            Residential MUST use: "[Action] [Type] [Brings/Creates] [Benefit] in [Location]"
+            Commercial MUST use: "New [Business] [Brings/Creates] [Benefit] to [Location]"
+            Extension MUST use: "[Direction] Extension [Creates/Adds] [Benefit]"
             
-            Examples:
-            "Cozy Family Extension in Richmond"
-            "Modern Shop Transforms Local Corner"
-            "Rear Extension Adds Dream Kitchen"
-            "New Café Brightens High Street"`
+            EXAMPLES OF GOOD TITLES:
+            "Modern Homes Create Community in Richmond"
+            "New Café Brings Life to High Street"
+            "Rear Extension Adds Dream Kitchen Space"
+            "Cozy Cottages Transform Local Neighborhood"
+            "Family Homes Build Community in Chelsea"`
           },
           {
             role: 'user',
-            content: `Create a short, engaging 6-word title for this planning application: ${description}`
+            content: `Create a short, engaging title (max 6 words) following the strict templates above for this planning application: ${description}`
           }
         ],
         temperature: 0.7,
