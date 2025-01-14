@@ -10,6 +10,7 @@ import { CreatePetition } from "./CreatePetition";
 import { ApplicationFeedback } from "./ApplicationFeedback";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ApplicationImage } from "./ApplicationImage";
 
 interface ApplicationContentProps {
   application: Application;
@@ -30,6 +31,7 @@ export const ApplicationContent = ({
   return (
     <>
       <Card className="overflow-hidden">
+        <ApplicationImage application={application} />
         <ApplicationTimeline application={application} />
         <Separator className="my-4" />
         <CollapsibleApplicationDetails application={application} />
