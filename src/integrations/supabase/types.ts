@@ -208,6 +208,7 @@ export type Database = {
           decision_target_date: string | null
           description: string | null
           development_type: string | null
+          engaging_title: string | null
           epc_number: string | null
           final_impact_score: number | null
           geom: unknown | null
@@ -274,6 +275,7 @@ export type Database = {
           decision_target_date?: string | null
           description?: string | null
           development_type?: string | null
+          engaging_title?: string | null
           epc_number?: string | null
           final_impact_score?: number | null
           geom?: unknown | null
@@ -340,6 +342,7 @@ export type Database = {
           decision_target_date?: string | null
           description?: string | null
           development_type?: string | null
+          engaging_title?: string | null
           epc_number?: string | null
           final_impact_score?: number | null
           geom?: unknown | null
@@ -732,6 +735,21 @@ export type Database = {
           message?: string | null
           phone?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      engaging_titles: {
+        Row: {
+          application_id: number | null
+          engaging_title: string | null
+        }
+        Insert: {
+          application_id?: number | null
+          engaging_title?: string | null
+        }
+        Update: {
+          application_id?: number | null
+          engaging_title?: string | null
         }
         Relationships: []
       }
@@ -2016,6 +2034,7 @@ export type Database = {
           decision_target_date: string | null
           description: string | null
           development_type: string | null
+          engaging_title: string | null
           epc_number: string | null
           final_impact_score: number | null
           geom: unknown | null
@@ -2116,6 +2135,7 @@ export type Database = {
           decision_target_date: string | null
           description: string | null
           development_type: string | null
+          engaging_title: string | null
           epc_number: string | null
           final_impact_score: number | null
           geom: unknown | null
