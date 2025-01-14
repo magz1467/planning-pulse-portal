@@ -12,8 +12,6 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
-  const displayTitle = application.engaging_title || application.ai_title || application.description || '';
-
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg z-[1000]">
       <div className="flex gap-3" onClick={onClick}>
@@ -28,7 +26,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-primary truncate">
-            <ApplicationTitle title={displayTitle} />
+            <ApplicationTitle title={application.engaging_title || application.description || ''} />
           </h3>
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">{application.address}</p>
           <div className="flex flex-col gap-2 mt-2">

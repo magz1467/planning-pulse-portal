@@ -52,7 +52,7 @@ export const PlanningApplicationList = ({
             </div>
             <div className="flex-1 min-w-0">
               <ApplicationTitle 
-                title={application.engaging_title || application.ai_title || application.description || ''} 
+                title={application.engaging_title || application.description || ''} 
                 className="mb-1"
               />
               <div className="flex items-center gap-1 mt-1 text-gray-600">
@@ -73,4 +73,4 @@ export const PlanningApplicationList = ({
       ))}
     </div>
   );
-};
+}
