@@ -1,16 +1,16 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import "https://deno.land/x/xhr@0.1.0/mod.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -20,10 +20,10 @@ serve(async (req) => {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    );
 
     // Parse request body
-    const { limit = 50 } = await req.json()
+    const { limit = 50 } = await req.json();
     console.log(`Processing batch of ${limit} applications`);
 
     // Get applications without AI titles
@@ -32,11 +32,11 @@ serve(async (req) => {
       .select('application_id, description')
       .is('ai_title', null)
       .not('description', 'is', null)
-      .limit(limit)
+      .limit(limit);
 
     if (fetchError) {
       console.error('Error fetching applications:', fetchError);
-      throw new Error(`Error fetching applications: ${fetchError.message}`)
+      throw new Error(`Error fetching applications: ${fetchError.message}`);
     }
 
     if (!applications?.length) {
@@ -48,7 +48,7 @@ serve(async (req) => {
           processed: 0 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      );
     }
 
     console.log(`Found ${applications.length} applications to process`);
@@ -71,36 +71,50 @@ serve(async (req) => {
             messages: [
               {
                 role: 'system',
-                content: 'You are a planning application expert. Create a punchy, casual 4-6 word title that captures the key changes in a way that anyone can understand. Focus on the main change and use everyday language. Avoid technical terms. Make it engaging and easy to grasp at a glance.'
+                content: `You are a creative and engaging writer who makes planning applications sound interesting and relatable.
+                Your task is to create catchy, conversational titles that capture attention while being informative.
+                Rules:
+                - Keep it under 8 words
+                - Use everyday language, no technical terms
+                - Make it sound exciting but factual
+                - Focus on the impact/change
+                - Add personality but stay professional
+                - Use active voice
+                - If it's a home improvement, make it sound aspirational
+                - If it's a business change, emphasize the community benefit
+                Examples:
+                "Cozy new coffee shop coming to High Street"
+                "Family home growing with modern extension"
+                "Historic building transforms into community hub"`
               },
               {
                 role: 'user',
-                content: `Create a short, punchy title for this planning application: ${app.description}`
+                content: `Create a short, engaging title for this planning application: ${app.description}`
               }
             ],
-            temperature: 0.2,
+            temperature: 0.7, // Increased for more creative outputs
             max_tokens: 100
           }),
-        })
+        });
 
         if (!response.ok) {
           console.error(`API response not ok for application ${app.application_id}:`, response.status, await response.text());
-          throw new Error(`API response not ok: ${response.status}`)
+          throw new Error(`API response not ok: ${response.status}`);
         }
 
-        const data = await response.json()
-        const title = data.choices[0].message.content.trim()
+        const data = await response.json();
+        const title = data.choices[0].message.content.trim();
         console.log(`Generated title for application ${app.application_id}:`, title);
 
         // Update the application with the AI title
         const { error: updateError } = await supabase
           .from('applications')
           .update({ ai_title: title })
-          .eq('application_id', app.application_id)
+          .eq('application_id', app.application_id);
 
         if (updateError) {
           console.error(`Error updating application ${app.application_id}:`, updateError);
-          throw new Error(`Error updating application ${app.application_id}: ${updateError.message}`)
+          throw new Error(`Error updating application ${app.application_id}: ${updateError.message}`);
         }
 
         console.log(`Successfully updated application ${app.application_id}`);
@@ -115,7 +129,7 @@ serve(async (req) => {
     const { count } = await supabase
       .from('applications')
       .select('*', { count: 'exact', head: true })
-      .not('ai_title', 'is', null)
+      .not('ai_title', 'is', null);
     
     console.log(`Total applications with AI titles: ${count}`);
 
@@ -125,7 +139,7 @@ serve(async (req) => {
       .select('application_id, ai_title')
       .not('ai_title', 'is', null)
       .order('application_id', { ascending: false })
-      .limit(5)
+      .limit(5);
 
     console.log('Recent titles generated:', recentTitles);
 
@@ -137,7 +151,7 @@ serve(async (req) => {
         total_with_titles: count
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    );
 
   } catch (error) {
     console.error('Error in generate-titles-manual:', error);
@@ -150,6 +164,6 @@ serve(async (req) => {
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-    )
+    );
   }
-})
+});
