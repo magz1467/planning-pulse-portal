@@ -35,36 +35,62 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a planning application expert. Create a concise 6-12 word header that captures the essence of the planning application description. Focus on the key changes or developments proposed.'
+            content: `You are a creative writer who makes planning applications sound exciting and relatable.
+            Your task is to create catchy, engaging titles that capture attention while being informative.
+            
+            Rules:
+            - MUST be exactly 6 words or less
+            - Use active, exciting verbs
+            - Focus on the positive impact
+            - Make it sound aspirational
+            - Avoid technical terms completely
+            - Start with action words when possible
+            - If it's residential, make it sound homey
+            - If it's commercial, emphasize community benefit
+            
+            Templates to follow:
+            Residential: "[Action] [Type] for [Location]"
+            Commercial: "New [Business] Coming to [Location]"
+            Extension: "[Direction] Extension Creates [Benefit]"
+            
+            Examples:
+            "Cozy Family Extension in Richmond"
+            "Modern Shop Transforms Local Corner"
+            "Rear Extension Adds Dream Kitchen"
+            "New Café Brightens High Street"`
           },
           {
             role: 'user',
-            content: `Create a concise header for this planning application: ${description}`
+            content: `Create a short, engaging 6-word title for this planning application: ${description}`
           }
         ],
-        temperature: 0.2,
+        temperature: 0.7,
         max_tokens: 100
       }),
     })
 
     if (!response.ok) {
-      console.error('API response not ok:', response.status, response.statusText)
+      console.error('API response not ok:', response.status, await response.text())
       throw new Error(`API response not ok: ${response.status}`)
     }
 
     const data = await response.json()
-    console.log('API response:', data)
+    const title = data.choices[0].message.content.trim()
+    console.log('Generated title:', title)
 
-    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid API response structure:', data)
-      throw new Error('Invalid API response structure')
+    // Validate the title meets our requirements
+    const words = title.split(' ')
+    if (words.length > 6) {
+      console.error('Title too long, truncating to 6 words')
+      const truncatedTitle = words.slice(0, 6).join(' ')
+      return new Response(
+        JSON.stringify({ header: truncatedTitle }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    const header = data.choices[0].message.content.trim()
-    console.log('Generated header:', header)
-
     return new Response(
-      JSON.stringify({ header }),
+      JSON.stringify({ header: title }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
