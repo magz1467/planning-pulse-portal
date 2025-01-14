@@ -9,9 +9,13 @@ const isAllCaps = (str: string) => {
   return str === str.toUpperCase() && str !== str.toLowerCase();
 };
 
+const hasEmoji = (str: string) => {
+  return /[\p{Emoji}]/u.test(str);
+};
+
 const transformText = (text: string) => {
   // Don't transform text if it contains emojis
-  if (text.match(/[\p{Emoji}]/u)) {
+  if (hasEmoji(text)) {
     return text;
   }
   
@@ -28,7 +32,7 @@ const transformText = (text: string) => {
 };
 
 export const ApplicationTitle = ({ title, className }: ApplicationTitleProps) => {
-  console.log('ApplicationTitle - Rendering title:', title); // Add logging
+  console.log('ApplicationTitle - Rendering title:', title);
   
   return (
     <h3 

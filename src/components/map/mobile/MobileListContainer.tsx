@@ -109,7 +109,7 @@ export const MobileListContainer = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <ApplicationTitle 
-                      title={app.ai_title || app.description || ''} 
+                      title={app.engaging_title || app.ai_title || app.description || ''} 
                       className="line-clamp-2 mb-1"
                     />
                     <p className="text-sm text-gray-600 mt-1 truncate">{app.address}</p>
