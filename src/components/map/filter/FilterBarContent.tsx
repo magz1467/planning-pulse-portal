@@ -1,72 +1,79 @@
-import { memo } from 'react';
-import { SortDropdown } from "@/components/map/filter/SortDropdown";
+import React, { useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
-import { Application } from "@/types/planning";
-import { SortType } from "@/hooks/use-sort-applications";
+import { FilterDropdown } from "./FilterDropdown";
+import { SortDropdown } from "./SortDropdown";
+import { ViewToggle } from "./ViewToggle";
 import { StatusFilter } from "./StatusFilter";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface FilterBarContentProps {
-  onFilterChange?: (filterType: string, value: string) => void;
-  onSortChange?: (sortType: SortType) => void;
-  activeFilters?: {
+  activeFilters: {
     status?: string;
     type?: string;
   };
-  activeSort?: SortType;
-  applications?: Application[];
+  activeSort: SortType;
+  isMapView: boolean;
+  onFilterChange: (filterType: string, value: string) => void;
+  onSortChange: (sortType: SortType) => void;
+  onToggleView: () => void;
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
     'Declined': number;
     'Other': number;
   };
-  isMobile: boolean;
 }
 
-export const FilterBarContent = memo(({
+export const FilterBarContent = React.memo(({
+  activeFilters,
+  activeSort,
+  isMapView,
   onFilterChange,
   onSortChange,
-  activeFilters = {},
-  activeSort = null,
-  applications = [],
-  statusCounts,
-  isMobile
+  onToggleView,
+  statusCounts
 }: FilterBarContentProps) => {
-  const sortButtonText = activeSort === 'closingSoon' ? 'Closing Soon' 
-    : activeSort === 'newest' ? 'Newest' 
-    : 'Sort';
+  
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
+    onFilterChange(filterType, value);
+  }, [onFilterChange]);
+
+  const handleSortChange = useCallback((sortType: SortType) => {
+    onSortChange(sortType);
+  }, [onSortChange]);
+
+  const handleViewToggle = useCallback(() => {
+    onToggleView();
+  }, [onToggleView]);
+
+  const memoizedStatusCounts = useMemo(() => ({
+    'Under Review': statusCounts?.['Under Review'] || 0,
+    'Approved': statusCounts?.['Approved'] || 0,
+    'Declined': statusCounts?.['Declined'] || 0,
+    'Other': statusCounts?.['Other'] || 0
+  }), [statusCounts]);
 
   return (
-    <div className="flex items-center gap-2 flex-1">
-      <ErrorBoundary>
-        <StatusFilter
-          onFilterChange={onFilterChange}
-          activeFilters={activeFilters}
-          isMobile={isMobile}
-          applications={applications}
-          statusCounts={statusCounts}
+    <div className="flex items-center gap-2 px-4 py-2 bg-background border-b">
+      <div className="flex-1 flex items-center gap-2">
+        <StatusFilter 
+          activeStatus={activeFilters.status}
+          onStatusChange={(status) => handleFilterChange('status', status)}
+          statusCounts={memoizedStatusCounts}
         />
-      </ErrorBoundary>
-
-      <ErrorBoundary>
-        <div className="flex items-center h-full">
-          <SortDropdown
-            activeSort={activeSort}
-            onSortChange={onSortChange}
-          >
-            <Button 
-              variant="outline" 
-              size={isMobile ? "sm" : "default"}
-              className="flex items-center gap-2"
-            >
-              <ArrowUpDown className="h-4 w-4" />
-              {sortButtonText}
-            </Button>
-          </SortDropdown>
-        </div>
-      </ErrorBoundary>
+        <FilterDropdown 
+          activeFilters={activeFilters}
+          onFilterChange={handleFilterChange}
+        />
+        <SortDropdown
+          activeSort={activeSort}
+          onSortChange={handleSortChange}
+        />
+      </div>
+      <ViewToggle 
+        isMapView={isMapView}
+        onToggleView={handleViewToggle}
+      />
     </div>
   );
 });
