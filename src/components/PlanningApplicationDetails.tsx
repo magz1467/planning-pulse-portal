@@ -28,6 +28,7 @@ export const PlanningApplicationDetails = ({
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [currentApplication, setCurrentApplication] = useState(application);
   const { toast } = useToast();
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
 
@@ -38,6 +39,8 @@ export const PlanningApplicationDetails = ({
       title: application?.title
     });
     
+    setCurrentApplication(application);
+    
     return () => {
       setShowEmailDialog(false);
       setShowFeedbackDialog(false);
@@ -46,9 +49,9 @@ export const PlanningApplicationDetails = ({
     };
   }, [application]);
 
-  if (!application) return null;
+  if (!currentApplication) return null;
 
-  const isSaved = savedApplications.includes(application.id);
+  const isSaved = savedApplications.includes(currentApplication.id);
 
   const feedbackStats = {
     thumbsUp: feedback === 'up' ? 13 : 12,
@@ -63,7 +66,7 @@ export const PlanningApplicationDetails = ({
       return;
     }
 
-    toggleSavedApplication(application.id);
+    toggleSavedApplication(currentApplication.id);
     toast({
       title: isSaved ? "Application removed" : "Application saved",
       description: isSaved 
@@ -109,7 +112,7 @@ export const PlanningApplicationDetails = ({
   };
 
   const handleRegenerateTitle = async () => {
-    if (!application.description) {
+    if (!currentApplication.description) {
       toast({
         title: "Cannot regenerate title",
         description: "No description available to generate title from",
@@ -121,7 +124,7 @@ export const PlanningApplicationDetails = ({
     setIsRegenerating(true);
     try {
       const response = await supabase.functions.invoke('generate-listing-header', {
-        body: { description: application.description }
+        body: { description: currentApplication.description }
       });
 
       if (response.error) throw response.error;
@@ -131,17 +134,20 @@ export const PlanningApplicationDetails = ({
       const { error: updateError } = await supabase
         .from('applications')
         .update({ ai_title: header })
-        .eq('application_id', application.id);
+        .eq('application_id', currentApplication.id);
 
       if (updateError) throw updateError;
+
+      // Update local state instead of reloading
+      setCurrentApplication(prev => prev ? {
+        ...prev,
+        ai_title: header
+      } : prev);
 
       toast({
         title: "Title regenerated",
         description: "The application title has been updated successfully"
       });
-
-      // Force a reload of the page to show the new title
-      window.location.reload();
 
     } catch (error) {
       console.error('Error regenerating title:', error);
@@ -160,16 +166,16 @@ export const PlanningApplicationDetails = ({
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <ApplicationMetadata 
-            application={application}
+            application={currentApplication}
             onShowEmailDialog={() => setShowEmailDialog(true)}
           />
         </div>
-        {!application.ai_title && (
+        {!currentApplication.ai_title && (
           <Button
             variant="outline"
             size="sm"
             onClick={handleRegenerateTitle}
-            disabled={isRegenerating || !application.description}
+            disabled={isRegenerating || !currentApplication.description}
             className="whitespace-nowrap text-xs"
           >
             <Wand2 className="w-3 h-3 mr-1" />
@@ -179,15 +185,15 @@ export const PlanningApplicationDetails = ({
       </div>
       
       <ApplicationActions 
-        applicationId={application.id}
-        reference={application.reference}
+        applicationId={currentApplication.id}
+        reference={currentApplication.reference}
         isSaved={isSaved}
         onSave={handleSave}
         onShowEmailDialog={() => setShowEmailDialog(true)}
       />
 
       <ApplicationContent 
-        application={application}
+        application={currentApplication}
         feedback={feedback}
         feedbackStats={feedbackStats}
         onFeedback={handleFeedback}
@@ -209,7 +215,7 @@ export const PlanningApplicationDetails = ({
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
         onSubmit={handleEmailSubmit}
-        postcode={application?.postcode || ''}
+        postcode={currentApplication?.postcode || ''}
       />
 
       <FeedbackEmailDialog
