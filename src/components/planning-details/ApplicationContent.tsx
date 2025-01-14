@@ -4,7 +4,6 @@ import { CollapsibleApplicationDetails } from "./CollapsibleApplicationDetails";
 import { ApplicationDescription } from "./ApplicationDescription";
 import { ApplicationComments } from "./ApplicationComments";
 import { ExpectedImpactAreas } from "./ExpectedImpactAreas";
-import { EnvironmentalImpactDial } from "./EnvironmentalImpactDial";
 import { ApplicationDocuments } from "./ApplicationDocuments";
 import { CreatePetition } from "./CreatePetition";
 import { ApplicationFeedback } from "./ApplicationFeedback";
@@ -36,12 +35,6 @@ export const ApplicationContent = ({
         <Separator className="my-4" />
         <CollapsibleApplicationDetails application={application} />
       </Card>
-      
-      <EnvironmentalImpactDial 
-        score={application.impact_score} 
-        details={application.impact_score_details}
-        applicationId={application.id}
-      />
 
       {application.impact_score_details?.impacted_services && (
         <ExpectedImpactAreas 
