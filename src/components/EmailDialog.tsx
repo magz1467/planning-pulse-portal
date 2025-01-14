@@ -95,7 +95,7 @@ export const EmailDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[2000]"
+        className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[2000] w-[calc(100%-2rem)] max-w-lg md:w-full"
         role="dialog"
         aria-labelledby="email-dialog-title"
         aria-describedby="email-dialog-description"
