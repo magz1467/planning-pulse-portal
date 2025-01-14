@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Map, List } from "lucide-react";
 
-interface ViewToggleProps {
-  isMapView: boolean;
+export interface ViewToggleProps {
+  isMapView?: boolean;
   onToggle: () => void;
 }
 

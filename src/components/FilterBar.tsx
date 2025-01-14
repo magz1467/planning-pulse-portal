@@ -32,7 +32,12 @@ export const FilterBar = ({
   activeSort,
   isMapView,
   applications = [],
-  statusCounts,
+  statusCounts = {
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  }
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
@@ -57,6 +62,8 @@ export const FilterBar = ({
       applications={applications}
       statusCounts={statusCounts}
       isMobile={isMobile}
+      isMapView={isMapView}
+      onToggle={onToggleView}
     />
   ), [
     handleFilterChange,
@@ -65,7 +72,9 @@ export const FilterBar = ({
     activeSort,
     applications,
     statusCounts,
-    isMobile
+    isMobile,
+    isMapView,
+    onToggleView
   ]);
 
   return (
