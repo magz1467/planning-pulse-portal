@@ -30,10 +30,12 @@ export const ApplicationMetadata = ({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-2xl font-semibold">
-          <ApplicationTitle title={application.engaging_title || application.title || application.reference} />
+        <h2 className="text-3xl font-semibold">
+          <ApplicationTitle 
+            title={application.engaging_title || application.title || application.reference} 
+            className="!text-2xl"
+          />
         </h2>
-        <p className="text-gray-600">{application.reference}</p>
         <div className={`mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full ${getScoreColor(application.final_impact_score)}`}>
           <span className="text-sm font-medium">Impact Score:</span>
           <span className="text-sm font-semibold">
