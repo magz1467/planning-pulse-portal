@@ -1,6 +1,8 @@
-import { memo } from "react";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
 import { FilterDropdown } from "./FilterDropdown";
 import { Application } from "@/types/planning";
+import { memo, useCallback } from "react";
 
 interface StatusFilterProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -19,9 +21,9 @@ interface StatusFilterProps {
 }
 
 export const StatusFilter = memo(({
-  onFilterChange = () => {},
+  onFilterChange,
   activeFilters = {},
-  isMobile = false,
+  isMobile,
   applications = [],
   statusCounts = {
     'Under Review': 0,
@@ -30,14 +32,29 @@ export const StatusFilter = memo(({
     'Other': 0
   }
 }: StatusFilterProps) => {
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
+    if (onFilterChange) {
+      onFilterChange(filterType, value);
+    }
+  }, [onFilterChange]);
+
   return (
     <FilterDropdown
-      onFilterChange={onFilterChange}
+      onFilterChange={handleFilterChange}
       activeFilters={activeFilters}
       isMobile={isMobile}
       applications={applications}
       statusCounts={statusCounts}
-    />
+    >
+      <Button 
+        variant="outline" 
+        size={isMobile ? "sm" : "default"}
+        className="flex items-center gap-2"
+      >
+        <Filter className="h-4 w-4" />
+        Filter
+      </Button>
+    </FilterDropdown>
   );
 });
 

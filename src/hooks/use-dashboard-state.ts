@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useApplicationsData } from "@/components/applications/dashboard/hooks/useApplicationsData";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
@@ -21,7 +21,6 @@ export const useDashboardState = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Use the handleMarkerClick from useSelectionState
   const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
@@ -37,20 +36,17 @@ export const useDashboardState = () => {
     applications, 
     isLoading: isLoadingApps, 
     fetchApplicationsInRadius,
-    statusCounts,
-    error
+    statusCounts
   } = useApplicationsData();
 
-  // Show error toast if there's an error fetching applications
+  // Auto-select first application on mobile only on initial load and only in map view
   useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error loading applications",
-        description: error.message || "Please try again later",
-        variant: "destructive",
-      });
+    if (!hasAutoSelected && applications.length > 0 && window.innerWidth <= 768 && !selectedId && isMapView) {
+      console.log('Auto-selecting first application on mobile - map view only');
+      handleMarkerClick(applications[0].id);
+      setHasAutoSelected(true);
     }
-  }, [error, toast]);
+  }, [applications, selectedId, hasAutoSelected, handleMarkerClick, isMapView]);
 
   useEffect(() => {
     if (isSearching && !coordinates) {
@@ -124,13 +120,9 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  // Memoize these computed values
-  const isInitialSearch = useMemo(() => !searchPoint && coordinates, [searchPoint, coordinates]);
-  const isNewSearch = useMemo(() => 
-    searchPoint && coordinates && 
-    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]), 
-    [searchPoint, coordinates]
-  );
+  const isInitialSearch = !searchPoint && coordinates;
+  const isNewSearch = searchPoint && coordinates && 
+    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
 
   useEffect(() => {
     if (!coordinates) return;
@@ -170,14 +162,13 @@ export const useDashboardState = () => {
     activeSort
   );
 
-  // Memoize the status counts to prevent unnecessary re-renders
-  const defaultStatusCounts = useMemo(() => ({
+  const defaultStatusCounts = {
     'Under Review': 0,
     'Approved': 0,
     'Declined': 0,
     'Other': 0,
     ...statusCounts
-  }), [statusCounts]);
+  };
 
   return {
     selectedId,

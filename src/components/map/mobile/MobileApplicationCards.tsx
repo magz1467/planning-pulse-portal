@@ -1,14 +1,14 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
   selectedId: number | null;
-  onSelectApplication: (id: number | null) => void;
+  onSelectApplication: (id: number) => void;
 }
 
 export const MobileApplicationCards = ({
@@ -20,13 +20,19 @@ export const MobileApplicationCards = ({
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('📱 MobileApplicationCards - Component mounted/updated:', {
+      applicationsCount: applications.length,
+      selectedId,
+      showFullDetails
+    });
+
     if (selectedId === null) {
       setShowFullDetails(false);
     }
-  }, [selectedId]);
+  }, [selectedId, applications.length]);
 
   const handleCommentSubmit = (content: string) => {
-    console.log("New comment:", content);
+    console.log("💬 New comment:", content);
     toast({
       title: "Comment Submitted",
       description: "Your comment has been recorded",
@@ -34,19 +40,26 @@ export const MobileApplicationCards = ({
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
+  console.log('📱 MobileApplicationCards - Selected application:', {
+    selectedId,
+    selectedApp,
+    applicationsAvailable: applications.length > 0
+  });
 
   if (!applications.length) {
+    console.log('📱 MobileApplicationCards - No applications available');
     return <EmptyState />;
   }
 
   if (showFullDetails && selectedApp) {
+    console.log('📱 MobileApplicationCards - Showing full details for application:', selectedApp.id);
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {
             setShowFullDetails(false);
-            onSelectApplication(null);
+            onSelectApplication(selectedId);
           }}
           onCommentSubmit={handleCommentSubmit}
         />
@@ -54,12 +67,15 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (selectedApp && !showFullDetails) {
+  if (selectedApp) {
+    console.log('📱 MobileApplicationCards - Showing mini card for application:', selectedApp.id);
     return (
-      <MiniCard
-        application={selectedApp}
-        onClick={() => setShowFullDetails(true)}
-      />
+      <div className="fixed left-0 right-0 bottom-0 p-4 pb-6 bg-transparent z-50 animate-slide-up">
+        <MiniCard
+          application={selectedApp}
+          onClick={() => setShowFullDetails(true)}
+        />
+      </div>
     );
   }
 

@@ -1,11 +1,12 @@
+import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ArrowUpDown } from "lucide-react";
+import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
-import { ArrowDownAZ } from "lucide-react";
-import { SortDropdown } from "./map/filter/SortDropdown";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface FilterBarProps {
@@ -15,10 +16,10 @@ interface FilterBarProps {
     status?: string;
     type?: string;
   };
-  activeSort: SortType;
+  activeSort?: SortType;
   isMapView?: boolean;
   onToggleView?: () => void;
-  applications?: any[];
+  applications?: Application[];
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
@@ -31,15 +32,15 @@ export const FilterBar = ({
   onFilterChange,
   onSortChange,
   activeFilters = {},
-  activeSort,
-  isMapView,
+  activeSort = null,
+  isMapView = true,
   onToggleView,
   applications = [],
   statusCounts
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
+  const [localActiveSort, setLocalActiveSort] = useState<SortType>(activeSort);
 
-  // Memoize handlers to prevent recreation on each render
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     if (onFilterChange) {
       onFilterChange(filterType, value);
@@ -47,21 +48,34 @@ export const FilterBar = ({
   }, [onFilterChange]);
 
   const handleSortChange = useCallback((sortType: SortType) => {
+    setLocalActiveSort(sortType);
     if (onSortChange) {
       onSortChange(sortType);
     }
   }, [onSortChange]);
 
-  // Memoize computed values
-  const sortButtonText = useMemo(() => {
-    if (activeSort === 'closingSoon') return 'Closing Soon';
-    if (activeSort === 'newest') return 'Newest';
-    return 'Sort';
+  useEffect(() => {
+    setLocalActiveSort(activeSort);
   }, [activeSort]);
+
+  const sortButtonText = useMemo(() => {
+    if (localActiveSort === 'closingSoon') return 'Closing Soon';
+    if (localActiveSort === 'newest') return 'Newest';
+    return 'Sort';
+  }, [localActiveSort]);
+
+  useEffect(() => {
+    console.log('FilterBar render state:', {
+      activeFilters,
+      activeSort: localActiveSort,
+      applications: applications?.length,
+      statusCounts
+    });
+  }, [activeFilters, localActiveSort, applications, statusCounts]);
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-1">
         <ErrorBoundary>
           <StatusFilter
             onFilterChange={handleFilterChange}
@@ -73,28 +87,26 @@ export const FilterBar = ({
         </ErrorBoundary>
 
         <ErrorBoundary>
-          <SortDropdown
-            activeSort={activeSort}
-            onSortChange={handleSortChange}
-          >
-            <Button
-              variant="outline"
-              size={isMobile ? "sm" : "default"}
-              className="flex items-center gap-2"
+          <div className="flex items-center h-full">
+            <SortDropdown
+              activeSort={localActiveSort}
+              onSortChange={handleSortChange}
             >
-              <ArrowDownAZ className="h-4 w-4" />
-              {sortButtonText}
-            </Button>
-          </SortDropdown>
+              <Button 
+                variant="outline" 
+                size={isMobile ? "sm" : "default"}
+                className="flex items-center gap-2"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+                {sortButtonText}
+              </Button>
+            </SortDropdown>
+          </div>
         </ErrorBoundary>
       </div>
 
-      {onToggleView && (
-        <div className="ml-auto">
-          <ErrorBoundary>
-            <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
-          </ErrorBoundary>
-        </div>
+      {isMobile && onToggleView && (
+        <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
-import Index from "@/pages/Index";
+import Index from "@/pages/index";
 import ApplicationsDashboardMapPage from "@/pages/applications/dashboard/map";
 import SavedApplicationsPage from "@/pages/saved";
 import MapView from "@/pages/MapView";

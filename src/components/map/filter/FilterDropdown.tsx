@@ -1,6 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,88 +6,69 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { Application } from "@/types/planning";
+import { ReactNode, memo, useCallback } from "react";
 
 interface FilterDropdownProps {
+  children: ReactNode;
   onFilterChange: (filterType: string, value: string) => void;
   activeFilters: {
     status?: string;
     type?: string;
   };
-  isMobile?: boolean;
-  applications?: any[];
-  statusCounts?: {
-    'Under Review': number;
-    'Approved': number;
-    'Declined': number;
-    'Other': number;
-  };
+  applications: Application[];
+  isMobile: boolean;
+  statusCounts: { [key: string]: number };
+  isLoading?: boolean;
 }
 
-const statusOptions = [
+const predefinedStatuses = [
   { label: "Under Review", value: "Under Review" },
   { label: "Approved", value: "Approved" },
   { label: "Declined", value: "Declined" },
+  { label: "Other", value: "Other" }
 ];
 
 export const FilterDropdown = memo(({
+  children,
   onFilterChange,
-  activeFilters = {},
-  statusCounts = {
-    'Under Review': 0,
-    'Approved': 0,
-    'Declined': 0,
-    'Other': 0
-  }
+  activeFilters,
+  applications,
+  isMobile,
+  statusCounts,
+  isLoading = false
 }: FilterDropdownProps) => {
-  const hasActiveFilters = useMemo(() => 
-    Object.values(activeFilters).some(Boolean), 
-    [activeFilters]
-  );
+  const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     onFilterChange(filterType, value);
   }, [onFilterChange]);
 
-  const handleClearFilters = useCallback(() => {
-    onFilterChange("status", "");
-    onFilterChange("type", "");
-  }, [onFilterChange]);
-
-  const statusOptionsWithCounts = useMemo(() => 
-    statusOptions.map(option => ({
-      ...option,
-      count: statusCounts[option.value as keyof typeof statusCounts] || 0
-    })),
-    [statusCounts]
-  );
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          className={cn(
-            "flex-1",
-            hasActiveFilters && "border-primary text-primary"
-          )}
-        >
-          <Filter className="w-4 h-4 mr-2" />
-          Filter
-        </Button>
+        {children}
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start"
-        className="w-[200px] bg-white z-[9999]"
+        className="w-[280px] bg-white z-[9999]"
       >
         {hasActiveFilters && (
           <>
-            <DropdownMenuItem onClick={handleClearFilters}>
-              Clear all filters
+            <DropdownMenuItem
+              onClick={() => handleFilterChange("status", "")}
+              className="text-blue-600 font-medium"
+            >
+              Clear filters
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
+
+        <DropdownMenuItem disabled className="text-sm font-semibold">
+          Status
+        </DropdownMenuItem>
+
         <DropdownMenuItem
           onClick={() => handleFilterChange("status", "")}
           className="justify-between"
@@ -97,13 +76,16 @@ export const FilterDropdown = memo(({
           All statuses
           {!activeFilters.status && <span>✓</span>}
         </DropdownMenuItem>
-        {statusOptionsWithCounts.map((option) => (
+
+        {predefinedStatuses.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleFilterChange("status", option.value)}
             className="justify-between"
           >
-            {option.label} ({option.count})
+            <span>
+              {option.label} ({isLoading ? '...' : statusCounts[option.value] || 0})
+            </span>
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>
         ))}
