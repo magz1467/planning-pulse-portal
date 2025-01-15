@@ -1,17 +1,17 @@
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
-import { Map as LeafletMap } from "leaflet";
+import { memo } from "react";
 
 export interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
   coordinates: [number, number];
-  onMarkerClick: (id: number) => void;
+  onMarkerClick: (id: number | null) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
+  onMapMove?: (map: any) => void;
 }
 
-export const MapView = ({
+export const MapView = memo(({
   applications,
   selectedId,
   coordinates,
@@ -31,4 +31,6 @@ export const MapView = ({
       />
     </div>
   );
-};
+});
+
+MapView.displayName = 'MapView';

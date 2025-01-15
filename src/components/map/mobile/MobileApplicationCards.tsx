@@ -8,7 +8,7 @@ import { MiniCard } from "./MiniCard";
 interface MobileApplicationCardsProps {
   applications: Application[];
   selectedId: number | null;
-  onSelectApplication: (id: number) => void;
+  onSelectApplication: (id: number | null) => void;
 }
 
 export const MobileApplicationCards = ({
@@ -22,6 +22,7 @@ export const MobileApplicationCards = ({
   // Auto-select first application on mobile if none selected
   useEffect(() => {
     if (applications.length > 0 && !selectedId) {
+      console.log('Auto-selecting first application:', applications[0].id);
       onSelectApplication(applications[0].id);
     }
   }, [applications, selectedId, onSelectApplication]);
