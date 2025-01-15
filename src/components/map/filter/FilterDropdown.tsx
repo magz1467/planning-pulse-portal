@@ -7,10 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Application } from "@/types/planning";
-import { ReactNode, memo, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 interface FilterDropdownProps {
-  children: ReactNode;
+  children: React.ReactNode;
   onFilterChange: (filterType: string, value: string) => void;
   activeFilters: {
     status?: string;
@@ -29,7 +29,7 @@ const predefinedStatuses = [
   { label: "Other", value: "Other" }
 ];
 
-export const FilterDropdown = memo(({
+export const FilterDropdown = ({
   children,
   onFilterChange,
   activeFilters,
@@ -38,7 +38,10 @@ export const FilterDropdown = memo(({
   statusCounts,
   isLoading = false
 }: FilterDropdownProps) => {
-  const hasActiveFilters = Object.values(activeFilters).some(Boolean);
+  const hasActiveFilters = useMemo(() => 
+    Object.values(activeFilters).some(Boolean),
+    [activeFilters]
+  );
 
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     onFilterChange(filterType, value);
@@ -92,6 +95,4 @@ export const FilterDropdown = memo(({
       </DropdownMenuContent>
     </DropdownMenu>
   );
-});
-
-FilterDropdown.displayName = 'FilterDropdown';
+};
