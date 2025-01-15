@@ -56,14 +56,6 @@ export const FilterDropdown = memo(({
     onFilterChange("type", "");
   }, [onFilterChange]);
 
-  const statusOptionsWithCounts = useMemo(() => 
-    statusOptions.map(option => ({
-      ...option,
-      count: statusCounts[option.value as keyof typeof statusCounts] || 0
-    })),
-    [statusCounts]
-  );
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -97,13 +89,13 @@ export const FilterDropdown = memo(({
           All statuses
           {!activeFilters.status && <span>✓</span>}
         </DropdownMenuItem>
-        {statusOptionsWithCounts.map((option) => (
+        {statusOptions.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleFilterChange("status", option.value)}
             className="justify-between"
           >
-            {option.label} ({option.count})
+            {option.label} ({statusCounts[option.value as keyof typeof statusCounts]})
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>
         ))}

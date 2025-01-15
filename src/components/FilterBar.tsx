@@ -35,7 +35,12 @@ export const FilterBar = ({
   isMapView,
   onToggleView,
   applications = [],
-  statusCounts
+  statusCounts = {
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  }
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
