@@ -41,11 +41,15 @@ export const FilterBar = ({
 
   // Memoize handlers to prevent recreation on each render
   const handleFilterChange = useCallback((filterType: string, value: string) => {
-    onFilterChange?.(filterType, value);
+    if (onFilterChange) {
+      onFilterChange(filterType, value);
+    }
   }, [onFilterChange]);
 
   const handleSortChange = useCallback((sortType: SortType) => {
-    onSortChange?.(sortType);
+    if (onSortChange) {
+      onSortChange(sortType);
+    }
   }, [onSortChange]);
 
   // Memoize computed values

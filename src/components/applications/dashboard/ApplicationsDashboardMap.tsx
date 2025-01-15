@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect, useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -23,30 +23,23 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Initialize default status counts
-  const defaultStatusCounts = {
+  // Initialize default status counts with useMemo to prevent unnecessary recalculations
+  const defaultStatusCounts = useMemo(() => ({
     'Under Review': 0,
     'Approved': 0,
     'Declined': 0,
     'Other': 0,
     ...statusCounts
-  };
+  }), [statusCounts]);
 
   // Memoize handlers
   const handleToggleView = useCallback(() => {
-    setIsMapView(!isMapView);
-  }, [isMapView, setIsMapView]);
-
-  // Debug logging for selectedId
-  useEffect(() => {
-    console.log('Selected ID state changed:', selectedId);
-  }, [selectedId]);
+    setIsMapView(prev => !prev);
+  }, [setIsMapView]);
 
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
-      console.log('Auto-selecting first application on mobile - map view only');
-      // Add a small delay to prevent immediate re-render
       const timer = setTimeout(() => {
         handleMarkerClick(filteredApplications[0].id);
       }, 100);
