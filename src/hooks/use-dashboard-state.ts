@@ -79,6 +79,12 @@ export const useDashboardState = () => {
 
   const logSearch = async (loadTime: number) => {
     try {
+      console.log('Logging search with params:', {
+        postcode,
+        status: initialTab,
+        loadTime
+      });
+
       const { data: { session } } = await supabase.auth.getSession();
       
       const { error } = await supabase.from('Searches').insert({
@@ -90,6 +96,12 @@ export const useDashboardState = () => {
 
       if (error) {
         console.error('Search logging error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
         toast({
           title: "Analytics Error",
           description: "Your search was processed but we couldn't log it. This won't affect your results.",
@@ -136,6 +148,12 @@ export const useDashboardState = () => {
         fetchApplicationsInRadius(tuple, 1000);
       } catch (error) {
         console.error('Search error:', error);
+        console.error('Error details:', {
+          message: (error as any).message,
+          details: (error as any).details,
+          hint: (error as any).hint,
+          code: (error as any).code
+        });
         toast({
           title: "Search Failed",
           description: "There was a problem fetching planning applications. Please try again or contact support if the issue persists.",
