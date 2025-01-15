@@ -40,7 +40,7 @@ export const useMapDashboardState = () => {
     activeSort,
     handleSortChange,
     statusCounts
-  } = useApplicationsState(coordinates);
+  } = useApplicationsState(coordinates ? [coordinates[0], coordinates[1]] : null);
 
   useEffect(() => {
     if (isSearching && !coordinates) {
@@ -69,7 +69,7 @@ export const useMapDashboardState = () => {
         variant: "destructive",
       });
     }
-  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast]);
+  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast, setIsSearching]);
 
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
