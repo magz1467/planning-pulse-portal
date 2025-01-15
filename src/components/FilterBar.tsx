@@ -61,8 +61,8 @@ export const FilterBar = ({
   }, [activeSort]);
 
   return (
-    <div className="flex items-center gap-2 p-2 bg-white border-b">
-      <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 p-1.5 bg-white border-b">
+      <div className="flex items-center gap-1.5">
         <ErrorBoundary>
           <StatusFilter
             onFilterChange={handleFilterChange}
@@ -81,7 +81,7 @@ export const FilterBar = ({
             <Button
               variant="outline"
               size={isMobile ? "sm" : "default"}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1.5"
             >
               <ArrowDownAZ className="h-4 w-4" />
               {sortButtonText}
