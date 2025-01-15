@@ -6,7 +6,8 @@ const initialState: MapState = {
   selectedId: null,
   applications: [],
   isMapView: true,
-  coordinates: [51.5074, -0.1278] // Default to London coordinates
+  coordinates: [51.5074, -0.1278], // Default to London coordinates
+  activeSort: null
 };
 
 function mapReducer(state: MapState, action: MapAction): MapState {
@@ -32,6 +33,11 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return {
         ...state,
         coordinates: action.payload
+      };
+    case 'SET_SORT':
+      return {
+        ...state,
+        activeSort: action.payload
       };
     default:
       return state;

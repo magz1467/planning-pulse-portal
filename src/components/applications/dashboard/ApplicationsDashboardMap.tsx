@@ -3,6 +3,7 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
 import { useApplicationsData } from "./hooks/useApplicationsData";
+import { SortType } from "@/hooks/use-sort-applications";
 
 export const ApplicationsDashboardMap = () => {
   const { state, dispatch } = useMapReducer();
@@ -26,6 +27,11 @@ export const ApplicationsDashboardMap = () => {
     }
   }, [applications]);
 
+  const handleSortChange = (sortType: SortType | null) => {
+    console.log('Handling sort change:', sortType);
+    dispatch({ type: 'SET_SORT', payload: sortType });
+  };
+
   return (
     <ErrorBoundary>
       <DashboardLayout
@@ -34,14 +40,14 @@ export const ApplicationsDashboardMap = () => {
         isMapView={state.isMapView}
         coordinates={state.coordinates}
         activeFilters={{}}
-        activeSort={null}
+        activeSort={state.activeSort}
         postcode=""
         isLoading={isLoading}
         filteredApplications={state.applications || []}
         handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
         handleFilterChange={() => {}}
         handlePostcodeSelect={() => {}}
-        handleSortChange={() => {}}
+        handleSortChange={handleSortChange}
         setIsMapView={(value) => dispatch({ type: 'TOGGLE_VIEW' })}
       />
     </ErrorBoundary>
