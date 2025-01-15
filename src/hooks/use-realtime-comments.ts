@@ -1,71 +1,101 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useToast } from './use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { useWebSocketConnection } from './use-websocket-connection';
-
-interface Comment {
-  id: number;
-  created_at: string;
-  comment: string;
-  user_id: string;
-  application_id: number;
-  parent_id?: number;
-  upvotes: number;
-  downvotes: number;
-  user_email?: string;
-}
+import { Comment } from '@/types/planning';
 
 export const useRealtimeComments = (applicationId: number) => {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
-  const handleNewComment = useCallback((payload: { 
-    new: Comment;
-    eventType: 'INSERT' | 'UPDATE' | 'DELETE';
-  }) => {
-    console.log('Received new comment:', payload);
-    
-    if (payload.eventType === 'INSERT') {
-      setComments(prev => [...prev, payload.new]);
-    } else if (payload.eventType === 'UPDATE') {
-      setComments(prev => 
-        prev.map(comment => 
-          comment.id === payload.new.id ? payload.new : comment
-        )
-      );
-    } else if (payload.eventType === 'DELETE') {
-      setComments(prev => 
-        prev.filter(comment => comment.id !== payload.new.id)
-      );
-    }
-  }, []);
-
-  const channel = useWebSocketConnection({
-    channelName: `comments-${applicationId}`,
-    eventConfig: {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'comments',
-      filter: `application_id=eq.${applicationId}`
-    },
-    callback: handleNewComment
-  });
-
+  // Fetch initial comments
   useEffect(() => {
-    const fetchExistingComments = async () => {
+    const fetchComments = async () => {
       try {
+        setIsLoading(true);
         const { data, error } = await supabase
-          .from('comments')
-          .select('*')
+          .from('Comments')
+          .select('*, profiles:profiles(username)')
           .eq('application_id', applicationId)
-          .order('created_at', { ascending: true });
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setComments(data || []);
       } catch (error) {
         console.error('Error fetching comments:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load comments',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchExistingComments();
+    if (applicationId) {
+      fetchComments();
+    }
+  }, [applicationId, toast]);
+
+  // Handle new comments via WebSocket
+  const handleNewComment = useCallback((payload: any) => {
+    const newComment = payload.new as Comment;
+    if (newComment && newComment.application_id === applicationId) {
+      setComments(prevComments => [newComment, ...prevComments]);
+    }
   }, [applicationId]);
 
-  return comments;
+  // Set up WebSocket connection
+  const { isConnected } = useWebSocketConnection(
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'Comments',
+      filter: `application_id=eq.${applicationId}`
+    },
+    handleNewComment
+  );
+
+  // Add new comment
+  const addComment = useCallback(async (content: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        throw new Error('User not authenticated');
+      }
+
+      const { data, error } = await supabase
+        .from('Comments')
+        .insert([
+          {
+            comment: content,
+            application_id: applicationId,
+            user_id: session.user.id,
+            user_email: session.user.email
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add comment',
+        variant: 'destructive'
+      });
+      return null;
+    }
+  }, [applicationId, toast]);
+
+  return {
+    comments,
+    isLoading,
+    isConnected,
+    addComment
+  };
 };

@@ -1,97 +1,87 @@
-import { useEffect, useState } from 'react';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { useEffect, useRef, useState } from 'react';
+import { useToast } from './use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
-interface EventConfig {
+interface WebSocketConfig {
   event: 'INSERT' | 'UPDATE' | 'DELETE';
   schema: string;
   table: string;
   filter?: string;
 }
 
-interface WebSocketConfig {
-  channelName: string;
-  eventConfig: EventConfig;
-  callback: (payload: any) => void;
-}
-
-export const useWebSocketConnection = ({
-  channelName,
-  eventConfig,
-  callback
-}: WebSocketConfig) => {
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+export const useWebSocketConnection = (config: WebSocketConfig, onMessage: (payload: any) => void) => {
   const { toast } = useToast();
-  const MAX_RETRIES = 3;
+  const [isConnected, setIsConnected] = useState(false);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const retryTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    const setupWebSocket = () => {
-      console.log('Setting up WebSocket connection...', {
-        channelName,
-        eventConfig
-      });
-
+    const connectWebSocket = () => {
       try {
-        const channel = supabase
-          .channel(channelName)
+        // Clean up existing connection if any
+        if (channelRef.current) {
+          channelRef.current.unsubscribe();
+        }
+
+        // Create new subscription
+        channelRef.current = supabase
+          .channel('db-changes')
           .on(
-            'postgres_changes',
+            'postgres_changes' as any,
             {
-              event: eventConfig.event,
-              schema: eventConfig.schema,
-              table: eventConfig.table,
-              filter: eventConfig.filter
+              event: config.event,
+              schema: config.schema,
+              table: config.table,
+              filter: config.filter
             },
-            callback
+            (payload) => {
+              console.log('Received WebSocket message:', payload);
+              onMessage(payload);
+            }
           )
           .subscribe((status) => {
-            console.log(`Subscription status for ${channelName}:`, status);
-
+            console.log('WebSocket connection status:', status);
             if (status === 'SUBSCRIBED') {
-              console.log('Successfully subscribed to channel:', channelName);
-              setRetryCount(0); // Reset retry count on successful connection
-            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-              console.error('Channel closed or error occurred:', status);
-              handleReconnect();
+              setIsConnected(true);
+              // Clear retry timeout if connection successful
+              if (retryTimeoutRef.current) {
+                clearTimeout(retryTimeoutRef.current);
+                retryTimeoutRef.current = undefined;
+              }
+            } else {
+              setIsConnected(false);
             }
           });
 
-        setChannel(channel);
       } catch (error) {
-        console.error('Error setting up WebSocket:', error);
-        handleReconnect();
-      }
-    };
-
-    const handleReconnect = () => {
-      if (retryCount < MAX_RETRIES) {
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-        console.log(`Attempting reconnection in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
-        
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          setupWebSocket();
-        }, delay);
-      } else {
+        console.error('WebSocket connection error:', error);
+        setIsConnected(false);
         toast({
-          title: "Connection Error",
-          description: "Failed to establish real-time connection. Please refresh the page.",
-          variant: "destructive"
+          title: 'Connection Error',
+          description: 'Failed to connect to real-time updates. Retrying...',
+          variant: 'destructive'
         });
+
+        // Retry connection with exponential backoff
+        if (!retryTimeoutRef.current) {
+          retryTimeoutRef.current = setTimeout(connectWebSocket, 5000);
+        }
       }
     };
 
-    setupWebSocket();
+    connectWebSocket();
 
+    // Cleanup function
     return () => {
-      if (channel) {
-        console.log('Cleaning up WebSocket connection:', channelName);
-        channel.unsubscribe();
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
       }
     };
-  }, [channelName, callback, retryCount]);
+  }, [config.event, config.schema, config.table, config.filter, toast, onMessage]);
 
-  return channel;
+  return { isConnected };
 };
