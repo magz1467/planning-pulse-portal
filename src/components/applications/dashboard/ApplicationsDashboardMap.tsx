@@ -2,6 +2,11 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
+import { MapAction } from "@/types/map-reducer";
+
+interface ExtendedDashboardLayoutProps extends Omit<DashboardLayoutProps, 'handleMarkerClick'> {
+  dispatch: React.Dispatch<MapAction>;
+}
 
 export const ApplicationsDashboardMap = () => {
   const { state, dispatch } = useMapReducer();
@@ -20,7 +25,16 @@ export const ApplicationsDashboardMap = () => {
         selectedId={state.selectedId}
         isMapView={state.isMapView}
         coordinates={state.coordinates}
-        dispatch={dispatch}
+        activeFilters={{}}
+        activeSort={null}
+        postcode=""
+        isLoading={false}
+        filteredApplications={state.applications}
+        handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
+        handleFilterChange={() => {}}
+        handlePostcodeSelect={() => {}}
+        handleSortChange={() => {}}
+        setIsMapView={(value) => dispatch({ type: value ? 'TOGGLE_VIEW' : 'TOGGLE_VIEW' })}
       />
     </ErrorBoundary>
   );

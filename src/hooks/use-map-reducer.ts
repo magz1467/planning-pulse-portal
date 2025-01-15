@@ -1,5 +1,6 @@
+import { Application } from "@/types/planning";
+import { MapState, MapAction } from "@/types/map-reducer";
 import { useReducer } from 'react';
-import { MapState, MapAction } from '@/types/map-reducer';
 
 const initialState: MapState = {
   selectedId: null,
