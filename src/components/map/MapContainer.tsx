@@ -54,7 +54,9 @@ export const MapContainerComponent = memo(({
         zoom={14}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
-        onmoveend={handleMoveEnd}
+        eventHandlers={{
+          moveend: handleMoveEnd
+        }}
       >
         <TileLayer 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
