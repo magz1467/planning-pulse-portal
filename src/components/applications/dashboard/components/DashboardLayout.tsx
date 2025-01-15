@@ -80,7 +80,7 @@ const DashboardLayoutComponent = ({
         <SidebarSection 
           isMobile={isMobile}
           applications={filteredApplications}
-          selectedApplication={selectedId}
+          selectedId={selectedId}
           postcode={postcode}
           activeFilters={activeFilters}
           activeSort={activeSort}
