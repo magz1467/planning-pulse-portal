@@ -32,6 +32,7 @@ export const StatusFilter = memo(({
     'Other': 0
   }
 }: StatusFilterProps) => {
+  // Memoize callback to prevent unnecessary re-renders
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     if (onFilterChange) {
       onFilterChange(filterType, value);
