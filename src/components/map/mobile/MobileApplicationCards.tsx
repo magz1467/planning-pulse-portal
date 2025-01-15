@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
 
@@ -19,7 +19,6 @@ export const MobileApplicationCards = ({
   const [showFullDetails, setShowFullDetails] = useState(false);
   const { toast } = useToast();
 
-  // Auto-select first application on mobile if none selected
   useEffect(() => {
     if (applications.length > 0 && !selectedId) {
       console.log('Auto-selecting first application:', applications[0].id);
@@ -83,5 +82,3 @@ export const MobileApplicationCards = ({
 
   return null;
 };
-
-MobileApplicationCards.displayName = 'MobileApplicationCards';

@@ -1,8 +1,8 @@
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
-import { memo } from 'react';
+import { memo } from "react";
 
-export interface MapViewProps {
+interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
   coordinates: [number, number];
