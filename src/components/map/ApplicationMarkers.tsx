@@ -3,6 +3,7 @@ import { Application } from "@/types/planning";
 import { LatLngTuple } from 'leaflet';
 import { useMemo, useCallback, memo } from 'react';
 import { useToast } from "@/hooks/use-toast";
+import L from 'leaflet';
 
 interface ApplicationMarkersProps {
   applications: Application[];
@@ -69,6 +70,7 @@ const SingleMarker = memo(({
   onClick: () => void;
 }) => {
   const { toast } = useToast();
+  console.log(`Rendering marker for application ${app.id}, selected: ${isSelected}`);
 
   if (!app.coordinates) {
     console.warn('Application missing coordinates:', app.id);
@@ -78,6 +80,7 @@ const SingleMarker = memo(({
   const color = getStatusColor(app.status);
   
   const handleClick = useCallback((e: L.LeafletMouseEvent) => {
+    console.log('Marker clicked:', app.id);
     e.originalEvent.stopPropagation();
     try {
       onClick();
@@ -89,7 +92,7 @@ const SingleMarker = memo(({
         variant: "destructive",
       });
     }
-  }, [onClick, toast]);
+  }, [onClick, toast, app.id]);
 
   return (
     <Marker
@@ -121,6 +124,7 @@ export const ApplicationMarkers = memo(({
   }, [onMarkerClick]);
 
   const markers = useMemo(() => {
+    console.log('Creating markers array, count:', applications.length);
     return applications.map((app) => (
       <SingleMarker
         key={`marker-${app.id}`}
