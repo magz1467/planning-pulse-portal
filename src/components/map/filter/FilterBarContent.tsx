@@ -4,20 +4,19 @@ import { SortDropdown } from "./SortDropdown";
 import { ViewToggle } from "./ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
 import { Application } from "@/types/planning";
-import { memo, useEffect } from "react";
+import { memo } from "react";
 import { Filter } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
 
 interface FilterBarContentProps {
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: SortType) => void;
+  onToggle?: () => void;
   activeFilters: {
     status?: string;
     type?: string;
   };
   activeSort: SortType;
   isMapView?: boolean;
-  onToggle?: () => void;
   applications?: Application[];
   isMobile?: boolean;
   statusCounts?: {
@@ -44,28 +43,6 @@ export const FilterBarContent = memo(({
     'Other': 0
   }
 }: FilterBarContentProps) => {
-  // Handle WebSocket errors gracefully
-  useEffect(() => {
-    const handleWebSocketError = (error: Event) => {
-      console.warn('WebSocket connection error:', error);
-      toast({
-        title: "Connection Issue",
-        description: "Having trouble maintaining connection. Will retry automatically.",
-        variant: "destructive",
-      });
-    };
-
-    window.addEventListener('error', (event) => {
-      if (event.message.includes('WebSocket')) {
-        handleWebSocketError(event);
-      }
-    });
-
-    return () => {
-      window.removeEventListener('error', handleWebSocketError);
-    };
-  }, []);
-
   return (
     <div className="flex items-center gap-2 px-4 py-2 bg-background border-b">
       <div className="flex-1 flex items-center gap-2">
