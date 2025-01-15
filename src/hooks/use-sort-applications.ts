@@ -65,8 +65,11 @@ const sortByImpactScore = (applications: Application[]) => {
     if (a.final_impact_score === null) return 1;
     if (b.final_impact_score === null) return -1;
     
-    // Sort by impact score descending (highest first)
-    return b.final_impact_score - a.final_impact_score;
+    // Convert to numbers and sort by impact score descending (highest first)
+    const scoreA = Number(a.final_impact_score);
+    const scoreB = Number(b.final_impact_score);
+    
+    return scoreB - scoreA;
   });
 };
 
