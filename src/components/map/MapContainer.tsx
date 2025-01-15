@@ -56,9 +56,9 @@ export const MapContainerComponent = memo(({
         style={{ height: "100%", width: "100%" }}
         whenReady={() => {
           console.log('Map is ready');
-        }}
-        whenCreated={(map) => {
-          mapRef.current = map;
+          if (mapRef.current) {
+            handleMoveEnd();
+          }
         }}
       >
         <TileLayer 
