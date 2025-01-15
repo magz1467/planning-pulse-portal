@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback, useMemo, useEffect, useState, memo } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface FilterBarProps {
@@ -28,7 +28,7 @@ interface FilterBarProps {
   };
 }
 
-export const FilterBar = memo(({
+export const FilterBar = ({
   onFilterChange,
   onSortChange,
   activeFilters = {},
@@ -101,6 +101,6 @@ export const FilterBar = memo(({
       )}
     </div>
   );
-});
+};
 
 FilterBar.displayName = 'FilterBar';
