@@ -3,6 +3,7 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
 import { MapAction } from "@/types/map-reducer";
+import type { DashboardLayoutProps } from "./components/DashboardLayout";
 
 interface ExtendedDashboardLayoutProps extends Omit<DashboardLayoutProps, 'handleMarkerClick'> {
   dispatch: React.Dispatch<MapAction>;
