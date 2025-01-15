@@ -30,7 +30,10 @@ export const useApplicationsState = (coordinates: LatLngTuple | null) => {
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
 
   useEffect(() => {
-    if (!coordinates) return;
+    if (!coordinates) {
+      console.log('No coordinates provided, skipping search');
+      return;
+    }
     
     if (isInitialSearch || isNewSearch) {
       console.log('Fetching applications with coordinates:', coordinates);
