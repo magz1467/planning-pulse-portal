@@ -24,11 +24,8 @@ export const MapSection = memo(({
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
-    // Force the click to be handled synchronously
-    setTimeout(() => {
-      onMarkerClick(id);
-    }, 0);
-  }, [onMarkerClick]); // Add onMarkerClick to dependencies
+    onMarkerClick(id);
+  }, [onMarkerClick]);
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -53,7 +50,7 @@ export const MapSection = memo(({
           <MobileApplicationCards
             applications={applications}
             selectedId={selectedId}
-            onSelectApplication={onMarkerClick}
+            onSelectApplication={handleMarkerClick}
           />
         )}
       </div>
