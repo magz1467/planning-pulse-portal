@@ -1,49 +1,96 @@
-import { useMemo } from 'react';
-import { Application } from '@/types/planning';
-import { isWithinNextSevenDays } from '@/utils/dateUtils';
+import { Application } from "@/types/planning";
+import { isWithinNextSevenDays } from "@/utils/dateUtils";
 
-export type SortType = 'closingSoon' | 'newest' | null;
+export type SortType = 'closingSoon' | 'newest' | 'impact' | null;
 
-export const useSortApplications = (
-  applications: Application[],
-  sortType: SortType
-) => {
-  return useMemo(() => {
-    if (!sortType || !applications?.length) return applications;
+interface SortConfig {
+  type: SortType;
+  applications: Application[];
+}
 
-    const sortedApps = [...applications];
+const sortByClosingDate = (applications: Application[]) => {
+  return [...applications].sort((a, b) => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
 
-    if (sortType === 'newest') {
-      return sortedApps.sort((a, b) => {
-        // Convert valid_date strings to timestamps for comparison
-        const dateA = a.valid_date ? new Date(a.valid_date).getTime() : 0;
-        const dateB = b.valid_date ? new Date(b.valid_date).getTime() : 0;
-        return dateB - dateA; // Most recent first
-      });
+    const dateA = a.last_date_consultation_comments ? new Date(a.last_date_consultation_comments) : null;
+    const dateB = b.last_date_consultation_comments ? new Date(b.last_date_consultation_comments) : null;
+
+    // Invalid dates go to the end
+    if (!dateA || isNaN(dateA.getTime())) return 1;
+    if (!dateB || isNaN(dateB.getTime())) return -1;
+
+    const isClosingSoonA = isWithinNextSevenDays(a.last_date_consultation_comments);
+    const isClosingSoonB = isWithinNextSevenDays(b.last_date_consultation_comments);
+
+    // Prioritize "Under Review" status
+    const isUnderReviewA = a.status?.toLowerCase().includes('under consideration');
+    const isUnderReviewB = b.status?.toLowerCase().includes('under consideration');
+
+    if (isUnderReviewA && !isUnderReviewB) return -1;
+    if (!isUnderReviewA && isUnderReviewB) return 1;
+
+    // Then prioritize closing soon
+    if (isClosingSoonA && !isClosingSoonB) return -1;
+    if (!isClosingSoonA && isClosingSoonB) return 1;
+
+    // If both are closing soon, sort by closest date
+    if (isClosingSoonA && isClosingSoonB) {
+      return dateA.getTime() - dateB.getTime();
     }
 
-    if (sortType === 'closingSoon') {
-      return sortedApps.sort((a, b) => {
-        // First check if items are closing soon
-        const aClosingSoon = a.last_date_consultation_comments ? 
-          isWithinNextSevenDays(a.last_date_consultation_comments) : false;
-        const bClosingSoon = b.last_date_consultation_comments ? 
-          isWithinNextSevenDays(b.last_date_consultation_comments) : false;
+    // For non-closing soon, sort by date descending
+    return dateB.getTime() - dateA.getTime();
+  });
+};
 
-        // If both or neither are closing soon, sort by actual date
-        if (aClosingSoon === bClosingSoon) {
-          const dateA = a.last_date_consultation_comments ? 
-            new Date(a.last_date_consultation_comments).getTime() : Infinity;
-          const dateB = b.last_date_consultation_comments ? 
-            new Date(b.last_date_consultation_comments).getTime() : Infinity;
-          return dateA - dateB; // Soonest first
-        }
+const sortByNewest = (applications: Application[]) => {
+  return [...applications].sort((a, b) => {
+    const dateA = a.valid_date ? new Date(a.valid_date) : null;
+    const dateB = b.valid_date ? new Date(b.valid_date) : null;
 
-        // Put closing soon items first
-        return aClosingSoon ? -1 : 1;
-      });
-    }
+    // Invalid dates go to the end
+    if (!dateA || isNaN(dateA.getTime())) return 1;
+    if (!dateB || isNaN(dateB.getTime())) return -1;
 
-    return applications;
-  }, [applications, sortType]);
+    // Sort by date descending (newest first)
+    return dateB.getTime() - dateA.getTime();
+  });
+};
+
+const sortByImpactScore = (applications: Application[]) => {
+  return [...applications].sort((a, b) => {
+    // Handle null cases - push them to the bottom
+    if (a.final_impact_score === null && b.final_impact_score === null) return 0;
+    if (a.final_impact_score === null) return 1;
+    if (b.final_impact_score === null) return -1;
+    
+    // Sort by impact score descending (highest first)
+    return Number(b.final_impact_score) - Number(a.final_impact_score);
+  });
+};
+
+export const useApplicationSorting = ({ type, applications }: SortConfig) => {
+  if (!applications?.length) return [];
+  
+  console.log('Sorting applications with type:', type);
+  console.log('Number of applications before sort:', applications.length);
+
+  let sorted;
+  switch (type) {
+    case 'closingSoon':
+      sorted = sortByClosingDate(applications);
+      break;
+    case 'newest':
+      sorted = sortByNewest(applications);
+      break;
+    case 'impact':
+      sorted = sortByImpactScore(applications);
+      break;
+    default:
+      sorted = applications;
+  }
+
+  console.log('Number of applications after sort:', sorted.length);
+  return sorted;
 };

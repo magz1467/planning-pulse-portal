@@ -36,6 +36,10 @@ export const SortDropdown = ({
           Closing Soon
           {activeSort === 'closingSoon' && <Check className="h-4 w-4 ml-2" />}
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleSort('impact')} className="flex items-center justify-between">
+          Highest Impact
+          {activeSort === 'impact' && <Check className="h-4 w-4 ml-2" />}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -56,6 +56,7 @@ export const FilterBar = ({
   const sortButtonText = useMemo(() => {
     if (activeSort === 'closingSoon') return 'Closing Soon';
     if (activeSort === 'newest') return 'Newest';
+    if (activeSort === 'impact') return 'Highest Impact';
     return 'Sort';
   }, [activeSort]);
 
