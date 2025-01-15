@@ -34,7 +34,7 @@ const statusOptions = [
 
 export const FilterDropdown = memo(({
   onFilterChange,
-  activeFilters,
+  activeFilters = {},
   statusCounts = {
     'Under Review': 0,
     'Approved': 0,
@@ -42,45 +42,27 @@ export const FilterDropdown = memo(({
     'Other': 0
   }
 }: FilterDropdownProps) => {
-  // COMMENTED FOR DEBUGGING - Remove if error persists
-  // const hasActiveFilters = useMemo(() => 
-  //   Object.values(activeFilters).some(Boolean), 
-  //   [activeFilters]
-  // );
-  const hasActiveFilters = Object.values(activeFilters).some(Boolean);
+  const hasActiveFilters = useMemo(() => 
+    Object.values(activeFilters).some(Boolean), 
+    [activeFilters]
+  );
 
-  // COMMENTED FOR DEBUGGING - Remove if error persists
-  // const handleFilterChange = useCallback((filterType: string, value: string) => {
-  //   onFilterChange(filterType, value);
-  // }, [onFilterChange]);
-  const handleFilterChange = (filterType: string, value: string) => {
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
     onFilterChange(filterType, value);
-  };
+  }, [onFilterChange]);
 
-  // COMMENTED FOR DEBUGGING - Remove if error persists
-  // const handleClearFilters = useCallback(() => {
-  //   onFilterChange("status", "");
-  //   onFilterChange("type", "");
-  // }, [onFilterChange]);
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     onFilterChange("status", "");
     onFilterChange("type", "");
-  };
+  }, [onFilterChange]);
 
-  // COMMENTED FOR DEBUGGING - Remove if error persists
-  // const statusOptionsWithCounts = useMemo(() => 
-  //   statusOptions.map(option => ({
-  //     ...option,
-  //     count: statusCounts[option.value as keyof typeof statusCounts] || 0
-  //   })),
-  //   [statusCounts]
-  // );
-  const statusOptionsWithCounts = statusOptions.map(option => ({
-    ...option,
-    count: statusCounts[option.value as keyof typeof statusCounts] || 0
-  }));
-
-  console.log('FilterDropdown render', { activeFilters, statusCounts }); // Debug log
+  const statusOptionsWithCounts = useMemo(() => 
+    statusOptions.map(option => ({
+      ...option,
+      count: statusCounts[option.value as keyof typeof statusCounts] || 0
+    })),
+    [statusCounts]
+  );
 
   return (
     <DropdownMenu>

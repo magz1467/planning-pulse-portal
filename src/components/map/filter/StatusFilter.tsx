@@ -30,8 +30,6 @@ export const StatusFilter = memo(({
     'Other': 0
   }
 }: StatusFilterProps) => {
-  console.log('StatusFilter render', { activeFilters, statusCounts }); // Debug log
-
   return (
     <FilterDropdown
       onFilterChange={onFilterChange}
