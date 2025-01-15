@@ -1,8 +1,7 @@
-import { SortDropdown } from "@/components/map/filter/SortDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ArrowUpDown } from "lucide-react";
-import { Application } from "@/types/planning";
 import { Button } from "@/components/ui/button";
+import { ArrowDownAZ } from "lucide-react";
+import { SortDropdown } from "./map/filter/SortDropdown";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
@@ -16,10 +15,10 @@ interface FilterBarProps {
     status?: string;
     type?: string;
   };
-  activeSort?: SortType;
+  activeSort: SortType;
   isMapView?: boolean;
   onToggleView?: () => void;
-  applications?: Application[];
+  applications?: any[];
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
@@ -32,8 +31,8 @@ export const FilterBar = ({
   onFilterChange,
   onSortChange,
   activeFilters = {},
-  activeSort = null,
-  isMapView = true,
+  activeSort,
+  isMapView,
   onToggleView,
   applications = [],
   statusCounts
@@ -41,15 +40,11 @@ export const FilterBar = ({
   const isMobile = useIsMobile();
 
   const handleFilterChange = useCallback((filterType: string, value: string) => {
-    if (onFilterChange) {
-      onFilterChange(filterType, value);
-    }
+    onFilterChange?.(filterType, value);
   }, [onFilterChange]);
 
   const handleSortChange = useCallback((sortType: SortType) => {
-    if (onSortChange) {
-      onSortChange(sortType);
-    }
+    onSortChange?.(sortType);
   }, [onSortChange]);
 
   const sortButtonText = useMemo(() => {
@@ -60,39 +55,41 @@ export const FilterBar = ({
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
-      <div className="flex items-center gap-2 flex-1">
-        <ErrorBoundary>
-          <StatusFilter
-            onFilterChange={handleFilterChange}
-            activeFilters={activeFilters}
-            isMobile={isMobile}
-            applications={applications}
-            statusCounts={statusCounts}
-          />
-        </ErrorBoundary>
+      <ErrorBoundary>
+        <StatusFilter
+          onFilterChange={handleFilterChange}
+          activeFilters={activeFilters}
+          isMobile={isMobile}
+          applications={applications}
+          statusCounts={statusCounts}
+        />
+      </ErrorBoundary>
 
+      <div className="flex items-center gap-2 ml-auto">
         <ErrorBoundary>
           <div className="flex items-center h-full">
             <SortDropdown
               activeSort={activeSort}
               onSortChange={handleSortChange}
             >
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size={isMobile ? "sm" : "default"}
                 className="flex items-center gap-2"
               >
-                <ArrowUpDown className="h-4 w-4" />
+                <ArrowDownAZ className="h-4 w-4" />
                 {sortButtonText}
               </Button>
             </SortDropdown>
           </div>
         </ErrorBoundary>
-      </div>
 
-      {isMobile && onToggleView && (
-        <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
-      )}
+        {onToggleView && (
+          <ErrorBoundary>
+            <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
+          </ErrorBoundary>
+        )}
+      </div>
     </div>
   );
 };
