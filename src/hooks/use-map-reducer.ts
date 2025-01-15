@@ -6,10 +6,12 @@ const initialState: MapState = {
   selectedId: null,
   applications: [],
   isMapView: true,
-  coordinates: null
+  coordinates: [51.5074, -0.1278] // Default to London coordinates
 };
 
 function mapReducer(state: MapState, action: MapAction): MapState {
+  console.log('Map reducer action:', action.type, action.payload);
+  
   switch (action.type) {
     case 'SELECT_APPLICATION':
       return {
