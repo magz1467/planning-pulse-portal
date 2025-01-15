@@ -36,17 +36,20 @@ export const useDashboardState = () => {
     applications, 
     isLoading: isLoadingApps, 
     fetchApplicationsInRadius,
-    statusCounts
+    statusCounts,
+    error
   } = useApplicationsData();
 
-  // Auto-select first application on mobile only on initial load and only in map view
+  // Show error toast if there's an error fetching applications
   useEffect(() => {
-    if (!hasAutoSelected && applications.length > 0 && window.innerWidth <= 768 && !selectedId && isMapView) {
-      console.log('Auto-selecting first application on mobile - map view only');
-      handleMarkerClick(applications[0].id);
-      setHasAutoSelected(true);
+    if (error) {
+      toast({
+        title: "Error loading applications",
+        description: error.message || "Please try again later",
+        variant: "destructive",
+      });
     }
-  }, [applications, selectedId, hasAutoSelected, handleMarkerClick, isMapView]);
+  }, [error, toast]);
 
   useEffect(() => {
     if (isSearching && !coordinates) {

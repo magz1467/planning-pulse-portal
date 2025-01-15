@@ -1,7 +1,9 @@
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { useCallback, useEffect, useMemo } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -37,6 +39,17 @@ export const ApplicationsDashboardMap = () => {
     setIsMapView(prev => !prev);
   }, [setIsMapView]);
 
+  // Show error toast if applications fail to load
+  useEffect(() => {
+    if (!isLoading && applications.length === 0 && coordinates) {
+      toast({
+        title: "No applications found",
+        description: "Try adjusting your search area or filters",
+        variant: "destructive",
+      });
+    }
+  }, [isLoading, applications.length, coordinates]);
+
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
@@ -48,22 +61,26 @@ export const ApplicationsDashboardMap = () => {
   }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
 
   return (
-    <DashboardLayout
-      selectedId={selectedId}
-      activeFilters={activeFilters}
-      activeSort={activeSort}
-      isMapView={isMapView}
-      setIsMapView={setIsMapView}
-      postcode={postcode}
-      coordinates={coordinates as [number, number]}
-      isLoading={isLoading}
-      applications={applications}
-      filteredApplications={filteredApplications}
-      statusCounts={defaultStatusCounts}
-      handleMarkerClick={handleMarkerClick}
-      handleFilterChange={handleFilterChange}
-      handlePostcodeSelect={handlePostcodeSelect}
-      handleSortChange={handleSortChange}
-    />
+    <ErrorBoundary>
+      <DashboardLayout
+        selectedId={selectedId}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+        isMapView={isMapView}
+        setIsMapView={setIsMapView}
+        postcode={postcode}
+        coordinates={coordinates as [number, number]}
+        isLoading={isLoading}
+        applications={applications}
+        filteredApplications={filteredApplications}
+        statusCounts={defaultStatusCounts}
+        handleMarkerClick={handleMarkerClick}
+        handleFilterChange={handleFilterChange}
+        handlePostcodeSelect={handlePostcodeSelect}
+        handleSortChange={handleSortChange}
+      />
+    </ErrorBoundary>
   );
 };
+
+export default ApplicationsDashboardMap;
