@@ -10,7 +10,7 @@ const initialState: MapState = {
 };
 
 function mapReducer(state: MapState, action: MapAction): MapState {
-  console.log('Map reducer action:', action.type, action.payload);
+  console.log('Map reducer action:', action.type, 'payload' in action ? action.payload : '');
   
   switch (action.type) {
     case 'SELECT_APPLICATION':
