@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,74 +7,92 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Application } from "@/types/planning";
-import { memo, useCallback, useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { memo, useCallback, useMemo } from 'react';
 
 interface FilterDropdownProps {
-  children: React.ReactNode;
   onFilterChange: (filterType: string, value: string) => void;
   activeFilters: {
     status?: string;
     type?: string;
   };
-  applications: Application[];
   isMobile: boolean;
-  statusCounts: { [key: string]: number };
-  isLoading?: boolean;
+  applications?: any[];
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
-const predefinedStatuses = [
+const statusOptions = [
   { label: "Under Review", value: "Under Review" },
   { label: "Approved", value: "Approved" },
   { label: "Declined", value: "Declined" },
-  { label: "Other", value: "Other" }
 ];
 
 export const FilterDropdown = memo(({
-  children,
   onFilterChange,
   activeFilters,
-  applications,
-  isMobile,
-  statusCounts,
-  isLoading = false
+  statusCounts = {
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  }
 }: FilterDropdownProps) => {
-  // Memoize expensive computations
+  // Memoize computed values
   const hasActiveFilters = useMemo(() => 
-    Object.values(activeFilters).some(Boolean),
+    Object.values(activeFilters).some(Boolean), 
     [activeFilters]
   );
 
-  // Memoize callback to prevent unnecessary re-renders
+  // Memoize handlers
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     onFilterChange(filterType, value);
   }, [onFilterChange]);
 
+  const handleClearFilters = useCallback(() => {
+    onFilterChange("status", "");
+    onFilterChange("type", "");
+  }, [onFilterChange]);
+
+  // Memoize status options with counts
+  const statusOptionsWithCounts = useMemo(() => 
+    statusOptions.map(option => ({
+      ...option,
+      count: statusCounts[option.value as keyof typeof statusCounts] || 0
+    })),
+    [statusCounts]
+  );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {children}
+        <Button 
+          variant="outline" 
+          className={cn(
+            "flex-1",
+            hasActiveFilters && "border-primary text-primary"
+          )}
+        >
+          <Filter className="w-4 h-4 mr-2" />
+          Filter
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start"
-        className="w-[280px] bg-white z-[9999]"
+        className="w-[200px] bg-white z-[9999]"
       >
         {hasActiveFilters && (
           <>
-            <DropdownMenuItem
-              onClick={() => handleFilterChange("status", "")}
-              className="text-blue-600 font-medium"
-            >
-              Clear filters
+            <DropdownMenuItem onClick={handleClearFilters}>
+              Clear all filters
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
-
-        <DropdownMenuItem disabled className="text-sm font-semibold">
-          Status
-        </DropdownMenuItem>
-
         <DropdownMenuItem
           onClick={() => handleFilterChange("status", "")}
           className="justify-between"
@@ -81,16 +100,13 @@ export const FilterDropdown = memo(({
           All statuses
           {!activeFilters.status && <span>✓</span>}
         </DropdownMenuItem>
-
-        {predefinedStatuses.map((option) => (
+        {statusOptionsWithCounts.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleFilterChange("status", option.value)}
             className="justify-between"
           >
-            <span>
-              {option.label} ({isLoading ? '...' : statusCounts[option.value] || 0})
-            </span>
+            {option.label} ({option.count})
             {activeFilters.status === option.value && <span>✓</span>}
           </DropdownMenuItem>
         ))}

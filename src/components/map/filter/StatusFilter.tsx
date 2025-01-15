@@ -46,16 +46,7 @@ export const StatusFilter = memo(({
       isMobile={isMobile}
       applications={applications}
       statusCounts={statusCounts}
-    >
-      <Button 
-        variant="outline" 
-        size={isMobile ? "sm" : "default"}
-        className="flex items-center gap-2"
-      >
-        <Filter className="h-4 w-4" />
-        Filter
-      </Button>
-    </FilterDropdown>
+    />
   );
 });
 
