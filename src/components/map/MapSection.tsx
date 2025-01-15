@@ -50,7 +50,7 @@ export const MapSection = memo(({
           <MobileApplicationCards
             applications={applications}
             selectedId={selectedId}
-            onSelectApplication={onMarkerClick}
+            onSelectApplication={handleMarkerClick}
           />
         )}
       </div>
