@@ -64,15 +64,6 @@ export const FilterBar = ({
     return 'Sort';
   }, [localActiveSort]);
 
-  useEffect(() => {
-    console.log('FilterBar render state:', {
-      activeFilters,
-      activeSort: localActiveSort,
-      applications: applications?.length,
-      statusCounts
-    });
-  }, [activeFilters, localActiveSort, applications, statusCounts]);
-
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
       <div className="flex items-center gap-2 flex-1">

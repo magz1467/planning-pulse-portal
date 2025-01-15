@@ -53,9 +53,7 @@ export const ApplicationMarkers = ({
               key={app.id}
               position={app.coordinates}
               eventHandlers={{
-                click: () => {
-                  onMarkerClick(app.id);
-                },
+                click: () => onMarkerClick(app.id),
               }}
               icon={createIcon(color, isSelected)}
               zIndexOffset={isSelected ? 1000 : 0}
