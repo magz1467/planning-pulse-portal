@@ -4,42 +4,42 @@ import { MobileListContainer } from "@/components/map/mobile/MobileListContainer
 
 interface SidebarSectionProps {
   isMobile: boolean;
+  isMapView: boolean;
   applications: Application[];
   selectedId: number | null;
   postcode: string;
+  coordinates: [number, number];
   activeFilters: {
     status?: string;
     type?: string;
   };
   activeSort: 'closingSoon' | 'newest' | null;
-  onFilterChange: (filterType: string, value: string) => void;
-  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
-  onSelectApplication: (id: number | null) => void;
-  onClose: () => void;
-  isMapView: boolean;
-  coordinates: [number, number];
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
     'Declined': number;
     'Other': number;
   };
+  onFilterChange: (filterType: string, value: string) => void;
+  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
+  onSelectApplication: (id: number | null) => void;
+  onClose: () => void;
 }
 
 export const SidebarSection = ({
   isMobile,
+  isMapView,
   applications,
   selectedId,
   postcode,
+  coordinates,
   activeFilters,
   activeSort,
+  statusCounts,
   onFilterChange,
   onSortChange,
   onSelectApplication,
   onClose,
-  isMapView,
-  coordinates,
-  statusCounts,
 }: SidebarSectionProps) => {
   if (!coordinates) return null;
 

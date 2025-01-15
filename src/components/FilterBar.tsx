@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback, useMemo, useEffect, useState, memo } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface FilterBarProps {
@@ -28,7 +28,7 @@ interface FilterBarProps {
   };
 }
 
-const FilterBarComponent = ({
+export const FilterBar = ({
   onFilterChange,
   onSortChange,
   activeFilters = {},
@@ -63,6 +63,15 @@ const FilterBarComponent = ({
     if (localActiveSort === 'newest') return 'Newest';
     return 'Sort';
   }, [localActiveSort]);
+
+  useEffect(() => {
+    console.log('FilterBar render state:', {
+      activeFilters,
+      activeSort: localActiveSort,
+      applications: applications?.length,
+      statusCounts
+    });
+  }, [activeFilters, localActiveSort, applications, statusCounts]);
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
@@ -102,6 +111,3 @@ const FilterBarComponent = ({
     </div>
   );
 };
-
-export const FilterBar = memo(FilterBarComponent);
-FilterBar.displayName = 'FilterBar';

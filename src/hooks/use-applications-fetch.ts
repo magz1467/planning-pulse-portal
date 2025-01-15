@@ -19,14 +19,6 @@ export const useApplicationsFetch = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      console.log('Making RPC call to get_applications_within_radius with params:', {
-        center_lng: center[1],
-        center_lat: center[0],
-        radius_meters: radius,
-        page_size: pageSize,
-        page_number: page
-      });
-
       const { data: applications, error } = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
@@ -38,12 +30,6 @@ export const useApplicationsFetch = () => {
 
       if (error) {
         console.error('Error fetching applications:', error);
-        console.error('Error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
         throw error;
       }
 

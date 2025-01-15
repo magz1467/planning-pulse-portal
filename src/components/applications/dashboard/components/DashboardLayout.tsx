@@ -8,7 +8,7 @@ import { Application } from "@/types/planning";
 import { Chatbot } from "@/components/Chatbot";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import { useState, memo } from "react";
+import { useState } from "react";
 
 interface DashboardLayoutProps {
   selectedId: number | null;
@@ -20,7 +20,7 @@ interface DashboardLayoutProps {
   isMapView: boolean;
   setIsMapView: (value: boolean) => void;
   postcode: string;
-  coordinates: [number, number];
+  coordinates: [number, number] | null;
   isLoading: boolean;
   applications: Application[];
   filteredApplications: Application[];
@@ -36,7 +36,7 @@ interface DashboardLayoutProps {
   handleSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
 }
 
-const DashboardLayoutComponent = ({
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   selectedId,
   activeFilters,
   activeSort,
@@ -52,7 +52,7 @@ const DashboardLayoutComponent = ({
   handleFilterChange,
   handlePostcodeSelect,
   handleSortChange,
-}: DashboardLayoutProps) => {
+}) => {
   const isMobile = useIsMobile();
   const [showChatbot, setShowChatbot] = useState(false);
 
@@ -60,49 +60,63 @@ const DashboardLayoutComponent = ({
     handleMarkerClick(null);
   };
 
+  const handleCenterChange = (newCenter: [number, number]) => {
+    if (handlePostcodeSelect) {
+      handlePostcodeSelect(`${newCenter[0]},${newCenter[1]}`);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
+    <div className="h-screen w-full flex flex-col relative">
       <DashboardHeader />
 
       <SearchSection 
         onPostcodeSelect={handlePostcodeSelect}
-        onFilterChange={handleFilterChange}
+        onFilterChange={coordinates ? handleFilterChange : undefined}
         onSortChange={handleSortChange}
         activeFilters={activeFilters}
         activeSort={activeSort}
         isMapView={isMapView}
-        onToggleView={() => setIsMapView(!isMapView)}
+        onToggleView={isMobile ? () => {
+          setIsMapView(!isMapView);
+          if (isMapView) {
+            handleMarkerClick(null);
+          }
+        } : undefined}
         applications={applications}
         statusCounts={statusCounts}
       />
-      
-      <div className="flex flex-1 min-h-0 relative">
-        <SidebarSection 
-          isMobile={isMobile}
-          applications={filteredApplications}
-          selectedId={selectedId}
-          postcode={postcode}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          onSelectApplication={handleMarkerClick}
-          onClose={handleClose}
-          isMapView={isMapView}
-          coordinates={coordinates}
-          statusCounts={statusCounts}
-        />
-        
-        {(!isMobile || isMapView) && (
-          <MapSection 
+
+      <div className="flex-1 relative w-full">
+        <div className="absolute inset-0 flex" style={{ zIndex: 10 }}>
+          <SidebarSection
             isMobile={isMobile}
             isMapView={isMapView}
-            coordinates={coordinates}
             applications={filteredApplications}
             selectedId={selectedId}
-            onMarkerClick={handleMarkerClick}
+            postcode={postcode}
+            coordinates={coordinates as [number, number]}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            statusCounts={statusCounts}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+            onSelectApplication={handleMarkerClick}
+            onClose={handleClose}
           />
-        )}
+
+          {(!isMobile || isMapView) && (
+            <MapSection
+              applications={filteredApplications}
+              selectedId={selectedId}
+              coordinates={coordinates as [number, number]}
+              isMobile={isMobile}
+              isMapView={isMapView}
+              onMarkerClick={handleMarkerClick}
+              onCenterChange={handleCenterChange}
+            />
+          )}
+        </div>
       </div>
 
       {isLoading && <LoadingOverlay />}
@@ -127,6 +141,3 @@ const DashboardLayoutComponent = ({
     </div>
   );
 };
-
-export const DashboardLayout = memo(DashboardLayoutComponent);
-DashboardLayout.displayName = 'DashboardLayout';
