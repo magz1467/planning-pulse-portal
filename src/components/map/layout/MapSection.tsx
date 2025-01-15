@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { useCallback, memo } from "react";
+import { useCallback, memo, useMemo } from "react";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -28,7 +28,10 @@ export const MapSection = memo(({
     setTimeout(() => {
       onMarkerClick(id);
     }, 0);
-  }, [onMarkerClick]); // Add onMarkerClick to dependencies
+  }, [onMarkerClick]);
+
+  // Memoize applications to prevent unnecessary re-renders
+  const memoizedApplications = useMemo(() => applications, [applications]);
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -43,7 +46,7 @@ export const MapSection = memo(({
     >
       <div className="absolute inset-0">
         <MapView
-          applications={applications}
+          applications={memoizedApplications}
           selectedId={selectedId}
           coordinates={coordinates}
           onMarkerClick={handleMarkerClick}
@@ -51,7 +54,7 @@ export const MapSection = memo(({
         />
         {isMobile && selectedId && (
           <MobileApplicationCards
-            applications={applications}
+            applications={memoizedApplications}
             selectedId={selectedId}
             onSelectApplication={onMarkerClick}
           />

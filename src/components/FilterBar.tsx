@@ -28,7 +28,7 @@ interface FilterBarProps {
   };
 }
 
-export const FilterBar = ({
+export const FilterBar = memo(({
   onFilterChange,
   onSortChange,
   activeFilters = {},
@@ -63,15 +63,6 @@ export const FilterBar = ({
     if (localActiveSort === 'newest') return 'Newest';
     return 'Sort';
   }, [localActiveSort]);
-
-  useEffect(() => {
-    console.log('FilterBar render state:', {
-      activeFilters,
-      activeSort: localActiveSort,
-      applications: applications?.length,
-      statusCounts
-    });
-  }, [activeFilters, localActiveSort, applications, statusCounts]);
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
@@ -110,4 +101,6 @@ export const FilterBar = ({
       )}
     </div>
   );
-};
+});
+
+FilterBar.displayName = 'FilterBar';
