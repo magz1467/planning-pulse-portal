@@ -82,4 +82,6 @@ export const MobileApplicationCards = ({
   }
 
   return null;
-};
+});
+
+MobileApplicationCards.displayName = 'MobileApplicationCards';
