@@ -2,8 +2,9 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useCallback, useEffect, useMemo } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { useCallback, useMemo } from "react";
+import { useAutoSelect } from "@/hooks/use-auto-select";
+import { useErrorHandling } from "@/hooks/use-error-handling";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -25,7 +26,12 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Initialize default status counts with useMemo to prevent unnecessary recalculations
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleToggleView = useCallback(() => {
+    setIsMapView(prev => !prev);
+  }, [setIsMapView]);
+
+  // Memoize computed values
   const defaultStatusCounts = useMemo(() => ({
     'Under Review': 0,
     'Approved': 0,
@@ -34,31 +40,20 @@ export const ApplicationsDashboardMap = () => {
     ...statusCounts
   }), [statusCounts]);
 
-  // Memoize handlers to prevent unnecessary re-renders
-  const handleToggleView = useCallback(() => {
-    setIsMapView(prev => !prev);
-  }, [setIsMapView]);
+  // Use custom hooks for side effects
+  useAutoSelect(
+    isMobile,
+    filteredApplications,
+    selectedId,
+    isLoading,
+    handleMarkerClick
+  );
 
-  // Show error toast if applications fail to load
-  useEffect(() => {
-    if (!isLoading && applications.length === 0 && coordinates) {
-      toast({
-        title: "No applications found",
-        description: "Try adjusting your search area or filters",
-        variant: "destructive",
-      });
-    }
-  }, [isLoading, applications.length, coordinates]);
-
-  // Auto-select first application on mobile when applications are loaded
-  useEffect(() => {
-    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading) {
-      const timer = setTimeout(() => {
-        handleMarkerClick(filteredApplications[0].id);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [filteredApplications, handleMarkerClick, isMobile, isLoading, selectedId]);
+  useErrorHandling(
+    isLoading,
+    applications.length,
+    !!coordinates
+  );
 
   return (
     <ErrorBoundary>
