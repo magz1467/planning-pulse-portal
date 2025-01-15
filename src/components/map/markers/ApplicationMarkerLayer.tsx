@@ -19,7 +19,7 @@ export const ApplicationMarkerLayer = memo(({
     <ApplicationMarkers
       applications={applications}
       selectedId={selectedId}
-      coordinates={coordinates}
+      baseCoordinates={coordinates}
       onMarkerClick={onMarkerClick}
     />
   );
