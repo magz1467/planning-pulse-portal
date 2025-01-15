@@ -55,17 +55,17 @@ export const FilterBar = ({
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
-      <ErrorBoundary>
-        <StatusFilter
-          onFilterChange={handleFilterChange}
-          activeFilters={activeFilters}
-          isMobile={isMobile}
-          applications={applications}
-          statusCounts={statusCounts}
-        />
-      </ErrorBoundary>
+      <div className="flex items-center gap-2">
+        <ErrorBoundary>
+          <StatusFilter
+            onFilterChange={handleFilterChange}
+            activeFilters={activeFilters}
+            isMobile={isMobile}
+            applications={applications}
+            statusCounts={statusCounts}
+          />
+        </ErrorBoundary>
 
-      <div className="flex items-center gap-2 ml-auto">
         <ErrorBoundary>
           <div className="flex items-center h-full">
             <SortDropdown
@@ -83,13 +83,15 @@ export const FilterBar = ({
             </SortDropdown>
           </div>
         </ErrorBoundary>
+      </div>
 
-        {onToggleView && (
+      {onToggleView && (
+        <div className="ml-auto">
           <ErrorBoundary>
             <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
           </ErrorBoundary>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
