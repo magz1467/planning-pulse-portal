@@ -32,18 +32,13 @@ export const ApplicationsDashboardMap = () => {
     ...statusCounts
   };
 
-  // Debug logging for selectedId
-  useEffect(() => {
-    console.log('Selected ID state changed:', selectedId);
-  }, [selectedId]);
-
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
       console.log('Auto-selecting first application on mobile - map view only');
       handleMarkerClick(filteredApplications[0].id);
     }
-  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]); // Removed setSelectedId dependency
+  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
 
   return (
     <DashboardLayout
