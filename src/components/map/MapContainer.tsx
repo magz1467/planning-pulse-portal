@@ -1,6 +1,5 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
 import { Application } from "@/types/planning";
-import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo, ReactNode } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
