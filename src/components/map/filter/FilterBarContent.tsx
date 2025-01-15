@@ -6,6 +6,7 @@ import { StatusFilter } from "./StatusFilter";
 import { SortType } from "@/hooks/use-sort-applications";
 import { Application } from "@/types/planning";
 import { memo } from "react";
+import { Filter } from "lucide-react";
 
 interface FilterBarContentProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -46,13 +47,6 @@ export const FilterBarContent = memo(({
   return (
     <div className="flex items-center gap-2 px-4 py-2 bg-background border-b">
       <div className="flex-1 flex items-center gap-2">
-        <StatusFilter 
-          onFilterChange={(status) => onFilterChange('status', status)}
-          activeFilters={activeFilters}
-          statusCounts={statusCounts}
-          isMobile={isMobile}
-          applications={applications}
-        />
         <FilterDropdown 
           activeFilters={activeFilters}
           onFilterChange={onFilterChange}
@@ -60,7 +54,8 @@ export const FilterBarContent = memo(({
           isMobile={isMobile}
           statusCounts={statusCounts}
         >
-          <Button variant="outline" size={isMobile ? "sm" : "default"}>
+          <Button variant="outline" size={isMobile ? "sm" : "default"} className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
             Filter
           </Button>
         </FilterDropdown>
