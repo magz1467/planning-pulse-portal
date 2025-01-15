@@ -1,7 +1,7 @@
 import { Marker } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import L from "leaflet";
 
 interface ApplicationMarkersProps {
@@ -41,6 +41,11 @@ export const ApplicationMarkers = ({
   onMarkerClick,
   selectedId,
 }: ApplicationMarkersProps) => {
+  const handleClick = useCallback((id: number) => (e: L.LeafletMouseEvent) => {
+    e.originalEvent.stopPropagation();
+    onMarkerClick(id);
+  }, [onMarkerClick]);
+
   return (
     <>
       {applications.map((app) => {
@@ -53,9 +58,7 @@ export const ApplicationMarkers = ({
               key={app.id}
               position={app.coordinates}
               eventHandlers={{
-                click: () => {
-                  onMarkerClick(app.id);
-                },
+                click: handleClick(app.id),
               }}
               icon={createIcon(color, isSelected)}
               zIndexOffset={isSelected ? 1000 : 0}
