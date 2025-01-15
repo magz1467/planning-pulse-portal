@@ -22,7 +22,7 @@ export const MapSection = memo(({
   onMarkerClick,
   onCenterChange,
 }: MapSectionProps) => {
-  const handleMarkerClick = useCallback((id: number) => {
+  const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
     onMarkerClick(id);
   }, [onMarkerClick]);
