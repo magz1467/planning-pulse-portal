@@ -8,7 +8,7 @@ import { Application } from "@/types/planning";
 import { Chatbot } from "@/components/Chatbot";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 
 interface DashboardLayoutProps {
   selectedId: number | null;
@@ -36,7 +36,7 @@ interface DashboardLayoutProps {
   handleSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
 }
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
+const DashboardLayoutComponent = ({
   selectedId,
   activeFilters,
   activeSort,
@@ -52,18 +52,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   handleFilterChange,
   handlePostcodeSelect,
   handleSortChange,
-}) => {
+}: DashboardLayoutProps) => {
   const isMobile = useIsMobile();
   const [showChatbot, setShowChatbot] = useState(false);
 
   const handleClose = () => {
     handleMarkerClick(null);
-  };
-
-  const handleCenterChange = (newCenter: [number, number]) => {
-    if (handlePostcodeSelect) {
-      handlePostcodeSelect(`${newCenter[0]},${newCenter[1]}`);
-    }
   };
 
   return (
@@ -113,7 +107,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               isMobile={isMobile}
               isMapView={isMapView}
               onMarkerClick={handleMarkerClick}
-              onCenterChange={handleCenterChange}
             />
           )}
         </div>
@@ -141,3 +134,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     </div>
   );
 };
+
+export const DashboardLayout = memo(DashboardLayoutComponent);
+DashboardLayout.displayName = 'DashboardLayout';
