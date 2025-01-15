@@ -1,17 +1,21 @@
-import React, { useMemo } from 'react';
-import { FilterBarContent } from "./FilterBarContent";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Application } from "@/types/planning";
 import { SortType } from "@/hooks/use-sort-applications";
+import { useCallback, useMemo } from "react";
+import { ViewToggle } from "./ViewToggle";
+import { FilterBarContent } from "./FilterBarContent";
 
 interface FilterBarProps {
-  activeFilters: {
+  onFilterChange?: (filterType: string, value: string) => void;
+  onSortChange?: (sortType: SortType) => void;
+  onToggleView?: () => void;
+  activeFilters?: {
     status?: string;
     type?: string;
   };
-  activeSort: SortType;
-  isMapView: boolean;
-  onFilterChange: (filterType: string, value: string) => void;
-  onSortChange: (sortType: SortType) => void;
-  onToggleView: () => void;
+  activeSort?: SortType;
+  isMapView?: boolean;
+  applications?: Application[];
   statusCounts?: {
     'Under Review': number;
     'Approved': number;
@@ -21,29 +25,65 @@ interface FilterBarProps {
 }
 
 export const FilterBar = ({
-  activeFilters,
-  activeSort,
-  isMapView,
   onFilterChange,
   onSortChange,
   onToggleView,
-  statusCounts
+  activeFilters = {},
+  activeSort,
+  isMapView,
+  applications = [],
+  statusCounts = {
+    'Under Review': 0,
+    'Approved': 0,
+    'Declined': 0,
+    'Other': 0
+  }
 }: FilterBarProps) => {
-  const memoizedContent = useMemo(() => (
+  const isMobile = useIsMobile();
+
+  const handleFilterChange = useCallback((filterType: string, value: string) => {
+    if (onFilterChange) {
+      onFilterChange(filterType, value);
+    }
+  }, [onFilterChange]);
+
+  const handleSortChange = useCallback((sortType: SortType) => {
+    if (onSortChange) {
+      onSortChange(sortType);
+    }
+  }, [onSortChange]);
+
+  const memoizedFilterBarContent = useMemo(() => (
     <FilterBarContent
+      onFilterChange={handleFilterChange}
+      onSortChange={handleSortChange}
       activeFilters={activeFilters}
       activeSort={activeSort}
-      isMapView={isMapView}
-      onFilterChange={onFilterChange}
-      onSortChange={onSortChange}
-      onToggleView={onToggleView}
+      applications={applications}
       statusCounts={statusCounts}
+      isMobile={isMobile}
+      isMapView={isMapView}
+      onToggle={onToggleView}
     />
-  ), [activeFilters, activeSort, isMapView, onFilterChange, onSortChange, onToggleView, statusCounts]);
+  ), [
+    handleFilterChange,
+    handleSortChange,
+    activeFilters,
+    activeSort,
+    applications,
+    statusCounts,
+    isMobile,
+    isMapView,
+    onToggleView
+  ]);
 
   return (
-    <div className="sticky top-0 z-10 bg-background">
-      {memoizedContent}
+    <div className="flex items-center gap-2 p-2 bg-white border-b">
+      {memoizedFilterBarContent}
+
+      {isMobile && onToggleView && (
+        <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
+      )}
     </div>
   );
 };

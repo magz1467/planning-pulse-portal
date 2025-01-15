@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -23,7 +23,7 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Initialize default status counts
+  // Initialize default status counts outside of render to prevent recreation
   const defaultStatusCounts = {
     'Under Review': 0,
     'Approved': 0,
@@ -32,13 +32,27 @@ export const ApplicationsDashboardMap = () => {
     ...statusCounts
   };
 
-  // Debug logging for selectedId
-  useEffect(() => {
-    console.log('Selected ID state changed:', selectedId);
-  }, [selectedId]); // Only re-run when selectedId changes
+  // Memoize the auto-selection handler to prevent recreation
+  const handleAutoSelect = useCallback(() => {
+    if (filteredApplications.length > 0) {
+      handleMarkerClick(filteredApplications[0].id);
+    }
+  }, [filteredApplications, handleMarkerClick]);
 
-  // Auto-select first application on mobile when applications are loaded
+  // Debug logging for selectedId with cleanup
   useEffect(() => {
+    const logMessage = `Selected ID state changed: ${selectedId}`;
+    console.log(logMessage);
+    
+    return () => {
+      console.log(`Cleaning up selectedId effect: ${selectedId}`);
+    };
+  }, [selectedId]);
+
+  // Auto-select first application on mobile with proper cleanup
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+
     if (
       isMobile && 
       filteredApplications.length > 0 && 
@@ -47,20 +61,23 @@ export const ApplicationsDashboardMap = () => {
       isMapView
     ) {
       console.log('Auto-selecting first application on mobile - map view only');
-      // Add a small delay to prevent immediate re-render
-      const timer = setTimeout(() => {
-        handleMarkerClick(filteredApplications[0].id);
-      }, 100);
-      return () => clearTimeout(timer);
+      timer = setTimeout(handleAutoSelect, 100);
     }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+        console.log('Cleaned up auto-select timer');
+      }
+    };
   }, [
-    isMobile, 
-    filteredApplications, 
-    selectedId, 
-    isLoading, 
-    handleMarkerClick, 
-    isMapView
-  ]); // Added proper dependency array
+    isMobile,
+    filteredApplications,
+    selectedId,
+    isLoading,
+    isMapView,
+    handleAutoSelect
+  ]);
 
   return (
     <DashboardLayout
