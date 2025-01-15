@@ -20,20 +20,13 @@ export const MobileApplicationCards = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    if (applications.length > 0 && !selectedId) {
-      console.log('Auto-selecting first application:', applications[0].id);
-      onSelectApplication(applications[0].id);
-    }
-  }, [applications, selectedId, onSelectApplication]);
-
-  useEffect(() => {
     if (selectedId === null) {
       setShowFullDetails(false);
     }
   }, [selectedId]);
 
   const handleCommentSubmit = (content: string) => {
-    console.log("💬 New comment:", content);
+    console.log("New comment:", content);
     toast({
       title: "Comment Submitted",
       description: "Your comment has been recorded",
@@ -41,26 +34,19 @@ export const MobileApplicationCards = ({
   };
 
   const selectedApp = applications.find(app => app.id === selectedId);
-  console.log('📱 MobileApplicationCards - Selected application:', {
-    selectedId,
-    selectedApp,
-    applicationsAvailable: applications.length > 0
-  });
 
   if (!applications.length) {
-    console.log('📱 MobileApplicationCards - No applications available');
     return <EmptyState />;
   }
 
   if (showFullDetails && selectedApp) {
-    console.log('📱 MobileApplicationCards - Showing full details for application:', selectedApp.id);
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <FullScreenDetails
           application={selectedApp}
           onClose={() => {
             setShowFullDetails(false);
-            onSelectApplication(selectedApp.id);
+            onSelectApplication(null);
           }}
           onCommentSubmit={handleCommentSubmit}
         />
@@ -68,15 +54,12 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (selectedApp) {
-    console.log('📱 MobileApplicationCards - Showing mini card for application:', selectedApp.id);
+  if (selectedApp && !showFullDetails) {
     return (
-      <div className="fixed left-0 right-0 bottom-0 p-4 pb-6 bg-transparent z-50 animate-slide-up">
-        <MiniCard
-          application={selectedApp}
-          onClick={() => setShowFullDetails(true)}
-        />
-      </div>
+      <MiniCard
+        application={selectedApp}
+        onClick={() => setShowFullDetails(true)}
+      />
     );
   }
 
