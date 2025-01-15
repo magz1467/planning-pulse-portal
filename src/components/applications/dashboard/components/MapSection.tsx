@@ -1,9 +1,9 @@
 import { Application } from "@/types/planning";
-import { MapView } from "@/components/map/MapView";
+import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { memo } from "react";
+import { useCallback, memo } from "react";
 
-export interface MapSectionProps {
+interface MapSectionProps {
   isMobile: boolean;
   isMapView: boolean;
   coordinates: [number, number];
@@ -22,22 +22,31 @@ export const MapSection = memo(({
   onMarkerClick,
   onCenterChange,
 }: MapSectionProps) => {
-  console.log('MapSection rendering with:', {
-    applicationsCount: applications?.length,
-    selectedId,
-    coordinates
-  });
+  const handleMarkerClick = useCallback((id: number | null) => {
+    console.log('MapSection handleMarkerClick:', id);
+    // Force the click to be handled synchronously
+    setTimeout(() => {
+      onMarkerClick(id);
+    }, 0);
+  }, [onMarkerClick]); // Add onMarkerClick to dependencies
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   return (
-    <div className="flex-1 relative">
+    <div 
+      className="flex-1 relative"
+      style={{ 
+        height: isMobile ? 'calc(100vh - 120px)' : '100%',
+        position: 'relative',
+        zIndex: 1
+      }}
+    >
       <div className="absolute inset-0">
         <MapView
           applications={applications}
           selectedId={selectedId}
           coordinates={coordinates}
-          onMarkerClick={onMarkerClick}
+          onMarkerClick={handleMarkerClick}
           onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (

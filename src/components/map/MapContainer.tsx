@@ -6,7 +6,7 @@ import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
 
-export interface MapContainerProps {
+interface MapContainerProps {
   applications: Application[];
   coordinates: [number, number];
   selectedId?: number | null;
@@ -27,23 +27,23 @@ export const MapContainerComponent = memo(({
 
   useEffect(() => {
     if (mapRef.current) {
-      console.log('Setting map view to coordinates:', coordinates);
+      console.log('🗺️ Setting map view to coordinates:', coordinates);
       mapRef.current.setView(coordinates, 14);
-      // Ensure map is properly sized
       setTimeout(() => {
         mapRef.current?.invalidateSize();
       }, 100);
     }
   }, [coordinates]);
 
-  const handleMoveEnd = () => {
-    if (mapRef.current && onCenterChange) {
-      const center = mapRef.current.getCenter();
-      onCenterChange([center.lat, center.lng]);
-    }
+  useEffect(() => {
     if (mapRef.current && onMapMove) {
       onMapMove(mapRef.current);
     }
+  }, [onMapMove]);
+
+  const handleMarkerClick = (id: number) => {
+    console.log('Marker clicked in MapContainer:', id);
+    onMarkerClick(id);
   };
 
   return (
@@ -54,12 +54,6 @@ export const MapContainerComponent = memo(({
         zoom={14}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
-        whenReady={() => {
-          console.log('Map is ready');
-          if (mapRef.current) {
-            handleMoveEnd();
-          }
-        }}
       >
         <TileLayer 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -70,7 +64,7 @@ export const MapContainerComponent = memo(({
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={coordinates}
-          onMarkerClick={onMarkerClick}
+          onMarkerClick={handleMarkerClick}
           selectedId={selectedId}
         />
       </LeafletMapContainer>

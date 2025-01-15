@@ -48,16 +48,3 @@
 .leaflet-control-container {
   z-index: 2;
 }
-
-.leaflet-marker-icon {
-  pointer-events: auto !important;
-  cursor: pointer;
-}
-
-.marker-icon-container {
-  z-index: 1000 !important;
-}
-
-.marker-icon-container.selected {
-  z-index: 1001 !important;
-}
