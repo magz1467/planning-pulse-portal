@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback, useMemo, useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 interface FilterBarProps {
@@ -39,7 +39,6 @@ export const FilterBar = ({
   statusCounts
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
-  const [localActiveSort, setLocalActiveSort] = useState<SortType>(activeSort);
 
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     if (onFilterChange) {
@@ -48,21 +47,16 @@ export const FilterBar = ({
   }, [onFilterChange]);
 
   const handleSortChange = useCallback((sortType: SortType) => {
-    setLocalActiveSort(sortType);
     if (onSortChange) {
       onSortChange(sortType);
     }
   }, [onSortChange]);
 
-  useEffect(() => {
-    setLocalActiveSort(activeSort);
-  }, [activeSort]);
-
   const sortButtonText = useMemo(() => {
-    if (localActiveSort === 'closingSoon') return 'Closing Soon';
-    if (localActiveSort === 'newest') return 'Newest';
+    if (activeSort === 'closingSoon') return 'Closing Soon';
+    if (activeSort === 'newest') return 'Newest';
     return 'Sort';
-  }, [localActiveSort]);
+  }, [activeSort]);
 
   return (
     <div className="flex items-center gap-2 p-2 bg-white border-b">
@@ -80,7 +74,7 @@ export const FilterBar = ({
         <ErrorBoundary>
           <div className="flex items-center h-full">
             <SortDropdown
-              activeSort={localActiveSort}
+              activeSort={activeSort}
               onSortChange={handleSortChange}
             >
               <Button 
