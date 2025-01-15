@@ -11,8 +11,6 @@ interface MapContainerProps {
   coordinates: [number, number];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
-  onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapContainerComponent = memo(({
@@ -20,31 +18,19 @@ export const MapContainerComponent = memo(({
   applications,
   selectedId,
   onMarkerClick,
-  onCenterChange,
-  onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
     if (mapRef.current) {
-      console.log('🗺️ Setting map view to coordinates:', coordinates);
+      console.log('Setting map view to coordinates:', coordinates);
       mapRef.current.setView(coordinates, 14);
+      // Ensure map is properly sized
       setTimeout(() => {
         mapRef.current?.invalidateSize();
       }, 100);
     }
   }, [coordinates]);
-
-  useEffect(() => {
-    if (mapRef.current && onMapMove) {
-      onMapMove(mapRef.current);
-    }
-  }, [onMapMove]);
-
-  const handleMarkerClick = (id: number) => {
-    console.log('Marker clicked in MapContainer:', id);
-    onMarkerClick(id);
-  };
 
   return (
     <div className="w-full h-full relative">
@@ -64,7 +50,7 @@ export const MapContainerComponent = memo(({
         <ApplicationMarkers
           applications={applications}
           baseCoordinates={coordinates}
-          onMarkerClick={handleMarkerClick}
+          onMarkerClick={onMarkerClick}
           selectedId={selectedId}
         />
       </LeafletMapContainer>
