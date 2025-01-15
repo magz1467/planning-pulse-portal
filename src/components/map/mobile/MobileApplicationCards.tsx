@@ -60,7 +60,7 @@ export const MobileApplicationCards = ({
           application={selectedApp}
           onClose={() => {
             setShowFullDetails(false);
-            onSelectApplication(selectedId);
+            onSelectApplication(selectedApp.id);
           }}
           onCommentSubmit={handleCommentSubmit}
         />
