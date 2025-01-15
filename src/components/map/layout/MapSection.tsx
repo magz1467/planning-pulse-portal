@@ -46,7 +46,7 @@ export const MapSection = memo(({
           onMarkerClick={handleMarkerClick}
           onCenterChange={onCenterChange}
         />
-        {isMobile && isMapView && (
+        {isMobile && (
           <MobileApplicationCards
             applications={applications}
             selectedId={selectedId}
