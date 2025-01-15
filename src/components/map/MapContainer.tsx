@@ -43,10 +43,11 @@ export const MapContainerComponent = memo(({
     }
   }, [onMapMove]);
 
-  const handleMarkerClick = (id: number) => {
-    console.log('Marker clicked in MapContainer:', id);
-    onMarkerClick(id);
-  };
+  console.log('MapContainer rendering:', {
+    applicationsCount: applications.length,
+    coordinates,
+    selectedId
+  });
 
   return (
     <div className="w-full h-full relative">
