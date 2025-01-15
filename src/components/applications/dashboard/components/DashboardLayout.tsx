@@ -34,6 +34,7 @@ interface DashboardLayoutProps {
   handleFilterChange: (filterType: string, value: string) => void;
   handlePostcodeSelect: (postcode: string) => void;
   handleSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
+  isMobile?: boolean; // Added isMobile prop
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({

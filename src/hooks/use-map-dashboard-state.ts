@@ -5,12 +5,10 @@ import { useApplicationsData } from "@/components/applications/dashboard/hooks/u
 import { useCoordinates } from "./use-coordinates";
 import { useFilteredApplications } from "./use-filtered-applications";
 import { useURLState } from "./use-url-state";
-import { useSelectionState } from "./use-selection-state"; 
+import { useMapState } from "./use-map-state";
 import { useFilterState } from "./use-filter-state";
 import { useToast } from "./use-toast";
-import { useNavigate } from "react-router-dom";
 
-// Default status counts defined outside component
 const DEFAULT_STATUS_COUNTS = {
   'Under Review': 0,
   'Approved': 0,
@@ -19,20 +17,10 @@ const DEFAULT_STATUS_COUNTS = {
 };
 
 export const useMapDashboardState = () => {
-  const { 
-    initialPostcode, 
-    initialTab, 
-    initialFilter,
-    initialApplicationId,
-    updateURLParams 
-  } = useURLState();
-  
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
-  const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
-  const [activeSort, setActiveSort] = useState<SortType>(null);
-  const [isMapView, setIsMapView] = useState(true);
+  const { initialPostcode, initialTab, initialFilter, initialApplicationId, updateURLParams } = useURLState();
+  const mapState = useMapState();
+  const filterState = useFilterState(initialFilter);
   const [postcode, setPostcode] = useState(initialPostcode || '');
   const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -59,10 +47,6 @@ export const useMapDashboardState = () => {
     setPostcode(newPostcode);
   }, [toast]);
 
-  const handleSortChange = useCallback((sortType: SortType) => {
-    setActiveSort(sortType);
-  }, []);
-
   useEffect(() => {
     if (coordinates) {
       try {
@@ -85,14 +69,13 @@ export const useMapDashboardState = () => {
     }
   }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
-  // Update URL params when relevant state changes
   useEffect(() => {
     try {
       updateURLParams({
         postcode,
         tab: initialTab,
-        filter: activeFilters.status,
-        applicationId: selectedId
+        filter: filterState.activeFilters.status,
+        applicationId: mapState.selectedId
       });
     } catch (error) {
       console.error('URL update error:', error);
@@ -102,29 +85,29 @@ export const useMapDashboardState = () => {
         variant: "destructive",
       });
     }
-  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, toast]);
+  }, [postcode, initialTab, filterState.activeFilters.status, mapState.selectedId, updateURLParams, toast]);
 
   const filteredApplications = useFilteredApplications(
     applications || [],
-    activeFilters,
-    activeSort
+    filterState.activeFilters,
+    mapState.activeSort
   );
 
   return {
-    selectedId,
-    activeFilters,
-    activeSort,
-    isMapView,
-    setIsMapView,
+    selectedId: mapState.selectedId,
+    activeFilters: filterState.activeFilters,
+    activeSort: mapState.activeSort,
+    isMapView: mapState.isMapView,
+    setIsMapView: mapState.setIsMapView,
     postcode,
     coordinates,
     isLoading: isLoadingCoords || isLoadingApps,
     applications,
     filteredApplications,
     statusCounts: { ...DEFAULT_STATUS_COUNTS, ...statusCounts },
-    handleMarkerClick,
-    handleFilterChange,
+    handleMarkerClick: mapState.handleMarkerClick,
+    handleFilterChange: filterState.handleFilterChange,
     handlePostcodeSelect,
-    handleSortChange,
+    handleSortChange: mapState.handleSortChange,
   };
 };
