@@ -55,6 +55,9 @@ export const MapContainerComponent = memo(({
         zoom={14}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
+        whenReady={() => {
+          console.log('Map is ready');
+        }}
         eventHandlers={{
           moveend: handleMoveEnd
         }}
