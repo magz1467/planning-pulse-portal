@@ -4,10 +4,13 @@ import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
 import { useApplicationsData } from "./hooks/useApplicationsData";
 import { SortType } from "@/hooks/use-sort-applications";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useAutoSelect } from "@/hooks/use-auto-select";
 
 export const ApplicationsDashboardMap = () => {
   const { state, dispatch } = useMapReducer();
   const { applications, isLoading, fetchApplicationsInRadius } = useApplicationsData();
+  const isMobile = useIsMobile();
 
   // Initialize map and fetch applications
   useEffect(() => {
@@ -26,6 +29,15 @@ export const ApplicationsDashboardMap = () => {
       dispatch({ type: 'SET_APPLICATIONS', payload: applications });
     }
   }, [applications]);
+
+  // Auto-select first application on mobile
+  useAutoSelect(
+    isMobile,
+    applications,
+    state.selectedId,
+    isLoading,
+    (id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })
+  );
 
   const handleSortChange = (sortType: SortType | null) => {
     console.log('Handling sort change:', sortType);
