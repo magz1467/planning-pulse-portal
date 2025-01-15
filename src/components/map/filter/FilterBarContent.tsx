@@ -2,11 +2,11 @@ import { Button } from "@/components/ui/button";
 import { FilterDropdown } from "./FilterDropdown";
 import { SortDropdown } from "./SortDropdown";
 import { ViewToggle } from "./ViewToggle";
-import { StatusFilter } from "./StatusFilter";
 import { SortType } from "@/hooks/use-sort-applications";
 import { Application } from "@/types/planning";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { Filter } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface FilterBarContentProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -44,6 +44,28 @@ export const FilterBarContent = memo(({
     'Other': 0
   }
 }: FilterBarContentProps) => {
+  // Handle WebSocket errors gracefully
+  useEffect(() => {
+    const handleWebSocketError = (error: Event) => {
+      console.warn('WebSocket connection error:', error);
+      toast({
+        title: "Connection Issue",
+        description: "Having trouble maintaining connection. Will retry automatically.",
+        variant: "destructive",
+      });
+    };
+
+    window.addEventListener('error', (event) => {
+      if (event.message.includes('WebSocket')) {
+        handleWebSocketError(event);
+      }
+    });
+
+    return () => {
+      window.removeEventListener('error', handleWebSocketError);
+    };
+  }, []);
+
   return (
     <div className="flex items-center gap-2 px-4 py-2 bg-background border-b">
       <div className="flex-1 flex items-center gap-2">
