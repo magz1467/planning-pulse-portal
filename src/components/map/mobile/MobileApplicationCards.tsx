@@ -19,17 +19,18 @@ export const MobileApplicationCards = ({
   const [showFullDetails, setShowFullDetails] = useState(false);
   const { toast } = useToast();
 
+  // Auto-select first application on mobile if none selected
   useEffect(() => {
-    console.log('📱 MobileApplicationCards - Component mounted/updated:', {
-      applicationsCount: applications.length,
-      selectedId,
-      showFullDetails
-    });
+    if (applications.length > 0 && !selectedId) {
+      onSelectApplication(applications[0].id);
+    }
+  }, [applications, selectedId, onSelectApplication]);
 
+  useEffect(() => {
     if (selectedId === null) {
       setShowFullDetails(false);
     }
-  }, [selectedId, applications.length]);
+  }, [selectedId]);
 
   const handleCommentSubmit = (content: string) => {
     console.log("💬 New comment:", content);
