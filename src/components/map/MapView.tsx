@@ -1,6 +1,6 @@
 import { MapContainerComponent } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
-import { Map as LeafletMap } from "leaflet";
+import { memo, useCallback } from "react";
 
 interface MapViewProps {
   applications: Application[];
@@ -8,10 +8,10 @@ interface MapViewProps {
   coordinates: [number, number];
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
+  onMapMove?: (map: any) => void;
 }
 
-export const MapView = ({
+export const MapView = memo(({
   applications,
   selectedId,
   coordinates,
@@ -19,15 +19,29 @@ export const MapView = ({
   onCenterChange,
   onMapMove,
 }: MapViewProps) => {
+  console.log('MapView rendering:', {
+    applicationsCount: applications?.length,
+    selectedId,
+    coordinates
+  });
+
+  const handleMarkerClick = useCallback((id: number) => {
+    console.log('MapView handleMarkerClick:', id);
+    onMarkerClick(id);
+  }, [onMarkerClick]);
+
   return (
     <div className="absolute inset-0">
       <MapContainerComponent
         applications={applications}
         coordinates={coordinates}
-        onMarkerClick={onMarkerClick}
+        selectedId={selectedId}
+        onMarkerClick={handleMarkerClick}
         onCenterChange={onCenterChange}
         onMapMove={onMapMove}
       />
     </div>
   );
-};
+});
+
+MapView.displayName = 'MapView';

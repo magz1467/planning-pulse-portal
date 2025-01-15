@@ -1,8 +1,8 @@
-import { Marker } from "react-leaflet";
+import { Marker } from 'react-leaflet';
 import { Application } from "@/types/planning";
-import { LatLngTuple } from "leaflet";
-import { useMemo } from "react";
-import L from "leaflet";
+import { LatLngTuple } from 'leaflet';
+import { useMemo, useCallback, memo } from 'react';
+import { useToast } from "@/hooks/use-toast";
 
 interface ApplicationMarkersProps {
   applications: Application[];
@@ -25,14 +25,16 @@ const getStatusColor = (status: string): string => {
 const createIcon = (color: string, isSelected: boolean) => {
   const size = isSelected ? 40 : 24;
   
-  // Create a div element for the marker
   const markerHtml = document.createElement('div');
   markerHtml.className = `marker-container ${isSelected ? 'selected' : ''}`;
-  markerHtml.style.width = `${size}px`;
-  markerHtml.style.height = `${size}px`;
-  markerHtml.style.cursor = 'pointer';
+  markerHtml.style.cssText = `
+    width: ${size}px;
+    height: ${size}px;
+    cursor: pointer;
+    pointer-events: auto;
+    z-index: ${isSelected ? 1000 : 1};
+  `;
   
-  // Add the SVG content
   markerHtml.innerHTML = `
     <svg 
       width="${size}" 
@@ -40,7 +42,7 @@ const createIcon = (color: string, isSelected: boolean) => {
       viewBox="0 0 24 24" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
-      style="pointer-events: auto;"
+      style="pointer-events: none;"
     >
       <path 
         d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" 
@@ -57,43 +59,79 @@ const createIcon = (color: string, isSelected: boolean) => {
   });
 };
 
-export const ApplicationMarkers = ({
+const SingleMarker = memo(({ 
+  app, 
+  isSelected, 
+  onClick 
+}: { 
+  app: Application; 
+  isSelected: boolean; 
+  onClick: () => void;
+}) => {
+  const { toast } = useToast();
+
+  if (!app.coordinates) {
+    console.warn('Application missing coordinates:', app.id);
+    return null;
+  }
+
+  const color = getStatusColor(app.status);
+  
+  const handleClick = useCallback((e: L.LeafletMouseEvent) => {
+    e.originalEvent.stopPropagation();
+    try {
+      onClick();
+    } catch (error) {
+      console.error('Error handling marker click:', error);
+      toast({
+        title: "Error",
+        description: "Failed to select application. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [onClick, toast]);
+
+  return (
+    <Marker
+      position={app.coordinates}
+      icon={createIcon(color, isSelected)}
+      eventHandlers={{
+        click: handleClick,
+      }}
+      zIndexOffset={isSelected ? 1000 : 0}
+    />
+  );
+});
+
+SingleMarker.displayName = 'SingleMarker';
+
+export const ApplicationMarkers = memo(({
   applications,
-  baseCoordinates,
   onMarkerClick,
   selectedId,
 }: ApplicationMarkersProps) => {
-  console.log('ApplicationMarkers rendering with selectedId:', selectedId);
-  
-  return (
-    <>
-      {applications.map((app) => {
-        if (!app.coordinates) {
-          console.warn('Application missing coordinates:', app.id);
-          return null;
-        }
+  console.log('ApplicationMarkers rendering with:', {
+    applicationsCount: applications?.length,
+    selectedId
+  });
 
-        const color = getStatusColor(app.status);
-        const isSelected = app.id === selectedId;
-        
-        console.log(`Creating marker for app ${app.id}, selected: ${isSelected}`);
-        
-        return (
-          <Marker
-            key={app.id}
-            position={app.coordinates}
-            icon={createIcon(color, isSelected)}
-            eventHandlers={{
-              click: (e) => {
-                console.log('Marker clicked:', app.id);
-                e.originalEvent.stopPropagation();
-                onMarkerClick(app.id);
-              },
-            }}
-            zIndexOffset={isSelected ? 1000 : 0}
-          />
-        );
-      })}
-    </>
-  );
-};
+  const handleMarkerClick = useCallback((id: number) => {
+    console.log('Marker clicked:', id);
+    onMarkerClick(id);
+  }, [onMarkerClick]);
+
+  const markers = useMemo(() => {
+    return applications.map((app) => (
+      <SingleMarker
+        key={`marker-${app.id}`}
+        app={app}
+        isSelected={app.id === selectedId}
+        onClick={() => handleMarkerClick(app.id)}
+      />
+    ));
+  }, [applications, selectedId, handleMarkerClick]);
+
+  return <>{markers}</>;
+});
+
+ApplicationMarkers.displayName = 'ApplicationMarkers';
