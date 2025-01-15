@@ -11,7 +11,6 @@ interface MapSectionProps {
   selectedId: number | null;
   onMarkerClick: (id: number | null) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: any) => void;
 }
 
 export const MapSection = memo(({
@@ -22,9 +21,9 @@ export const MapSection = memo(({
   selectedId,
   onMarkerClick,
   onCenterChange,
-  onMapMove,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
+    console.log('MapSection handleMarkerClick:', id);
     onMarkerClick(id);
   }, [onMarkerClick]);
 
@@ -46,9 +45,8 @@ export const MapSection = memo(({
           coordinates={coordinates}
           onMarkerClick={handleMarkerClick}
           onCenterChange={onCenterChange}
-          onMapMove={onMapMove}
         />
-        {isMobile && selectedId && (
+        {isMobile && (
           <MobileApplicationCards
             applications={applications}
             selectedId={selectedId}

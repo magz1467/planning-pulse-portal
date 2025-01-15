@@ -52,13 +52,13 @@ export const ApplicationsDashboardMap = () => {
 
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
-    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
+    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading) {
       const timer = setTimeout(() => {
         handleMarkerClick(filteredApplications[0].id);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [filteredApplications, handleMarkerClick, isMobile, isLoading, isMapView, selectedId]);
+  }, [filteredApplications, handleMarkerClick, isMobile, isLoading, selectedId]);
 
   return (
     <ErrorBoundary>
