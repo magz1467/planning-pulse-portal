@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useApplicationsData } from "@/components/applications/dashboard/hooks/useApplicationsData";
 import { useCoordinates } from "@/hooks/use-coordinates";
 import { useFilteredApplications } from "@/hooks/use-filtered-applications";
@@ -21,6 +21,7 @@ export const useDashboardState = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Use the handleMarkerClick from useSelectionState
   const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
@@ -123,9 +124,13 @@ export const useDashboardState = () => {
     setActiveSort(sortType);
   };
 
-  const isInitialSearch = !searchPoint && coordinates;
-  const isNewSearch = searchPoint && coordinates && 
-    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
+  // Memoize these computed values
+  const isInitialSearch = useMemo(() => !searchPoint && coordinates, [searchPoint, coordinates]);
+  const isNewSearch = useMemo(() => 
+    searchPoint && coordinates && 
+    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]), 
+    [searchPoint, coordinates]
+  );
 
   useEffect(() => {
     if (!coordinates) return;
@@ -165,13 +170,14 @@ export const useDashboardState = () => {
     activeSort
   );
 
-  const defaultStatusCounts = {
+  // Memoize the status counts to prevent unnecessary re-renders
+  const defaultStatusCounts = useMemo(() => ({
     'Under Review': 0,
     'Approved': 0,
     'Declined': 0,
     'Other': 0,
     ...statusCounts
-  };
+  }), [statusCounts]);
 
   return {
     selectedId,
