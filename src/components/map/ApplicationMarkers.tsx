@@ -31,11 +31,12 @@ export const ApplicationMarkers = ({
     const size = isSelected ? 40 : 24;
     return L.divIcon({
       className: `custom-marker-icon ${isSelected ? 'selected' : ''}`,
-      html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      html: `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="z-index: ${isSelected ? 1000 : 1};">
         <path d="M12 0C7.58 0 4 3.58 4 8c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" fill="${color}"/>
       </svg>`,
       iconSize: [size, size],
       iconAnchor: [size/2, size],
+      className: 'marker-icon-container',
     });
   }, []);
 

@@ -4,7 +4,6 @@ import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
-import { MapContainerProps as LeafletMapContainerProps } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
 
 export interface MapContainerProps {
@@ -55,11 +54,11 @@ export const MapContainerComponent = memo(({
         zoom={14}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
-        eventHandlers={{
-          ready: () => {
-            console.log('Map is ready');
-          },
-          moveend: handleMoveEnd
+        whenReady={() => {
+          console.log('Map is ready');
+        }}
+        whenCreated={(map) => {
+          mapRef.current = map;
         }}
       >
         <TileLayer 
