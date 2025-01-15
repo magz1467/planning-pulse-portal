@@ -1,7 +1,9 @@
-import { Application } from "@/types/planning";
-import { MapView } from "./MapView";
-import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { useCallback, memo } from "react";
+import { Application } from "@/types/planning";
+import { MapAction } from "@/types/map-reducer";
+import { MapView } from "./MapView";
+import { MapControls } from "./components/MapControls";
+import { MobileMapControls } from "./components/MobileMapControls";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -9,7 +11,7 @@ interface MapSectionProps {
   coordinates: [number, number];
   applications: Application[];
   selectedId: number | null;
-  onMarkerClick: (id: number | null) => void;
+  dispatch: React.Dispatch<MapAction>;
   onCenterChange?: (center: [number, number]) => void;
 }
 
@@ -19,13 +21,13 @@ export const MapSection = memo(({
   coordinates,
   applications,
   selectedId,
-  onMarkerClick,
+  dispatch,
   onCenterChange,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
-    onMarkerClick(id);
-  }, [onMarkerClick]);
+    dispatch({ type: 'SELECT_APPLICATION', payload: id });
+  }, [dispatch]);
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -38,22 +40,20 @@ export const MapSection = memo(({
         zIndex: 1
       }}
     >
-      <div className="absolute inset-0">
-        <MapView
+      <MapControls
+        dispatch={dispatch}
+        selectedId={selectedId}
+        applications={applications}
+        coordinates={coordinates}
+        onCenterChange={onCenterChange}
+      />
+      {isMobile && selectedId && (
+        <MobileMapControls
           applications={applications}
           selectedId={selectedId}
-          coordinates={coordinates}
-          onMarkerClick={handleMarkerClick}
-          onCenterChange={onCenterChange}
+          onSelectApplication={handleMarkerClick}
         />
-        {isMobile && (
-          <MobileApplicationCards
-            applications={applications}
-            selectedId={selectedId}
-            onSelectApplication={handleMarkerClick}
-          />
-        )}
-      </div>
+      )}
     </div>
   );
 });
