@@ -5,6 +5,7 @@ import { Share, MessageCircle } from "lucide-react";
 import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 import { ImageResolver } from "./components/ImageResolver";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
+import { useToast } from "@/hooks/use-toast";
 
 interface MiniCardProps {
   application: Application;
@@ -12,6 +13,53 @@ interface MiniCardProps {
 }
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
+  const { toast } = useToast();
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Create share data
+    const shareData = {
+      title: application.engaging_title || application.description || 'Planning Application',
+      text: `Check out this planning application at ${application.address}`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully",
+          description: "The planning application has been shared",
+        });
+      } else {
+        // Fallback to copying to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          title: "Link copied",
+          description: "The link has been copied to your clipboard",
+        });
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+      toast({
+        title: "Error sharing",
+        description: "There was an error sharing this application",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleComment = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // This will expand the full view with comments section visible
+    onClick();
+    toast({
+      title: "Comments opened",
+      description: "You can now view and add comments",
+    });
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg z-[1000]">
       <div className="flex gap-3" onClick={onClick}>
@@ -43,10 +91,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
         <Button
           variant="outline"
           className="flex-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            // Share functionality
-          }}
+          onClick={handleShare}
         >
           <Share className="w-4 h-4 mr-2" />
           Share
@@ -54,10 +99,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
         <Button
           variant="outline"
           className="flex-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            // Comment functionality
-          }}
+          onClick={handleComment}
         >
           <MessageCircle className="w-4 h-4 mr-2" />
           Comment
