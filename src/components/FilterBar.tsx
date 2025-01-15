@@ -28,7 +28,7 @@ interface FilterBarProps {
   };
 }
 
-export const FilterBar = memo(({
+const FilterBarComponent = ({
   onFilterChange,
   onSortChange,
   activeFilters = {},
@@ -101,6 +101,7 @@ export const FilterBar = memo(({
       )}
     </div>
   );
-});
+};
 
+export const FilterBar = memo(FilterBarComponent);
 FilterBar.displayName = 'FilterBar';

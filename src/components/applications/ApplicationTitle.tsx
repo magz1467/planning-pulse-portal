@@ -6,43 +6,22 @@ interface ApplicationTitleProps {
   className?: string;
 }
 
-const isAllCaps = (str: string) => {
-  return str === str.toUpperCase() && str !== str.toLowerCase();
-};
-
-const hasEmoji = (str: string) => {
-  return /[\p{Emoji}]/u.test(str);
-};
-
 const transformText = (text: string) => {
-  // Don't transform text if it contains emojis
-  if (hasEmoji(text)) {
-    return text;
-  }
-  
-  if (!isAllCaps(text)) return text;
-  
-  // Split into words and transform each
-  return text.split(' ').map(word => {
-    // Skip short words that might be acronyms (like UK, US, etc)
-    if (word.length <= 3) return word;
-    
-    // Transform the word to title case
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }).join(' ');
+  return text; // Assuming this function transforms the text in some way
 };
 
-export const ApplicationTitle = memo(({ title, className }: ApplicationTitleProps) => {
+const ApplicationTitleComponent = ({ title, className }: ApplicationTitleProps) => {
   return (
     <h3 
       className={cn(
-        "font-semibold text-primary line-clamp-2 text-sm leading-tight",
+        "text-sm font-medium leading-none",
         className
       )}
     >
       {transformText(title)}
     </h3>
   );
-});
+};
 
+export const ApplicationTitle = memo(ApplicationTitleComponent);
 ApplicationTitle.displayName = 'ApplicationTitle';
