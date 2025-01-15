@@ -1,3 +1,4 @@
+import { memo, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import {
@@ -8,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { memo, useCallback, useMemo } from 'react';
 
 interface FilterDropdownProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -16,7 +16,7 @@ interface FilterDropdownProps {
     status?: string;
     type?: string;
   };
-  isMobile: boolean;
+  isMobile?: boolean;
   applications?: any[];
   statusCounts?: {
     'Under Review': number;
