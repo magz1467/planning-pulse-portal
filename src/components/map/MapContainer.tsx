@@ -4,6 +4,7 @@ import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
+import { MapContainerProps as LeafletMapContainerProps } from 'react-leaflet/lib/MapContainer';
 import "leaflet/dist/leaflet.css";
 
 export interface MapContainerProps {
