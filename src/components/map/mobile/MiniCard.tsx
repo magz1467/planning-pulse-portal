@@ -11,8 +11,8 @@ interface MiniCardProps {
 
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg z-[1000]">
-      <div className="flex gap-3" onClick={onClick}>
+    <div className="fixed bottom-2 left-2 right-2 bg-white border rounded-lg shadow-lg z-[1000]">
+      <div className="flex gap-3 p-4" onClick={onClick}>
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <ImageResolver
             imageMapUrl={application.image_map_url}
