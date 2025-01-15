@@ -35,13 +35,13 @@ export const ApplicationTitle = ({ title, className }: ApplicationTitleProps) =>
   console.log('ApplicationTitle - Rendering title:', title);
   
   return (
-    <div 
+    <h3 
       className={cn(
         "font-semibold text-primary line-clamp-2 text-sm leading-tight",
         className
       )}
     >
       {transformText(title)}
-    </div>
+    </h3>
   );
 };

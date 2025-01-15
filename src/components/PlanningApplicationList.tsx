@@ -1,13 +1,10 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Bell } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
 import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { EmailDialog } from "@/components/EmailDialog";
 
 interface PlanningApplicationListProps {
   applications: Application[];
@@ -23,8 +20,6 @@ export const PlanningApplicationList = ({
   postcode
 }: PlanningApplicationListProps) => {
   const sortedApplications = useSortApplications(applications, activeSort);
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [selectedPostcode, setSelectedPostcode] = useState("");
 
   console.log('PlanningApplicationList - Rendering with applications:', applications?.length);
 
@@ -36,10 +31,6 @@ export const PlanningApplicationList = ({
       </div>
     );
   }
-
-  const handleEmailSubmit = (radius: string) => {
-    setShowEmailDialog(false);
-  };
 
   return (
     <div className="divide-y">
@@ -60,24 +51,10 @@ export const PlanningApplicationList = ({
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start">
-                <ApplicationTitle 
-                  title={application.engaging_title || application.description || ''} 
-                  className="mb-1"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-500 hover:text-primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPostcode(application.postcode || postcode);
-                    setShowEmailDialog(true);
-                  }}
-                >
-                  <Bell className="h-4 w-4" />
-                </Button>
-              </div>
+              <ApplicationTitle 
+                title={application.engaging_title || application.description || ''} 
+                className="mb-1"
+              />
               <div className="flex items-center gap-1 mt-1 text-gray-600">
                 <MapPin className="w-3 h-3" />
                 <p className="text-sm truncate">{application.address}</p>
@@ -94,13 +71,6 @@ export const PlanningApplicationList = ({
           </div>
         </div>
       ))}
-
-      <EmailDialog 
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        onSubmit={handleEmailSubmit}
-        postcode={selectedPostcode}
-      />
     </div>
   );
 }

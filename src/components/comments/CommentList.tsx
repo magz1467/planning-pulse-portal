@@ -4,7 +4,6 @@ import { CommentItem } from './CommentItem';
 import { CommentForm } from './CommentForm';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useComments } from './hooks/useComments';
-import { Card } from '@/components/ui/card';
 
 interface CommentListProps {
   applicationId: number;
@@ -28,18 +27,6 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
         <Skeleton className="h-20 w-full" />
         <Skeleton className="h-20 w-full" />
       </div>
-    );
-  }
-
-  if (!comments?.length) {
-    return (
-      <Card className="p-4">
-        <div className="text-center text-gray-500">
-          <p>No comments yet</p>
-          <p className="text-sm">Be the first to comment on this application</p>
-        </div>
-        <CommentForm applicationId={applicationId} setComments={setComments} />
-      </Card>
     );
   }
 

@@ -1,20 +1,29 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
+
+interface FilterState {
+  status?: string;
+  type?: string;
+}
 
 export const useFilterState = (initialFilter?: string) => {
-  const [activeFilters, setActiveFilters] = useState<{
-    status?: string;
-    type?: string;
-  }>({ status: initialFilter });
+  const [activeFilters, setActiveFilters] = useState<FilterState>({
+    status: initialFilter
+  });
 
-  const handleFilterChange = useCallback((filterType: string, value: string) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
-  }, []);
+  const handleFilterChange = (filterType: string, value: string) => {
+    console.log('Applying filter:', filterType, value);
+    setActiveFilters(prev => {
+      const newFilters = {
+        ...prev,
+        [filterType]: value
+      };
+      return newFilters;
+    });
+  };
 
   return {
     activeFilters,
+    setActiveFilters,
     handleFilterChange
   };
 };

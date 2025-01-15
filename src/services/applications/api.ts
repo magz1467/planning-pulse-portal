@@ -9,14 +9,6 @@ export async function getApplicationsWithinRadius(
   page_number: number = 0
 ) {
   try {
-    console.log('Fetching applications with params:', {
-      center_lat,
-      center_lng,
-      radius_meters,
-      page_size,
-      page_number
-    });
-
     const { data, error } = await supabase.rpc(
       'get_applications_with_counts',
       {
@@ -38,18 +30,12 @@ export async function getApplicationsWithinRadius(
       return null;
     }
 
-    if (!data || data.length === 0) {
-      console.log('No applications found in radius');
-      return [];
-    }
-
-    console.log(`Found ${data.length} applications`);
     return data;
   } catch (error) {
     console.error('Error in getApplicationsWithinRadius:', error);
     toast({
       title: "Error fetching applications",
-      description: "Please try again later", 
+      description: "Please try again later",
       variant: "destructive"
     });
     return null;
