@@ -2,19 +2,29 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
-import { MapAction } from "@/types/map-reducer";
+import { useApplicationsData } from "./hooks/useApplicationsData";
 
 export const ApplicationsDashboardMap = () => {
   const { state, dispatch } = useMapReducer();
+  const { applications, isLoading, fetchApplicationsInRadius } = useApplicationsData();
 
-  // Example of how to update applications when they're fetched
+  // Initialize map and fetch applications
   useEffect(() => {
-    // Initialize with default coordinates for London
-    dispatch({ 
-      type: 'SET_COORDINATES', 
-      payload: [51.5074, -0.1278] 
-    });
+    const defaultCoords: [number, number] = [51.5074, -0.1278]; // London
+    dispatch({ type: 'SET_COORDINATES', payload: defaultCoords });
+    
+    // Fetch applications within 1km radius of London
+    if (defaultCoords) {
+      fetchApplicationsInRadius(defaultCoords, 1000);
+    }
   }, []);
+
+  // Update applications in state when they're fetched
+  useEffect(() => {
+    if (applications.length > 0) {
+      dispatch({ type: 'SET_APPLICATIONS', payload: applications });
+    }
+  }, [applications]);
 
   return (
     <ErrorBoundary>
@@ -26,7 +36,7 @@ export const ApplicationsDashboardMap = () => {
         activeFilters={{}}
         activeSort={null}
         postcode=""
-        isLoading={false}
+        isLoading={isLoading}
         filteredApplications={state.applications || []}
         handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
         handleFilterChange={() => {}}
