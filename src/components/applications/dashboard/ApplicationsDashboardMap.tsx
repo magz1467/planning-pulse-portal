@@ -41,13 +41,9 @@ export const ApplicationsDashboardMap = () => {
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
       console.log('Auto-selecting first application on mobile - map view only');
-      // Add a small delay to prevent immediate re-render
-      const timer = setTimeout(() => {
-        handleMarkerClick(filteredApplications[0].id);
-      }, 100);
-      return () => clearTimeout(timer);
+      handleMarkerClick(filteredApplications[0].id);
     }
-  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
+  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]); // Removed setSelectedId dependency
 
   return (
     <DashboardLayout

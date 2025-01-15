@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { memo } from 'react';
 
 interface ApplicationTitleProps {
   title: string;
@@ -31,9 +32,7 @@ const transformText = (text: string) => {
   }).join(' ');
 };
 
-export const ApplicationTitle = ({ title, className }: ApplicationTitleProps) => {
-  console.log('ApplicationTitle - Rendering title:', title);
-  
+export const ApplicationTitle = memo(({ title, className }: ApplicationTitleProps) => {
   return (
     <h3 
       className={cn(
@@ -44,4 +43,6 @@ export const ApplicationTitle = ({ title, className }: ApplicationTitleProps) =>
       {transformText(title)}
     </h3>
   );
-};
+});
+
+ApplicationTitle.displayName = 'ApplicationTitle';
