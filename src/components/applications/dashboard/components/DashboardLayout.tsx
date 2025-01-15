@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { useState } from "react";
 
-interface DashboardLayoutProps {
+export interface DashboardLayoutProps {
   selectedId: number | null;
   activeFilters: {
     status?: string;
@@ -60,12 +60,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     handleMarkerClick(null);
   };
 
-  const handleCenterChange = (newCenter: [number, number]) => {
-    if (handlePostcodeSelect) {
-      handlePostcodeSelect(`${newCenter[0]},${newCenter[1]}`);
-    }
-  };
-
   return (
     <div className="h-screen w-full flex flex-col relative">
       <DashboardHeader />
@@ -113,7 +107,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               isMobile={isMobile}
               isMapView={isMapView}
               onMarkerClick={handleMarkerClick}
-              onCenterChange={handleCenterChange}
             />
           )}
         </div>

@@ -1,71 +1,39 @@
-import { useDashboardState } from "@/hooks/use-dashboard-state";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "./components/DashboardLayout";
+import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
+import { MapAction } from "@/types/map-reducer";
 
 export const ApplicationsDashboardMap = () => {
-  const isMobile = useIsMobile();
-  const {
-    selectedId,
-    activeFilters,
-    activeSort,
-    isMapView,
-    setIsMapView,
-    postcode,
-    coordinates,
-    isLoading,
-    applications,
-    filteredApplications,
-    statusCounts,
-    handleMarkerClick,
-    handleFilterChange,
-    handlePostcodeSelect,
-    handleSortChange,
-  } = useDashboardState();
+  const { state, dispatch } = useMapReducer();
 
-  // Initialize default status counts
-  const defaultStatusCounts = {
-    'Under Review': 0,
-    'Approved': 0,
-    'Declined': 0,
-    'Other': 0,
-    ...statusCounts
-  };
-
-  // Debug logging for selectedId
+  // Example of how to update applications when they're fetched
   useEffect(() => {
-    console.log('Selected ID state changed:', selectedId);
-  }, [selectedId]);
-
-  // Auto-select first application on mobile when applications are loaded
-  useEffect(() => {
-    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
-      console.log('Auto-selecting first application on mobile - map view only');
-      // Add a small delay to prevent immediate re-render
-      const timer = setTimeout(() => {
-        handleMarkerClick(filteredApplications[0].id);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
+    // Initialize with default coordinates for London
+    dispatch({ 
+      type: 'SET_COORDINATES', 
+      payload: [51.5074, -0.1278] 
+    });
+  }, []);
 
   return (
-    <DashboardLayout
-      selectedId={selectedId}
-      activeFilters={activeFilters}
-      activeSort={activeSort}
-      isMapView={isMapView}
-      setIsMapView={setIsMapView}
-      postcode={postcode}
-      coordinates={coordinates as [number, number]}
-      isLoading={isLoading}
-      applications={applications}
-      filteredApplications={filteredApplications}
-      statusCounts={defaultStatusCounts}
-      handleMarkerClick={handleMarkerClick}
-      handleFilterChange={handleFilterChange}
-      handlePostcodeSelect={handlePostcodeSelect}
-      handleSortChange={handleSortChange}
-    />
+    <ErrorBoundary>
+      <DashboardLayout
+        applications={state.applications || []}
+        selectedId={state.selectedId}
+        isMapView={state.isMapView}
+        coordinates={state.coordinates}
+        activeFilters={{}}
+        activeSort={null}
+        postcode=""
+        isLoading={false}
+        filteredApplications={state.applications || []}
+        handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
+        handleFilterChange={() => {}}
+        handlePostcodeSelect={() => {}}
+        handleSortChange={() => {}}
+        setIsMapView={(value) => dispatch({ type: 'TOGGLE_VIEW' })}
+      />
+    </ErrorBoundary>
   );
 };

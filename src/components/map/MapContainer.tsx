@@ -1,7 +1,7 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
 import { Application } from "@/types/planning";
 import { ApplicationMarkers } from "./ApplicationMarkers";
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo, useCallback } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
@@ -41,10 +41,10 @@ export const MapContainerComponent = memo(({
     }
   }, [onMapMove]);
 
-  const handleMarkerClick = (id: number) => {
+  const handleMarkerClick = useCallback((id: number) => {
     console.log('Marker clicked in MapContainer:', id);
     onMarkerClick(id);
-  };
+  }, [onMarkerClick]);
 
   return (
     <div className="w-full h-full relative">

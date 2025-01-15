@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { LoadingOverlay } from "@/components/applications/dashboard/components/LoadingOverlay";
+import { memo, useCallback } from 'react';
 
 interface MapContentProps {
   applications: Application[];
@@ -14,7 +15,7 @@ interface MapContentProps {
   isLoading?: boolean;
 }
 
-export const MapContent = ({
+export const MapContent = memo(({
   applications,
   selectedId,
   coordinates,
@@ -32,6 +33,11 @@ export const MapContent = ({
     isMapView,
     isLoading
   });
+
+  const handleMarkerClick = useCallback((id: number | null) => {
+    console.log('MapContent handleMarkerClick:', id);
+    onMarkerClick(id);
+  }, [onMarkerClick]);
 
   if (!coordinates || (!isMobile && !isMapView)) {
     console.log('⚠️ MapContent early return - missing coordinates or view conditions not met');
@@ -53,17 +59,19 @@ export const MapContent = ({
           applications={applications}
           selectedId={selectedId}
           coordinates={coordinates}
-          onMarkerClick={onMarkerClick}
+          onMarkerClick={handleMarkerClick}
           onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards
             applications={applications}
             selectedId={selectedId}
-            onSelectApplication={onMarkerClick}
+            onSelectApplication={handleMarkerClick}
           />
         )}
       </div>
     </div>
   );
-};
+});
+
+MapContent.displayName = 'MapContent';
