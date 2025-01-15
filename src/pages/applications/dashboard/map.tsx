@@ -1,12 +1,10 @@
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ApplicationsDashboardMap } from "@/components/applications/dashboard/ApplicationsDashboardMap";
 
-const ApplicationsDashboardMapPage = () => {
+export default function ApplicationsDashboardMapPage() {
   return (
     <ErrorBoundary>
       <ApplicationsDashboardMap />
     </ErrorBoundary>
   );
-};
-
-export default ApplicationsDashboardMapPage;
+}

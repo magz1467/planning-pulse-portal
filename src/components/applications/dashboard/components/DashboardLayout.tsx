@@ -20,7 +20,7 @@ interface DashboardLayoutProps {
   isMapView: boolean;
   setIsMapView: (value: boolean) => void;
   postcode: string;
-  coordinates: [number, number] | null;
+  coordinates: [number, number];
   isLoading: boolean;
   applications: Application[];
   filteredApplications: Application[];
@@ -61,55 +61,45 @@ const DashboardLayoutComponent = ({
   };
 
   return (
-    <div className="h-screen w-full flex flex-col relative">
+    <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
       <DashboardHeader />
 
       <SearchSection 
         onPostcodeSelect={handlePostcodeSelect}
-        onFilterChange={coordinates ? handleFilterChange : undefined}
+        onFilterChange={handleFilterChange}
         onSortChange={handleSortChange}
         activeFilters={activeFilters}
         activeSort={activeSort}
         isMapView={isMapView}
-        onToggleView={isMobile ? () => {
-          setIsMapView(!isMapView);
-          if (isMapView) {
-            handleMarkerClick(null);
-          }
-        } : undefined}
+        onToggleView={() => setIsMapView(!isMapView)}
         applications={applications}
         statusCounts={statusCounts}
       />
-
-      <div className="flex-1 relative w-full">
-        <div className="absolute inset-0 flex" style={{ zIndex: 10 }}>
-          <SidebarSection
+      
+      <div className="flex flex-1 min-h-0 relative">
+        <SidebarSection 
+          isMobile={isMobile}
+          applications={filteredApplications}
+          selectedApplication={selectedId}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={handleFilterChange}
+          onSortChange={handleSortChange}
+          onSelectApplication={handleMarkerClick}
+          onClose={handleClose}
+        />
+        
+        {(!isMobile || isMapView) && (
+          <MapSection 
             isMobile={isMobile}
             isMapView={isMapView}
+            coordinates={coordinates}
             applications={filteredApplications}
             selectedId={selectedId}
-            postcode={postcode}
-            coordinates={coordinates as [number, number]}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            statusCounts={statusCounts}
-            onFilterChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            onSelectApplication={handleMarkerClick}
-            onClose={handleClose}
+            onMarkerClick={handleMarkerClick}
           />
-
-          {(!isMobile || isMapView) && (
-            <MapSection
-              applications={filteredApplications}
-              selectedId={selectedId}
-              coordinates={coordinates as [number, number]}
-              isMobile={isMobile}
-              isMapView={isMapView}
-              onMarkerClick={handleMarkerClick}
-            />
-          )}
-        </div>
+        )}
       </div>
 
       {isLoading && <LoadingOverlay />}

@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -23,22 +23,14 @@ export const ApplicationsDashboardMap = () => {
     handleSortChange,
   } = useDashboardState();
 
-  // Initialize default status counts
-  const defaultStatusCounts = {
-    'Under Review': 0,
-    'Approved': 0,
-    'Declined': 0,
-    'Other': 0,
-    ...statusCounts
-  };
-
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
     if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
-      console.log('Auto-selecting first application on mobile - map view only');
       handleMarkerClick(filteredApplications[0].id);
     }
   }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
+
+  if (!coordinates) return null;
 
   return (
     <DashboardLayout
@@ -48,11 +40,11 @@ export const ApplicationsDashboardMap = () => {
       isMapView={isMapView}
       setIsMapView={setIsMapView}
       postcode={postcode}
-      coordinates={coordinates as [number, number]}
+      coordinates={coordinates}
       isLoading={isLoading}
       applications={applications}
       filteredApplications={filteredApplications}
-      statusCounts={defaultStatusCounts}
+      statusCounts={statusCounts}
       handleMarkerClick={handleMarkerClick}
       handleFilterChange={handleFilterChange}
       handlePostcodeSelect={handlePostcodeSelect}
