@@ -1,6 +1,7 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
 import { Application } from "@/types/planning";
-import { useEffect, useRef, memo, ReactNode } from "react";
+import { ApplicationMarkers } from "./ApplicationMarkers";
+import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
@@ -12,7 +13,6 @@ interface MapContainerProps {
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
   onMapMove?: (map: LeafletMap) => void;
-  children?: ReactNode;
 }
 
 export const MapContainerComponent = memo(({
@@ -22,7 +22,6 @@ export const MapContainerComponent = memo(({
   onMarkerClick,
   onCenterChange,
   onMapMove,
-  children
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
@@ -42,11 +41,10 @@ export const MapContainerComponent = memo(({
     }
   }, [onMapMove]);
 
-  console.log('MapContainer rendering:', {
-    applicationsCount: applications.length,
-    coordinates,
-    selectedId
-  });
+  const handleMarkerClick = (id: number) => {
+    console.log('Marker clicked in MapContainer:', id);
+    onMarkerClick(id);
+  };
 
   return (
     <div className="w-full h-full relative">
@@ -63,7 +61,12 @@ export const MapContainerComponent = memo(({
           maxZoom={19}
         />
         <SearchLocationPin position={coordinates} />
-        {children}
+        <ApplicationMarkers
+          applications={applications}
+          baseCoordinates={coordinates}
+          onMarkerClick={handleMarkerClick}
+          selectedId={selectedId}
+        />
       </LeafletMapContainer>
     </div>
   );

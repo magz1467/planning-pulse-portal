@@ -1,7 +1,7 @@
 import { Marker } from "react-leaflet";
 import { Application } from "@/types/planning";
 import { LatLngTuple } from "leaflet";
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import L from "leaflet";
 
 interface ApplicationMarkersProps {
@@ -41,46 +41,28 @@ export const ApplicationMarkers = ({
   onMarkerClick,
   selectedId,
 }: ApplicationMarkersProps) => {
-  console.log('ApplicationMarkers rendering with:', { 
-    applicationsCount: applications.length,
-    selectedId,
-    baseCoordinates
-  });
-
-  const handleClick = useCallback((id: number) => (e: L.LeafletMouseEvent) => {
-    console.log('Marker clicked:', id);
-    e.originalEvent.stopPropagation();
-    onMarkerClick(id);
-  }, [onMarkerClick]);
-
   return (
     <>
       {applications.map((app) => {
-        if (!app.coordinates) {
-          console.warn('Application missing coordinates:', app.id);
-          return null;
-        }
-
         const color = getStatusColor(app.status);
         const isSelected = app.id === selectedId;
         
-        console.log('Rendering marker:', {
-          id: app.id,
-          coordinates: app.coordinates,
-          isSelected
-        });
-
-        return (
-          <Marker
-            key={app.id}
-            position={app.coordinates}
-            eventHandlers={{
-              click: handleClick(app.id),
-            }}
-            icon={createIcon(color, isSelected)}
-            zIndexOffset={isSelected ? 1000 : 0}
-          />
-        );
+        if (app.coordinates) {
+          return (
+            <Marker
+              key={app.id}
+              position={app.coordinates}
+              eventHandlers={{
+                click: () => {
+                  onMarkerClick(app.id);
+                },
+              }}
+              icon={createIcon(color, isSelected)}
+              zIndexOffset={isSelected ? 1000 : 0}
+            />
+          );
+        }
+        return null;
       })}
     </>
   );

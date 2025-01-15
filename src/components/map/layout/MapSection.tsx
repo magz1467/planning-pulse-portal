@@ -1,8 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { ApplicationMarkerLayer } from "../markers/ApplicationMarkerLayer";
-import { memo, useCallback } from "react";
+import { useCallback, memo } from "react";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -25,10 +24,11 @@ export const MapSection = memo(({
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
+    // Force the click to be handled synchronously
     setTimeout(() => {
       onMarkerClick(id);
     }, 0);
-  }, [onMarkerClick]);
+  }, [onMarkerClick]); // Add onMarkerClick to dependencies
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -48,20 +48,12 @@ export const MapSection = memo(({
           coordinates={coordinates}
           onMarkerClick={handleMarkerClick}
           onCenterChange={onCenterChange}
-        >
-          <ApplicationMarkerLayer
-            applications={applications}
-            selectedId={selectedId}
-            coordinates={coordinates}
-            onMarkerClick={handleMarkerClick}
-          />
-        </MapView>
-        
+        />
         {isMobile && selectedId && (
           <MobileApplicationCards
             applications={applications}
             selectedId={selectedId}
-            onSelectApplication={handleMarkerClick}
+            onSelectApplication={onMarkerClick}
           />
         )}
       </div>
