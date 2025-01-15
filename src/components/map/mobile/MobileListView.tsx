@@ -8,6 +8,7 @@ import { StatusBadge } from "./components/StatusBadge";
 interface MobileListViewProps {
   postcode: string;
   applications: Application[];
+  selectedApplication?: number | null;
   onSelectApplication: (id: number) => void;
   onShowEmailDialog: () => void;
 }
@@ -15,6 +16,7 @@ interface MobileListViewProps {
 export const MobileListView = ({
   postcode,
   applications,
+  selectedApplication,
   onSelectApplication,
   onShowEmailDialog,
 }: MobileListViewProps) => {
