@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
+import { memo } from "react";
 import { FilterDropdown } from "./FilterDropdown";
 import { Application } from "@/types/planning";
-import { memo, useCallback } from "react";
 
 interface StatusFilterProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -21,9 +19,9 @@ interface StatusFilterProps {
 }
 
 export const StatusFilter = memo(({
-  onFilterChange,
+  onFilterChange = () => {},
   activeFilters = {},
-  isMobile,
+  isMobile = false,
   applications = [],
   statusCounts = {
     'Under Review': 0,
@@ -32,16 +30,11 @@ export const StatusFilter = memo(({
     'Other': 0
   }
 }: StatusFilterProps) => {
-  // Memoize callback to prevent recreation on every render
-  const handleFilterChange = useCallback((filterType: string, value: string) => {
-    if (onFilterChange) {
-      onFilterChange(filterType, value);
-    }
-  }, [onFilterChange]);
+  console.log('StatusFilter render', { activeFilters, statusCounts }); // Debug log
 
   return (
     <FilterDropdown
-      onFilterChange={handleFilterChange}
+      onFilterChange={onFilterChange}
       activeFilters={activeFilters}
       isMobile={isMobile}
       applications={applications}

@@ -42,30 +42,45 @@ export const FilterDropdown = memo(({
     'Other': 0
   }
 }: FilterDropdownProps) => {
-  // Memoize computed values
-  const hasActiveFilters = useMemo(() => 
-    Object.values(activeFilters).some(Boolean), 
-    [activeFilters]
-  );
+  // COMMENTED FOR DEBUGGING - Remove if error persists
+  // const hasActiveFilters = useMemo(() => 
+  //   Object.values(activeFilters).some(Boolean), 
+  //   [activeFilters]
+  // );
+  const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
-  // Memoize handlers
-  const handleFilterChange = useCallback((filterType: string, value: string) => {
+  // COMMENTED FOR DEBUGGING - Remove if error persists
+  // const handleFilterChange = useCallback((filterType: string, value: string) => {
+  //   onFilterChange(filterType, value);
+  // }, [onFilterChange]);
+  const handleFilterChange = (filterType: string, value: string) => {
     onFilterChange(filterType, value);
-  }, [onFilterChange]);
+  };
 
-  const handleClearFilters = useCallback(() => {
+  // COMMENTED FOR DEBUGGING - Remove if error persists
+  // const handleClearFilters = useCallback(() => {
+  //   onFilterChange("status", "");
+  //   onFilterChange("type", "");
+  // }, [onFilterChange]);
+  const handleClearFilters = () => {
     onFilterChange("status", "");
     onFilterChange("type", "");
-  }, [onFilterChange]);
+  };
 
-  // Memoize status options with counts
-  const statusOptionsWithCounts = useMemo(() => 
-    statusOptions.map(option => ({
-      ...option,
-      count: statusCounts[option.value as keyof typeof statusCounts] || 0
-    })),
-    [statusCounts]
-  );
+  // COMMENTED FOR DEBUGGING - Remove if error persists
+  // const statusOptionsWithCounts = useMemo(() => 
+  //   statusOptions.map(option => ({
+  //     ...option,
+  //     count: statusCounts[option.value as keyof typeof statusCounts] || 0
+  //   })),
+  //   [statusCounts]
+  // );
+  const statusOptionsWithCounts = statusOptions.map(option => ({
+    ...option,
+    count: statusCounts[option.value as keyof typeof statusCounts] || 0
+  }));
+
+  console.log('FilterDropdown render', { activeFilters, statusCounts }); // Debug log
 
   return (
     <DropdownMenu>
