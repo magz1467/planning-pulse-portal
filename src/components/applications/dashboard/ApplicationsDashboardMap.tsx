@@ -58,7 +58,7 @@ export const ApplicationsDashboardMap = () => {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
+  }, [filteredApplications, handleMarkerClick, isMobile, isLoading, isMapView, selectedId]);
 
   return (
     <ErrorBoundary>
