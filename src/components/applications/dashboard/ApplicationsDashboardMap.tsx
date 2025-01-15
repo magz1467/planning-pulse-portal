@@ -35,11 +35,17 @@ export const ApplicationsDashboardMap = () => {
   // Debug logging for selectedId
   useEffect(() => {
     console.log('Selected ID state changed:', selectedId);
-  }, [selectedId]);
+  }, [selectedId]); // Only re-run when selectedId changes
 
   // Auto-select first application on mobile when applications are loaded
   useEffect(() => {
-    if (isMobile && filteredApplications.length > 0 && !selectedId && !isLoading && isMapView) {
+    if (
+      isMobile && 
+      filteredApplications.length > 0 && 
+      !selectedId && 
+      !isLoading && 
+      isMapView
+    ) {
       console.log('Auto-selecting first application on mobile - map view only');
       // Add a small delay to prevent immediate re-render
       const timer = setTimeout(() => {
@@ -47,7 +53,14 @@ export const ApplicationsDashboardMap = () => {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isMobile, filteredApplications, selectedId, isLoading, handleMarkerClick, isMapView]);
+  }, [
+    isMobile, 
+    filteredApplications, 
+    selectedId, 
+    isLoading, 
+    handleMarkerClick, 
+    isMapView
+  ]); // Added proper dependency array
 
   return (
     <DashboardLayout
