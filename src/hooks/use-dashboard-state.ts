@@ -173,11 +173,6 @@ export const useDashboardState = () => {
     ...statusCounts
   };
 
-  const handleMarkerClick = useCallback((id: number | null) => {
-    console.log('Marker clicked:', id);
-    setSelectedId(prev => id === prev ? null : id);
-  }, []);
-
   return {
     selectedId,
     activeFilters,
