@@ -16,6 +16,14 @@ interface SidebarSectionProps {
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number | null) => void;
   onClose: () => void;
+  isMapView: boolean;
+  coordinates: [number, number];
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const SidebarSection = ({
@@ -29,7 +37,12 @@ export const SidebarSection = ({
   onSortChange,
   onSelectApplication,
   onClose,
+  isMapView,
+  coordinates,
+  statusCounts,
 }: SidebarSectionProps) => {
+  if (!coordinates) return null;
+
   if (!isMobile) {
     return (
       <DesktopSidebar
@@ -42,19 +55,24 @@ export const SidebarSection = ({
         onSortChange={onSortChange}
         onSelectApplication={onSelectApplication}
         onClose={onClose}
+        statusCounts={statusCounts}
       />
     );
   }
 
-  return (
-    <MobileListContainer
-      applications={applications}
-      selectedApplication={selectedId}
-      postcode={postcode}
-      onSelectApplication={onSelectApplication}
-      onShowEmailDialog={() => {}}
-      hideFilterBar={true}
-      onClose={onClose}
-    />
-  );
+  if (!isMapView) {
+    return (
+      <MobileListContainer
+        applications={applications}
+        selectedApplication={selectedId}
+        postcode={postcode}
+        onSelectApplication={onSelectApplication}
+        onShowEmailDialog={() => {}}
+        hideFilterBar={true}
+        onClose={onClose}
+      />
+    );
+  }
+
+  return null;
 };

@@ -88,6 +88,9 @@ const DashboardLayoutComponent = ({
           onSortChange={handleSortChange}
           onSelectApplication={handleMarkerClick}
           onClose={handleClose}
+          isMapView={isMapView}
+          coordinates={coordinates}
+          statusCounts={statusCounts}
         />
         
         {(!isMobile || isMapView) && (
