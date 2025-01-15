@@ -44,7 +44,7 @@ export const useWebSocketConnection = ({
       channel = supabase
         .channel(channelName)
         .on(
-          'postgres_changes',
+          'postgres_changes' as 'INSERT' | 'UPDATE' | 'DELETE',
           {
             event: eventConfig.event,
             schema: eventConfig.schema,
