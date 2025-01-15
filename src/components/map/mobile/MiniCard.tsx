@@ -26,7 +26,8 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
     };
 
     try {
-      if (navigator.share) {
+      // Try Web Share API first
+      if (navigator.share && window.isSecureContext) {
         await navigator.share(shareData);
         toast({
           title: "Shared successfully",
@@ -42,11 +43,20 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       }
     } catch (err) {
       console.error('Error sharing:', err);
-      toast({
-        title: "Error sharing",
-        description: "There was an error sharing this application",
-        variant: "destructive",
-      });
+      // Try clipboard as fallback if sharing fails
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          title: "Link copied",
+          description: "The link has been copied to your clipboard",
+        });
+      } catch (clipboardErr) {
+        toast({
+          title: "Error sharing",
+          description: "There was an error sharing this application",
+          variant: "destructive",
+        });
+      }
     }
   };
 
