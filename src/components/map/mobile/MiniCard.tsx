@@ -83,11 +83,11 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-primary truncate">
+          <h3 className="font-semibold text-primary mb-1 line-clamp-2">
             <ApplicationTitle title={application.engaging_title || application.description || ''} />
           </h3>
-          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{application.address}</p>
-          <div className="flex flex-col gap-2 mt-2">
+          <p className="text-sm text-gray-600 mb-2 line-clamp-2">{application.address}</p>
+          <div className="flex items-center gap-2">
             <ApplicationBadges
               status={application.status}
               lastDateConsultationComments={application.last_date_consultation_comments}
