@@ -60,13 +60,13 @@ const sortByNewest = (applications: Application[]) => {
 
 const sortByImpactScore = (applications: Application[]) => {
   return [...applications].sort((a, b) => {
-    // Handle null cases - push them to the bottom
+    // Handle null values - push them to the bottom
     if (a.final_impact_score === null && b.final_impact_score === null) return 0;
     if (a.final_impact_score === null) return 1;
     if (b.final_impact_score === null) return -1;
     
     // Sort by impact score descending (highest first)
-    return Number(b.final_impact_score) - Number(a.final_impact_score);
+    return b.final_impact_score - a.final_impact_score;
   });
 };
 
