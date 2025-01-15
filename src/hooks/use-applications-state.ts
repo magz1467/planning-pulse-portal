@@ -4,9 +4,10 @@ import { useApplicationsData } from '@/components/applications/dashboard/hooks/u
 import { useFilteredApplications } from './use-filtered-applications';
 import { SortType } from './use-sort-applications';
 import { useToast } from './use-toast';
+import { LatLngTuple } from 'leaflet';
 
-export const useApplicationsState = (coordinates: [number, number] | null) => {
-  const [searchPoint, setSearchPoint] = useState<[number, number] | null>(null);
+export const useApplicationsState = (coordinates: LatLngTuple | null) => {
+  const [searchPoint, setSearchPoint] = useState<LatLngTuple | null>(null);
   const { toast } = useToast();
   
   const { 
@@ -23,6 +24,7 @@ export const useApplicationsState = (coordinates: [number, number] | null) => {
     setActiveSort(sortType);
   };
 
+  // Only search when coordinates actually change
   const isInitialSearch = !searchPoint && coordinates;
   const isNewSearch = searchPoint && coordinates && 
     (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
@@ -33,8 +35,7 @@ export const useApplicationsState = (coordinates: [number, number] | null) => {
     if (isInitialSearch || isNewSearch) {
       console.log('Fetching applications with coordinates:', coordinates);
       try {
-        const [lat, lng] = coordinates;
-        const tuple: [number, number] = [lat, lng];
+        const tuple: LatLngTuple = [coordinates[0], coordinates[1]];
         setSearchPoint(tuple);
         fetchApplicationsInRadius(tuple, 1000).catch(error => {
           console.error('Error fetching applications:', error);

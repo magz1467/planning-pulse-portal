@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
-import { useCoordinates } from './use-coordinates';
+import { useCoordinates } from '@/hooks/use-coordinates';
+import { useFilteredApplications } from '@/hooks/use-filtered-applications';
+import { useURLState } from './use-url-state';
+import { useSelectionState } from './use-selection-state';
 import { useFilterState } from './use-filter-state';
+import { useToast } from './use-toast';
+import { useNavigate } from 'react-router-dom';
 import { useMapViewState } from './use-map-view-state';
 import { useSearchState } from './use-search-state';
 import { useApplicationsState } from './use-applications-state';
-import { useFilteredApplications } from './use-filtered-applications';
-import { useURLState } from './use-url-state';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from './use-toast';
+import { LatLngTuple } from 'leaflet';
 
 export const useMapDashboardState = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const { 
     initialPostcode, 
     initialTab, 
@@ -19,9 +19,12 @@ export const useMapDashboardState = () => {
     initialApplicationId,
     updateURLParams 
   } = useURLState();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
+  const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
-  const { isMapView, setIsMapView, selectedId, handleMarkerClick } = useMapViewState();
+  const { isMapView, setIsMapView } = useMapViewState();
   const { 
     postcode,
     isSearching,
@@ -40,8 +43,9 @@ export const useMapDashboardState = () => {
     activeSort,
     handleSortChange,
     statusCounts
-  } = useApplicationsState(coordinates ? [coordinates[0], coordinates[1]] : null);
+  } = useApplicationsState(coordinates ? [coordinates[0], coordinates[1]] as LatLngTuple : null);
 
+  // Handle search errors and URL updates
   useEffect(() => {
     if (isSearching && !coordinates) {
       toast({
@@ -71,6 +75,7 @@ export const useMapDashboardState = () => {
     }
   }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast, setIsSearching]);
 
+  // Handle search completion
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
       const loadTime = (Date.now() - searchStartTime) / 1000;

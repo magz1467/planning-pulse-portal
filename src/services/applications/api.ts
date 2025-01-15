@@ -49,7 +49,7 @@ export async function getApplicationsWithinRadius(
     console.error('Error in getApplicationsWithinRadius:', error);
     toast({
       title: "Error fetching applications",
-      description: "Please try again later",
+      description: "Please try again later", 
       variant: "destructive"
     });
     return null;
