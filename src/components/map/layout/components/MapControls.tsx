@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Application } from "@/types/planning";
 import { MapAction } from "@/types/map-reducer";
+import { MapView } from "../MapView";
 
 interface MapControlsProps {
   dispatch: React.Dispatch<MapAction>;

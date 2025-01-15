@@ -2,7 +2,7 @@ import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
-import { useSortApplications, SortType } from "@/hooks/use-sort-applications";
+import { useApplicationSorting, SortType } from "@/hooks/use-sort-applications";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
 import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 
@@ -19,7 +19,10 @@ export const PlanningApplicationList = ({
   activeSort,
   postcode
 }: PlanningApplicationListProps) => {
-  const sortedApplications = useSortApplications(applications, activeSort);
+  const sortedApplications = useApplicationSorting({
+    type: activeSort || null,
+    applications
+  });
 
   console.log('PlanningApplicationList - Rendering with applications:', applications?.length);
 

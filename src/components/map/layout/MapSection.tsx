@@ -1,9 +1,8 @@
-import { useCallback, memo } from "react";
 import { Application } from "@/types/planning";
-import { MapAction } from "@/types/map-reducer";
 import { MapView } from "./MapView";
-import { MapControls } from "./components/MapControls";
-import { MobileMapControls } from "./components/MobileMapControls";
+import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
+import { useCallback, memo } from "react";
+import { MapAction } from "@/types/map-reducer";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -40,20 +39,22 @@ export const MapSection = memo(({
         zIndex: 1
       }}
     >
-      <MapControls
-        dispatch={dispatch}
-        selectedId={selectedId}
-        applications={applications}
-        coordinates={coordinates}
-        onCenterChange={onCenterChange}
-      />
-      {isMobile && selectedId && (
-        <MobileMapControls
+      <div className="absolute inset-0">
+        <MapView
           applications={applications}
           selectedId={selectedId}
-          onSelectApplication={handleMarkerClick}
+          coordinates={coordinates}
+          onMarkerClick={handleMarkerClick}
+          onCenterChange={onCenterChange}
         />
-      )}
+        {isMobile && selectedId && (
+          <MobileApplicationCards
+            applications={applications}
+            selectedId={selectedId}
+            onSelectApplication={handleMarkerClick}
+          />
+        )}
+      </div>
     </div>
   );
 });
