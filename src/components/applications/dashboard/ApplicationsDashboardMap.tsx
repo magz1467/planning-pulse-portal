@@ -1,7 +1,7 @@
 import { useDashboardState } from "@/hooks/use-dashboard-state";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
@@ -31,6 +31,11 @@ export const ApplicationsDashboardMap = () => {
     'Other': 0,
     ...statusCounts
   };
+
+  // Memoize handlers
+  const handleToggleView = useCallback(() => {
+    setIsMapView(!isMapView);
+  }, [isMapView, setIsMapView]);
 
   // Debug logging for selectedId
   useEffect(() => {

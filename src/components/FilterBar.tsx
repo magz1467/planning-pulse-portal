@@ -39,6 +39,7 @@ export const FilterBar = ({
 }: FilterBarProps) => {
   const isMobile = useIsMobile();
 
+  // Memoize handlers to prevent recreation on each render
   const handleFilterChange = useCallback((filterType: string, value: string) => {
     onFilterChange?.(filterType, value);
   }, [onFilterChange]);
@@ -47,6 +48,7 @@ export const FilterBar = ({
     onSortChange?.(sortType);
   }, [onSortChange]);
 
+  // Memoize computed values
   const sortButtonText = useMemo(() => {
     if (activeSort === 'closingSoon') return 'Closing Soon';
     if (activeSort === 'newest') return 'Newest';
@@ -67,21 +69,19 @@ export const FilterBar = ({
         </ErrorBoundary>
 
         <ErrorBoundary>
-          <div className="flex items-center h-full">
-            <SortDropdown
-              activeSort={activeSort}
-              onSortChange={handleSortChange}
+          <SortDropdown
+            activeSort={activeSort}
+            onSortChange={handleSortChange}
+          >
+            <Button
+              variant="outline"
+              size={isMobile ? "sm" : "default"}
+              className="flex items-center gap-2"
             >
-              <Button
-                variant="outline"
-                size={isMobile ? "sm" : "default"}
-                className="flex items-center gap-2"
-              >
-                <ArrowDownAZ className="h-4 w-4" />
-                {sortButtonText}
-              </Button>
-            </SortDropdown>
-          </div>
+              <ArrowDownAZ className="h-4 w-4" />
+              {sortButtonText}
+            </Button>
+          </SortDropdown>
         </ErrorBoundary>
       </div>
 
