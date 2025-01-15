@@ -34,7 +34,7 @@ export const ApplicationsDashboardMap = () => {
     ...statusCounts
   }), [statusCounts]);
 
-  // Memoize handlers
+  // Memoize handlers to prevent unnecessary re-renders
   const handleToggleView = useCallback(() => {
     setIsMapView(prev => !prev);
   }, [setIsMapView]);
