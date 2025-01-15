@@ -3,13 +3,14 @@ import { MapView } from "@/components/map/MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { memo } from "react";
 
-interface MapSectionProps {
+export interface MapSectionProps {
   isMobile: boolean;
   isMapView: boolean;
   coordinates: [number, number];
   applications: Application[];
   selectedId: number | null;
   onMarkerClick: (id: number | null) => void;
+  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapSection = memo(({
@@ -19,6 +20,7 @@ export const MapSection = memo(({
   applications,
   selectedId,
   onMarkerClick,
+  onCenterChange,
 }: MapSectionProps) => {
   console.log('MapSection rendering with:', {
     applicationsCount: applications?.length,
@@ -36,6 +38,7 @@ export const MapSection = memo(({
           selectedId={selectedId}
           coordinates={coordinates}
           onMarkerClick={onMarkerClick}
+          onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards

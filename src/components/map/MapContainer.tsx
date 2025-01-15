@@ -6,11 +6,13 @@ import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import "leaflet/dist/leaflet.css";
 
-interface MapContainerProps {
+export interface MapContainerProps {
   applications: Application[];
   coordinates: [number, number];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
+  onCenterChange?: (center: [number, number]) => void;
+  onMapMove?: (map: LeafletMap) => void;
 }
 
 export const MapContainerComponent = memo(({
@@ -18,6 +20,8 @@ export const MapContainerComponent = memo(({
   applications,
   selectedId,
   onMarkerClick,
+  onCenterChange,
+  onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
 
@@ -32,6 +36,16 @@ export const MapContainerComponent = memo(({
     }
   }, [coordinates]);
 
+  const handleMoveEnd = () => {
+    if (mapRef.current && onCenterChange) {
+      const center = mapRef.current.getCenter();
+      onCenterChange([center.lat, center.lng]);
+    }
+    if (mapRef.current && onMapMove) {
+      onMapMove(mapRef.current);
+    }
+  };
+
   return (
     <div className="w-full h-full relative">
       <LeafletMapContainer
@@ -40,6 +54,7 @@ export const MapContainerComponent = memo(({
         zoom={14}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
+        onmoveend={handleMoveEnd}
       >
         <TileLayer 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
