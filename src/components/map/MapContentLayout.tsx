@@ -6,6 +6,7 @@ import { useState } from "react";
 import { MobileListContainer } from "./mobile/MobileListContainer";
 import { MapSection } from "./layout/MapSection";
 import { DesktopSidebarSection } from "./layout/DesktopSidebarSection";
+import { MapAction } from "@/types/map-reducer";
 
 interface MapContentLayoutProps {
   isLoading: boolean;
@@ -20,7 +21,7 @@ interface MapContentLayoutProps {
   activeSort: 'closingSoon' | 'newest' | null;
   isMapView: boolean;
   isMobile: boolean;
-  onMarkerClick: (id: number | null) => void;
+  dispatch: React.Dispatch<MapAction>;
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onToggleView: () => void;
@@ -36,7 +37,7 @@ export const MapContentLayout = ({
   activeSort,
   isMapView,
   isMobile,
-  onMarkerClick,
+  dispatch,
   onFilterChange,
   onSortChange,
   onToggleView,
@@ -54,7 +55,7 @@ export const MapContentLayout = ({
   };
 
   const handleClose = () => {
-    onMarkerClick(null);
+    dispatch({ type: 'SELECT_APPLICATION', payload: null });
   };
 
   return (
@@ -78,7 +79,7 @@ export const MapContentLayout = ({
           activeSort={activeSort}
           onFilterChange={onFilterChange}
           onSortChange={onSortChange}
-          onSelectApplication={onMarkerClick}
+          onSelectApplication={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
           onClose={handleClose}
         />
         
@@ -88,7 +89,7 @@ export const MapContentLayout = ({
           coordinates={coordinates}
           applications={filteredApplications}
           selectedId={selectedApplication}
-          onMarkerClick={onMarkerClick}
+          dispatch={dispatch}
         />
         
         {isMobile && !isMapView && (
@@ -96,7 +97,7 @@ export const MapContentLayout = ({
             applications={filteredApplications}
             selectedApplication={selectedApplication}
             postcode={postcode}
-            onSelectApplication={onMarkerClick}
+            onSelectApplication={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
             onShowEmailDialog={() => setShowEmailDialog(true)}
             onClose={handleClose}
           />
