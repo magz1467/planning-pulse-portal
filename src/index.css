@@ -48,3 +48,36 @@
 .leaflet-control-container {
   z-index: 2;
 }
+
+.custom-marker {
+  background: none;
+  border: none;
+  pointer-events: auto !important;
+}
+
+.marker-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.marker-container.selected {
+  z-index: 1001;
+}
+
+.marker-container svg {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+/* Ensure markers are above other map elements */
+.leaflet-marker-pane {
+  z-index: 600 !important;
+}
+
+.leaflet-popup-pane {
+  z-index: 700 !important;
+}
