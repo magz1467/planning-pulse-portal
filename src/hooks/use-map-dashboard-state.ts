@@ -48,6 +48,7 @@ export const useMapDashboardState = () => {
   // Handle search errors and URL updates
   useEffect(() => {
     if (isSearching && !coordinates) {
+      console.log('Search error - No coordinates found for postcode:', postcode);
       toast({
         title: "Location Error",
         description: "We couldn't find that location. Please check the postcode and try again.",
@@ -73,7 +74,7 @@ export const useMapDashboardState = () => {
         variant: "destructive",
       });
     }
-  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast, setIsSearching]);
+  }, [postcode, initialTab, activeFilters.status, selectedId, coordinates, isSearching]); // Added proper dependencies
 
   // Handle search completion
   useEffect(() => {
