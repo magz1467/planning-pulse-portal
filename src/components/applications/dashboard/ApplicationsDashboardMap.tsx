@@ -6,6 +6,7 @@ import { useApplicationsData } from "./hooks/useApplicationsData";
 import { SortType } from "@/hooks/use-sort-applications";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAutoSelect } from "@/hooks/use-auto-select";
+import { useCoordinates } from "@/hooks/use-coordinates";
 
 export const ApplicationsDashboardMap = () => {
   const { state, dispatch } = useMapReducer();
@@ -44,6 +45,16 @@ export const ApplicationsDashboardMap = () => {
     dispatch({ type: 'SET_SORT', payload: sortType });
   };
 
+  const handlePostcodeSelect = async (postcode: string) => {
+    console.log('Handling postcode select:', postcode);
+    const { coordinates } = await useCoordinates(postcode);
+    
+    if (coordinates) {
+      dispatch({ type: 'SET_COORDINATES', payload: coordinates });
+      fetchApplicationsInRadius(coordinates, 1000);
+    }
+  };
+
   return (
     <ErrorBoundary>
       <DashboardLayout
@@ -58,7 +69,7 @@ export const ApplicationsDashboardMap = () => {
         filteredApplications={state.applications || []}
         handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
         handleFilterChange={() => {}}
-        handlePostcodeSelect={() => {}}
+        handlePostcodeSelect={handlePostcodeSelect}
         handleSortChange={handleSortChange}
         setIsMapView={(value) => dispatch({ type: 'TOGGLE_VIEW' })}
       />
