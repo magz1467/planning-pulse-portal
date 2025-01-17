@@ -8,8 +8,8 @@ export const HeroImage = () => {
         alt="Three women checking their phones in a picturesque village setting" 
         className="rounded-lg shadow-xl w-full h-auto object-cover"
         loading="eager"
-        width={400}
-        height={300}
+        width={300}
+        height={225}
       />
     </div>
   );
