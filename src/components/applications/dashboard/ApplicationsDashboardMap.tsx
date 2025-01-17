@@ -40,7 +40,7 @@ export const ApplicationsDashboardMap = () => {
     (id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })
   );
 
-  const handleSortChange = (sortType: SortType | null) => {
+  const handleSortChange = (sortType: "closingSoon" | "newest" | null) => {
     console.log('Handling sort change:', sortType);
     dispatch({ type: 'SET_SORT', payload: sortType });
   };
@@ -50,8 +50,8 @@ export const ApplicationsDashboardMap = () => {
     const { coordinates } = await useCoordinates(postcode);
     
     if (coordinates) {
-      dispatch({ type: 'SET_COORDINATES', payload: coordinates });
-      fetchApplicationsInRadius(coordinates, 1000);
+      dispatch({ type: 'SET_COORDINATES', payload: coordinates as [number, number] });
+      fetchApplicationsInRadius(coordinates as [number, number], 1000);
     }
   };
 
