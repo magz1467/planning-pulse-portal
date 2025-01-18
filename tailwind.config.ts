@@ -22,16 +22,16 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FFF9F3",  // Updated to new light background
-        foreground: "#333333",  // Updated to new text color
+        background: "#FFFBF7",  // Made slightly brighter
+        foreground: "#333333",  // Kept for good contrast
         primary: {
-          DEFAULT: "#B5D19C",   // Updated to new sage green
-          dark: "#A3BC8C",      // Darker shade for hover states
-          light: "#C7DEB2",     // Lighter shade for secondary elements
-          foreground: "#FFFFFF", // White text for better contrast on primary
+          DEFAULT: "#C7E3AE",   // Made the sage green brighter
+          dark: "#B5D19C",      // Adjusted darker shade
+          light: "#D9EFC0",     // Adjusted lighter shade
+          foreground: "#FFFFFF", // White text for contrast
         },
         secondary: {
-          DEFAULT: "#F9E4E8",   // Updated to new rose pink shade
+          DEFAULT: "#F9E4E8",   // Kept the rose pink as requested
           foreground: "#FFFFFF", // White text for contrast
         },
         destructive: {
@@ -40,11 +40,11 @@ export default {
         },
         muted: {
           DEFAULT: "#F8F6F3",
-          foreground: "#4B4B4B",  // Updated to specified text color
+          foreground: "#4B4B4B",  // Kept for readability
         },
         accent: {
-          DEFAULT: "#F9E4E8", // Using new rose pink shade as accent
-          foreground: "#333333",  // Updated to specified text color
+          DEFAULT: "#F9E4E8", // Using rose pink as accent
+          foreground: "#333333",  // Kept for readability
         },
       },
       borderRadius: {
