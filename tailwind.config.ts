@@ -26,12 +26,12 @@ export default {
         foreground: "#4B4B4B",
         primary: {
           DEFAULT: "#2E4E3F",
-          dark: "#1E3A2E",
-          light: "#A2B3A1",
+          dark: "#1E3A2E",    // Darker shade for hover states
+          light: "#A2B3A1",   // Muted sage for secondary elements
         },
         secondary: {
-          DEFAULT: "#C16A5A",
-          foreground: "#FEC6A1",
+          DEFAULT: "#C16A5A", // Warm terracotta
+          foreground: "#FEC6A1", // Lighter peach for contrast
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -42,7 +42,7 @@ export default {
           foreground: "#4B4B4B",
         },
         accent: {
-          DEFAULT: "#C8A7A2",
+          DEFAULT: "#C8A7A2", // Dusty rose
           foreground: "#4B4B4B",
         },
         popover: {
