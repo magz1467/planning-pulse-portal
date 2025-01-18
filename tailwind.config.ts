@@ -22,16 +22,16 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FFFBF7",  // Made slightly brighter
+        background: "#FFFBF7",  // Kept bright background
         foreground: "#333333",  // Kept for good contrast
         primary: {
-          DEFAULT: "#C7E3AE",   // Made the sage green brighter
-          dark: "#B5D19C",      // Adjusted darker shade
-          light: "#D9EFC0",     // Adjusted lighter shade
+          DEFAULT: "#8FA97A",   // Updated to requested sage green
+          dark: "#7A9165",      // Adjusted darker shade
+          light: "#A4BE8F",     // Adjusted lighter shade
           foreground: "#FFFFFF", // White text for contrast
         },
         secondary: {
-          DEFAULT: "#F9E4E8",   // Kept the rose pink as requested
+          DEFAULT: "#F9E4E8",   // Kept the rose pink
           foreground: "#FFFFFF", // White text for contrast
         },
         destructive: {
