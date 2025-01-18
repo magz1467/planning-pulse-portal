@@ -66,7 +66,7 @@ export const SearchForm = () => {
         <Button 
           type="submit" 
           variant="outline"
-          className="w-full border-2 border-primary-light text-primary hover:bg-primary hover:text-white py-6"
+          className="w-full border-4 border-primary text-primary hover:bg-primary hover:text-white py-6 font-semibold text-lg tracking-wide transition-all duration-200 shadow-sm hover:shadow-md"
           disabled={isSearching || !postcode.trim()}
         >
           {isSearching ? 'Searching...' : 'Show planning applications'}
