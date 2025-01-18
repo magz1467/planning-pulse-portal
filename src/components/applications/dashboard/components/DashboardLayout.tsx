@@ -9,6 +9,7 @@ import { Chatbot } from "@/components/Chatbot";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { useState } from "react";
+import { MapAction } from "@/types/map-reducer";
 
 export interface DashboardLayoutProps {
   selectedId: number | null;
@@ -60,6 +61,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     handleMarkerClick(null);
   };
 
+  const dispatch = (action: MapAction) => {
+    if (action.type === 'SELECT_APPLICATION') {
+      handleMarkerClick(action.payload);
+    }
+  };
+
   return (
     <div className="h-screen w-full flex flex-col relative">
       <DashboardHeader />
@@ -106,7 +113,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               coordinates={coordinates as [number, number]}
               isMobile={isMobile}
               isMapView={isMapView}
-              onMarkerClick={handleMarkerClick}
+              dispatch={dispatch}
             />
           )}
         </div>
