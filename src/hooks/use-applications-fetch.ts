@@ -3,19 +3,28 @@ import { Application } from "@/types/planning";
 import { supabase } from "@/integrations/supabase/client";
 import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash/debounce';
+
+// Cache duration in milliseconds (5 minutes)
+const CACHE_TIME = 5 * 60 * 1000;
 
 export const useApplicationsFetch = () => {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const queryClient = useQueryClient();
 
-  const fetchApplicationsInRadius = async (
+  // Create a cache key based on search parameters
+  const createCacheKey = (center: LatLngTuple, radius: number, page: number = 0, pageSize: number = 100) => {
+    return ['applications', center[0], center[1], radius, page, pageSize];
+  };
+
+  // Debounced fetch function
+  const debouncedFetch = debounce(async (
     center: LatLngTuple,
     radius: number,
-    page = 0,
-    pageSize = 100
+    page: number = 0,
+    pageSize: number = 100
   ) => {
-    setIsLoading(true);
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
@@ -35,9 +44,7 @@ export const useApplicationsFetch = () => {
 
       if (!data) {
         console.log('No applications found');
-        setApplications([]);
-        setTotalCount(0);
-        return;
+        return { applications: [], totalCount: 0 };
       }
 
       const { applications: appsData, total_count, status_counts } = data[0];
@@ -48,6 +55,7 @@ export const useApplicationsFetch = () => {
         title: app.title
       })));
 
+      // Pre-compute coordinate transformations
       const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
@@ -58,27 +66,54 @@ export const useApplicationsFetch = () => {
         title: app.title
       })));
 
-      setApplications(transformedApplications || []);
-      setTotalCount(total_count || 0);
-
+      return {
+        applications: transformedApplications || [],
+        totalCount: total_count || 0,
+        statusCounts: status_counts || {}
+      };
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
-      // Show more detailed error information
-      console.error('Error details:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
-    } finally {
-      setIsLoading(false);
+      throw error;
     }
+  }, 300); // 300ms debounce
+
+  const fetchApplicationsInRadius = async (
+    center: LatLngTuple,
+    radius: number,
+    page: number = 0,
+    pageSize: number = 100
+  ) => {
+    const cacheKey = createCacheKey(center, radius, page, pageSize);
+    
+    // Check cache first
+    const cachedData = queryClient.getQueryData(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    const result = await debouncedFetch(center, radius, page, pageSize);
+    
+    // Cache the result
+    queryClient.setQueryData(cacheKey, result, {
+      cacheTime: CACHE_TIME
+    });
+
+    return result;
   };
 
+  const { data: applications = [], isLoading, error } = useQuery({
+    queryKey: ['applications'],
+    queryFn: () => fetchApplicationsInRadius([51.5074, -0.1278], 1000),
+    staleTime: CACHE_TIME,
+    cacheTime: CACHE_TIME,
+    refetchOnWindowFocus: false
+  });
+
   return {
-    applications,
+    applications: applications.applications || [],
     isLoading,
     totalCount,
+    error,
     fetchApplicationsInRadius,
   };
 };
