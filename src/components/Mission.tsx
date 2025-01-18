@@ -6,7 +6,7 @@ const Mission = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-foreground">
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-foreground font-playfair">
               Our Mission
             </h2>
             <div className="grid md:grid-cols-2 gap-8 items-center">
