@@ -62,6 +62,7 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         caveat: ["Caveat", "cursive"],
+        playfair: ["Playfair Display", "serif"],
       },
       keyframes: {
         "slide-up": {

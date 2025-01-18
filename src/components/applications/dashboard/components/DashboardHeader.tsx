@@ -8,17 +8,13 @@ export const DashboardHeader = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold" 
+            <span className="text-2xl font-bold font-playfair" 
               style={{
-                fontFamily: "'Caveat', cursive",
+                color: "#C8A7A2", // Dusty Rose
                 letterSpacing: "0.05em",
-                textShadow: "2px 2px 4px rgba(249, 115, 22, 0.2)",
-                background: "linear-gradient(45deg, #F97316, #FEC6A1)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                textTransform: "uppercase"
+                textTransform: "lowercase"
               }}>
-              Nimbygram
+              nimbygram
             </span>
           </Link>
         </div>
