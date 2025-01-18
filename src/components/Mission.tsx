@@ -2,15 +2,15 @@ import Image from "@/components/ui/image";
 
 const Mission = () => {
   return (
-    <div className="bg-gray-50 py-24">
+    <div className="bg-muted py-24">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-foreground">
               Our Mission
             </h2>
             <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-6 text-gray-600">
+              <div className="space-y-6 text-foreground">
                 <p className="text-lg">
                   The UK planning system has long been burdened by slow processes and limited transparency. With average application decisions taking 8-13 weeks, the need for innovation is clear.
                 </p>
