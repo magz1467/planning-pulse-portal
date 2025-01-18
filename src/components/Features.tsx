@@ -13,8 +13,8 @@ const Features = () => {
           {/* Image Section */}
           <div className="relative">
             <Image
-              src="/lovable-uploads/877d91fe-eb57-49a6-915a-a9d063ce98b1.png"
-              alt="Couple standing in front of a countryside house"
+              src="/lovable-uploads/2dfd74e5-fc91-48b5-bbeb-34d3332bd7d6.png"
+              alt="Three women checking their phones in a picturesque village setting"
               className="rounded-xl shadow-lg w-full h-auto"
               width={600}
               height={600}
