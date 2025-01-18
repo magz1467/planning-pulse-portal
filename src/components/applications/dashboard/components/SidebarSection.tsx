@@ -45,18 +45,20 @@ export const SidebarSection = ({
 
   if (!isMobile) {
     return (
-      <DesktopSidebar
-        applications={applications}
-        selectedApplication={selectedId}
-        postcode={postcode}
-        activeFilters={activeFilters}
-        activeSort={activeSort}
-        onFilterChange={onFilterChange}
-        onSortChange={onSortChange}
-        onSelectApplication={onSelectApplication}
-        onClose={onClose}
-        statusCounts={statusCounts}
-      />
+      <div className="w-[50%] h-full overflow-hidden border-r border-gray-200 bg-white">
+        <DesktopSidebar
+          applications={applications}
+          selectedApplication={selectedId}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={onFilterChange}
+          onSortChange={onSortChange}
+          onSelectApplication={onSelectApplication}
+          onClose={onClose}
+          statusCounts={statusCounts}
+        />
+      </div>
     );
   }
 
