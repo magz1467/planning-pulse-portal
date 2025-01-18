@@ -14,7 +14,7 @@ const Services = () => {
               loading="lazy"
             />
             <div className="p-6 flex flex-col flex-1">
-              <h3 className="text-xl font-semibold mb-3 text-foreground">For Residents</h3>
+              <h3 className="text-xl font-semibold mb-3 text-foreground font-playfair">For Residents</h3>
               <p className="text-foreground mb-4 flex-1 font-sans">
                 Easily comment for free on local developments. Stay informed and have your say on changes in your community.
               </p>
@@ -35,7 +35,7 @@ const Services = () => {
               loading="lazy"
             />
             <div className="p-6 flex flex-col flex-1">
-              <h3 className="text-xl font-semibold mb-3 text-foreground">For Developers</h3>
+              <h3 className="text-xl font-semibold mb-3 text-foreground font-playfair">For Developers</h3>
               <p className="text-foreground mb-4 flex-1 font-sans">
                 Get feedback on your project before decision day. Easily see other developments in the area and understand community sentiment.
               </p>
@@ -56,7 +56,7 @@ const Services = () => {
               loading="lazy"
             />
             <div className="p-6 flex flex-col flex-1">
-              <h3 className="text-xl font-semibold mb-3 text-foreground">For Local Authorities</h3>
+              <h3 className="text-xl font-semibold mb-3 text-foreground font-playfair">For Local Authorities</h3>
               <p className="text-foreground mb-4 flex-1 font-sans">
                 Automate and accelerate your planning process. Streamline communication between residents and developers.
               </p>
