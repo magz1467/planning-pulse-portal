@@ -23,7 +23,7 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "#F3EFE8",
-        foreground: "#4B4B4B",
+        foreground: "#403E43",  // Darker charcoal for better contrast
         primary: {
           DEFAULT: "#2E4E3F",
           dark: "#1E3A2E",    // Darker shade for hover states
@@ -40,19 +40,11 @@ export default {
         },
         muted: {
           DEFAULT: "#F1F0FB",
-          foreground: "#4B4B4B",
+          foreground: "#403E43",  // Darker charcoal for better contrast
         },
         accent: {
           DEFAULT: "#C8A7A2", // Dusty rose
-          foreground: "#4B4B4B",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          foreground: "#403E43",  // Darker charcoal for better contrast
         },
       },
       borderRadius: {
