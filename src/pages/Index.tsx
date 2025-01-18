@@ -7,10 +7,12 @@ import { Stats } from "@/components/Stats";
 import StayUpToDate from "@/components/StayUpToDate";
 import GetInTouch from "@/components/GetInTouch";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 const Index = () => {
   return (
     <div className="flex flex-col min-h-screen">
+      <Header />
       <main className="flex-grow">
         <Hero />
         <Features />
