@@ -28,6 +28,7 @@ export default {
           DEFAULT: "#2E4E3F",
           dark: "#1E3A2E",    // Darker shade for hover states
           light: "#A2B3A1",   // Muted sage for secondary elements
+          foreground: "#FFFFFF", // White text for better contrast on primary
         },
         secondary: {
           DEFAULT: "#C16A5A", // Warm terracotta
