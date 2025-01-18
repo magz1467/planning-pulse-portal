@@ -47,16 +47,16 @@ export const SearchForm = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-4">
+    <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
       <SearchTabs 
         activeTab={activeTab}
         onTabChange={setActiveTab}
         disabled={isSearching}
       />
       
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
         <div>
-          <label className="text-sm text-gray-500 mb-1 block">Search location</label>
+          <label className="text-sm text-gray-500 mb-1.5 block">Search location</label>
           <PostcodeSearch
             onSelect={setPostcode}
             placeholder="Enter a postcode"
@@ -66,7 +66,7 @@ export const SearchForm = () => {
         <Button 
           type="submit" 
           variant="outline"
-          className="w-full border-4 border-primary text-primary hover:bg-primary hover:text-white py-6 font-semibold text-lg tracking-wide transition-all duration-200 shadow-sm hover:shadow-md"
+          className="w-full border-4 border-primary text-primary hover:bg-primary hover:text-white py-6 font-semibold text-lg tracking-wide transition-all duration-200 shadow-sm hover:shadow-md mt-4"
           disabled={isSearching || !postcode.trim()}
         >
           {isSearching ? 'Searching...' : 'Show planning applications'}
