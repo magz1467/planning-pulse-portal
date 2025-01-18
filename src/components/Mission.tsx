@@ -2,10 +2,10 @@ import Image from "@/components/ui/image";
 
 const Mission = () => {
   return (
-    <div className="bg-muted py-24">
+    <div className="py-24">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-8">
+          <div className="bg-white rounded-xl shadow-sm p-8 border-2 border-accent">
             <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-foreground font-playfair">
               Our Mission
             </h2>
