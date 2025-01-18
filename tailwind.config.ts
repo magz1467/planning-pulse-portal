@@ -25,13 +25,13 @@ export default {
         background: "#FFFBF7",  // Keeping bright background for contrast
         foreground: "#47463f",  // Updated to Gunmetal Gray
         primary: {
-          DEFAULT: "#8bc5be",   // Updated to Tiffany Blue
-          dark: "#7ab0a9",      // Darker shade of Tiffany Blue
-          light: "#9cd0c9",     // Lighter shade of Tiffany Blue
+          DEFAULT: "#33C3F0",   // Updated to a brighter turquoise
+          dark: "#1EAEDB",      // Darker shade for hover
+          light: "#47D3FF",     // Lighter shade
           foreground: "#FFFFFF", // White text for contrast
         },
         secondary: {
-          DEFAULT: "#af5662",   // Updated to Honeysuckle
+          DEFAULT: "#af5662",   // Honeysuckle
           foreground: "#FFFFFF", // White text for contrast
         },
         destructive: {
@@ -39,7 +39,7 @@ export default {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#f6c8cc",   // Updated to Rose Quartz
+          DEFAULT: "#f6c8cc",   // Rose Quartz
           foreground: "#47463f",  // Using Gunmetal Gray for text
         },
         accent: {
