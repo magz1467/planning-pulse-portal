@@ -2,6 +2,7 @@ import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { useCallback, memo } from "react";
+import { MapAction } from "@/types/map-reducer";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -9,7 +10,7 @@ interface MapSectionProps {
   coordinates: [number, number];
   applications: Application[];
   selectedId: number | null;
-  onMarkerClick: (id: number | null) => void;
+  dispatch: React.Dispatch<MapAction>;
   onCenterChange?: (center: [number, number]) => void;
 }
 
@@ -19,13 +20,13 @@ export const MapSection = memo(({
   coordinates,
   applications,
   selectedId,
-  onMarkerClick,
+  dispatch,
   onCenterChange,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
-    onMarkerClick(id);
-  }, [onMarkerClick]);
+    dispatch({ type: 'SELECT_APPLICATION', payload: id });
+  }, [dispatch]);
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -35,7 +36,8 @@ export const MapSection = memo(({
       style={{ 
         height: isMobile ? 'calc(100vh - 120px)' : '100%',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        marginLeft: !isMobile ? '-10%' : '0' // Adjust map position for desktop view
       }}
     >
       <div className="absolute inset-0">

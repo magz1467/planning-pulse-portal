@@ -29,8 +29,15 @@ export const MapContainerComponent = memo(({
     if (mapRef.current) {
       console.log('🗺️ Setting map view to coordinates:', coordinates);
       mapRef.current.setView(coordinates, 14);
+      // Add a slight delay to ensure the map recenters properly after resize
       setTimeout(() => {
         mapRef.current?.invalidateSize();
+        // Adjust the center slightly to account for the sidebar
+        const center = mapRef.current?.getCenter();
+        if (center) {
+          const newLng = center.lng + 0.02; // Adjust this value as needed
+          mapRef.current?.setView([center.lat, newLng], mapRef.current.getZoom());
+        }
       }, 100);
     }
   }, [coordinates]);
