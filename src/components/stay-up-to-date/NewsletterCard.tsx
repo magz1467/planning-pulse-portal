@@ -19,8 +19,8 @@ export const NewsletterCard = () => {
     <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
-          src="/lovable-uploads/737c5ab0-2470-49df-8f26-24d3db46160b.png"
-          alt="Newsletter signup"
+          src="/lovable-uploads/eb848051-e385-460c-a55d-70d3815b949c.png"
+          alt="Woman in elegant dress standing in front of traditional British housing"
           className="w-full h-full object-cover"
         />
       </div>
