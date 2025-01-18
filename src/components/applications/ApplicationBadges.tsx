@@ -7,12 +7,14 @@ interface ApplicationBadgesProps {
   status: string;
   lastDateConsultationComments?: string | null;
   impactScore?: number | null;
+  validDate?: string | null;
 }
 
 export const ApplicationBadges = ({
   status,
   lastDateConsultationComments,
-  impactScore
+  impactScore,
+  validDate
 }: ApplicationBadgesProps) => {
   const badges = [];
 
@@ -22,6 +24,19 @@ export const ApplicationBadges = ({
       {getStatusText(status)}
     </span>
   );
+
+  // New application badge
+  if (validDate) {
+    const submissionDate = new Date(validDate);
+    const novemberCutoff = new Date('2024-11-01');
+    if (submissionDate > novemberCutoff) {
+      badges.push(
+        <span key="new" className="text-xs px-2 py-1 rounded bg-[#f6c8cc] text-[#47463f]">
+          New
+        </span>
+      );
+    }
+  }
 
   // Closing soon badge
   if (lastDateConsultationComments && isWithinNextSevenDays(lastDateConsultationComments)) {
