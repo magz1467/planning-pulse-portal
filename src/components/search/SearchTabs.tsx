@@ -8,30 +8,18 @@ interface SearchTabsProps {
 
 export const SearchTabs = ({ activeTab, onTabChange, disabled }: SearchTabsProps) => {
   return (
-    <div className="flex gap-4 mb-6">
+    <div className="flex mb-6">
       <Button 
         variant="outline" 
-        className={`flex-1 transition-colors ${
+        className={`flex-1 transition-colors border-2 ${
           activeTab === 'recent' 
-            ? 'bg-primary-light text-primary hover:bg-primary hover:text-white' 
-            : 'hover:bg-primary-light hover:text-primary'
+            ? 'bg-accent text-primary hover:bg-accent/90' 
+            : 'hover:bg-accent/20'
         }`}
         onClick={() => onTabChange('recent')}
         disabled={disabled}
       >
         Recent
-      </Button>
-      <Button 
-        variant="outline" 
-        className={`flex-1 transition-colors ${
-          activeTab === 'completed' 
-            ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' 
-            : 'hover:bg-gray-100 hover:text-gray-600'
-        }`}
-        onClick={() => onTabChange('completed')}
-        disabled={disabled}
-      >
-        Completed
       </Button>
     </div>
   );
