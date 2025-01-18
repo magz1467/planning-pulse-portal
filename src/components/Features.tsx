@@ -1,27 +1,51 @@
-import { Search, MessageSquare, Send } from "lucide-react";
+import { PenLine, Map, FileText } from "lucide-react";
+import Image from "@/components/ui/image";
 
 const Features = () => {
   return (
     <div className="bg-white py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-foreground">
+        <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center text-foreground font-playfair">
           The easy way to have your say on local developments
         </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-background p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <Search className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-3">1. Easily search and view local applications</h3>
-            <p className="text-foreground">Find and explore planning applications in your area with our simple search tools.</p>
+        
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          {/* Image Section */}
+          <div className="relative">
+            <Image
+              src="/lovable-uploads/877d91fe-eb57-49a6-915a-a9d063ce98b1.png"
+              alt="Couple standing in front of a countryside house"
+              className="rounded-xl shadow-lg w-full h-auto"
+              width={600}
+              height={600}
+            />
           </div>
-          <div className="bg-background p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <MessageSquare className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-3">2. Easily comment and feedback to the developer</h3>
-            <p className="text-foreground">Share your thoughts and concerns directly with developers through our platform.</p>
-          </div>
-          <div className="bg-background p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <Send className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-3">3. Feedback automatically submitted to the local authority</h3>
-            <p className="text-foreground">Your feedback is automatically forwarded to the relevant local authority for consideration.</p>
+
+          {/* Features List Section */}
+          <div className="space-y-8">
+            <div className="flex items-start space-x-4 p-6 bg-background rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <FileText className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold mb-2">1. Instant petition</h3>
+                <p className="text-foreground">Unleash your inner Nimby by creating a petition against ghastly developments</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4 p-6 bg-background rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <Map className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold mb-2">2. See it all</h3>
+                <p className="text-foreground">Filter developments on a map</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4 p-6 bg-background rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <PenLine className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold mb-2">3. Tell the developer</h3>
+                <p className="text-foreground">Tell the developer what you think</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
