@@ -10,7 +10,7 @@ const Mission = () => {
               Our Mission
             </h2>
             <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div className="space-y-6 text-foreground">
+              <div className="space-y-6 text-foreground font-sans">
                 <p className="text-lg">
                   The UK planning system has long been burdened by slow processes and limited transparency. With average application decisions taking 8-13 weeks, the need for innovation is clear.
                 </p>

@@ -53,7 +53,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Open Sans", "sans-serif"],
         caveat: ["Caveat", "cursive"],
         playfair: ["Playfair Display", "serif"],
       },
