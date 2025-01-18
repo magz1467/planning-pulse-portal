@@ -8,8 +8,8 @@ const Services = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-background rounded-xl shadow-sm overflow-hidden flex flex-col">
             <img
-              src="/lovable-uploads/68757589-4c57-4ded-b8e5-a554c7d8cd6f.png"
-              alt="Developer and resident reviewing planning documents"
+              src="/lovable-uploads/b35a2c3a-6a17-4cdf-b0ef-27bc28fb93c1.png"
+              alt="Local residents monitoring development"
               className="w-full h-48 object-cover"
               loading="lazy"
             />
@@ -29,8 +29,8 @@ const Services = () => {
 
           <div className="bg-background rounded-xl shadow-sm overflow-hidden flex flex-col">
             <img
-              src="/lovable-uploads/b35a2c3a-6a17-4cdf-b0ef-27bc28fb93c1.png"
-              alt="Local residents monitoring development"
+              src="/lovable-uploads/68757589-4c57-4ded-b8e5-a554c7d8cd6f.png"
+              alt="Developer and resident reviewing planning documents"
               className="w-full h-48 object-cover"
               loading="lazy"
             />
