@@ -20,8 +20,8 @@ const Mission = () => {
               </div>
               <div className="flex items-center justify-center h-full">
                 <Image 
-                  src="/lovable-uploads/ecdf4ccf-de30-4de8-a738-6470bdc2d41c.png"
-                  alt="Modern sustainable home design" 
+                  src="/lovable-uploads/eb848051-e385-460c-a55d-70d3815b949c.png"
+                  alt="Woman in elegant dress standing in front of traditional British housing" 
                   className="rounded-lg shadow-xl w-full h-[400px] object-cover"
                   loading="lazy"
                   width={800}
