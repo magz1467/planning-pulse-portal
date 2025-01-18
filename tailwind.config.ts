@@ -22,16 +22,16 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FFFBF7",  // Kept bright background
-        foreground: "#333333",  // Kept for good contrast
+        background: "#FFFBF7",  // Keeping bright background for contrast
+        foreground: "#47463f",  // Updated to Gunmetal Gray
         primary: {
-          DEFAULT: "#8FA97A",   // Updated to requested sage green
-          dark: "#7A9165",      // Adjusted darker shade
-          light: "#A4BE8F",     // Adjusted lighter shade
+          DEFAULT: "#8bc5be",   // Updated to Tiffany Blue
+          dark: "#7ab0a9",      // Darker shade of Tiffany Blue
+          light: "#9cd0c9",     // Lighter shade of Tiffany Blue
           foreground: "#FFFFFF", // White text for contrast
         },
         secondary: {
-          DEFAULT: "#F9E4E8",   // Kept the rose pink
+          DEFAULT: "#af5662",   // Updated to Honeysuckle
           foreground: "#FFFFFF", // White text for contrast
         },
         destructive: {
@@ -39,12 +39,12 @@ export default {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#F8F6F3",
-          foreground: "#4B4B4B",  // Kept for readability
+          DEFAULT: "#f6c8cc",   // Updated to Rose Quartz
+          foreground: "#47463f",  // Using Gunmetal Gray for text
         },
         accent: {
-          DEFAULT: "#F9E4E8", // Using rose pink as accent
-          foreground: "#333333",  // Kept for readability
+          DEFAULT: "#f6c8cc", // Using Rose Quartz as accent
+          foreground: "#47463f",  // Using Gunmetal Gray for text
         },
       },
       borderRadius: {
