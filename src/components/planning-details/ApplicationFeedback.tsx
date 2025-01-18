@@ -23,7 +23,9 @@ export const ApplicationFeedback = ({
         <Button
           variant={feedback === 'yimby' ? "default" : "outline"}
           onClick={() => onFeedback('yimby')}
-          className="flex items-center gap-2 justify-start h-auto p-2"
+          className={`flex items-center gap-2 justify-start h-auto p-2 ${
+            feedback === 'yimby' ? 'bg-primary hover:bg-primary-dark' : 'hover:bg-primary/10'
+          }`}
         >
           <div className="w-12 h-12 rounded-full overflow-hidden">
             <ImageWithFallback
