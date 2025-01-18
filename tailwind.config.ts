@@ -22,7 +22,7 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FFFBF7",  // Keeping bright background for contrast
+        background: "#f6c8cc",  // Updated to Rose Quartz for background
         foreground: "#47463f",  // Updated to Gunmetal Gray
         primary: {
           DEFAULT: "#8bc5be",   // Updated to Tiffany Blue
