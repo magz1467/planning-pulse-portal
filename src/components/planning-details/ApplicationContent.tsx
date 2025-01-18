@@ -13,12 +13,12 @@ import { ApplicationImage } from "./ApplicationImage";
 
 interface ApplicationContentProps {
   application: Application;
-  feedback: 'up' | 'down' | null;
+  feedback: 'yimby' | 'nimby' | null;
   feedbackStats: {
-    thumbsUp: number;
-    thumbsDown: number;
+    yimbyCount: number;
+    nimbyCount: number;
   };
-  onFeedback: (type: 'up' | 'down') => void;
+  onFeedback: (type: 'yimby' | 'nimby') => void;
 }
 
 export const ApplicationContent = ({

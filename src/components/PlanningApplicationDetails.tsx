@@ -25,7 +25,7 @@ export const PlanningApplicationDetails = ({
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
+  const [feedback, setFeedback] = useState<'yimby' | 'nimby' | null>(null);
   const [currentApplication, setCurrentApplication] = useState(application);
   const { toast } = useToast();
   const { savedApplications, toggleSavedApplication } = useSavedApplications();
@@ -52,8 +52,8 @@ export const PlanningApplicationDetails = ({
   const isSaved = savedApplications.includes(currentApplication.id);
 
   const feedbackStats = {
-    thumbsUp: feedback === 'up' ? 13 : 12,
-    thumbsDown: feedback === 'down' ? 4 : 3
+    yimbyCount: feedback === 'yimby' ? 13 : 12,
+    nimbyCount: feedback === 'nimby' ? 4 : 3
   };
 
   const handleSave = async () => {
@@ -96,16 +96,16 @@ export const PlanningApplicationDetails = ({
     setShowFeedbackDialog(false);
   };
 
-  const handleFeedback = (type: 'up' | 'down') => {
+  const handleFeedback = (type: 'yimby' | 'nimby') => {
     setFeedback(prev => prev === type ? null : type);
     
     toast({
       title: type === feedback ? "Feedback removed" : "Thank you for your feedback",
       description: type === feedback 
         ? "Your feedback has been removed"
-        : type === 'up' 
-          ? "We're glad this was helpful!" 
-          : "We'll work on improving this",
+        : type === 'yimby' 
+          ? "Thanks for supporting new development!" 
+          : "We understand your concerns",
     });
   };
 

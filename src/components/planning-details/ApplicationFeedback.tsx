@@ -1,13 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { Home, Building } from "lucide-react";
 
 interface ApplicationFeedbackProps {
-  feedback: 'up' | 'down' | null;
-  onFeedback: (type: 'up' | 'down') => void;
+  feedback: 'yimby' | 'nimby' | null;
+  onFeedback: (type: 'yimby' | 'nimby') => void;
   feedbackStats: {
-    thumbsUp: number;
-    thumbsDown: number;
+    yimbyCount: number;
+    nimbyCount: number;
   };
 }
 
@@ -21,30 +21,30 @@ export const ApplicationFeedback = ({
       <h3 className="font-semibold mb-4">Community Feedback</h3>
       <div className="flex flex-col gap-2">
         <Button
-          variant={feedback === 'up' ? "default" : "outline"}
-          onClick={() => onFeedback('up')}
+          variant={feedback === 'yimby' ? "default" : "outline"}
+          onClick={() => onFeedback('yimby')}
           className="flex items-center gap-2 justify-start"
         >
-          <ThumbsUp className={`h-5 w-5 ${
-            feedback === 'up' ? 'text-white' : 'text-primary'
+          <Building className={`h-5 w-5 ${
+            feedback === 'yimby' ? 'text-white' : 'text-primary'
           }`} />
-          <span className="text-lg font-medium">{feedbackStats.thumbsUp}</span>
+          <span className="text-lg font-medium">{feedbackStats.yimbyCount}</span>
           <span className={`text-sm ${
-            feedback === 'up' ? 'text-white' : 'text-gray-500'
-          }`}>people like this</span>
+            feedback === 'yimby' ? 'text-white' : 'text-gray-500'
+          }`}>people said YIMBY</span>
         </Button>
         <Button
-          variant={feedback === 'down' ? "outline" : "outline"}
-          onClick={() => onFeedback('down')}
+          variant={feedback === 'nimby' ? "outline" : "outline"}
+          onClick={() => onFeedback('nimby')}
           className={`flex items-center gap-2 justify-start ${
-            feedback === 'down' ? 'bg-[#ea384c]/10' : ''
+            feedback === 'nimby' ? 'bg-[#ea384c]/10' : ''
           }`}
         >
-          <ThumbsDown className={`h-5 w-5 ${
-            feedback === 'down' ? 'text-[#ea384c]' : 'text-gray-600'
+          <Home className={`h-5 w-5 ${
+            feedback === 'nimby' ? 'text-[#ea384c]' : 'text-gray-600'
           }`} />
-          <span className="text-lg font-medium">{feedbackStats.thumbsDown}</span>
-          <span className="text-xs text-gray-500">people dislike this</span>
+          <span className="text-lg font-medium">{feedbackStats.nimbyCount}</span>
+          <span className="text-xs text-gray-500">people said NIMBY</span>
         </Button>
       </div>
     </Card>
