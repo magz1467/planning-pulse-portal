@@ -25,9 +25,9 @@ export default {
         background: "#FFF9F3",  // Updated to new light background
         foreground: "#333333",  // Updated to new text color
         primary: {
-          DEFAULT: "#A4B884",   // Updated to sage green
-          dark: "#8FA374",      // Darker shade for hover states
-          light: "#B8C9A0",     // Lighter shade for secondary elements
+          DEFAULT: "#B5D19C",   // Updated to new sage green
+          dark: "#A3BC8C",      // Darker shade for hover states
+          light: "#C7DEB2",     // Lighter shade for secondary elements
           foreground: "#FFFFFF", // White text for better contrast on primary
         },
         secondary: {
