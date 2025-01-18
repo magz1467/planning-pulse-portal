@@ -1,14 +1,9 @@
 import { Link } from "react-router-dom";
 
-export const Logo = () => (
-  <Link to="/" className="flex items-center gap-2">
-    <span className="text-2xl font-bold font-playfair" 
-      style={{
-        color: "#8bc5be", // Tiffany Blue
-        letterSpacing: "0.05em",
-        textTransform: "lowercase"
-      }}>
-      nimbygram
-    </span>
-  </Link>
-);
+export const Logo = () => {
+  return (
+    <Link to="/" className="flex items-center space-x-2">
+      <span className="text-[#af5662] font-playfair text-xl font-bold">NimbyGram</span>
+    </Link>
+  );
+};
