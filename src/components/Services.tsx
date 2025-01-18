@@ -8,8 +8,8 @@ const Services = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-background rounded-xl shadow-sm overflow-hidden flex flex-col">
             <img
-              src="/lovable-uploads/bbc0ab46-b246-4a14-b768-a9ee0b4cd8e0.png"
-              alt="Resident using the platform"
+              src="/lovable-uploads/68757589-4c57-4ded-b8e5-a554c7d8cd6f.png"
+              alt="Developer and resident reviewing planning documents"
               className="w-full h-48 object-cover"
               loading="lazy"
             />
@@ -29,8 +29,8 @@ const Services = () => {
 
           <div className="bg-background rounded-xl shadow-sm overflow-hidden flex flex-col">
             <img
-              src="/lovable-uploads/00c352b2-8697-4425-a649-17b25f1c6db3.png"
-              alt="Developer reviewing feedback"
+              src="/lovable-uploads/b35a2c3a-6a17-4cdf-b0ef-27bc28fb93c1.png"
+              alt="Local residents monitoring development"
               className="w-full h-48 object-cover"
               loading="lazy"
             />
@@ -50,8 +50,8 @@ const Services = () => {
 
           <div className="bg-background rounded-xl shadow-sm overflow-hidden flex flex-col">
             <img
-              src="/lovable-uploads/ea10c55a-9324-434a-8bbf-c2de0a2f9b25.png"
-              alt="Local authority dashboard"
+              src="/lovable-uploads/c8c1be52-f92b-4bfe-b3c9-a43e04162eb1.png"
+              alt="Community members engaging with local planning"
               className="w-full h-48 object-cover"
               loading="lazy"
             />
