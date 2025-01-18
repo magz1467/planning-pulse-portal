@@ -6,7 +6,7 @@ export const SocialMediaCard = () => {
     <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
-          src="/lovable-uploads/abb1ba01-758b-471b-a769-5607e42a106b.png"
+          src="/lovable-uploads/563eae08-0970-4eea-ae24-693638dcd50b.png"
           alt="Nextdoor community"
           className="w-full h-full object-cover"
         />

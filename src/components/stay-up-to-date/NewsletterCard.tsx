@@ -19,7 +19,7 @@ export const NewsletterCard = () => {
     <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
-          src="/lovable-uploads/a2a07703-6892-41d1-9ad5-b0d659241c1d.png"
+          src="/lovable-uploads/737c5ab0-2470-49df-8f26-24d3db46160b.png"
           alt="Newsletter signup"
           className="w-full h-full object-cover"
         />

@@ -19,7 +19,7 @@ export const AreaUpdatesCard = () => {
     <div className="flex flex-col rounded-xl p-8 border border-gray-200 h-full bg-white">
       <div className="mb-6 h-48 overflow-hidden rounded-lg">
         <Image
-          src="/lovable-uploads/6492526a-800c-4702-a7f5-544d42447cc7.png"
+          src="/lovable-uploads/30262c17-5db6-4b74-a6f8-0c1a0d10363b.png"
           alt="Community engagement"
           className="w-full h-full object-cover"
         />
