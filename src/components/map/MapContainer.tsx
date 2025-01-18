@@ -32,12 +32,6 @@ export const MapContainerComponent = memo(({
       // Add a slight delay to ensure the map recenters properly after resize
       setTimeout(() => {
         mapRef.current?.invalidateSize();
-        // Adjust the center slightly to account for the sidebar
-        const center = mapRef.current?.getCenter();
-        if (center) {
-          const newLng = center.lng + 0.02; // Adjust this value as needed
-          mapRef.current?.setView([center.lat, newLng], mapRef.current.getZoom());
-        }
       }, 100);
     }
   }, [coordinates]);

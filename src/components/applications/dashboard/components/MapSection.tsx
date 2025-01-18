@@ -36,8 +36,7 @@ export const MapSection = memo(({
       style={{ 
         height: isMobile ? 'calc(100vh - 120px)' : '100%',
         position: 'relative',
-        zIndex: 1,
-        marginLeft: !isMobile ? '-10%' : '0' // Adjust map position for desktop view
+        zIndex: 1
       }}
     >
       <div className="absolute inset-0">
