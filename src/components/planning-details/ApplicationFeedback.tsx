@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, Building } from "lucide-react";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 
 interface ApplicationFeedbackProps {
   feedback: 'yimby' | 'nimby' | null;
@@ -23,11 +23,15 @@ export const ApplicationFeedback = ({
         <Button
           variant={feedback === 'yimby' ? "default" : "outline"}
           onClick={() => onFeedback('yimby')}
-          className="flex items-center gap-2 justify-start"
+          className="flex items-center gap-2 justify-start h-auto p-2"
         >
-          <Building className={`h-5 w-5 ${
-            feedback === 'yimby' ? 'text-white' : 'text-primary'
-          }`} />
+          <div className="w-12 h-12 rounded-full overflow-hidden">
+            <ImageWithFallback
+              src="/lovable-uploads/34f1334d-97ed-4c93-9cc7-4aa462946fa1.png"
+              alt="YIMBY"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <span className="text-lg font-medium">{feedbackStats.yimbyCount}</span>
           <span className={`text-sm ${
             feedback === 'yimby' ? 'text-white' : 'text-gray-500'
@@ -36,15 +40,19 @@ export const ApplicationFeedback = ({
         <Button
           variant={feedback === 'nimby' ? "outline" : "outline"}
           onClick={() => onFeedback('nimby')}
-          className={`flex items-center gap-2 justify-start ${
+          className={`flex items-center gap-2 justify-start h-auto p-2 ${
             feedback === 'nimby' ? 'bg-[#ea384c]/10' : ''
           }`}
         >
-          <Home className={`h-5 w-5 ${
-            feedback === 'nimby' ? 'text-[#ea384c]' : 'text-gray-600'
-          }`} />
+          <div className="w-12 h-12 rounded-full overflow-hidden">
+            <ImageWithFallback
+              src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
+              alt="NIMBY"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <span className="text-lg font-medium">{feedbackStats.nimbyCount}</span>
-          <span className="text-xs text-gray-500">people said NIMBY</span>
+          <span className="text-sm text-gray-500">people said NIMBY</span>
         </Button>
       </div>
     </Card>
