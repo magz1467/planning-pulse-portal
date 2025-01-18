@@ -22,7 +22,7 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#FDE1D3",  // Changed to a lighter rose pink shade
+        background: "#F3EFE8",  // Reverted to original color
         foreground: "#403E43",  // Darker charcoal for better contrast
         primary: {
           DEFAULT: "#2E4E3F",
