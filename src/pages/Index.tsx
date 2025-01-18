@@ -14,10 +14,18 @@ const Index = () => {
       <Header />
       <main className="flex-grow border-x border-primary/10">
         <Hero />
-        <Features />
-        <Services />
-        <Mission />
-        <StayUpToDate />
+        <div className="mb-24">
+          <Features />
+        </div>
+        <div className="mb-24">
+          <Services />
+        </div>
+        <div className="mb-24">
+          <Mission />
+        </div>
+        <div className="mb-24">
+          <StayUpToDate />
+        </div>
         <GetInTouch />
       </main>
       <Footer />
