@@ -2111,6 +2111,20 @@ export type Database = {
           status_counts: Json
         }[]
       }
+      get_applications_with_counts_optimized: {
+        Args: {
+          center_lng: number
+          center_lat: number
+          radius_meters: number
+          page_size?: number
+          page_number?: number
+        }
+        Returns: {
+          applications: Json
+          total_count: number
+          status_counts: Json
+        }[]
+      }
       get_applications_within_radius: {
         Args: {
           center_lng: number

@@ -19,8 +19,8 @@ export const useApplicationsFetch = () => {
     console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      const { data: applications, error } = await supabase
-        .rpc('get_applications_within_radius', {
+      const { data, error } = await supabase
+        .rpc('get_applications_with_counts_optimized', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius,
@@ -33,44 +33,33 @@ export const useApplicationsFetch = () => {
         throw error;
       }
 
-      if (!applications) {
+      if (!data) {
         console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log(`📦 Raw applications data:`, applications.map(app => ({
+      const { applications: appsData, total_count, status_counts } = data[0];
+
+      console.log(`📦 Raw applications data:`, appsData?.map(app => ({
         id: app.id,
         class_3: app.class_3,
         title: app.title
       })));
 
-      const transformedApplications = applications
+      const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
-      console.log('✨ Transformed applications:', transformedApplications.map(app => ({
+      console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
         id: app.id,
         class_3: app.class_3,
         title: app.title
       })));
 
       setApplications(transformedApplications || []);
-
-      // Get total count
-      const { data: countData, error: countError } = await supabase
-        .rpc('get_applications_count_within_radius', {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: radius
-        });
-
-      if (countError) {
-        console.error('Error fetching count:', countError);
-      } else {
-        setTotalCount(countData || 0);
-      }
+      setTotalCount(total_count || 0);
 
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
