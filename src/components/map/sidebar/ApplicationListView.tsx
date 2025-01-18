@@ -39,6 +39,12 @@ export const ApplicationListView = ({
     <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
       <div className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-10 bg-white">
+          <div className="p-4 bg-primary/5 border-b">
+            <h2 className="font-playfair text-2xl text-primary mb-2">Your Feed for Your Area</h2>
+            <p className="text-sm text-gray-600">
+              Showing high-impact developments recently listed near {postcode}. These applications may significantly affect your neighborhood.
+            </p>
+          </div>
           <FilterBar 
             onFilterChange={onFilterChange}
             onSortChange={onSortChange}
