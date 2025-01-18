@@ -22,29 +22,29 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#F3EFE8",  // Reverted to original color
-        foreground: "#403E43",  // Darker charcoal for better contrast
+        background: "#FFF9F3",  // Updated to new light background
+        foreground: "#333333",  // Updated to new text color
         primary: {
-          DEFAULT: "#2E4E3F",
-          dark: "#1E3A2E",    // Darker shade for hover states
-          light: "#A2B3A1",   // Muted sage for secondary elements
+          DEFAULT: "#A4B884",   // Updated to sage green
+          dark: "#8FA374",      // Darker shade for hover states
+          light: "#B8C9A0",     // Lighter shade for secondary elements
           foreground: "#FFFFFF", // White text for better contrast on primary
         },
         secondary: {
-          DEFAULT: "#C16A5A", // Warm terracotta
-          foreground: "#FEC6A1", // Lighter peach for contrast
+          DEFAULT: "#E8B3BA",   // Updated to rose pink
+          foreground: "#FFFFFF", // White text for contrast
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#F1F0FB",
-          foreground: "#403E43",  // Darker charcoal for better contrast
+          DEFAULT: "#F8F6F3",
+          foreground: "#4B4B4B",  // Updated to specified text color
         },
         accent: {
-          DEFAULT: "#C8A7A2", // Dusty rose
-          foreground: "#403E43",  // Darker charcoal for better contrast
+          DEFAULT: "#E8B3BA", // Using rose pink as accent
+          foreground: "#333333",  // Updated to specified text color
         },
       },
       borderRadius: {
