@@ -61,6 +61,7 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
+        caveat: ["Caveat", "cursive"],
       },
       keyframes: {
         "slide-up": {

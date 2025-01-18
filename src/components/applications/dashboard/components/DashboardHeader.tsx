@@ -12,7 +12,7 @@ export const DashboardHeader = () => {
             <Home className="h-6 w-6 text-primary" />
             <span className="text-2xl font-bold" 
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "'Caveat', cursive",
                 letterSpacing: "0.05em",
                 textShadow: "2px 2px 4px rgba(16, 185, 129, 0.2)",
                 background: "linear-gradient(45deg, #10B981, #065F46)",
