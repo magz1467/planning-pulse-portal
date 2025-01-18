@@ -31,7 +31,7 @@ export default {
           foreground: "#FFFFFF", // White text for better contrast on primary
         },
         secondary: {
-          DEFAULT: "#E8B3BA",   // Updated to rose pink
+          DEFAULT: "#F9E4E8",   // Updated to new rose pink shade
           foreground: "#FFFFFF", // White text for contrast
         },
         destructive: {
@@ -43,7 +43,7 @@ export default {
           foreground: "#4B4B4B",  // Updated to specified text color
         },
         accent: {
-          DEFAULT: "#E8B3BA", // Using rose pink as accent
+          DEFAULT: "#F9E4E8", // Using new rose pink shade as accent
           foreground: "#333333",  // Updated to specified text color
         },
       },
