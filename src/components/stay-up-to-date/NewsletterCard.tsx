@@ -25,7 +25,7 @@ export const NewsletterCard = () => {
         />
       </div>
       <div className="flex-grow">
-        <h3 className="text-xl font-semibold mb-4">Newsletter</h3>
+        <h3 className="text-xl font-semibold mb-4 font-playfair">Newsletter</h3>
         <p className="text-gray-600 mb-6">Stay up to date with the latest planning news and updates</p>
         <Button 
           onClick={() => setShowEmailDialog(true)} 

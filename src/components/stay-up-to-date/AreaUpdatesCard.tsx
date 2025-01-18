@@ -25,7 +25,7 @@ export const AreaUpdatesCard = () => {
         />
       </div>
       <div className="flex-grow">
-        <h3 className="text-xl font-semibold mb-4">Local Updates</h3>
+        <h3 className="text-xl font-semibold mb-4 font-playfair">Local Updates</h3>
         <p className="text-gray-600 mb-6">Get a notification when a new application goes live near you</p>
         <Button 
           onClick={() => setShowEmailDialog(true)} 

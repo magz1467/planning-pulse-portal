@@ -12,7 +12,7 @@ export const SocialMediaCard = () => {
         />
       </div>
       <div className="flex-grow">
-        <h3 className="text-xl font-semibold mb-4">Follow Us</h3>
+        <h3 className="text-xl font-semibold mb-4 font-playfair">Follow Us</h3>
         <p className="text-gray-600 mb-6">Join our community on social media for daily updates and discussions.</p>
         <div className="space-y-4 mt-auto">
           <a 
