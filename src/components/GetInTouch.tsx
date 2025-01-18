@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import Image from "@/components/ui/image";
 
 const GetInTouch = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -69,20 +70,31 @@ const GetInTouch = () => {
   return (
     <div className="bg-gray-50 py-24">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              Get in Touch
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              If you are a developer, council, or press, get in touch to hear more about our partnership options.
-            </p>
-            <button 
-              onClick={() => setIsDialogOpen(true)}
-              className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"
-            >
-              Contact Us
-            </button>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative overflow-hidden rounded-xl">
+              <Image
+                src="/lovable-uploads/e8f9bc6c-005f-4b76-9b7a-b689baf3a28c.png"
+                alt="Our team"
+                className="w-full h-[500px] object-cover rounded-xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-xl" />
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm p-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 font-playfair">
+                Get in Touch
+              </h2>
+              <p className="text-lg text-gray-600 mb-8">
+                If you are a developer, council, or press, get in touch to hear more about our partnership options.
+              </p>
+              <button 
+                onClick={() => setIsDialogOpen(true)}
+                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                Contact Us
+              </button>
+            </div>
           </div>
         </div>
       </div>
