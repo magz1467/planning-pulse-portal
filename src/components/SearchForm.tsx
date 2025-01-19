@@ -25,7 +25,7 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
     }
 
     try {
-      navigate('/map', { 
+      navigate('/applications/dashboard/map', { 
         state: { 
           postcode: postcode.trim(),
           tab: activeTab
