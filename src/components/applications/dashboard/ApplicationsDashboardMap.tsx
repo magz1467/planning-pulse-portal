@@ -15,6 +15,7 @@ export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const searchPostcode = location.state?.postcode;
+  const { coordinates } = useCoordinates(searchPostcode);
 
   // Initialize map and fetch applications
   useEffect(() => {
@@ -51,8 +52,6 @@ export const ApplicationsDashboardMap = () => {
 
   const handlePostcodeSelect = async (postcode: string) => {
     console.log('Handling postcode select:', postcode);
-    const { coordinates } = await useCoordinates(postcode);
-    
     if (coordinates) {
       dispatch({ type: 'SET_COORDINATES', payload: coordinates as [number, number] });
       fetchApplicationsInRadius(coordinates as [number, number], 1000);
@@ -61,15 +60,11 @@ export const ApplicationsDashboardMap = () => {
 
   // Handle initial postcode search
   useEffect(() => {
-    const initializeWithPostcode = async () => {
-      if (searchPostcode) {
-        console.log('Initializing with search postcode:', searchPostcode);
-        await handlePostcodeSelect(searchPostcode);
-      }
-    };
-
-    initializeWithPostcode();
-  }, [searchPostcode]);
+    if (searchPostcode && coordinates) {
+      console.log('Initializing with search postcode:', searchPostcode);
+      handlePostcodeSelect(searchPostcode);
+    }
+  }, [searchPostcode, coordinates]);
 
   return (
     <ErrorBoundary>
