@@ -68,7 +68,33 @@ export const PlanningApplicationList = ({
                   lastDateConsultationComments={application.last_date_consultation_comments}
                   impactScore={application.final_impact_score}
                 />
-                <span className="text-xs text-gray-500">{application.distance}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">{application.distance}</span>
+                  {application.feedback_stats && (
+                    <div className="flex items-center gap-3 text-xs">
+                      <span className="flex items-center gap-1">
+                        <div className="w-4 h-4 rounded-full overflow-hidden">
+                          <ImageWithFallback
+                            src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
+                            alt="YIMBY"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-gray-600">{application.feedback_stats.yimby || 0}</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <div className="w-4 h-4 rounded-full overflow-hidden">
+                          <ImageWithFallback
+                            src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
+                            alt="NIMBY"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-gray-600">{application.feedback_stats.nimby || 0}</span>
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -76,4 +102,4 @@ export const PlanningApplicationList = ({
       ))}
     </div>
   );
-}
+};
