@@ -56,7 +56,7 @@ export const SearchForm = () => {
       
       <form onSubmit={handleSubmit} className="space-y-2">
         <div>
-          <label className="text-sm text-gray-500 mb-0.5 block">Search location</label>
+          <label className="text-sm text-gray-500 mb-0 block">Search location</label>
           <PostcodeSearch
             onSelect={setPostcode}
             placeholder="Enter a postcode"
@@ -65,7 +65,7 @@ export const SearchForm = () => {
         
         <Button 
           type="submit" 
-          className="w-full bg-primary text-primary-foreground py-6 font-semibold text-lg tracking-wide transition-all duration-200 shadow-sm hover:shadow-md mt-2 hover:bg-primary-dark"
+          className="w-full bg-primary text-primary-foreground py-6 font-semibold text-lg tracking-wide transition-all duration-200 shadow-sm hover:shadow-md hover:bg-primary-dark"
           disabled={isSearching || !postcode.trim()}
         >
           {isSearching ? 'Searching...' : 'Show planning applications'}
