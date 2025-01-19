@@ -22,7 +22,7 @@ export const ApplicationActions = ({
   const { toast } = useToast();
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center gap-2">
       <Button
         variant="outline"
         size="sm"
