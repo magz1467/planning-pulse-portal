@@ -47,7 +47,7 @@ export const SearchForm = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-2">
+    <div className="w-full max-w-3xl">
       <SearchTabs 
         activeTab={activeTab}
         onTabChange={setActiveTab}
