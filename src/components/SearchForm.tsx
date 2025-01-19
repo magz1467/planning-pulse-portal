@@ -54,7 +54,7 @@ export const SearchForm = () => {
         disabled={isSearching}
       />
       
-      <form onSubmit={handleSubmit} className="mt-2 space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-2">
         <div>
           <label className="text-sm text-gray-500 mb-0.5 block">Search location</label>
           <PostcodeSearch
