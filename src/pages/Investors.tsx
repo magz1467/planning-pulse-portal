@@ -45,10 +45,10 @@ const Investors = () => {
             <p className="text-gray-700">
               For investment inquiries, please contact our team at{" "}
               <a 
-                href="mailto:investors@planningpulse.com" 
-                className="text-primary hover:text-primary-dark font-medium"
+                href="mailto:marco@nimbygram.com" 
+                className="text-secondary hover:text-secondary/80 font-medium"
               >
-                investors@planningpulse.com
+                marco@nimbygram.com
               </a>
             </p>
           </section>
