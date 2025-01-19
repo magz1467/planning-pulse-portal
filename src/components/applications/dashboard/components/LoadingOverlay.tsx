@@ -28,28 +28,6 @@ export const LoadingOverlay = () => {
             <p className="text-sm text-gray-600 max-w-sm font-medium">
               We're gathering the latest planning applications in your area
             </p>
-
-            {/* Trust indicators with British-style messaging */}
-            <ul className="space-y-3 text-sm text-gray-600 mt-6">
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span>Official Council Planning Data</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span>Live Updates from Local Authorities</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span>Verified Neighbourhood Information</span>
-              </li>
-            </ul>
           </div>
 
           {/* Stylized loading spinner */}
