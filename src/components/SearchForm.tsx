@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { PostcodeSearch } from "@/components/PostcodeSearch";
 
 interface SearchFormProps {
   activeTab?: string;
@@ -29,8 +29,7 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
         state: { 
           postcode: postcode.trim(),
           tab: activeTab
-        },
-        replace: true
+        }
       });
     } catch (error) {
       console.error('Error during search:', error);
@@ -39,11 +38,9 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
-      <Input
-        type="text"
+      <PostcodeSearch
+        onSelect={setPostcode}
         placeholder="Enter postcode"
-        value={postcode}
-        onChange={(e) => setPostcode(e.target.value)}
         className="flex-1"
       />
       <Button type="submit" className="bg-primary hover:bg-primary-dark">
