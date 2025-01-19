@@ -27,11 +27,11 @@ export const ApplicationFeedback = ({
           <Button
             variant={feedback === 'yimby' ? "default" : "outline"}
             onClick={() => onFeedback('yimby')}
-            className={`flex items-center gap-2 ${
+            className={`flex items-center gap-2 flex-1 ${
               feedback === 'yimby' ? 'bg-primary hover:bg-primary-dark' : 'hover:bg-primary/10'
             }`}
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden">
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
               <ImageWithFallback
                 src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
                 alt="YIMBY"
@@ -43,11 +43,11 @@ export const ApplicationFeedback = ({
           <Button
             variant={feedback === 'nimby' ? "outline" : "outline"}
             onClick={() => onFeedback('nimby')}
-            className={`flex items-center gap-2 ${
+            className={`flex items-center gap-2 flex-1 ${
               feedback === 'nimby' ? 'bg-[#ea384c]/10' : ''
             }`}
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden">
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
               <ImageWithFallback
                 src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
                 alt="NIMBY"
@@ -72,7 +72,7 @@ export const ApplicationFeedback = ({
             feedback === 'yimby' ? 'bg-primary hover:bg-primary-dark' : 'hover:bg-primary/10'
           }`}
         >
-          <div className="w-24 h-24 rounded-full overflow-hidden">
+          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
             <ImageWithFallback
               src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
               alt="YIMBY"
@@ -93,7 +93,7 @@ export const ApplicationFeedback = ({
             feedback === 'nimby' ? 'bg-[#ea384c]/10' : ''
           }`}
         >
-          <div className="w-24 h-24 rounded-full overflow-hidden">
+          <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
             <ImageWithFallback
               src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
               alt="NIMBY"
