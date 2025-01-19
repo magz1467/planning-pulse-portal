@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Linkedin } from "lucide-react";
+import { Facebook, Twitter, LinkedIn } from "lucide-react";
 
 const GetInTouch = () => {
   return (
@@ -30,7 +30,7 @@ const GetInTouch = () => {
           rel="noopener noreferrer" 
           className="text-primary hover:text-primary-dark"
         >
-          <Linkedin className="w-6 h-6" />
+          <LinkedIn className="w-6 h-6" />
         </a>
       </div>
     </div>
