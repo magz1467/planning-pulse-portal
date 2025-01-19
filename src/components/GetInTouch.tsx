@@ -1,5 +1,6 @@
 import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "@/components/ui/image";
 
 const GetInTouch = () => {
   return (
@@ -18,7 +19,7 @@ const GetInTouch = () => {
                 Have a question? Send us an email and we'll get back to you.
               </p>
               <Button asChild variant="outline" className="w-full">
-                <a href="mailto:hello@nimbygram.com">Send Email</a>
+                <a href="mailto:marco@nimbygram.com">Send Email</a>
               </Button>
             </div>
             
@@ -33,6 +34,14 @@ const GetInTouch = () => {
               <Button asChild variant="outline" className="w-full">
                 <a href="tel:+442080000000">020 8000 0000</a>
               </Button>
+            </div>
+
+            <div className="relative h-[300px] rounded-lg overflow-hidden">
+              <Image
+                src="/photo-1486312338219-ce68d2c6f44d"
+                alt="Contact us"
+                className="object-cover w-full h-full"
+              />
             </div>
           </div>
         </div>

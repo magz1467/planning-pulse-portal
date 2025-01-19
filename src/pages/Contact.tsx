@@ -22,17 +22,17 @@ const Contact = () => {
             <ContactSection 
               title="Sales Inquiries"
               description="Interested in our services? Our sales team is here to help."
-              email="sales@planningpulse.com"
+              email="marco@nimbygram.com"
             />
             <ContactSection 
               title="Partnership Opportunities"
               description="Looking to partner with us? Let's explore possibilities together."
-              email="partnerships@planningpulse.com"
+              email="marco@nimbygram.com"
             />
             <ContactSection 
               title="Questions & Complaints"
               description="Have a question or concern? We're here to listen and help."
-              email="support@planningpulse.com"
+              email="marco@nimbygram.com"
             />
           </div>
         </div>
