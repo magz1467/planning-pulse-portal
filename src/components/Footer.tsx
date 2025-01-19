@@ -8,7 +8,7 @@ const Footer = () => {
           <div>
             <h3 className="font-bold mb-4">About Us</h3>
             <ul className="space-y-2">
-              <li><Link to="/about" className="hover:text-primary">About PlanningPulse</Link></li>
+              <li><Link to="/about" className="hover:text-primary">About NimbyGram</Link></li>
               <li><Link to="/careers" className="hover:text-primary">Careers</Link></li>
               <li><Link to="/press" className="hover:text-primary">Press</Link></li>
               <li><Link to="/investors" className="hover:text-primary">Investors</Link></li>
@@ -41,8 +41,8 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-sm text-gray-400">
-          <p>© {new Date().getFullYear()} PlanningPulse Ltd. All rights reserved.</p>
-          <p className="mt-2">PlanningPulse Ltd is registered in England and Wales.</p>
+          <p>© {new Date().getFullYear()} NimbyGram Ltd. All rights reserved.</p>
+          <p className="mt-2">NimbyGram Ltd is registered in England and Wales.</p>
         </div>
       </div>
     </footer>
