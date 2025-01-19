@@ -13,10 +13,10 @@ const About = () => {
             {/* Hero section with title and intro */}
             <div className="mb-16">
               <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">
-                About PlanningPulse
+                About Nimbygram
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed">
-                PlanningPulse is revolutionizing the way communities engage with local planning applications. Our platform bridges the gap between residents, developers, and local authorities, making the planning process more transparent and efficient.
+                Nimbygram is revolutionizing the way communities engage with local planning applications. Our platform bridges the gap between residents, developers, and local authorities, making the planning process more transparent and efficient.
               </p>
             </div>
 
