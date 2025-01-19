@@ -47,21 +47,8 @@ export interface Application {
   class_3?: string | null;
   final_impact_score?: number | null;
   engaging_title?: string | null;
-}
-
-export interface Comment {
-  id: number;
-  created_at: string;
-  comment: string;
-  user_id?: string;
-  application_id?: number;
-  parent_id?: number;
-  upvotes?: number;
-  downvotes?: number;
-  user?: {
-    username?: string;
-  };
-  profiles?: {
-    username?: string;
+  feedback_stats?: {
+    yimby?: number;
+    nimby?: number;
   };
 }
