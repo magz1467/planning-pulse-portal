@@ -32,7 +32,8 @@ export const SearchForm = () => {
         state: { 
           postcode: postcode.trim(),
           tab: activeTab
-        } 
+        },
+        replace: true // Add replace: true to ensure proper navigation
       });
     } catch (error) {
       console.error('Error during search:', error);
