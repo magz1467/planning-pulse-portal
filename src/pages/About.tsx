@@ -30,8 +30,8 @@ const About = () => {
               </div>
               <div>
                 <Image
-                  src="/lovable-uploads/334551c0-9c95-45dc-ac93-6a0c71f0d7c6.png"
-                  alt="Community planning meeting with diverse group of people discussing and collaborating"
+                  src="/lovable-uploads/86ad94f3-f27f-4a04-898c-eca329e3ff65.png"
+                  alt="Community members using mobile phones to engage with planning applications"
                   className="rounded-2xl shadow-xl w-full h-[300px] object-cover"
                   width={500}
                   height={300}
@@ -43,8 +43,8 @@ const About = () => {
             <div className="grid md:grid-cols-2 gap-12">
               <div>
                 <Image
-                  src="/lovable-uploads/59df3d90-4a1f-40be-bd8f-211e7adbabe6.png"
-                  alt="Diverse group of professionals having a discussion"
+                  src="/lovable-uploads/2c0140af-5067-4789-85ab-48d4476e179c.png"
+                  alt="Professional team standing in front of a rural property"
                   className="rounded-2xl shadow-xl w-full h-[300px] object-cover"
                   width={500}
                   height={300}
