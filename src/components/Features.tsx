@@ -34,16 +34,16 @@ const Features = () => {
             <div className="flex items-start space-x-4 p-6 bg-background rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <Map className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">2. See it all</h3>
-                <p className="text-foreground">Filter developments on a map</p>
+                <h3 className="text-lg font-semibold mb-2">2. Nimby or Yimby</h3>
+                <p className="text-foreground">Upvote or downsvote applications</p>
               </div>
             </div>
 
             <div className="flex items-start space-x-4 p-6 bg-background rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <PenLine className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">3. Tell the developer</h3>
-                <p className="text-foreground">Tell the developer what you think</p>
+                <h3 className="text-lg font-semibold mb-2">3. Easy Share</h3>
+                <p className="text-foreground">Instantly share great or ghastly applications with your network to get more local feedback</p>
               </div>
             </div>
           </div>
