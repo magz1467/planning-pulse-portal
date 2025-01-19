@@ -29,9 +29,21 @@ export const useApplicationsData = () => {
   ) => {
     setIsLoading(true);
     setError(null);
-    console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
+    console.log('🔍 Starting fetch with params:', { 
+      center, 
+      radius, 
+      page, 
+      pageSize,
+      timestamp: new Date().toISOString()
+    });
 
     try {
+      console.log('📍 Calling Supabase RPC with coordinates:', {
+        lat: center[0],
+        lng: center[1],
+        radius_meters: radius
+      });
+
       const { data: applications, error } = await supabase
         .rpc('get_applications_within_radius', {
           center_lng: center[1],
@@ -42,7 +54,7 @@ export const useApplicationsData = () => {
         });
 
       if (error) {
-        console.error('Error fetching applications:', error);
+        console.error('❌ Error fetching applications:', error);
         setError({
           message: 'Error fetching applications',
           details: error.message
@@ -53,27 +65,19 @@ export const useApplicationsData = () => {
       }
 
       if (!applications || !Array.isArray(applications)) {
-        console.log('No applications found');
+        console.log('⚠️ No applications found or invalid response:', applications);
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log(`📦 Raw applications data:`, applications.map(app => ({
-        id: app.id,
-        class_3: app.class_3,
-        title: app.title
-      })));
+      console.log(`📦 Received ${applications.length} raw applications`);
 
       const transformedApplications = applications
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
-      console.log('✨ Transformed applications:', transformedApplications.map(app => ({
-        id: app.id,
-        class_3: app.class_3,
-        title: app.title
-      })));
+      console.log('✨ Transformed applications count:', transformedApplications.length);
 
       setApplications(transformedApplications || []);
 
@@ -99,6 +103,7 @@ export const useApplicationsData = () => {
       });
 
       setStatusCounts(counts);
+      console.log('📊 Status counts:', counts);
 
       // Get total count
       const { data: countData, error: countError } = await supabase
@@ -109,27 +114,28 @@ export const useApplicationsData = () => {
         });
 
       if (countError) {
-        console.error('Error fetching count:', countError);
+        console.error('❌ Error fetching count:', countError);
         setTotalCount(0);
       } else {
+        console.log('📈 Total count:', countData);
         setTotalCount(countData || 0);
       }
 
     } catch (error: any) {
-      console.error('Failed to fetch applications:', error);
-      setError({
-        message: 'Failed to fetch applications',
-        details: error.message
-      });
-      // Show more detailed error information
-      console.error('Error details:', {
+      console.error('💥 Failed to fetch applications:', {
+        error,
         message: error.message,
         details: error.details,
         hint: error.hint,
         code: error.code
       });
+      setError({
+        message: 'Failed to fetch applications',
+        details: error.message
+      });
     } finally {
       setIsLoading(false);
+      console.log('🏁 Fetch completed');
     }
   };
 
