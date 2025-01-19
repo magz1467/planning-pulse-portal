@@ -17,6 +17,7 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import About from "@/pages/About";
 import Press from "@/pages/Press";
+import Admin2 from "@/pages/Admin2";
 import { RouteObject } from "react-router-dom";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 
@@ -114,6 +115,11 @@ export const routes: RouteObject[] = [
   {
     path: "/press",
     element: <Press />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/admin2",
+    element: <Admin2 />,
     errorElement: <RouteErrorBoundary />,
   }
 ];
