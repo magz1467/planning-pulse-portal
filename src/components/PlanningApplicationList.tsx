@@ -5,6 +5,7 @@ import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { useApplicationSorting, SortType } from "@/hooks/use-sort-applications";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
 import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 
 interface PlanningApplicationListProps {
   applications: Application[];
