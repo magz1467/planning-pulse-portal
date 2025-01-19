@@ -29,7 +29,7 @@ export const ApplicationFeedback = ({
         >
           <div className="w-12 h-12 rounded-full overflow-hidden">
             <ImageWithFallback
-              src="/lovable-uploads/34f1334d-97ed-4c93-9cc7-4aa462946fa1.png"
+              src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
               alt="YIMBY"
               className="w-full h-full object-cover"
             />
