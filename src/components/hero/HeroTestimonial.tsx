@@ -12,7 +12,7 @@ export const HeroTestimonial = () => {
       </div>
       
       {/* Testimonial text */}
-      <blockquote className="relative z-10 text-foreground/90 font-playfair text-lg italic text-center px-8">
+      <blockquote className="relative z-10 text-foreground font-playfair text-lg italic text-center px-8 font-bold">
         "I feel too old for TikTok fads and too young for the town hall meeting. NimbyGram is my new fix."
       </blockquote>
     </div>
