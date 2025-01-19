@@ -70,7 +70,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
 
       {open && search.length >= 2 && (
         <div className="absolute z-[9999] w-full mt-1">
-          <Command className="rounded-lg border shadow-md">
+          <Command className="rounded-lg border shadow-md bg-white">
             <CommandList>
               {isLoading ? (
                 <CommandEmpty>Loading suggestions...</CommandEmpty>
@@ -82,6 +82,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
                     <CommandItem
                       key={suggestion.postcode}
                       onSelect={() => handleSelect(suggestion.postcode)}
+                      className="hover:bg-primary/10"
                     >
                       <div className="flex flex-col">
                         <span className="font-medium">{suggestion.postcode}</span>
