@@ -18,6 +18,9 @@ import Terms from "@/pages/Terms";
 import About from "@/pages/About";
 import Press from "@/pages/Press";
 import Admin2 from "@/pages/Admin2";
+import ResidentServices from "@/pages/ResidentServices";
+import DeveloperServices from "@/pages/DeveloperServices";
+import CouncilServices from "@/pages/CouncilServices";
 import { RouteObject } from "react-router-dom";
 import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 
@@ -120,6 +123,21 @@ export const routes: RouteObject[] = [
   {
     path: "/admin2",
     element: <Admin2 />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/resident-services",
+    element: <ResidentServices />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/developer-services",
+    element: <DeveloperServices />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/council-services",
+    element: <CouncilServices />,
     errorElement: <RouteErrorBoundary />,
   }
 ];
