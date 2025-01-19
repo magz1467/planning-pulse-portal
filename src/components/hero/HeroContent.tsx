@@ -22,7 +22,7 @@ export const HeroContent = () => {
           height={200}
         />
       </div>
-      <div className="bg-white rounded-xl shadow-sm py-2 px-2">
+      <div className="bg-white rounded-xl shadow-sm p-2">
         <SearchForm />
       </div>
     </div>
