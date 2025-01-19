@@ -3,6 +3,7 @@ import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 import { AlertSection } from "./AlertSection";
 import { FilterBar } from "@/components/FilterBar";
 import { SortType } from "@/hooks/use-sort-applications";
+import { Button } from "@/components/ui/button";
 
 interface ApplicationListViewProps {
   applications: Application[];
@@ -40,10 +41,18 @@ export const ApplicationListView = ({
       <div className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-10 bg-white">
           <div className="p-4 bg-primary/5 border-b">
-            <h2 className="font-playfair text-2xl text-primary mb-2">Your Feed for Your Area</h2>
-            <p className="text-sm text-gray-600">
-              Showing high-impact developments recently listed near {postcode ? postcode : 'you'}. These applications may significantly affect your neighborhood.
-            </p>
+            <div className="flex flex-col space-y-2">
+              <h2 className="font-playfair text-2xl text-primary mb-2">Your Feed for Your Area</h2>
+              <p className="text-sm text-gray-600">
+                Showing high-impact developments recently listed near {postcode ? postcode : 'you'}. These applications may significantly affect your neighborhood.
+              </p>
+              <Button 
+                onClick={onShowEmailDialog}
+                className="w-full bg-primary hover:bg-primary-dark text-white"
+              >
+                Get Alerts
+              </Button>
+            </div>
           </div>
           <FilterBar 
             onFilterChange={onFilterChange}
@@ -54,10 +63,6 @@ export const ApplicationListView = ({
             statusCounts={statusCounts}
           />
         </div>
-        <AlertSection 
-          postcode={postcode}
-          onShowEmailDialog={onShowEmailDialog}
-        />
         <PlanningApplicationList
           applications={applications}
           postcode={postcode}
