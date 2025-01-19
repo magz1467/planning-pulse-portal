@@ -42,7 +42,7 @@ export const ApplicationListView = ({
           <div className="p-4 bg-primary/5 border-b">
             <h2 className="font-playfair text-2xl text-primary mb-2">Your Feed for Your Area</h2>
             <p className="text-sm text-gray-600">
-              Showing high-impact developments recently listed near {postcode}. These applications may significantly affect your neighborhood.
+              Showing high-impact developments recently listed near {postcode ? postcode : 'you'}. These applications may significantly affect your neighborhood.
             </p>
           </div>
           <FilterBar 
