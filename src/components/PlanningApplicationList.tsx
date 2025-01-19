@@ -78,45 +78,45 @@ export const PlanningApplicationList = ({
                   lastDateConsultationComments={application.last_date_consultation_comments}
                   impactScore={application.final_impact_score}
                 />
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-gray-500">{application.distance}</span>
                   {application.feedback_stats && (
-                    <div className="flex items-center gap-3 text-xs">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 flex items-center gap-1"
+                        className="h-6 px-2 flex items-center gap-1 hover:bg-green-50"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleFeedback(application.id, 'yimby');
                         }}
                       >
-                        <div className="w-4 h-4 rounded-full overflow-hidden">
+                        <div className="w-5 h-5 rounded-full overflow-hidden">
                           <ImageWithFallback
                             src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
                             alt="YIMBY"
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <span className="text-gray-600">{application.feedback_stats.yimby || 0}</span>
+                        <span className="text-gray-600 text-xs font-medium">{application.feedback_stats.yimby || 0}</span>
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 flex items-center gap-1"
+                        className="h-6 px-2 flex items-center gap-1 hover:bg-red-50"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleFeedback(application.id, 'nimby');
                         }}
                       >
-                        <div className="w-4 h-4 rounded-full overflow-hidden">
+                        <div className="w-5 h-5 rounded-full overflow-hidden">
                           <ImageWithFallback
                             src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
                             alt="NIMBY"
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <span className="text-gray-600">{application.feedback_stats.nimby || 0}</span>
+                        <span className="text-gray-600 text-xs font-medium">{application.feedback_stats.nimby || 0}</span>
                       </Button>
                     </div>
                   )}
