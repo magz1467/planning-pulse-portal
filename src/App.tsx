@@ -12,6 +12,12 @@ import PlanningAppeals from "@/pages/content/PlanningAppeals";
 import SustainableDevelopment from "@/pages/content/SustainableDevelopment";
 import HeritageConservation from "@/pages/content/HeritageConservation";
 import PlanningAuthorities from "@/pages/content/PlanningAuthorities";
+import Cookies from "@/pages/Cookies";
+import Contact from "@/pages/Contact";
+import Careers from "@/pages/Careers";
+import Investors from "@/pages/Investors";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +73,36 @@ const router = createBrowserRouter([
   {
     path: "/content/planning-authorities",
     element: <PlanningAuthorities />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/cookies",
+    element: <Cookies />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/careers",
+    element: <Careers />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/investors",
+    element: <Investors />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/privacy",
+    element: <Privacy />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/terms",
+    element: <Terms />,
     errorElement: <RouteErrorBoundary />,
   }
 ]);
