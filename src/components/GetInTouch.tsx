@@ -1,4 +1,4 @@
-import { Mail, Phone, Linkedin } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const GetInTouch = () => {
@@ -32,21 +32,6 @@ const GetInTouch = () => {
               </p>
               <Button asChild variant="outline" className="w-full">
                 <a href="tel:+442080000000">020 8000 0000</a>
-              </Button>
-            </div>
-            
-            <div className="p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <Linkedin className="w-6 h-6 text-primary" />
-                <h3 className="text-xl font-semibold">Follow Us</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Connect with us on LinkedIn for updates.
-              </p>
-              <Button asChild variant="outline" className="w-full">
-                <a href="https://www.linkedin.com/company/nimbygram" target="_blank" rel="noopener noreferrer">
-                  Connect
-                </a>
               </Button>
             </div>
           </div>
