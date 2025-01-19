@@ -55,8 +55,7 @@ export const SearchForm = () => {
       />
       
       <form onSubmit={handleSubmit} className="space-y-2">
-        <div className="space-y-1">
-          <label className="text-sm text-gray-500 inline-block">Search location</label>
+        <div>
           <PostcodeSearch
             onSelect={setPostcode}
             placeholder="Enter a postcode"
