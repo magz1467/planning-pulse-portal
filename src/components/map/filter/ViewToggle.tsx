@@ -25,7 +25,7 @@ export const ViewToggle = ({ isMapView, onToggle }: ViewToggleProps) => {
         className={!isMapView ? "text-primary" : "text-gray-500"}
       >
         <List className="h-5 w-5 mr-1" />
-        List
+        Feed
       </Button>
     </div>
   );
