@@ -7,19 +7,23 @@ import { SortType } from "@/hooks/use-sort-applications";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAutoSelect } from "@/hooks/use-auto-select";
 import { useCoordinates } from "@/hooks/use-coordinates";
+import { useLocation } from "react-router-dom";
 
 export const ApplicationsDashboardMap = () => {
   const { state, dispatch } = useMapReducer();
   const { applications, isLoading, fetchApplicationsInRadius } = useApplicationsData();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const searchPostcode = location.state?.postcode;
 
   // Initialize map and fetch applications
   useEffect(() => {
     const defaultCoords: [number, number] = [51.5074, -0.1278]; // London
-    dispatch({ type: 'SET_COORDINATES', payload: defaultCoords });
     
-    // Fetch applications within 1km radius of London
-    if (defaultCoords) {
+    // Only use default coordinates if no postcode is provided
+    if (!searchPostcode) {
+      console.log('No postcode provided, using default London coordinates');
+      dispatch({ type: 'SET_COORDINATES', payload: defaultCoords });
       fetchApplicationsInRadius(defaultCoords, 1000);
     }
   }, []);
@@ -55,6 +59,18 @@ export const ApplicationsDashboardMap = () => {
     }
   };
 
+  // Handle initial postcode search
+  useEffect(() => {
+    const initializeWithPostcode = async () => {
+      if (searchPostcode) {
+        console.log('Initializing with search postcode:', searchPostcode);
+        await handlePostcodeSelect(searchPostcode);
+      }
+    };
+
+    initializeWithPostcode();
+  }, [searchPostcode]);
+
   return (
     <ErrorBoundary>
       <DashboardLayout
@@ -64,7 +80,7 @@ export const ApplicationsDashboardMap = () => {
         coordinates={state.coordinates}
         activeFilters={{}}
         activeSort={state.activeSort}
-        postcode=""
+        postcode={searchPostcode || ""}
         isLoading={isLoading}
         filteredApplications={state.applications || []}
         handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
