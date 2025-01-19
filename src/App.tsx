@@ -18,6 +18,8 @@ import Careers from "@/pages/Careers";
 import Investors from "@/pages/Investors";
 import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
+import About from "@/pages/About";
+import Press from "@/pages/Press";
 
 const router = createBrowserRouter([
   {
@@ -103,6 +105,16 @@ const router = createBrowserRouter([
   {
     path: "/terms",
     element: <Terms />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/about",
+    element: <About />,
+    errorElement: <RouteErrorBoundary />,
+  },
+  {
+    path: "/press",
+    element: <Press />,
     errorElement: <RouteErrorBoundary />,
   }
 ]);

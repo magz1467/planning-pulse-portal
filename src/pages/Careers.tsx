@@ -31,12 +31,12 @@ const Careers = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8">Careers at PlanningPulse</h1>
+        <h1 className="text-4xl font-bold mb-8">Careers at Nimbygram</h1>
         
         <div className="mb-12">
           <h2 className="text-2xl font-semibold mb-4">Join Our Team</h2>
           <p className="text-lg text-gray-700 max-w-3xl">
-            At PlanningPulse, we're revolutionizing how communities engage with urban planning. 
+            At Nimbygram, we're revolutionizing how communities engage with urban planning. 
             We're an innovative company that combines cutting-edge technology with urban development expertise 
             to create solutions that matter. Our team is passionate about making cities more livable, 
             planning more accessible, and communities more connected.
