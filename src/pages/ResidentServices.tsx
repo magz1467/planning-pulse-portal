@@ -43,8 +43,8 @@ const ResidentServices = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/5 rounded-2xl transform rotate-3"></div>
                 <Image
-                  src="/lovable-uploads/c21e23a0-f1e5-43ef-b085-aff9c1f2fa76.png"
-                  alt="Local resident using planning application platform"
+                  src="/lovable-uploads/2ddbeeaf-9458-4cc2-ba2f-cf2da75ae103.png"
+                  alt="Local residents looking at countryside property"
                   className="rounded-2xl shadow-lg relative z-10 object-center"
                   width={800}
                   height={600}
