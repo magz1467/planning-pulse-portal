@@ -2,6 +2,7 @@ import { Stats } from "@/components/Stats";
 import { SearchForm } from "@/components/SearchForm";
 import { HeroTitle } from "./HeroTitle";
 import { HeroSubtitle } from "./HeroSubtitle";
+import { HeroTestimonial } from "./HeroTestimonial";
 import Image from "@/components/ui/image";
 
 export const HeroContent = () => {
@@ -25,6 +26,7 @@ export const HeroContent = () => {
       <div className="bg-white rounded-xl shadow-sm p-2">
         <SearchForm />
       </div>
+      <HeroTestimonial />
     </div>
   );
 };
