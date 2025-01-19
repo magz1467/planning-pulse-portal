@@ -36,7 +36,7 @@ const Footer = () => {
           <div>
             <h3 className="font-bold mb-4">Connect</h3>
             <p className="text-sm mb-4">Registered office:<br />123 Planning Street<br />London, EC1A 1BB</p>
-            <p className="text-sm">Company No: 12345678<br />VAT No: GB123456789</p>
+            <p className="text-sm h-[40px]"></p>
           </div>
         </div>
         
