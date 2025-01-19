@@ -16,7 +16,7 @@ export const SocialMediaCard = () => {
         <p className="text-gray-600 mb-6">Join our community on social media for daily updates and discussions.</p>
         <div className="space-y-4 mt-auto">
           <a 
-            href="https://www.facebook.com/profile.php?id=61570929167355" 
+            href="https://www.facebook.com/profile.php?id=61572261991963" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full bg-[#1877F2] text-white py-2 px-4 rounded-lg hover:bg-[#1659c7] transition-colors"
