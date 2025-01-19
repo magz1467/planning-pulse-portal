@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ApplicationFeedbackProps {
   feedback: 'yimby' | 'nimby' | null;
@@ -16,6 +17,50 @@ export const ApplicationFeedback = ({
   onFeedback,
   feedbackStats 
 }: ApplicationFeedbackProps) => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <Card className="p-4 hover:border-primary transition-colors">
+        <h3 className="font-semibold mb-4">Community Feedback</h3>
+        <div className="flex justify-between gap-2">
+          <Button
+            variant={feedback === 'yimby' ? "default" : "outline"}
+            onClick={() => onFeedback('yimby')}
+            className={`flex items-center gap-2 ${
+              feedback === 'yimby' ? 'bg-primary hover:bg-primary-dark' : 'hover:bg-primary/10'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden">
+              <ImageWithFallback
+                src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
+                alt="YIMBY"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-sm">{feedbackStats.yimbyCount}</span>
+          </Button>
+          <Button
+            variant={feedback === 'nimby' ? "outline" : "outline"}
+            onClick={() => onFeedback('nimby')}
+            className={`flex items-center gap-2 ${
+              feedback === 'nimby' ? 'bg-[#ea384c]/10' : ''
+            }`}
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden">
+              <ImageWithFallback
+                src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
+                alt="NIMBY"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-sm">{feedbackStats.nimbyCount}</span>
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-4 hover:border-primary transition-colors">
       <h3 className="font-semibold mb-4">Community Feedback</h3>
@@ -27,7 +72,7 @@ export const ApplicationFeedback = ({
             feedback === 'yimby' ? 'bg-primary hover:bg-primary-dark' : 'hover:bg-primary/10'
           }`}
         >
-          <div className="w-16 h-16 rounded-full overflow-hidden">
+          <div className="w-24 h-24 rounded-full overflow-hidden">
             <ImageWithFallback
               src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
               alt="YIMBY"
@@ -48,7 +93,7 @@ export const ApplicationFeedback = ({
             feedback === 'nimby' ? 'bg-[#ea384c]/10' : ''
           }`}
         >
-          <div className="w-16 h-16 rounded-full overflow-hidden">
+          <div className="w-24 h-24 rounded-full overflow-hidden">
             <ImageWithFallback
               src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
               alt="NIMBY"

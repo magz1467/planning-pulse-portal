@@ -6,19 +6,22 @@ import { useApplicationSorting, SortType } from "@/hooks/use-sort-applications";
 import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
 import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { Button } from "@/components/ui/button";
 
 interface PlanningApplicationListProps {
   applications: Application[];
   postcode: string;
   onSelectApplication: (id: number | null) => void;
   activeSort?: SortType;
+  onFeedback?: (applicationId: number, type: 'yimby' | 'nimby') => void;
 }
 
 export const PlanningApplicationList = ({
   applications,
   onSelectApplication,
   activeSort,
-  postcode
+  postcode,
+  onFeedback
 }: PlanningApplicationListProps) => {
   const sortedApplications = useApplicationSorting({
     type: activeSort || null,
@@ -35,6 +38,12 @@ export const PlanningApplicationList = ({
       </div>
     );
   }
+
+  const handleFeedback = (applicationId: number, type: 'yimby' | 'nimby') => {
+    if (onFeedback) {
+      onFeedback(applicationId, type);
+    }
+  };
 
   return (
     <div className="divide-y">
@@ -73,7 +82,15 @@ export const PlanningApplicationList = ({
                   <span className="text-xs text-gray-500">{application.distance}</span>
                   {application.feedback_stats && (
                     <div className="flex items-center gap-3 text-xs">
-                      <span className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 flex items-center gap-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFeedback(application.id, 'yimby');
+                        }}
+                      >
                         <div className="w-4 h-4 rounded-full overflow-hidden">
                           <ImageWithFallback
                             src="/lovable-uploads/3df4c01a-a60f-43c5-892a-18bf170175b6.png"
@@ -82,8 +99,16 @@ export const PlanningApplicationList = ({
                           />
                         </div>
                         <span className="text-gray-600">{application.feedback_stats.yimby || 0}</span>
-                      </span>
-                      <span className="flex items-center gap-1">
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 flex items-center gap-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFeedback(application.id, 'nimby');
+                        }}
+                      >
                         <div className="w-4 h-4 rounded-full overflow-hidden">
                           <ImageWithFallback
                             src="/lovable-uploads/4dfbdd6f-07d8-4c20-bd77-0754d1f78644.png"
@@ -92,7 +117,7 @@ export const PlanningApplicationList = ({
                           />
                         </div>
                         <span className="text-gray-600">{application.feedback_stats.nimby || 0}</span>
-                      </span>
+                      </Button>
                     </div>
                   )}
                 </div>
