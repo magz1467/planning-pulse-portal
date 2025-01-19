@@ -3,7 +3,7 @@ import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 
 interface FeedbackButtonsProps {
   applicationId: number;
-  feedbackStats: {
+  feedbackStats?: {
     yimby?: number;
     nimby?: number;
   };
@@ -12,7 +12,7 @@ interface FeedbackButtonsProps {
 
 export const FeedbackButtons = ({ applicationId, feedbackStats, onFeedback }: FeedbackButtonsProps) => {
   return (
-    <div className="flex items-center gap-1 ml-auto">
+    <div className="flex items-center gap-1">
       <Button
         variant="ghost"
         size="sm"
@@ -29,7 +29,7 @@ export const FeedbackButtons = ({ applicationId, feedbackStats, onFeedback }: Fe
             className="w-full h-full object-cover"
           />
         </div>
-        <span className="text-gray-600 text-xs">{feedbackStats.yimby || 0}</span>
+        <span className="text-gray-600 text-xs">{feedbackStats?.yimby || 0}</span>
       </Button>
       <Button
         variant="ghost"
@@ -47,7 +47,7 @@ export const FeedbackButtons = ({ applicationId, feedbackStats, onFeedback }: Fe
             className="w-full h-full object-cover"
           />
         </div>
-        <span className="text-gray-600 text-xs">{feedbackStats.nimby || 0}</span>
+        <span className="text-gray-600 text-xs">{feedbackStats?.nimby || 0}</span>
       </Button>
     </div>
   );
