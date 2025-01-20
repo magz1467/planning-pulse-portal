@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 // Category-specific image mapping - same as ApplicationImage
 const CATEGORY_IMAGES = {
   'Demolition': '/lovable-uploads/7448dbb9-9558-4d5b-abd8-b9a086dc632c.png',
-  'Extension': '/lovable-uploads/3d400936-3af5-4445-b768-a9342b176d2f.png',
+  'Extension': '/lovable-uploads/b0296cbb-48ab-46ec-9ac1-93c1251ca198.png',
   'New Build': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=60',
   'Change of Use': 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop&q=60',
   'Listed Building': 'https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&auto=format&fit=crop&q=60',
