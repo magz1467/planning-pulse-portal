@@ -20,7 +20,7 @@ const CATEGORY_IMAGES = {
   'Residential': 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=60',
   'Infrastructure': 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=800&auto=format&fit=crop&q=60',
   'Planning Conditions': '/lovable-uploads/c5f375f5-c862-4a11-a43e-7dbac6a9085a.png',
-  'Miscellaneous': 'https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60'
+  'Miscellaneous': '/lovable-uploads/8e72e46c-85ce-497d-811e-9f03eaabded2.png'
 };
 
 export const ImageResolver = ({ 
