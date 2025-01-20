@@ -35,10 +35,28 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
       class_3: application.class_3
     });
 
-    // Use category image if class_3 is available
-    if (application.class_3 && CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES]) {
-      console.log('ApplicationImage - Using category image for:', application.class_3);
-      setImageSource(CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES]);
+    // First try to determine category from title if class_3 is not set
+    let detectedCategory = application.class_3;
+    if (!detectedCategory && application.description) {
+      const titleLower = application.description.toLowerCase();
+      if (titleLower.includes('demolition')) {
+        detectedCategory = 'Demolition';
+      } else if (titleLower.includes('extension')) {
+        detectedCategory = 'Extension';
+      } else if (titleLower.includes('new build')) {
+        detectedCategory = 'New Build';
+      } else if (titleLower.includes('change of use')) {
+        detectedCategory = 'Change of Use';
+      } else if (titleLower.includes('listed building')) {
+        detectedCategory = 'Listed Building';
+      }
+      console.log('ApplicationImage - Detected category from title:', detectedCategory);
+    }
+
+    // Use category image if available
+    if (detectedCategory && CATEGORY_IMAGES[detectedCategory as keyof typeof CATEGORY_IMAGES]) {
+      console.log('ApplicationImage - Using category image for:', detectedCategory);
+      setImageSource(CATEGORY_IMAGES[detectedCategory as keyof typeof CATEGORY_IMAGES]);
       return;
     }
 
@@ -51,7 +69,7 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
     // Finally use miscellaneous category image as fallback
     console.log('ApplicationImage - Using miscellaneous category image');
     setImageSource(CATEGORY_IMAGES['Miscellaneous']);
-  }, [application.id, application.image, application.image_map_url, application.class_3]);
+  }, [application.id, application.image, application.image_map_url, application.class_3, application.description]);
 
   const handleImageError = (error: any) => {
     console.error('ApplicationImage - Image loading failed:', {
