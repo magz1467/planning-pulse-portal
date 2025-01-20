@@ -6,7 +6,7 @@ import { CommentContent } from "./CommentContent";
 import { CommentVotes } from "./CommentVotes";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, ChevronDown, ChevronRight } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 
@@ -29,6 +29,7 @@ export const CommentItem = ({
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [replies, setReplies] = useState<Comment[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const fetchVoteStatus = async () => {
@@ -142,6 +143,7 @@ export const CommentItem = ({
       setReplies(prev => [...prev, newComment]);
       setReplyContent('');
       setIsReplying(false);
+      setIsExpanded(true); // Auto-expand when adding a new reply
       
       if (onReplyAdded) {
         onReplyAdded(newComment);
@@ -189,6 +191,21 @@ export const CommentItem = ({
               Reply
             </Button>
           )}
+          {replies.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-muted-foreground hover:text-foreground ml-auto"
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4 mr-1" />
+              ) : (
+                <ChevronRight className="h-4 w-4 mr-1" />
+              )}
+              {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+            </Button>
+          )}
         </div>
 
         {isReplying && (
@@ -219,7 +236,7 @@ export const CommentItem = ({
         )}
       </Card>
 
-      {replies.length > 0 && (
+      {replies.length > 0 && isExpanded && (
         <div className="mt-2 space-y-2">
           {replies.map((reply) => (
             <CommentItem
