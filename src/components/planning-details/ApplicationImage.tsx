@@ -22,7 +22,6 @@ const CATEGORY_IMAGES = {
 };
 
 export const ApplicationImage = ({ application }: ApplicationImageProps) => {
-  const [imageError, setImageError] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -32,7 +31,8 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
       image_map_url: application.image_map_url,
       image: application.image,
       currentImageSource: imageSource,
-      class_3: application.class_3
+      class_3: application.class_3,
+      title: application.description || ''
     });
 
     // First try to determine category from title if class_3 is not set
@@ -79,7 +79,6 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
     });
     
     setImageSource(CATEGORY_IMAGES['Miscellaneous']);
-    setImageError(`Failed to load image: ${error.message}`);
     
     toast({
       title: "Image Load Error",
@@ -90,11 +89,6 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
 
   return (
     <div className="w-full aspect-video relative overflow-hidden rounded-lg bg-gray-100">
-      {imageError && (
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-500 bg-gray-100 z-10">
-          {imageError}
-        </div>
-      )}
       {imageSource && (
         <Image
           src={imageSource}
