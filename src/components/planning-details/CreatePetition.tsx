@@ -32,9 +32,9 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   };
 
   return (
-    <Card className="p-4 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-all duration-300">
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-4">
+    <Card className="p-6 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-all duration-300">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-6">
           <Button
             variant="ghost"
             className="w-full flex items-center justify-between group hover:bg-primary/5"
@@ -54,7 +54,7 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
             </span>
           </Button>
 
-          <div className="space-y-4 pl-4">
+          <div className="space-y-5 pl-4 pt-2">
             <div className="flex items-start gap-3">
               <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
               <p className="text-sm text-gray-600">Instant petition creation to challenge applications</p>
@@ -70,13 +70,13 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="relative flex items-center justify-center">
           <Image
             src="/lovable-uploads/44747e06-e179-40ce-9a85-66748ee50961.png"
             alt="Create a petition illustration"
             width={400}
             height={400}
-            className="rounded-lg shadow-md"
+            className="rounded-lg shadow-md max-w-full h-auto"
           />
         </div>
       </div>
