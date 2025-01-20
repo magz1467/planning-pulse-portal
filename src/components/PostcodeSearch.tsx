@@ -54,7 +54,7 @@ export const PostcodeSearch = ({ onSelect, placeholder = "Search location", clas
           placeholder={placeholder}
           value={search}
           onChange={handleInputChange}
-          className="w-full pl-4 pr-10 py-2"
+          className="w-full pr-10"
           onFocus={() => search.length >= 2 && setOpen(true)}
         />
         <Button 
