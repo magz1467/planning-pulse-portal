@@ -35,7 +35,7 @@ const Footer = () => {
           
           <div>
             <h3 className="font-bold mb-4">Connect</h3>
-            <p className="text-sm mb-4">Registered office:<br />123 Planning Street<br />London, EC1A 1BB</p>
+            <p className="text-sm mb-4">Email: marco@nimbygram.com</p>
             <p className="text-sm h-[40px]"></p>
           </div>
         </div>
