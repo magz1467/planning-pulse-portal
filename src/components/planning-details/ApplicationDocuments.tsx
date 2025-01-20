@@ -12,33 +12,22 @@ interface Document {
   url: string;
 }
 
-// Mock documents - in a real app these would come from the backend
-const mockDocuments: Document[] = [
-  {
-    id: 1,
-    title: "Site Plan",
-    type: "PDF",
-    size: "2.4 MB",
-    url: "#"
-  },
-  {
-    id: 2,
-    title: "Elevation Drawings",
-    type: "PDF",
-    size: "1.8 MB",
-    url: "#"
-  },
-  {
-    id: 3,
-    title: "Design and Access Statement",
-    type: "PDF",
-    size: "3.1 MB",
-    url: "#"
-  }
-];
-
 export const ApplicationDocuments = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const documents: Document[] = []; // Empty array instead of mock data
+
+  if (!documents.length) {
+    return (
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold">Application Documents</h3>
+            <p className="text-sm text-gray-500">No documents available</p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-4">
@@ -47,7 +36,7 @@ export const ApplicationDocuments = () => {
           <div>
             <h3 className="font-semibold">Application Documents</h3>
             <p className="text-sm text-gray-500">
-              {mockDocuments.length} documents attached to this application
+              {documents.length} documents attached to this application
             </p>
           </div>
           <div>
@@ -61,7 +50,7 @@ export const ApplicationDocuments = () => {
         
         <CollapsibleContent className="mt-4">
           <div className="space-y-2">
-            {mockDocuments.map((doc) => (
+            {documents.map((doc) => (
               <div
                 key={doc.id}
                 className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors"
