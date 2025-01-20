@@ -11,7 +11,7 @@ interface ImageResolverProps {
 
 // Category-specific image mapping
 const CATEGORY_IMAGES = {
-  'Demolition': 'https://images.unsplash.com/photo-1666257093504-7f0c74b370f2?w=800&auto=format&fit=crop&q=60',
+  'Demolition': '/lovable-uploads/7448dbb9-9558-4d5b-abd8-b9a086dc632c.png',
   'Extension': 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60',
   'New Build': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=60',
   'Change of Use': 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop&q=60',
