@@ -14,7 +14,7 @@ export const QuoteSection = () => {
           </div>
           
           {/* Quote text */}
-          <blockquote className="relative z-10 text-foreground font-playfair text-lg md:text-xl italic text-center px-8 font-bold">
+          <blockquote className="relative z-10 text-foreground font-playfair text-xl md:text-2xl italic text-center px-8 font-bold">
             "I don't have the time to get my information from posters stuck on lamp posts! Nimbygram finally makes it easy to see what's going on in my area."
           </blockquote>
         </div>
