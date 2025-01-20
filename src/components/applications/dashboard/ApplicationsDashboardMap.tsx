@@ -3,7 +3,6 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import { useMapReducer } from "@/hooks/use-map-reducer";
 import { useEffect } from "react";
 import { useApplicationsData } from "./hooks/useApplicationsData";
-import { SortType } from "@/hooks/use-sort-applications";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAutoSelect } from "@/hooks/use-auto-select";
 import { useCoordinates } from "@/hooks/use-coordinates";
@@ -15,7 +14,7 @@ export const ApplicationsDashboardMap = () => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const searchPostcode = location.state?.postcode;
-  const { coordinates } = useCoordinates(searchPostcode);
+  const { coordinates, isLoading: isLoadingCoords } = useCoordinates(searchPostcode);
 
   // Initialize map and fetch applications
   useEffect(() => {
@@ -53,18 +52,20 @@ export const ApplicationsDashboardMap = () => {
   const handlePostcodeSelect = async (postcode: string) => {
     console.log('Handling postcode select:', postcode);
     if (coordinates) {
+      console.log('Setting new coordinates:', coordinates);
       dispatch({ type: 'SET_COORDINATES', payload: coordinates as [number, number] });
       fetchApplicationsInRadius(coordinates as [number, number], 1000);
     }
   };
 
-  // Handle initial postcode search
+  // Handle initial postcode search and coordinate updates
   useEffect(() => {
-    if (searchPostcode && coordinates) {
-      console.log('Initializing with search postcode:', searchPostcode);
-      handlePostcodeSelect(searchPostcode);
+    if (coordinates) {
+      console.log('Coordinates updated:', coordinates, 'for postcode:', searchPostcode);
+      dispatch({ type: 'SET_COORDINATES', payload: coordinates as [number, number] });
+      fetchApplicationsInRadius(coordinates as [number, number], 1000);
     }
-  }, [searchPostcode, coordinates]);
+  }, [coordinates]);
 
   return (
     <ErrorBoundary>
@@ -76,7 +77,7 @@ export const ApplicationsDashboardMap = () => {
         activeFilters={{}}
         activeSort={state.activeSort}
         postcode={searchPostcode || ""}
-        isLoading={isLoading}
+        isLoading={isLoading || isLoadingCoords}
         filteredApplications={state.applications || []}
         handleMarkerClick={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
         handleFilterChange={() => {}}
