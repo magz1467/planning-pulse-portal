@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
-import { useSearchLogger } from "@/hooks/use-search-logger";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchFormProps {
   activeTab?: string;
@@ -12,36 +14,80 @@ interface SearchFormProps {
 export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
   const [postcode, setPostcode] = useState('');
   const navigate = useNavigate();
-  const { logSearch } = useSearchLogger();
+  const { toast } = useToast();
 
-  const handleSearch = async (searchPostcode: string) => {
-    setPostcode(searchPostcode);
+  const logSearch = async (postcode: string) => {
+    try {
+      console.log('Logging search from SearchForm:', {
+        postcode,
+        status: activeTab,
+        timestamp: new Date().toISOString()
+      });
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase.from('Searches').insert({
+        'Post Code': postcode,
+        'Status': activeTab,
+        'User_logged_in': !!session?.user
+      });
+
+      if (error) {
+        console.error('Error logging search:', error);
+        toast({
+          title: "Analytics Error",
+          description: "Your search was processed but we couldn't log it. This won't affect your results.",
+          variant: "default",
+        });
+      } else {
+        console.log('Search logged successfully from SearchForm');
+      }
+    } catch (error) {
+      console.error('Error logging search:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
-    await logSearch({
-      postcode: searchPostcode,
-      status: activeTab,
-      source: 'SearchForm'
-    });
+    if (!postcode.trim()) {
+      return;
+    }
+
+    const trimmedPostcode = postcode.trim();
 
     if (onSearch) {
-      onSearch(searchPostcode);
-    } else {
-      navigate(`/map?postcode=${encodeURIComponent(searchPostcode)}`);
+      onSearch(trimmedPostcode);
+    }
+
+    try {
+      await logSearch(trimmedPostcode);
+      
+      navigate('/applications/dashboard/map', { 
+        state: { 
+          postcode: trimmedPostcode,
+          tab: activeTab
+        }
+      });
+    } catch (error) {
+      console.error('Error during search:', error);
     }
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <div className="relative">
-        <PostcodeSearch
-          onSelect={handleSearch}
-          placeholder="Enter your postcode"
-          className="w-full"
-        />
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
-        </div>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      <PostcodeSearch
+        onSelect={setPostcode}
+        placeholder="Enter postcode"
+        className="flex-1"
+      />
+      <Button 
+        type="submit" 
+        className="w-full bg-primary hover:bg-primary-dark text-white py-6 text-lg font-semibold rounded-xl shadow-sm"
+      >
+        <Search className="w-5 h-5 mr-2" />
+        Show planning applications
+      </Button>
+    </form>
   );
 };
