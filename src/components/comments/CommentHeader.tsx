@@ -9,7 +9,7 @@ export const CommentHeader = ({ comment }: CommentHeaderProps) => {
     <div className="flex items-center justify-between mb-2">
       <div className="flex items-center space-x-2">
         <span className="font-medium">
-          {comment.user?.username || comment.user_email || 'Anonymous'}
+          {comment.user?.username || comment.profiles?.username || comment.user_email || 'Anonymous'}
         </span>
         <span className="text-sm text-muted-foreground">
           {new Date(comment.created_at).toLocaleDateString()}

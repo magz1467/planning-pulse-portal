@@ -6,7 +6,7 @@ export interface CommentContentProps {
 
 export const CommentContent = ({ comment }: CommentContentProps) => {
   return (
-    <div className="text-sm text-muted-foreground">
+    <div className="text-sm text-foreground">
       {comment.comment}
     </div>
   );

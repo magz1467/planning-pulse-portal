@@ -1,20 +1,34 @@
 import { Comment } from "@/types/planning";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { CommentHeader } from "./CommentHeader";
 import { CommentContent } from "./CommentContent";
 import { CommentVotes } from "./CommentVotes";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { MessageSquarePlus } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 
 interface CommentItemProps {
   comment: Comment;
   currentUserId?: string;
+  level?: number;
+  onReplyAdded?: (newComment: Comment) => void;
 }
 
-export const CommentItem = ({ comment, currentUserId }: CommentItemProps) => {
+export const CommentItem = ({ 
+  comment, 
+  currentUserId,
+  level = 0,
+  onReplyAdded 
+}: CommentItemProps) => {
   const [voteStatus, setVoteStatus] = useState<'up' | 'down' | null>(null);
   const [upvotes, setUpvotes] = useState(comment.upvotes || 0);
   const [downvotes, setDownvotes] = useState(comment.downvotes || 0);
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyContent, setReplyContent] = useState('');
+  const [replies, setReplies] = useState<Comment[]>([]);
 
   useEffect(() => {
     const fetchVoteStatus = async () => {
@@ -32,7 +46,23 @@ export const CommentItem = ({ comment, currentUserId }: CommentItemProps) => {
       }
     };
 
+    const fetchReplies = async () => {
+      const { data: repliesData, error } = await supabase
+        .from('Comments')
+        .select('*, profiles:profiles(username)')
+        .eq('parent_id', comment.id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching replies:', error);
+        return;
+      }
+
+      setReplies(repliesData || []);
+    };
+
     fetchVoteStatus();
+    fetchReplies();
   }, [comment.id, currentUserId]);
 
   const handleVoteChange = async (type: 'up' | 'down') => {
@@ -92,20 +122,116 @@ export const CommentItem = ({ comment, currentUserId }: CommentItemProps) => {
     }
   };
 
+  const handleReply = async () => {
+    if (!currentUserId || !replyContent.trim()) return;
+
+    try {
+      const { data: newComment, error } = await supabase
+        .from('Comments')
+        .insert({
+          comment: replyContent.trim(),
+          application_id: comment.application_id,
+          user_id: currentUserId,
+          parent_id: comment.id
+        })
+        .select('*, profiles:profiles(username)')
+        .single();
+
+      if (error) throw error;
+
+      setReplies(prev => [...prev, newComment]);
+      setReplyContent('');
+      setIsReplying(false);
+      
+      if (onReplyAdded) {
+        onReplyAdded(newComment);
+      }
+
+      toast({
+        title: "Reply added",
+        description: "Your reply has been posted successfully.",
+      });
+    } catch (error) {
+      console.error('Error posting reply:', error);
+      toast({
+        title: "Error",
+        description: "Failed to post reply. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Limit nesting level to 3 to prevent deep threads
+  const maxLevel = 3;
+
   return (
-    <Card className="p-4">
-      <CommentHeader comment={comment} />
-      <CommentContent comment={comment} />
-      <div className="mt-2">
-        <CommentVotes
-          commentId={comment.id}
-          upvotes={upvotes}
-          downvotes={downvotes}
-          currentUserId={currentUserId}
-          voteStatus={voteStatus}
-          onVoteChange={handleVoteChange}
-        />
-      </div>
-    </Card>
+    <div className={`${level > 0 ? 'ml-6' : ''}`}>
+      <Card className="p-4">
+        <CommentHeader comment={comment} />
+        <CommentContent comment={comment} />
+        <div className="mt-2 flex items-center space-x-4">
+          <CommentVotes
+            commentId={comment.id}
+            upvotes={upvotes}
+            downvotes={downvotes}
+            currentUserId={currentUserId}
+            voteStatus={voteStatus}
+            onVoteChange={handleVoteChange}
+          />
+          {currentUserId && level < maxLevel && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsReplying(!isReplying)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <MessageSquarePlus className="h-4 w-4 mr-2" />
+              Reply
+            </Button>
+          )}
+        </div>
+
+        {isReplying && (
+          <div className="mt-4 space-y-2">
+            <Textarea
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              placeholder="Write your reply..."
+              className="min-h-[100px]"
+            />
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsReplying(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleReply}
+                disabled={!replyContent.trim()}
+              >
+                Post Reply
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {replies.length > 0 && (
+        <div className="mt-2 space-y-2">
+          {replies.map((reply) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              currentUserId={currentUserId}
+              level={level + 1}
+              onReplyAdded={onReplyAdded}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
