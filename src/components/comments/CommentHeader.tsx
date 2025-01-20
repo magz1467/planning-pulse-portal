@@ -1,34 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { Comment } from "@/types/planning";
 
-interface CommentHeaderProps {
-  displayName: string;
-  createdAt: string;
-  canDelete: boolean;
-  onDelete?: () => void;
+export interface CommentHeaderProps {
+  comment: Comment;
 }
 
-export const CommentHeader = ({
-  displayName,
-  createdAt,
-  canDelete,
-  onDelete
-}: CommentHeaderProps) => {
+export const CommentHeader = ({ comment }: CommentHeaderProps) => {
   return (
-    <div className="flex justify-between items-start mb-2">
-      <div className="text-sm text-gray-600">
-        {displayName} • {new Date(createdAt).toLocaleDateString()}
+    <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center space-x-2">
+        <span className="font-medium">
+          {comment.user?.username || comment.user_email || 'Anonymous'}
+        </span>
+        <span className="text-sm text-muted-foreground">
+          {new Date(comment.created_at).toLocaleDateString()}
+        </span>
       </div>
-      {canDelete && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDelete}
-          className="text-red-500 hover:text-red-700"
-        >
-          <Trash className="h-4 w-4" />
-        </Button>
-      )}
     </div>
   );
 };

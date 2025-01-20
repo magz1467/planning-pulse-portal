@@ -1,11 +1,13 @@
-interface CommentContentProps {
-  content: string;
+import { Comment } from "@/types/planning";
+
+export interface CommentContentProps {
+  comment: Comment;
 }
 
-export const CommentContent = ({ content }: CommentContentProps) => {
+export const CommentContent = ({ comment }: CommentContentProps) => {
   return (
-    <div className="text-sm text-gray-800">
-      {content}
+    <div className="text-sm text-muted-foreground">
+      {comment.comment}
     </div>
   );
-}
+};

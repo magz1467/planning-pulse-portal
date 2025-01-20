@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CommentVotesProps {
   commentId: number;
@@ -12,70 +11,52 @@ interface CommentVotesProps {
   onVoteChange: (type: 'up' | 'down') => void;
 }
 
-export const CommentVotes = ({ 
-  commentId, 
-  upvotes = 0, 
-  downvotes = 0,
+export const CommentVotes = ({
+  commentId,
+  upvotes,
+  downvotes,
   currentUserId,
   voteStatus,
   onVoteChange
 }: CommentVotesProps) => {
   const { toast } = useToast();
 
-  const handleVote = async (type: 'up' | 'down') => {
+  const handleVote = (type: 'up' | 'down') => {
     if (!currentUserId) {
       toast({
-        title: "Please sign in",
-        description: "You need to be signed in to vote on comments",
+        title: "Sign in required",
+        description: "Please sign in to vote on comments",
         variant: "destructive"
       });
       return;
     }
-
-    try {
-      // First try to get existing vote
-      const { data: existingVote, error: fetchError } = await supabase
-        .from('comment_votes')
-        .select()
-        .eq('comment_id', commentId)
-        .eq('user_id', currentUserId)
-        .maybeSingle(); // Using maybeSingle instead of single to handle no results case
-
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
-
-      onVoteChange(type);
-    } catch (error) {
-      console.error('Error handling vote:', error);
-      toast({
-        title: "Error",
-        description: "Failed to register vote. Please try again.",
-        variant: "destructive"
-      });
-    }
+    onVoteChange(type);
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => handleVote('up')}
-        className={voteStatus === 'up' ? 'text-green-500' : ''}
-      >
-        <ThumbsUp className="h-4 w-4 mr-1" />
-        {upvotes || 0}
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => handleVote('down')}
-        className={voteStatus === 'down' ? 'text-red-500' : ''}
-      >
-        <ThumbsDown className="h-4 w-4 mr-1" />
-        {downvotes || 0}
-      </Button>
+    <div className="flex items-center space-x-4">
+      <div className="flex items-center">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className={`hover:bg-primary/10 ${voteStatus === 'up' ? 'text-primary' : ''}`}
+          onClick={() => handleVote('up')}
+        >
+          <ThumbsUp className="w-4 h-4 mr-1" />
+          <span>{upvotes}</span>
+        </Button>
+      </div>
+      <div className="flex items-center">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className={`hover:bg-primary/10 ${voteStatus === 'down' ? 'text-primary' : ''}`}
+          onClick={() => handleVote('down')}
+        >
+          <ThumbsDown className="w-4 h-4 mr-1" />
+          <span>{downvotes}</span>
+        </Button>
+      </div>
     </div>
   );
 };
