@@ -33,13 +33,10 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
   return (
     <Card className="p-6 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-all duration-300">
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h3 className="font-playfair text-2xl text-primary">Create Petition</h3>
-            <p className="text-sm text-secondary">Rally support</p>
-          </div>
+        <div className="space-y-4">
+          <h3 className="font-playfair text-2xl text-primary font-bold">Create Petition</h3>
 
-          <div className="space-y-5 pl-4 pt-2">
+          <div className="space-y-5">
             <div className="flex items-start gap-3">
               <span className="text-primary text-xl">📝</span>
               <p className="text-sm text-gray-600">Instant petition creation to challenge applications</p>
@@ -61,7 +58,7 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
             alt="Create a petition illustration"
             width={400}
             height={400}
-            className="rounded-lg shadow-md max-w-full h-auto"
+            className="rounded-full shadow-md max-w-full h-auto"
           />
         </div>
       </div>
