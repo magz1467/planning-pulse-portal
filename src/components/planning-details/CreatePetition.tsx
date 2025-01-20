@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { PetitionReasons } from "./petition/PetitionReasons";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PetitionSharing } from "./petition/PetitionSharing";
-import Image from "@/components/ui/image";
+import { PetitionHeader } from "./petition/PetitionHeader";
+import { PetitionFeatures } from "./petition/PetitionFeatures";
+import { PetitionImage } from "./petition/PetitionImage";
+import { PetitionButton } from "./petition/PetitionButton";
 
 interface CreatePetitionProps {
   applicationId: number;
@@ -34,42 +37,13 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
     <Card className="p-6 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-all duration-300">
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-4">
-          <h3 className="font-playfair text-2xl text-primary font-bold">Create Petition</h3>
-
-          <div className="space-y-5">
-            <div className="flex items-start gap-3">
-              <span className="text-primary text-xl">📝</span>
-              <p className="text-sm text-gray-600">Instant petition creation to challenge applications</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-primary text-xl">🌟</span>
-              <p className="text-sm text-gray-600">Easy share with your local network</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-primary text-xl">📨</span>
-              <p className="text-sm text-gray-600">Template ready for you to send to the council</p>
-            </div>
-          </div>
+          <PetitionHeader />
+          <PetitionFeatures />
         </div>
-
-        <div className="relative flex items-center justify-center">
-          <Image
-            src="/lovable-uploads/44747e06-e179-40ce-9a85-66748ee50961.png"
-            alt="Create a petition illustration"
-            width={400}
-            height={400}
-            className="rounded-full shadow-md max-w-full h-auto"
-          />
-        </div>
+        <PetitionImage />
       </div>
 
-      <Button
-        variant="default"
-        className="w-full mt-8 bg-secondary hover:bg-secondary/90 text-white py-6 text-lg font-semibold"
-        onClick={() => setShowReasons(true)}
-      >
-        Start Your Petition →
-      </Button>
+      <PetitionButton onClick={() => setShowReasons(true)} />
 
       <Dialog open={showReasons} onOpenChange={setShowReasons}>
         <DialogContent className="sm:max-w-[425px]">
