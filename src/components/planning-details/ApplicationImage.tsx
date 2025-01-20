@@ -7,24 +7,24 @@ interface ApplicationImageProps {
   application: Application;
 }
 
+// Category-specific image mapping - same as ImageResolver
+const CATEGORY_IMAGES = {
+  'Demolition': '/lovable-uploads/7448dbb9-9558-4d5b-abd8-b9a086dc632c.png',
+  'Extension': '/lovable-uploads/3d400936-3af5-4445-b768-a9342b176d2f.png',
+  'New Build': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=60',
+  'Change of Use': 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop&q=60',
+  'Listed Building': 'https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&auto=format&fit=crop&q=60',
+  'Commercial': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=60',
+  'Residential': 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=60',
+  'Infrastructure': 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=800&auto=format&fit=crop&q=60',
+  'Planning Conditions': '/lovable-uploads/c5f375f5-c862-4a11-a43e-7dbac6a9085a.png',
+  'Miscellaneous': '/lovable-uploads/8e72e46c-85ce-497d-811e-9f03eaabded2.png'
+};
+
 export const ApplicationImage = ({ application }: ApplicationImageProps) => {
   const [imageError, setImageError] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState<string | null>(null);
   const { toast } = useToast();
-
-  // Array of diverse house images from Unsplash (same as in PlanningApplicationList)
-  const houseImages = [
-    "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1598228723793-52759bba239c?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=800&auto=format&fit=crop&q=60",
-    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=60"
-  ];
-
-  // Function to get a random image based on application id
-  const getRandomImage = (id: number) => {
-    return houseImages[id % houseImages.length];
-  };
 
   useEffect(() => {
     const loadImage = async () => {
@@ -67,21 +67,20 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
           }
         }
 
-        // Finally fall back to random house image
-        const fallbackImage = getRandomImage(application.id);
-        setImageSource(fallbackImage);
-        console.log('ApplicationImage - Using fallback image:', fallbackImage);
+        // Finally use category image or default
+        const categoryImage = application.class_3 ? CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES] : CATEGORY_IMAGES['Miscellaneous'];
+        setImageSource(categoryImage);
+        console.log('ApplicationImage - Using category image:', categoryImage);
 
       } catch (error) {
         console.error('ApplicationImage - Error loading image:', error);
-        const fallbackImage = getRandomImage(application.id);
-        setImageSource(fallbackImage);
+        setImageSource(CATEGORY_IMAGES['Miscellaneous']);
         setImageError(`Failed to load image: ${error.message}`);
       }
     };
 
     loadImage();
-  }, [application.id, application.image, application.image_map_url]);
+  }, [application.id, application.image, application.image_map_url, application.class_3]);
 
   const handleImageError = (error: any) => {
     console.error('ApplicationImage - Image loading failed:', {
@@ -90,9 +89,7 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
       attemptedUrl: imageSource
     });
     
-    // Try fallback image
-    const fallbackImage = getRandomImage(application.id);
-    setImageSource(fallbackImage);
+    setImageSource(CATEGORY_IMAGES['Miscellaneous']);
     setImageError(`Failed to load image: ${error.message}`);
     
     toast({
