@@ -1,13 +1,13 @@
 import { Comment } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { CommentHeader } from "./CommentHeader";
 import { CommentContent } from "./CommentContent";
-import { CommentVotes } from "./CommentVotes";
+import { CommentVoteSection } from "./CommentVoteSection";
+import { CommentActions } from "./CommentActions";
+import { CommentReplyForm } from "./CommentReplyForm";
+import { CommentReplies } from "./CommentReplies";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageSquarePlus, ChevronDown, ChevronRight } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 
 interface CommentItemProps {
@@ -77,11 +77,9 @@ export const CommentItem = ({
       if (type === 'down') setDownvotes(prev => prev - 1);
       setVoteStatus(null);
     } else {
-      // If changing vote type, remove old vote first
       if (voteStatus === 'up') setUpvotes(prev => prev - 1);
       if (voteStatus === 'down') setDownvotes(prev => prev - 1);
       
-      // Add new vote
       if (type === 'up') setUpvotes(prev => prev + 1);
       if (type === 'down') setDownvotes(prev => prev + 1);
       setVoteStatus(type);
@@ -106,7 +104,6 @@ export const CommentItem = ({
           });
       }
 
-      // Update the comment's vote counts in the database
       await supabase
         .from('Comments')
         .update({
@@ -116,7 +113,6 @@ export const CommentItem = ({
         .eq('id', comment.id);
     } catch (error) {
       console.error('Error updating vote:', error);
-      // Revert optimistic updates on error
       setVoteStatus(voteStatus);
       setUpvotes(comment.upvotes || 0);
       setDownvotes(comment.downvotes || 0);
@@ -143,7 +139,7 @@ export const CommentItem = ({
       setReplies(prev => [...prev, newComment]);
       setReplyContent('');
       setIsReplying(false);
-      setIsExpanded(true); // Auto-expand when adding a new reply
+      setIsExpanded(true);
       
       if (onReplyAdded) {
         onReplyAdded(newComment);
@@ -163,16 +159,13 @@ export const CommentItem = ({
     }
   };
 
-  // Limit nesting level to 3 to prevent deep threads
-  const maxLevel = 3;
-
   return (
     <div className={`${level > 0 ? 'ml-6' : ''}`}>
       <Card className="p-4">
         <CommentHeader comment={comment} />
         <CommentContent comment={comment} />
         <div className="mt-2 flex items-center space-x-4">
-          <CommentVotes
+          <CommentVoteSection
             commentId={comment.id}
             upvotes={upvotes}
             downvotes={downvotes}
@@ -180,75 +173,33 @@ export const CommentItem = ({
             voteStatus={voteStatus}
             onVoteChange={handleVoteChange}
           />
-          {currentUserId && level < maxLevel && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsReplying(!isReplying)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <MessageSquarePlus className="h-4 w-4 mr-2" />
-              Reply
-            </Button>
-          )}
-          {replies.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="text-muted-foreground hover:text-foreground ml-auto"
-            >
-              {isExpanded ? (
-                <ChevronDown className="h-4 w-4 mr-1" />
-              ) : (
-                <ChevronRight className="h-4 w-4 mr-1" />
-              )}
-              {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
-            </Button>
-          )}
+          <CommentActions
+            currentUserId={currentUserId}
+            level={level}
+            repliesCount={replies.length}
+            isExpanded={isExpanded}
+            onReplyClick={() => setIsReplying(!isReplying)}
+            onExpandClick={() => setIsExpanded(!isExpanded)}
+          />
         </div>
 
         {isReplying && (
-          <div className="mt-4 space-y-2">
-            <Textarea
-              value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
-              placeholder="Write your reply..."
-              className="min-h-[100px]"
-            />
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsReplying(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleReply}
-                disabled={!replyContent.trim()}
-              >
-                Post Reply
-              </Button>
-            </div>
-          </div>
+          <CommentReplyForm
+            replyContent={replyContent}
+            onReplyChange={setReplyContent}
+            onReplySubmit={handleReply}
+            onReplyCancel={() => setIsReplying(false)}
+          />
         )}
       </Card>
 
-      {replies.length > 0 && isExpanded && (
-        <div className="mt-2 space-y-2">
-          {replies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              currentUserId={currentUserId}
-              level={level + 1}
-              onReplyAdded={onReplyAdded}
-            />
-          ))}
-        </div>
-      )}
+      <CommentReplies
+        replies={replies}
+        currentUserId={currentUserId}
+        level={level}
+        isExpanded={isExpanded}
+        onReplyAdded={onReplyAdded}
+      />
     </div>
   );
 };
