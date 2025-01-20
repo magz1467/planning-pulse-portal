@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Share, FileCheck } from "lucide-react";
 import { PetitionReasons } from "./petition/PetitionReasons";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PetitionSharing } from "./petition/PetitionSharing";
@@ -35,36 +34,22 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
     <Card className="p-6 border-2 border-primary/20 shadow-lg hover:border-primary/40 transition-all duration-300">
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <Button
-            variant="ghost"
-            className="w-full flex items-center justify-between group hover:bg-primary/5"
-            onClick={() => setShowReasons(true)}
-          >
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <FileText className="h-5 w-5 text-primary" />
-              </div>
-              <div className="text-left">
-                <h3 className="font-semibold text-lg text-primary">Create Petition</h3>
-                <p className="text-sm text-gray-600">Rally support</p>
-              </div>
-            </div>
-            <span className="text-primary text-sm font-medium">
-              Start →
-            </span>
-          </Button>
+          <div className="space-y-2">
+            <h3 className="font-playfair text-2xl text-primary">Create Petition</h3>
+            <p className="text-sm text-secondary">Rally support</p>
+          </div>
 
           <div className="space-y-5 pl-4 pt-2">
             <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+              <span className="text-primary text-xl">📝</span>
               <p className="text-sm text-gray-600">Instant petition creation to challenge applications</p>
             </div>
             <div className="flex items-start gap-3">
-              <Share className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+              <span className="text-primary text-xl">🌟</span>
               <p className="text-sm text-gray-600">Easy share with your local network</p>
             </div>
             <div className="flex items-start gap-3">
-              <FileCheck className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+              <span className="text-primary text-xl">📨</span>
               <p className="text-sm text-gray-600">Template ready for you to send to the council</p>
             </div>
           </div>
@@ -80,6 +65,14 @@ export const CreatePetition = ({ applicationId }: CreatePetitionProps) => {
           />
         </div>
       </div>
+
+      <Button
+        variant="default"
+        className="w-full mt-8 bg-secondary hover:bg-secondary/90 text-white py-6 text-lg font-semibold"
+        onClick={() => setShowReasons(true)}
+      >
+        Start Your Petition →
+      </Button>
 
       <Dialog open={showReasons} onOpenChange={setShowReasons}>
         <DialogContent className="sm:max-w-[425px]">
