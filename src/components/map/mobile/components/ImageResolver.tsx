@@ -40,16 +40,35 @@ export const ImageResolver = ({
       image_map_url: imageMapUrl,
       image,
       currentImageSource,
-      class_3
+      class_3,
+      title
     });
 
     // Reset error state when props change
     setHasError(false);
 
-    // Use category image if class_3 is available
-    if (class_3 && CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]) {
-      console.log('ImageResolver - Using category image for:', class_3);
-      setCurrentImageSource(CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]);
+    // First try to determine category from title if class_3 is not set
+    let detectedCategory = class_3;
+    if (!detectedCategory && title) {
+      const titleLower = title.toLowerCase();
+      if (titleLower.includes('demolition')) {
+        detectedCategory = 'Demolition';
+      } else if (titleLower.includes('extension')) {
+        detectedCategory = 'Extension';
+      } else if (titleLower.includes('new build')) {
+        detectedCategory = 'New Build';
+      } else if (titleLower.includes('change of use')) {
+        detectedCategory = 'Change of Use';
+      } else if (titleLower.includes('listed building')) {
+        detectedCategory = 'Listed Building';
+      }
+      console.log('ImageResolver - Detected category from title:', detectedCategory);
+    }
+    
+    // Use category image if available
+    if (detectedCategory && CATEGORY_IMAGES[detectedCategory as keyof typeof CATEGORY_IMAGES]) {
+      console.log('ImageResolver - Using category image for:', detectedCategory);
+      setCurrentImageSource(CATEGORY_IMAGES[detectedCategory as keyof typeof CATEGORY_IMAGES]);
       return;
     }
     
@@ -62,7 +81,7 @@ export const ImageResolver = ({
     // Finally use miscellaneous category image as fallback
     console.log('ImageResolver - Using miscellaneous category image');
     setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
-  }, [imageMapUrl, image, applicationId, class_3]);
+  }, [imageMapUrl, image, applicationId, class_3, title]);
 
   const handleImageError = () => {
     console.log('ImageResolver - Error loading image:', currentImageSource);
