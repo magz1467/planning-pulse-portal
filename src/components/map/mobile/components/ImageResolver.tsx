@@ -35,7 +35,7 @@ export const ImageResolver = ({
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    console.log('ApplicationImage - Initial State:', {
+    console.log('ImageResolver - Initial State:', {
       applicationId,
       image_map_url: imageMapUrl,
       image,
@@ -57,17 +57,17 @@ export const ImageResolver = ({
     // Use category-specific image based on class_3
     else if (class_3 && CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]) {
       setCurrentImageSource(CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]);
-      console.log('ApplicationImage - Using category image for:', class_3);
+      console.log('ImageResolver - Using category image for:', class_3);
     }
     // Finally use miscellaneous category image as fallback
     else {
-      console.log('ApplicationImage - Using miscellaneous category image');
+      console.log('ImageResolver - Using miscellaneous category image');
       setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
     }
   }, [imageMapUrl, image, applicationId, class_3]);
 
   const handleImageError = () => {
-    console.log('ApplicationImage - Error loading image:', currentImageSource);
+    console.log('ImageResolver - Error loading image:', currentImageSource);
     setHasError(true);
     
     // If current source failed, try the category image
