@@ -18,7 +18,7 @@ const CATEGORY_IMAGES = {
   'Residential': 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=60',
   'Infrastructure': 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=800&auto=format&fit=crop&q=60',
   'Planning Conditions': '/lovable-uploads/c5f375f5-c862-4a11-a43e-7dbac6a9085a.png',
-  'Miscellaneous': '/lovable-uploads/8e72e46c-85ce-497d-811e-9f03eaabded2.png'
+  'Miscellaneous': '/lovable-uploads/e22c5043-4a12-4668-96a9-ec4185b9b1dd.png'
 };
 
 export const ApplicationImage = ({ application }: ApplicationImageProps) => {
@@ -37,7 +37,7 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
       });
 
       try {
-        // Try image_map_url first
+        // Try to use the map image first
         if (application.image_map_url) {
           const response = await fetch(application.image_map_url);
           if (response.ok) {
@@ -70,7 +70,10 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
         // Finally use category image or default
         const categoryImage = application.class_3 ? CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES] : CATEGORY_IMAGES['Miscellaneous'];
         setImageSource(categoryImage);
-        console.log('ApplicationImage - Using category image:', categoryImage);
+        console.log('ApplicationImage - Using category image:', {
+          class_3: application.class_3,
+          image: categoryImage
+        });
 
       } catch (error) {
         console.error('ApplicationImage - Error loading image:', error);
