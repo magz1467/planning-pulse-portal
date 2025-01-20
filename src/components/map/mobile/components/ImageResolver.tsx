@@ -11,7 +11,7 @@ const CATEGORY_IMAGES = {
   'Residential': 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=60',
   'Infrastructure': 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=800&auto=format&fit=crop&q=60',
   'Planning Conditions': '/lovable-uploads/c5f375f5-c862-4a11-a43e-7dbac6a9085a.png',
-  'Miscellaneous': '/lovable-uploads/e22c5043-4a12-4668-96a9-ec4185b9b1dd.png'
+  'Miscellaneous': '/lovable-uploads/ce773ff2-12e2-463a-b81e-1042a334d0cc.png'
 };
 
 interface ImageResolverProps {
