@@ -33,7 +33,8 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
         applicationId: application.id,
         image_map_url: application.image_map_url,
         image: application.image,
-        currentImageSource: imageSource
+        currentImageSource: imageSource,
+        class_3: application.class_3
       });
 
       try {

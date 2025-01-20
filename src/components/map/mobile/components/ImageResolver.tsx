@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 
-interface ImageResolverProps {
-  imageMapUrl: string | null;
-  image: string | undefined;
-  title: string;
-  applicationId: number;
-  coordinates?: [number, number];
-  class_3?: string | null;
-}
-
-// Category-specific image mapping
+// Category-specific image mapping - same as ApplicationImage
 const CATEGORY_IMAGES = {
   'Demolition': '/lovable-uploads/7448dbb9-9558-4d5b-abd8-b9a086dc632c.png',
   'Extension': '/lovable-uploads/3d400936-3af5-4445-b768-a9342b176d2f.png',
@@ -20,8 +11,17 @@ const CATEGORY_IMAGES = {
   'Residential': 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=60',
   'Infrastructure': 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=800&auto=format&fit=crop&q=60',
   'Planning Conditions': '/lovable-uploads/c5f375f5-c862-4a11-a43e-7dbac6a9085a.png',
-  'Miscellaneous': '/lovable-uploads/8e72e46c-85ce-497d-811e-9f03eaabded2.png'
+  'Miscellaneous': '/lovable-uploads/e22c5043-4a12-4668-96a9-ec4185b9b1dd.png'
 };
+
+interface ImageResolverProps {
+  imageMapUrl: string | null;
+  image: string | undefined;
+  title: string;
+  applicationId: number;
+  coordinates?: [number, number];
+  class_3?: string | null;
+}
 
 export const ImageResolver = ({ 
   imageMapUrl, 
