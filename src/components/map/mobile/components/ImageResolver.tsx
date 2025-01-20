@@ -46,36 +46,28 @@ export const ImageResolver = ({
     // Reset error state when props change
     setHasError(false);
 
-    // Try to use the map image first
-    if (imageMapUrl) {
-      setCurrentImageSource(imageMapUrl);
-    }
-    // Then try the regular image
-    else if (image && image !== '/placeholder.svg') {
-      setCurrentImageSource(image);
-    }
-    // Use category-specific image based on class_3
-    else if (class_3 && CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]) {
-      setCurrentImageSource(CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]);
+    // Use category image if class_3 is available
+    if (class_3 && CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]) {
       console.log('ImageResolver - Using category image for:', class_3);
+      setCurrentImageSource(CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]);
+      return;
     }
+    
+    // Then try the regular image
+    if (image && image !== '/placeholder.svg') {
+      setCurrentImageSource(image);
+      return;
+    }
+
     // Finally use miscellaneous category image as fallback
-    else {
-      console.log('ImageResolver - Using miscellaneous category image');
-      setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
-    }
+    console.log('ImageResolver - Using miscellaneous category image');
+    setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
   }, [imageMapUrl, image, applicationId, class_3]);
 
   const handleImageError = () => {
     console.log('ImageResolver - Error loading image:', currentImageSource);
     setHasError(true);
-    
-    // If current source failed, try the category image
-    if (class_3 && CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]) {
-      setCurrentImageSource(CATEGORY_IMAGES[class_3 as keyof typeof CATEGORY_IMAGES]);
-    } else {
-      setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
-    }
+    setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
   };
 
   if (!currentImageSource || hasError) {

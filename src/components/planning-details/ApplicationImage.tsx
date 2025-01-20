@@ -27,63 +27,30 @@ export const ApplicationImage = ({ application }: ApplicationImageProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const loadImage = async () => {
-      // Log initial state
-      console.log('ApplicationImage - Initial State:', {
-        applicationId: application.id,
-        image_map_url: application.image_map_url,
-        image: application.image,
-        currentImageSource: imageSource,
-        class_3: application.class_3
-      });
+    console.log('ApplicationImage - Initial State:', {
+      applicationId: application.id,
+      image_map_url: application.image_map_url,
+      image: application.image,
+      currentImageSource: imageSource,
+      class_3: application.class_3
+    });
 
-      try {
-        // Try to use the map image first
-        if (application.image_map_url) {
-          const response = await fetch(application.image_map_url);
-          if (response.ok) {
-            setImageSource(application.image_map_url);
-            console.log('ApplicationImage - Using image_map_url:', application.image_map_url);
-            return;
-          } else {
-            console.warn('ApplicationImage - image_map_url failed to load:', {
-              url: application.image_map_url,
-              status: response.status
-            });
-          }
-        }
+    // Use category image if class_3 is available
+    if (application.class_3 && CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES]) {
+      console.log('ApplicationImage - Using category image for:', application.class_3);
+      setImageSource(CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES]);
+      return;
+    }
 
-        // Then try application.image
-        if (application.image && application.image !== '/placeholder.svg') {
-          const response = await fetch(application.image);
-          if (response.ok) {
-            setImageSource(application.image);
-            console.log('ApplicationImage - Using application.image:', application.image);
-            return;
-          } else {
-            console.warn('ApplicationImage - application.image failed to load:', {
-              url: application.image,
-              status: response.status
-            });
-          }
-        }
+    // Then try the regular image
+    if (application.image && application.image !== '/placeholder.svg') {
+      setImageSource(application.image);
+      return;
+    }
 
-        // Finally use category image or default
-        const categoryImage = application.class_3 ? CATEGORY_IMAGES[application.class_3 as keyof typeof CATEGORY_IMAGES] : CATEGORY_IMAGES['Miscellaneous'];
-        setImageSource(categoryImage);
-        console.log('ApplicationImage - Using category image:', {
-          class_3: application.class_3,
-          image: categoryImage
-        });
-
-      } catch (error) {
-        console.error('ApplicationImage - Error loading image:', error);
-        setImageSource(CATEGORY_IMAGES['Miscellaneous']);
-        setImageError(`Failed to load image: ${error.message}`);
-      }
-    };
-
-    loadImage();
+    // Finally use miscellaneous category image as fallback
+    console.log('ApplicationImage - Using miscellaneous category image');
+    setImageSource(CATEGORY_IMAGES['Miscellaneous']);
   }, [application.id, application.image, application.image_map_url, application.class_3]);
 
   const handleImageError = (error: any) => {
