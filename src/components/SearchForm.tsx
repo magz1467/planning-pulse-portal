@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchFormProps {
   activeTab?: string;
@@ -13,12 +14,14 @@ interface SearchFormProps {
 export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
   const [postcode, setPostcode] = useState('');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const logSearch = async (postcode: string) => {
     try {
       console.log('Logging search from SearchForm:', {
         postcode,
-        status: activeTab
+        status: activeTab,
+        timestamp: new Date().toISOString()
       });
 
       const { data: { session } } = await supabase.auth.getSession();
@@ -31,6 +34,11 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
 
       if (error) {
         console.error('Error logging search:', error);
+        toast({
+          title: "Analytics Error",
+          description: "Your search was processed but we couldn't log it. This won't affect your results.",
+          variant: "default",
+        });
       } else {
         console.log('Search logged successfully from SearchForm');
       }

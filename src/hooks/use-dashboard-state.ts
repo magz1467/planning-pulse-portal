@@ -83,10 +83,11 @@ export const useDashboardState = () => {
 
   const logSearch = async (loadTime: number) => {
     try {
-      console.log('Logging search:', {
+      console.log('Logging search from useDashboardState:', {
         postcode,
         status: initialTab,
-        loadTime
+        loadTime,
+        timestamp: new Date().toISOString()
       });
 
       const { data: { session } } = await supabase.auth.getSession();
@@ -106,7 +107,7 @@ export const useDashboardState = () => {
           variant: "default",
         });
       } else {
-        console.log('Search logged successfully');
+        console.log('Search logged successfully from useDashboardState');
       }
     } catch (error) {
       console.error('Search logging error:', error);
