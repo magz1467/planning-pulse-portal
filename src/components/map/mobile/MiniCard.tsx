@@ -1,8 +1,8 @@
 import { Application } from "@/types/planning";
-import { Card } from "@/components/ui/card";
+import { MapPin } from "lucide-react";
+import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 import { ImageResolver } from "./components/ImageResolver";
-import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 
 interface MiniCardProps {
   application: Application;
@@ -26,7 +26,12 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
           <h3 className="font-semibold text-primary mb-1 line-clamp-2">
             <ApplicationTitle title={application.engaging_title || application.description || ''} />
           </h3>
-          <p className="text-sm text-gray-600 mb-2 line-clamp-2">{application.address}</p>
+          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3 h-3" />
+              {application.address}
+            </span>
+          </p>
           <div className="flex items-center gap-2">
             <ApplicationBadges
               status={application.status}
