@@ -83,6 +83,12 @@ export const useDashboardState = () => {
 
   const logSearch = async (loadTime: number) => {
     try {
+      console.log('Logging search:', {
+        postcode,
+        status: initialTab,
+        loadTime
+      });
+
       const { data: { session } } = await supabase.auth.getSession();
       
       const { error } = await supabase.from('Searches').insert({
@@ -99,6 +105,8 @@ export const useDashboardState = () => {
           description: "Your search was processed but we couldn't log it. This won't affect your results.",
           variant: "default",
         });
+      } else {
+        console.log('Search logged successfully');
       }
     } catch (error) {
       console.error('Search logging error:', error);
@@ -157,6 +165,7 @@ export const useDashboardState = () => {
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
       const loadTime = (Date.now() - searchStartTime) / 1000;
+      console.log('Search completed, logging with load time:', loadTime);
       logSearch(loadTime);
       setSearchStartTime(null);
       setIsSearching(false);

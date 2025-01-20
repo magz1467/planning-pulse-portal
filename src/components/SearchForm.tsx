@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SearchFormProps {
   activeTab?: string;
@@ -13,6 +14,31 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
   const [postcode, setPostcode] = useState('');
   const navigate = useNavigate();
 
+  const logSearch = async (postcode: string) => {
+    try {
+      console.log('Logging search from SearchForm:', {
+        postcode,
+        status: activeTab
+      });
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase.from('Searches').insert({
+        'Post Code': postcode,
+        'Status': activeTab,
+        'User_logged_in': !!session?.user
+      });
+
+      if (error) {
+        console.error('Error logging search:', error);
+      } else {
+        console.log('Search logged successfully from SearchForm');
+      }
+    } catch (error) {
+      console.error('Error logging search:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -20,14 +46,18 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
       return;
     }
 
+    const trimmedPostcode = postcode.trim();
+
     if (onSearch) {
-      onSearch(postcode.trim());
+      onSearch(trimmedPostcode);
     }
 
     try {
+      await logSearch(trimmedPostcode);
+      
       navigate('/applications/dashboard/map', { 
         state: { 
-          postcode: postcode.trim(),
+          postcode: trimmedPostcode,
           tab: activeTab
         }
       });
