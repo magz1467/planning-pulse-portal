@@ -6,6 +6,10 @@ import { HeroTestimonial } from "./HeroTestimonial";
 import Image from "@/components/ui/image";
 
 export const HeroContent = () => {
+  const handleSearch = (postcode: string) => {
+    // This is an empty implementation since we're using the default navigation behavior
+  };
+
   return (
     <div className="space-y-3">
       <HeroTitle />
@@ -24,7 +28,7 @@ export const HeroContent = () => {
         />
       </div>
       <div className="bg-white rounded-xl shadow-sm p-2">
-        <SearchForm />
+        <SearchForm onSearch={handleSearch} />
       </div>
       <HeroTestimonial />
     </div>

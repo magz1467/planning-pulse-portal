@@ -6,7 +6,7 @@ import { useSearchLogger } from "@/hooks/use-search-logger";
 
 interface SearchFormProps {
   activeTab?: string;
-  onSearch: (postcode: string) => void;
+  onSearch?: (postcode: string) => void;
 }
 
 export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
@@ -34,7 +34,7 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
     <div className="w-full max-w-lg mx-auto">
       <div className="relative">
         <PostcodeSearch
-          onPostcodeSelect={handleSearch}
+          onSelect={handleSearch}
           placeholder="Enter your postcode"
           className="w-full"
         />
