@@ -83,8 +83,8 @@ export const ClassificationFilters = ({
             variant={isActive ? "default" : "outline"}
             className={cn(
               "flex flex-col items-center gap-1 py-2 h-auto min-w-[80px] whitespace-nowrap bg-transparent",
-              isActive && "bg-primary text-primary-foreground",
-              !isActive && "hover:bg-primary/5"
+              isActive && "bg-[#7ab0a9] text-primary-foreground", // Darker Tiffany Blue for active state
+              !isActive && "hover:bg-[#9cd0c9]" // Lighter Tiffany Blue for hover
             )}
             onClick={() => onFilterChange("classification", isActive ? "" : filter.value)}
           >
