@@ -69,8 +69,6 @@ export const MobileApplicationCards = ({
           <div 
             className="fixed bottom-0 left-0 right-0 z-[1000] touch-pan-y"
             onClick={() => setShowFullDetails(true)}
-            onTouchStart={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
           >
             <MiniCard
               application={selectedApp}
