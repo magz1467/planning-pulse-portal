@@ -65,14 +65,8 @@ export const FilterBar = ({
           applications={applications}
           statusCounts={statusCounts}
           isMapView={isMapView || false}
-          onToggleView={() => onToggleView?.()}
+          onToggleView={onToggleView}
         />
-
-        {onToggleView && (
-          <div className="ml-auto">
-            <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
-          </div>
-        )}
       </div>
     </div>
   );
