@@ -66,7 +66,9 @@ export const useApplicationsData = () => {
         console.error('❌ Error fetching applications:', error);
         setError({
           message: 'Error fetching applications',
-          details: error.message
+          details: error.message === "canceling statement due to statement timeout" 
+            ? "The search took too long. Please try a smaller radius or different location."
+            : error.message
         });
         setApplications([]);
         setTotalCount(0);
