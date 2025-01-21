@@ -4,7 +4,6 @@ import { SidebarSection } from "./SidebarSection";
 import { DashboardHeader } from "./DashboardHeader";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { FilterControls } from "@/components/map/filter/FilterControls";
 import { SortType } from "@/hooks/use-sort-applications";
 
 interface DashboardLayoutProps {
@@ -51,23 +50,10 @@ export const DashboardLayout = ({
         onFilterChange={handleFilterChange}
         onSortChange={handleSortChange}
         activeFilters={activeFilters}
-        activeSort={activeSort}
+        activeSort={activeSort || 'newest'}
         isMapView={isMapView}
         onToggleView={() => setIsMapView(!isMapView)}
       />
-      
-      <div className="p-4 border-b">
-        <FilterControls 
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          activeFilters={activeFilters}
-          activeSort={activeSort || null}
-          isMobile={isMobile}
-          applications={applications}
-          isMapView={isMapView}
-          onToggleView={() => setIsMapView(!isMapView)}
-        />
-      </div>
       
       <div className="flex flex-1 min-h-0 relative">
         {isLoading && <LoadingOverlay />}
