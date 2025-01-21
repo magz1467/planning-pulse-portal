@@ -20,6 +20,9 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
     });
   }, [comments, applicationId, isLoading]);
 
+  // Filter to only show top-level comments (those without a parent_id)
+  const topLevelComments = comments.filter(comment => !comment.parent_id);
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -33,7 +36,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
   return (
     <div className="space-y-4">
       <CommentForm applicationId={applicationId} setComments={setComments} />
-      {comments?.map((comment) => (
+      {topLevelComments?.map((comment) => (
         <CommentItem 
           key={comment.id} 
           comment={comment}
