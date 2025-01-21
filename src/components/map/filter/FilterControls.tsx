@@ -42,8 +42,8 @@ export const FilterControls = ({
   })();
 
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar w-full">
-      <div className="flex items-center gap-1.5 min-w-max">
+    <div className="flex overflow-x-auto hide-scrollbar w-full no-wrap">
+      <div className="flex items-center gap-1.5 flex-nowrap">
         <ErrorBoundary>
           <StatusFilter
             onFilterChange={onFilterChange}
