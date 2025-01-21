@@ -48,13 +48,13 @@ export const useApplicationsData = () => {
       const { data, error } = await supabase.rpc(
         'get_applications_with_counts_optimized',
         {
-          center_lng: center[1],
           center_lat: center[0],
+          center_lng: center[1], 
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
         }
-      );
+      ).timeout(30000); // 30 second timeout
 
       if (error) {
         console.error('❌ Error fetching applications:', error);
@@ -66,7 +66,9 @@ export const useApplicationsData = () => {
         setTotalCount(0);
         toast({
           title: "Error loading applications",
-          description: "Please try again later",
+          description: error.message === "canceling statement due to statement timeout" 
+            ? "The search took too long. Please try a smaller radius or different location."
+            : "Please try again later",
           variant: "destructive"
         });
         return;
