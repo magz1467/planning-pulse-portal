@@ -1,8 +1,7 @@
 import { useState } from "react"
 import { useAlertSignup } from "@/hooks/useAlertSignup"
 import { EmailDialog } from "./EmailDialog"
-import { AlertSignupButton } from "./alerts/AlertSignupButton"
-import { SubscribedAlert } from "./alerts/SubscribedAlert"
+import { Button } from "@/components/ui/button"
 import { supabase } from "@/integrations/supabase/client"
 import { AlertSignupLoggedOut } from "./alerts/AlertSignupLoggedOut"
 
@@ -37,20 +36,17 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
 
   return (
     <>
-      <div className="p-4 bg-[#8bc5be]/10 rounded-lg mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Bell className="text-[#8bc5be]" size={20} />
-          <h3 className="font-medium text-[#8bc5be]">Get Updates for This Area</h3>
-        </div>
-        <p className="text-gray-600 mb-4">
-          Stay informed about new planning applications near {postcode}
+      <div className="p-6 bg-primary rounded-lg mb-4">
+        <h2 className="text-2xl font-playfair text-white mb-3">Your Feed for Your Area</h2>
+        <p className="text-white/90 mb-6">
+          Showing high-impact developments recently listed near {postcode}. These applications may significantly affect your neighborhood.
         </p>
         <Button 
-          className="w-full bg-[#8bc5be] hover:bg-[#8bc5be]/90"
+          className="w-full bg-white hover:bg-white/90 text-primary font-medium"
           onClick={() => setShowEmailDialog(true)}
           disabled={isSubscribed || isLoading}
         >
-          {isLoading ? "Setting up..." : isSubscribed ? "Subscribed" : "Get Alerts"}
+          Get Alerts
         </Button>
       </div>
       <EmailDialog 
