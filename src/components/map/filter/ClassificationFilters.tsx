@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Award, Film, Tree, Hammer, Home, House, Trees } from "lucide-react";
+import { Award, Film, Trees, Hammer, Home, House } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ClassificationFiltersProps {
@@ -28,7 +28,7 @@ export const ClassificationFilters = ({
     {
       label: "Trees",
       value: "trees",
-      icon: Tree,
+      icon: Trees,
       description: "Tree-related applications",
     },
     {
