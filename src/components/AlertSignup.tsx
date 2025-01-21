@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useAlertSignup } from "@/hooks/useAlertSignup"
 import { EmailDialog } from "./EmailDialog"
-import { Button } from "@/components/ui/button"
+import { AlertSignupButton } from "./alerts/AlertSignupButton"
+import { SubscribedAlert } from "./alerts/SubscribedAlert"
 import { supabase } from "@/integrations/supabase/client"
 import { AlertSignupLoggedOut } from "./alerts/AlertSignupLoggedOut"
 
@@ -36,19 +37,11 @@ export const AlertSignup = ({ postcode }: AlertSignupProps) => {
 
   return (
     <>
-      <div className="p-6 bg-primary rounded-lg mb-4">
-        <h2 className="text-2xl font-playfair text-white mb-3">Your Feed for Your Area</h2>
-        <p className="text-white/90 mb-6">
-          Showing high-impact developments recently listed near {postcode}. These applications may significantly affect your neighborhood.
-        </p>
-        <Button 
-          className="w-full bg-white hover:bg-white/90 text-primary font-medium"
-          onClick={() => setShowEmailDialog(true)}
-          disabled={isSubscribed || isLoading}
-        >
-          Get Alerts
-        </Button>
-      </div>
+      <AlertSignupButton 
+        isSubscribed={isSubscribed}
+        isLoading={isLoading}
+        onClick={() => setShowEmailDialog(true)}
+      />
       <EmailDialog 
         open={showEmailDialog}
         onOpenChange={setShowEmailDialog}
