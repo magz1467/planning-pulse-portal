@@ -60,7 +60,7 @@ export const ClassificationFilters = ({
       value: "other",
       icon: House,
       description: "Other applications",
-    },
+    }
   ];
 
   return (
