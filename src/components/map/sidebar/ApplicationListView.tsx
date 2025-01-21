@@ -2,6 +2,8 @@ import { Application } from "@/types/planning";
 import { FilterBar } from "@/components/FilterBar";
 import { AlertSection } from "./AlertSection";
 import { SortType } from "@/hooks/use-sort-applications";
+import { ImageResolver } from "@/components/map/mobile/components/ImageResolver";
+import { ApplicationBadges } from "@/components/applications/ApplicationBadges";
 
 interface ApplicationListViewProps {
   applications: Application[];
@@ -47,22 +49,37 @@ export const ApplicationListView = ({
         {applications.map((app) => (
           <div
             key={app.id}
-            className="p-4 border-b cursor-pointer hover:bg-gray-50"
+            className="py-3 px-4 border-b cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => onSelectApplication(app.id)}
           >
-            <h3 className="font-semibold text-primary truncate">
-              {app.ai_title || app.description}
-            </h3>
-            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-              {app.address}
-            </p>
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-xs px-2 py-1 rounded-full bg-gray-100">
-                {app.status}
-              </span>
-              <span className="text-xs text-gray-500">
-                {app.distance}
-              </span>
+            <div className="flex gap-3">
+              <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                <ImageResolver
+                  imageMapUrl={app.image_map_url}
+                  image={app.image}
+                  title={app.title || app.description || ''}
+                  applicationId={app.id}
+                  coordinates={app.coordinates}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-primary truncate">
+                  {app.engaging_title || app.description}
+                </h3>
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                  {app.address}
+                </p>
+                <div className="flex flex-col gap-1.5 mt-2">
+                  <ApplicationBadges
+                    status={app.status}
+                    lastDateConsultationComments={app.last_date_consultation_comments}
+                    impactScore={app.final_impact_score}
+                  />
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-500">{app.distance}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ))}
