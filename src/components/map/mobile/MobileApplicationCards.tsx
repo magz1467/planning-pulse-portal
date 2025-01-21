@@ -67,7 +67,7 @@ export const MobileApplicationCards = ({
       <>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <div 
-            className="fixed bottom-0 left-0 right-0 z-[1000] touch-pan-y"
+            className="fixed bottom-0 left-0 right-0 z-[1000]"
             onClick={() => setShowFullDetails(true)}
           >
             <MiniCard
