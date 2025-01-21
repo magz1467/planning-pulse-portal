@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { Card } from "@/components/ui/card";
-import { MapPin, Bookmark, Heart } from "lucide-react";
+import { MapPin, Bookmark, Heart, X } from "lucide-react";
 import { getStatusColor } from "@/utils/statusColors";
 import { ApplicationTitle } from "@/components/applications/ApplicationTitle";
 
@@ -11,8 +11,16 @@ interface ApplicationDetailsProps {
 
 export const ApplicationDetails = ({ application, onClose }: ApplicationDetailsProps) => {
   return (
-    <Card className="p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={onClose}>
-      <div className="flex flex-col gap-4">
+    <Card className="p-4 relative">
+      <button 
+        onClick={onClose}
+        className="absolute top-2 right-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
+        aria-label="Close details"
+      >
+        <X className="h-5 w-5 text-gray-500" />
+      </button>
+      
+      <div className="flex flex-col gap-4 pt-4">
         <div className="flex gap-4">
           {application.image && (
             <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
