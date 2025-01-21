@@ -59,8 +59,8 @@ export const useApplicationsFetch = () => {
         if (rpcError.message.includes('statement timeout') || rpcError.code === '57014') {
           if (retryCount < 3) {
             console.log(`Retry attempt ${retryCount + 1} after timeout`);
-            // Wait a bit before retrying
-            await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+            // Wait a bit before retrying with exponential backoff
+            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
             return fetchApplicationsInRadius(center, radius, page, pageSize, retryCount + 1);
           }
           toast({
