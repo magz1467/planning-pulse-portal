@@ -5,6 +5,7 @@ import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
 import { useApplicationError } from './use-application-error';
 import { useApplicationStatus } from './use-application-status';
+import { toast } from "@/components/ui/use-toast";
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -22,6 +23,11 @@ export const useApplicationsFetch = () => {
     // Don't proceed if coordinates are invalid
     if (!center || !center[0] || !center[1]) {
       console.log('Invalid coordinates provided:', center);
+      toast({
+        title: "Invalid Location",
+        description: "Please provide a valid location to search",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -36,13 +42,7 @@ export const useApplicationsFetch = () => {
     });
 
     try {
-      console.log('📍 Calling Supabase RPC with coordinates:', {
-        lat: center[0],
-        lng: center[1],
-        radius_meters: radius
-      });
-
-      const { data, error } = await supabase.rpc(
+      const { data, error: rpcError } = await supabase.rpc(
         'get_applications_with_counts_optimized',
         {
           center_lat: center[0],
@@ -53,8 +53,17 @@ export const useApplicationsFetch = () => {
         }
       );
 
-      if (error) {
-        handleError(error);
+      if (rpcError) {
+        // Handle timeout errors specifically
+        if (rpcError.message.includes('statement timeout')) {
+          toast({
+            title: "Search Timeout",
+            description: "The search took too long. Please try a smaller radius or different location.",
+            variant: "destructive",
+          });
+        } else {
+          handleError(rpcError);
+        }
         return;
       }
 

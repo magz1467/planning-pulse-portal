@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Application } from "@/types/planning";
 
 interface StatusCounts {
   'Under Review': number;
@@ -15,29 +16,27 @@ export const useApplicationStatus = () => {
     'Other': 0
   });
 
-  const calculateStatusCounts = (applications: any[]) => {
-    const counts = {
+  const calculateStatusCounts = (applications: Application[]) => {
+    const counts = applications.reduce((acc, app) => {
+      const status = app.status?.toLowerCase() || '';
+      if (status.includes('under consideration')) {
+        acc['Under Review']++;
+      } else if (status.includes('approved')) {
+        acc['Approved']++;
+      } else if (status.includes('declined') || status.includes('refused') || status.includes('withdrawn')) {
+        acc['Declined']++;
+      } else {
+        acc['Other']++;
+      }
+      return acc;
+    }, {
       'Under Review': 0,
       'Approved': 0,
       'Declined': 0,
       'Other': 0
-    };
-
-    applications.forEach(app => {
-      const status = app.status.toLowerCase();
-      if (status.includes('under consideration')) {
-        counts['Under Review']++;
-      } else if (status.includes('approved')) {
-        counts['Approved']++;
-      } else if (status.includes('declined')) {
-        counts['Declined']++;
-      } else {
-        counts['Other']++;
-      }
     });
 
     setStatusCounts(counts);
-    console.log('📊 Status counts:', counts);
   };
 
   return {
