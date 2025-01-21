@@ -37,7 +37,7 @@ export const SearchSection = ({
 
   return (
     <div className="bg-white border-b">
-      <div className="container mx-auto px-4 py-3">
+      <div className="py-3">
         <PostcodeSearch
           onSelect={onPostcodeSelect}
           placeholder="Search new location"
@@ -46,7 +46,7 @@ export const SearchSection = ({
 
       {onFilterChange && (
         <div className="w-full border-t">
-          <div className="container mx-auto px-4 py-2">
+          <div className="py-2">
             <FilterBar 
               onFilterChange={onFilterChange}
               onSortChange={onSortChange}
