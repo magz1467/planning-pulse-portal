@@ -1,56 +1,70 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Comment } from '@/types/planning';
+import { Comment } from "@/types/planning";
 
 interface CommentFormProps {
   applicationId: number;
-  setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
+  setComments: (comments: Comment[]) => void;
 }
 
-export const CommentForm = ({
-  applicationId,
-  setComments
-}: CommentFormProps) => {
-  const [content, setContent] = useState('');
+export const CommentForm = ({ applicationId, setComments }: CommentFormProps) => {
+  const [content, setContent] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!content.trim()) return;
 
-    if (!content) return;
-
+    setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from('Comments')
-        .insert([{ application_id: applicationId, comment: content }])
-        .select();
-
-      if (error) {
-        console.error('Error submitting comment:', error);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
         toast({
           title: "Error",
-          description: "Failed to submit comment",
+          description: "You must be logged in to comment",
           variant: "destructive",
         });
         return;
       }
 
-      setComments(prev => [...prev, ...(data || [])]);
-      setContent('');
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', session.user.id)
+        .single();
+
+      const { data: newComment, error } = await supabase
+        .from('Comments')
+        .insert({
+          comment: content.trim(),
+          application_id: applicationId,
+          user_id: session.user.id,
+          user_email: session.user.email,
+        })
+        .select('*, profiles:profiles(username)')
+        .single();
+
+      if (error) throw error;
+
+      setComments(prev => [newComment, ...prev]);
+      setContent("");
       toast({
-        title: "Comment submitted",
-        description: "Your comment has been added",
+        title: "Success",
+        description: "Comment posted successfully",
       });
-    } catch (err) {
-      console.error('Error in handleSubmit:', err);
+    } catch (error) {
+      console.error('Error posting comment:', error);
       toast({
         title: "Error",
-        description: "Failed to submit comment",
+        description: "Failed to post comment",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -59,11 +73,16 @@ export const CommentForm = ({
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Write your comment..."
-        rows={3}
-        required
+        placeholder="Write a comment..."
+        className="min-h-[100px]"
       />
-      <Button type="submit">Submit Comment</Button>
+      <Button 
+        type="submit" 
+        disabled={isSubmitting || !content.trim()}
+        className="w-full sm:w-auto"
+      >
+        {isSubmitting ? "Posting..." : "Post Comment"}
+      </Button>
     </form>
   );
 };
