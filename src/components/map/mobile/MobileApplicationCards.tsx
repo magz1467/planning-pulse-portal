@@ -4,6 +4,8 @@ import { FullScreenDetails } from "./FullScreenDetails";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
+import { Drawer } from "@/components/ui/drawer";
+import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
@@ -17,11 +19,13 @@ export const MobileApplicationCards = ({
   onSelectApplication,
 }: MobileApplicationCardsProps) => {
   const [showFullDetails, setShowFullDetails] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (selectedId === null) {
       setShowFullDetails(false);
+      setIsDrawerOpen(false);
     }
   }, [selectedId]);
 
@@ -56,10 +60,26 @@ export const MobileApplicationCards = ({
 
   if (selectedApp && !showFullDetails) {
     return (
-      <MiniCard
-        application={selectedApp}
-        onClick={() => setShowFullDetails(true)}
-      />
+      <>
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <MiniCard
+            application={selectedApp}
+            onClick={() => setIsDrawerOpen(true)}
+          />
+          <Drawer.Content className="h-[85vh] px-4">
+            <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
+            <PlanningApplicationList
+              applications={applications}
+              postcode=""
+              onSelectApplication={(id) => {
+                onSelectApplication(id);
+                setIsDrawerOpen(false);
+              }}
+              activeSort="newest"
+            />
+          </Drawer.Content>
+        </Drawer>
+      </>
     );
   }
 

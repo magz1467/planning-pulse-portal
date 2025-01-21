@@ -12,7 +12,10 @@ interface MiniCardProps {
 export const MiniCard = ({ application, onClick }: MiniCardProps) => {
   return (
     <div className="fixed bottom-2 left-2 right-2 bg-white border rounded-lg shadow-lg z-[1000]">
-      <div className="flex gap-3 p-4" onClick={onClick}>
+      <div 
+        className="flex gap-3 p-4 cursor-pointer touch-pan-y" 
+        onClick={onClick}
+      >
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <ImageResolver
             imageMapUrl={application.image_map_url}
@@ -41,6 +44,9 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
             <span className="text-xs text-gray-500">{application.distance}</span>
           </div>
         </div>
+      </div>
+      <div className="px-4 pb-2 text-xs text-gray-500 text-center">
+        Pull up to see all applications
       </div>
     </div>
   );
