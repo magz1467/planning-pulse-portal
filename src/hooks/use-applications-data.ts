@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Application } from "@/types/planning";
-import { supabase } from "@/integrations/supabase/client";
-import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
+import { fetchApplicationsInRadius } from './applications/use-applications-fetch';
+import { calculateStatusCounts, StatusCounts } from './applications/use-status-counts';
 
-interface ApplicationError {
+export interface ApplicationError {
   message: string;
   details?: string;
 }
@@ -14,14 +14,14 @@ export const useApplicationsData = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [error, setError] = useState<ApplicationError | null>(null);
-  const [statusCounts, setStatusCounts] = useState({
+  const [statusCounts, setStatusCounts] = useState<StatusCounts>({
     'Under Review': 0,
     'Approved': 0,
     'Declined': 0,
     'Other': 0
   });
 
-  const fetchApplicationsInRadius = async (
+  const fetchApplications = async (
     center: LatLngTuple,
     radius: number,
     page = 0,
@@ -29,93 +29,18 @@ export const useApplicationsData = () => {
   ) => {
     setIsLoading(true);
     setError(null);
-    console.log('🔍 Starting fetch with params:', { 
-      center, 
-      radius, 
-      page, 
-      pageSize,
-      timestamp: new Date().toISOString()
-    });
 
     try {
-      // Single RPC call to get both applications and counts
-      const { data, error } = await supabase
-        .rpc('get_applications_with_counts_optimized', {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: radius,
-          page_size: pageSize,
-          page_number: page
-        });
-
-      if (error) {
-        console.error('Error fetching applications:', error);
-        throw error;
-      }
-
-      if (!data || !data[0]) {
-        console.log('No applications found');
-        setApplications([]);
-        setTotalCount(0);
-        return;
-      }
-
-      const { applications: appsData, total_count, status_counts } = data[0];
-
-      console.log(`📦 Raw applications data:`, appsData?.map(app => ({
-        id: app.id,
-        class_3: app.class_3,
-        title: app.title,
-        final_impact_score: app.final_impact_score
-      })));
-
-      const transformedApplications = appsData
-        ?.map(app => transformApplicationData(app, center))
-        .filter((app): app is Application => app !== null);
-
-      console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
-        id: app.id,
-        class_3: app.class_3,
-        title: app.title,
-        final_impact_score: app.final_impact_score
-      })));
-
-      // Verify sorting
-      console.log('🔄 Verifying impact score ordering:', transformedApplications?.map(app => ({
-        id: app.id,
-        final_impact_score: app.final_impact_score
-      })));
-
-      setApplications(transformedApplications || []);
-      setTotalCount(total_count || 0);
-
-      // Calculate status counts
-      const counts = {
-        'Under Review': 0,
-        'Approved': 0,
-        'Declined': 0,
-        'Other': 0
-      };
-
-      transformedApplications.forEach(app => {
-        const status = app.status.toLowerCase();
-        if (status.includes('under consideration')) {
-          counts['Under Review']++;
-        } else if (status.includes('approved')) {
-          counts['Approved']++;
-        } else if (status.includes('declined')) {
-          counts['Declined']++;
-        } else {
-          counts['Other']++;
-        }
-      });
-
-      setStatusCounts(counts);
-      console.log('📊 Status counts:', counts);
+      const { applications: fetchedApps, totalCount: count } = 
+        await fetchApplicationsInRadius({ center, radius, page, pageSize });
+      
+      setApplications(fetchedApps);
+      setTotalCount(count);
+      setStatusCounts(calculateStatusCounts(fetchedApps));
+      console.log('📊 Status counts:', statusCounts);
 
     } catch (error: any) {
       console.error('Failed to fetch applications:', error);
-      // Show more detailed error information
       console.error('Error details:', {
         message: error.message,
         details: error.details,
@@ -138,6 +63,6 @@ export const useApplicationsData = () => {
     totalCount,
     statusCounts,
     error,
-    fetchApplicationsInRadius,
+    fetchApplicationsInRadius: fetchApplications,
   };
 };
