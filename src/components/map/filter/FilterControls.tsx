@@ -1,10 +1,11 @@
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StatusFilter } from "./StatusFilter";
-import { SortDropdown } from "./SortDropdown";
+import { SortDropdown } from "./SortDropdown"; 
 import { Button } from "@/components/ui/button";
-import { ArrowDownAZ } from "lucide-react";
+import { ArrowDownAZ, ListFilter, List } from "lucide-react";
 import { ClassificationFilters } from "./ClassificationFilters";
 import { SortType } from "@/hooks/use-sort-applications";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterControlsProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -23,6 +24,8 @@ interface FilterControlsProps {
     'Declined': number;
     'Other': number;
   };
+  isMapView?: boolean;
+  onToggleView?: () => void;
 }
 
 export const FilterControls = ({
@@ -32,7 +35,9 @@ export const FilterControls = ({
   activeSort,
   isMobile,
   applications,
-  statusCounts
+  statusCounts,
+  isMapView,
+  onToggleView
 }: FilterControlsProps) => {
   const sortButtonText = (() => {
     if (activeSort === 'closingSoon') return 'Closing Soon';
@@ -55,19 +60,31 @@ export const FilterControls = ({
         </ErrorBoundary>
 
         <ErrorBoundary>
-          <SortDropdown
-            activeSort={activeSort}
-            onSortChange={onSortChange}
-          >
+          {isMobile && isMapView ? (
             <Button
               variant="outline"
-              size={isMobile ? "sm" : "default"}
+              size="sm"
               className="flex items-center gap-1.5 whitespace-nowrap"
+              onClick={onToggleView}
             >
-              <ArrowDownAZ className="h-4 w-4" />
-              {sortButtonText}
+              <List className="h-4 w-4" />
+              Feed
             </Button>
-          </SortDropdown>
+          ) : (
+            <SortDropdown
+              activeSort={activeSort}
+              onSortChange={onSortChange}
+            >
+              <Button
+                variant="outline"
+                size={isMobile ? "sm" : "default"}
+                className="flex items-center gap-1.5 whitespace-nowrap"
+              >
+                <ArrowDownAZ className="h-4 w-4" />
+                {sortButtonText}
+              </Button>
+            </SortDropdown>
+          )}
         </ErrorBoundary>
 
         <ClassificationFilters 
