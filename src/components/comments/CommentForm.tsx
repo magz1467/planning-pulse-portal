@@ -50,7 +50,14 @@ export const CommentForm = ({ applicationId, setComments }: CommentFormProps) =>
 
       if (error) throw error;
 
-      setComments(prev => [newComment, ...prev]);
+      // Get current comments and add new comment
+      const { data: currentComments } = await supabase
+        .from('Comments')
+        .select('*, profiles:profiles(username)')
+        .eq('application_id', applicationId)
+        .order('created_at', { ascending: false });
+
+      setComments(currentComments as Comment[]);
       setContent("");
       toast({
         title: "Success",
