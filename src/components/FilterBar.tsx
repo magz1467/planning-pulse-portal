@@ -67,11 +67,6 @@ export const FilterBar = ({
 
   return (
     <div className="flex flex-col bg-white border-b">
-      <ClassificationFilters 
-        onFilterChange={handleFilterChange}
-        activeFilter={activeFilters.classification}
-      />
-      
       <div className="flex items-center gap-1.5 p-1.5">
         <div className="flex items-center gap-1.5">
           <ErrorBoundary>
@@ -109,6 +104,11 @@ export const FilterBar = ({
           </div>
         )}
       </div>
+      
+      <ClassificationFilters 
+        onFilterChange={handleFilterChange}
+        activeFilter={activeFilters.classification}
+      />
     </div>
   );
 };
