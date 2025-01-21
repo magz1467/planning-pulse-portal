@@ -10,7 +10,7 @@ export async function getApplicationsWithinRadius(
 ) {
   try {
     const { data, error } = await supabase.rpc(
-      'get_applications_with_counts_optimized',
+      'get_applications_within_radius',
       {
         center_lat,
         center_lng,

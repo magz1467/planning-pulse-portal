@@ -2111,7 +2111,7 @@ export type Database = {
           status_counts: Json
         }[]
       }
-      get_applications_with_counts_optimized: {
+      get_applications_within_radius: {
         Args: {
           center_lat: number
           center_lng: number
