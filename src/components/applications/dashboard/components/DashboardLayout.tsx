@@ -14,6 +14,7 @@ interface DashboardLayoutProps {
   activeFilters: {
     status?: string;
     type?: string;
+    classification?: string;
   };
   activeSort: 'closingSoon' | 'newest' | null;
   postcode: string;
@@ -56,10 +57,14 @@ export const DashboardLayout = ({
         onToggleView={() => setIsMapView(!isMapView)}
         applications={applications}
       />
-      <ClassificationFilters 
-        onFilterChange={handleFilterChange}
-        activeFilter={activeFilters.type}
-      />
+      <div className="w-full bg-white border-b px-4 py-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <ClassificationFilters 
+            onFilterChange={handleFilterChange}
+            activeFilter={activeFilters.classification}
+          />
+        </div>
+      </div>
       {!isMobile && (
         <FilterBar
           onFilterChange={handleFilterChange}
@@ -82,9 +87,9 @@ export const DashboardLayout = ({
           activeSort={activeSort}
           isMapView={isMapView}
           isMobile={isMobile}
-          dispatch={({ type, payload }) => {
-            if (type === 'SELECT_APPLICATION') {
-              handleMarkerClick(payload);
+          dispatch={({ type, id }) => {
+            if (type === 'SELECT_APPLICATION' && id) {
+              handleMarkerClick(id);
             }
           }}
           onFilterChange={handleFilterChange}
