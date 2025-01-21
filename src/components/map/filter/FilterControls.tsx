@@ -67,7 +67,7 @@ export const FilterControls = ({
               onClick={onToggleView}
             >
               <List className="h-4 w-4" />
-              Feed
+              Sort
             </Button>
           ) : (
             <SortDropdown
