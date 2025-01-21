@@ -3,6 +3,7 @@ import { Application } from "@/types/planning";
 import { supabase } from "@/integrations/supabase/client";
 import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
+import { toast } from '@/components/ui/use-toast';
 
 interface ApplicationError {
   message: string;
@@ -44,14 +45,16 @@ export const useApplicationsData = () => {
         radius_meters: radius
       });
 
-      const { data: applications, error } = await supabase
-        .rpc('get_applications_within_radius', {
-          center_lng: center[1],
+      const { data, error } = await supabase.rpc(
+        'get_applications_with_counts_optimized',
+        {
           center_lat: center[0],
+          center_lng: center[1],
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        });
+        }
+      );
 
       if (error) {
         console.error('❌ Error fetching applications:', error);
@@ -61,19 +64,24 @@ export const useApplicationsData = () => {
         });
         setApplications([]);
         setTotalCount(0);
+        toast({
+          title: "Error loading applications",
+          description: "Please try again later",
+          variant: "destructive"
+        });
         return;
       }
 
-      if (!applications || !Array.isArray(applications)) {
-        console.log('⚠️ No applications found or invalid response:', applications);
+      if (!data || !Array.isArray(data)) {
+        console.log('⚠️ No applications found or invalid response:', data);
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      console.log(`📦 Received ${applications.length} raw applications`);
+      console.log(`📦 Received ${data.length} raw applications`);
 
-      const transformedApplications = applications
+      const transformedApplications = data
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
@@ -106,12 +114,14 @@ export const useApplicationsData = () => {
       console.log('📊 Status counts:', counts);
 
       // Get total count
-      const { data: countData, error: countError } = await supabase
-        .rpc('get_applications_count_within_radius', {
+      const { data: countData, error: countError } = await supabase.rpc(
+        'get_applications_count_within_radius',
+        {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius
-        });
+        }
+      );
 
       if (countError) {
         console.error('❌ Error fetching count:', countError);
@@ -132,6 +142,11 @@ export const useApplicationsData = () => {
       setError({
         message: 'Failed to fetch applications',
         details: error.message
+      });
+      toast({
+        title: "Error loading applications",
+        description: "Please try again later",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
