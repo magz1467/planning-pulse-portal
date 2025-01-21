@@ -1,10 +1,18 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
-import { FullScreenDetails } from "./FullScreenDetails";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { 
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 
 interface MobileApplicationCardsProps {
@@ -43,21 +51,6 @@ export const MobileApplicationCards = ({
     return <EmptyState />;
   }
 
-  if (showFullDetails && selectedApp) {
-    return (
-      <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
-        <FullScreenDetails
-          application={selectedApp}
-          onClose={() => {
-            setShowFullDetails(false);
-            onSelectApplication(null);
-          }}
-          onCommentSubmit={handleCommentSubmit}
-        />
-      </div>
-    );
-  }
-
   if (selectedApp && !showFullDetails) {
     return (
       <>
@@ -67,7 +60,9 @@ export const MobileApplicationCards = ({
             onClick={() => setIsDrawerOpen(true)}
           />
           <DrawerContent className="h-[85vh] px-4">
-            <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
+            <DrawerHeader>
+              <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
+            </DrawerHeader>
             <PlanningApplicationList
               applications={applications}
               postcode=""
