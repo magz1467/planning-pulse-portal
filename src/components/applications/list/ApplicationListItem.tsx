@@ -31,7 +31,7 @@ export const ApplicationListItem = ({
       <div className="flex gap-3">
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <ImageResolver
-            imageMapUrl={application.image_map_url}
+            image_map_url={application.image_map_url}
             image={application.image}
             title={application.title || application.description || ''}
             applicationId={application.id}
