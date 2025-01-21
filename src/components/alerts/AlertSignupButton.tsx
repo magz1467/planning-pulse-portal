@@ -1,5 +1,5 @@
-import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Bell } from "lucide-react"
 
 interface AlertSignupButtonProps {
   isSubscribed: boolean
@@ -15,11 +15,10 @@ export const AlertSignupButton = ({ isSubscribed, isLoading, onClick }: AlertSig
           <Bell className="text-[#9b87f5]" size={16} />
           <h3 className="font-playfair text-[#9b87f5]">Your Feed</h3>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
+        <Button 
           onClick={onClick}
-          disabled={isSubscribed || isLoading}
+          disabled={isLoading || isSubscribed}
+          size="sm"
           className="h-8"
         >
           <Bell className="h-4 w-4" />
