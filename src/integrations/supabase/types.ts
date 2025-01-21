@@ -2113,8 +2113,8 @@ export type Database = {
       }
       get_applications_with_counts_optimized: {
         Args: {
-          center_lng: number
           center_lat: number
+          center_lng: number
           radius_meters: number
           page_size?: number
           page_number?: number
