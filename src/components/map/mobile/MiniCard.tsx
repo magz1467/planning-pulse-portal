@@ -15,7 +15,7 @@ export const MiniCard = ({ application, onClick }: MiniCardProps) => {
       <div className="flex gap-3 p-4" onClick={onClick}>
         <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
           <ImageResolver
-            image_map_url={application.image_map_url}
+            imageMapUrl={application.image_map_url}
             image={application.image}
             title={application.title || application.description || ''}
             applicationId={application.id}

@@ -6,37 +6,31 @@ import { SortType } from "./use-application-sorting";
 import { useURLState } from "./use-url-state";
 import { useSelectionState } from "./use-selection-state";
 import { useFilterState } from "./use-filter-state";
-import { useDashboardURL } from "./dashboard/use-dashboard-url";
-import { useSearchState } from "./dashboard/use-search-state";
-import { useSearchLogging } from "./dashboard/use-search-logging";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 export const useDashboardState = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
   const { 
     initialPostcode, 
     initialTab, 
     initialFilter,
-    initialApplicationId
+    initialApplicationId,
+    updateURLParams 
   } = useURLState();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
+  // Use the handleMarkerClick from useSelectionState
   const { selectedId, handleMarkerClick } = useSelectionState(initialApplicationId);
   const { activeFilters, handleFilterChange } = useFilterState(initialFilter);
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [isMapView, setIsMapView] = useState(true);
   const [postcode, setPostcode] = useState(initialPostcode || '');
-
-  const {
-    isSearching,
-    setIsSearching,
-    searchStartTime,
-    setSearchStartTime,
-    searchPoint,
-    setSearchPoint,
-    handlePostcodeSelect
-  } = useSearchState();
+  const [searchStartTime, setSearchStartTime] = useState<number | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchPoint, setSearchPoint] = useState<[number, number] | null>(null);
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   const { coordinates, isLoading: isLoadingCoords } = useCoordinates(postcode);
   const { 
@@ -47,11 +41,7 @@ export const useDashboardState = () => {
     error
   } = useApplicationsData();
 
-  const { logSearch } = useSearchLogging();
-  
-  useDashboardURL(postcode, activeFilters, selectedId, initialTab);
-
-  // Handle errors
+  // Show error toast if there's an error fetching applications
   useEffect(() => {
     if (error) {
       toast({
@@ -62,7 +52,6 @@ export const useDashboardState = () => {
     }
   }, [error, toast]);
 
-  // Handle coordinates updates and search
   useEffect(() => {
     if (isSearching && !coordinates) {
       toast({
@@ -75,10 +64,86 @@ export const useDashboardState = () => {
       return;
     }
 
-    const isInitialSearch = !searchPoint && coordinates;
-    const isNewSearch = searchPoint && coordinates && 
-      (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]);
+    try {
+      updateURLParams({
+        postcode,
+        tab: initialTab,
+        filter: activeFilters.status,
+        applicationId: selectedId
+      });
+    } catch (error) {
+      console.error('URL update error:', error);
+      toast({
+        title: "Navigation Error",
+        description: "There was a problem updating the page URL. Please try refreshing the page.",
+        variant: "destructive",
+      });
+    }
+  }, [postcode, initialTab, activeFilters.status, selectedId, updateURLParams, coordinates, isSearching, navigate, toast]);
 
+  const logSearch = async (loadTime: number) => {
+    try {
+      console.log('Logging search from useDashboardState:', {
+        postcode,
+        status: initialTab,
+        loadTime,
+        timestamp: new Date().toISOString()
+      });
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase.from('Searches').insert({
+        'Post Code': postcode,
+        'Status': initialTab,
+        'User_logged_in': !!session?.user,
+        'load_time': loadTime
+      });
+
+      if (error) {
+        console.error('Search logging error:', error);
+        toast({
+          title: "Analytics Error",
+          description: "Your search was processed but we couldn't log it. This won't affect your results.",
+          variant: "default",
+        });
+      } else {
+        console.log('Search logged successfully from useDashboardState');
+      }
+    } catch (error) {
+      console.error('Search logging error:', error);
+    }
+  };
+
+  const handlePostcodeSelect = async (newPostcode: string) => {
+    if (!newPostcode) {
+      toast({
+        title: "Invalid Postcode",
+        description: "Please enter a valid postcode to search.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSearching(true);
+    setSearchStartTime(Date.now());
+    setPostcode(newPostcode);
+  };
+
+  const handleSortChange = (sortType: SortType) => {
+    console.log('Changing sort to:', sortType);
+    setActiveSort(sortType);
+  };
+
+  // Memoize these computed values
+  const isInitialSearch = useMemo(() => !searchPoint && coordinates, [searchPoint, coordinates]);
+  const isNewSearch = useMemo(() => 
+    searchPoint && coordinates && 
+    (searchPoint[0] !== coordinates[0] || searchPoint[1] !== coordinates[1]), 
+    [searchPoint, coordinates]
+  );
+
+  useEffect(() => {
+    if (!coordinates) return;
+    
     if (isInitialSearch || isNewSearch) {
       console.log('Fetching applications with coordinates:', coordinates);
       try {
@@ -96,23 +161,17 @@ export const useDashboardState = () => {
         setIsSearching(false);
       }
     }
-  }, [coordinates, isSearching, navigate, searchPoint, setIsSearching, setSearchPoint, toast, fetchApplicationsInRadius]);
+  }, [coordinates, isInitialSearch, isNewSearch, fetchApplicationsInRadius, toast]);
 
-  // Handle search completion and logging
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
       const loadTime = (Date.now() - searchStartTime) / 1000;
       console.log('Search completed, logging with load time:', loadTime);
-      logSearch(postcode, initialTab, loadTime);
+      logSearch(loadTime);
       setSearchStartTime(null);
       setIsSearching(false);
     }
-  }, [isLoadingApps, isLoadingCoords, searchStartTime, postcode, initialTab, logSearch, setSearchStartTime, setIsSearching]);
-
-  const handleSortChange = (sortType: SortType) => {
-    console.log('Changing sort to:', sortType);
-    setActiveSort(sortType);
-  };
+  }, [isLoadingApps, isLoadingCoords, searchStartTime, postcode]);
 
   const safeApplications = applications || [];
   const filteredApplications = useFilteredApplications(
@@ -121,6 +180,7 @@ export const useDashboardState = () => {
     activeSort
   );
 
+  // Memoize the status counts to prevent unnecessary re-renders
   const defaultStatusCounts = useMemo(() => ({
     'Under Review': 0,
     'Approved': 0,

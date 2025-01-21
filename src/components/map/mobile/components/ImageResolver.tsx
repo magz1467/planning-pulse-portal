@@ -1,82 +1,111 @@
 import { useState, useEffect } from 'react';
-import Image from '@/components/ui/image';
+
+// Category-specific image mapping - same as ApplicationImage
+const CATEGORY_IMAGES = {
+  'Demolition': '/lovable-uploads/7448dbb9-9558-4d5b-abd8-b9a086dc632c.png',
+  'Extension': '/lovable-uploads/b0296cbb-48ab-46ec-9ac1-93c1251ca198.png',
+  'New Build': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=60',
+  'Change of Use': 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop&q=60',
+  'Listed Building': 'https://images.unsplash.com/photo-1464146072230-91cabc968266?w=800&auto=format&fit=crop&q=60',
+  'Commercial': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=60',
+  'Residential': 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop&q=60',
+  'Infrastructure': 'https://images.unsplash.com/photo-1621955964441-c173e01c135b?w=800&auto=format&fit=crop&q=60',
+  'Planning Conditions': '/lovable-uploads/c5f375f5-c862-4a11-a43e-7dbac6a9085a.png',
+  'Miscellaneous': '/lovable-uploads/ce773ff2-12e2-463a-b81e-1042a334d0cc.png'
+};
 
 interface ImageResolverProps {
+  imageMapUrl: string | null;
+  image: string | undefined;
+  title: string;
   applicationId: number;
-  image_map_url: string | null;
-  image?: string;
+  coordinates?: [number, number];
   class_3?: string | null;
-  title?: string;
 }
 
 export const ImageResolver = ({ 
+  imageMapUrl, 
+  image, 
+  title,
   applicationId,
-  image_map_url,
-  image = '/placeholder.svg',
-  class_3,
-  title = ''
+  coordinates,
+  class_3 
 }: ImageResolverProps) => {
   const [currentImageSource, setCurrentImageSource] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    // Log initial state for debugging
     console.log('ImageResolver - Initial State:', {
       applicationId,
-      image_map_url,
+      image_map_url: imageMapUrl,
       image,
       currentImageSource,
       class_3,
       title
     });
 
-    // Helper to detect category from title
-    const detectCategoryFromTitle = (title: string) => {
-      const lowerTitle = title.toLowerCase();
-      if (lowerTitle.includes('demolition') || lowerTitle.includes('demolish')) return 'Demolition';
-      if (lowerTitle.includes('extension') || lowerTitle.includes('extend')) return 'Extension';
-      if (lowerTitle.includes('new build') || lowerTitle.includes('construction')) return 'NewBuild';
-      return null;
-    };
+    // Reset error state when props change
+    setHasError(false);
 
-    const detectedCategory = detectCategoryFromTitle(title);
-    console.log('ImageResolver - Detected category from title:', detectedCategory);
-
-    // Determine the image source
-    const determineImageSource = () => {
-      // First priority: map image if available
-      if (image_map_url) {
-        console.log('ImageResolver - Using map image');
-        return image_map_url;
+    // First try to determine category from title if class_3 is not set
+    let detectedCategory = class_3;
+    if (!detectedCategory && title) {
+      const titleLower = title.toLowerCase();
+      if (titleLower.includes('demolition')) {
+        detectedCategory = 'Demolition';
+      } else if (titleLower.includes('extension')) {
+        detectedCategory = 'Extension';
+      } else if (titleLower.includes('new build')) {
+        detectedCategory = 'New Build';
+      } else if (titleLower.includes('change of use')) {
+        detectedCategory = 'Change of Use';
+      } else if (titleLower.includes('listed building')) {
+        detectedCategory = 'Listed Building';
       }
+      console.log('ImageResolver - Detected category from title:', detectedCategory);
+    }
+    
+    // Use category image if available
+    if (detectedCategory && CATEGORY_IMAGES[detectedCategory as keyof typeof CATEGORY_IMAGES]) {
+      console.log('ImageResolver - Using category image for:', detectedCategory);
+      setCurrentImageSource(CATEGORY_IMAGES[detectedCategory as keyof typeof CATEGORY_IMAGES]);
+      return;
+    }
+    
+    // Then try the regular image
+    if (image && image !== '/placeholder.svg') {
+      setCurrentImageSource(image);
+      return;
+    }
 
-      // Second priority: class_3 based category image
-      if (typeof class_3 === 'string' && class_3) {
-        console.log('ImageResolver - Using category image for:', class_3);
-        return `/category-images/${class_3.toLowerCase()}.jpg`;
-      }
+    // Finally use miscellaneous category image as fallback
+    console.log('ImageResolver - Using miscellaneous category image');
+    setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
+  }, [imageMapUrl, image, applicationId, class_3, title]);
 
-      // Third priority: title-based category detection
-      if (detectedCategory) {
-        console.log('ImageResolver - Using category image for:', detectedCategory);
-        return `/category-images/${detectedCategory.toLowerCase()}.jpg`;
-      }
+  const handleImageError = () => {
+    console.log('ImageResolver - Error loading image:', currentImageSource);
+    setHasError(true);
+    setCurrentImageSource(CATEGORY_IMAGES['Miscellaneous']);
+  };
 
-      // Fallback: use miscellaneous category image
-      console.log('ImageResolver - Using miscellaneous category image');
-      return '/category-images/miscellaneous.jpg';
-    };
-
-    setCurrentImageSource(determineImageSource());
-  }, [applicationId, image_map_url, image, class_3, title]);
+  if (!currentImageSource || hasError) {
+    return (
+      <img
+        src={CATEGORY_IMAGES['Miscellaneous']}
+        alt={title}
+        className="w-full h-full object-cover"
+        onError={handleImageError}
+      />
+    );
+  }
 
   return (
-    <Image
-      src={currentImageSource || image}
-      alt={title || 'Planning application image'}
-      width={300}
-      height={200}
-      className="w-full h-[200px] object-cover rounded-lg"
-      loading="lazy"
+    <img
+      src={currentImageSource}
+      alt={title}
+      className="w-full h-full object-cover"
+      onError={handleImageError}
     />
   );
 };

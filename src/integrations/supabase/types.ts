@@ -2113,8 +2113,8 @@ export type Database = {
       }
       get_applications_with_counts_optimized: {
         Args: {
-          center_lat: number
           center_lng: number
+          center_lat: number
           radius_meters: number
           page_size?: number
           page_number?: number
@@ -2123,6 +2123,82 @@ export type Database = {
           applications: Json
           total_count: number
           status_counts: Json
+        }[]
+      }
+      get_applications_within_radius: {
+        Args: {
+          center_lng: number
+          center_lat: number
+          radius_meters: number
+          page_size?: number
+          page_number?: number
+        }
+        Returns: {
+          actual_commencement_date: string | null
+          actual_completion_date: string | null
+          ai_search_details: Json | null
+          ai_title: string | null
+          appeal_decision: string | null
+          appeal_decision_date: string | null
+          appeal_start_date: string | null
+          appeal_status: string | null
+          application_details: Json | null
+          application_id: number
+          application_type: string | null
+          application_type_full: string | null
+          bo_system: string | null
+          borough: string | null
+          centroid: Json | null
+          centroid_easting: string | null
+          centroid_northing: string | null
+          cil_liability: string | null
+          class_3: string | null
+          classification: string | null
+          date_building_work_completed_under_previous_permission: string | null
+          date_building_work_started_under_previous_permission: string | null
+          decision: string | null
+          decision_agency: string | null
+          decision_conditions: Json | null
+          decision_date: string | null
+          decision_process: string | null
+          decision_target_date: string | null
+          description: string | null
+          development_type: string | null
+          engaging_title: string | null
+          epc_number: string | null
+          final_impact_score: number | null
+          geom: unknown | null
+          id: string
+          image_link: Json | null
+          image_map_url: string | null
+          impact_score: number | null
+          impact_score_details: Json | null
+          impacted_services: Json | null
+          lapsed_date: string | null
+          last_date_consultation_comments: string | null
+          last_synced: string | null
+          last_updated: string | null
+          last_updated_by: string | null
+          locality: string | null
+          lpa_app_no: string | null
+          lpa_name: string | null
+          parking_details: Json | null
+          polygon: Json | null
+          postcode: string | null
+          pp_id: string | null
+          reference_no_of_permission_being_relied_on: string | null
+          secondary_street_name: string | null
+          site_name: string | null
+          site_number: string | null
+          status: string | null
+          street_name: string | null
+          subdivision_of_building: string | null
+          title_number: string | null
+          uprn: string | null
+          url_planning_app: string | null
+          valid_date: string | null
+          ward: string | null
+          wgs84_polygon: Json | null
         }[]
       }
       get_developments_within_distance: {

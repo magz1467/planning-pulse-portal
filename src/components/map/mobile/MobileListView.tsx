@@ -12,7 +12,7 @@ interface MobileListViewProps {
   onSelectApplication: (id: number) => void;
   onShowEmailDialog: () => void;
   hideFilterBar?: boolean;
-  onClose?: () => void;  
+  onClose?: () => void;  // Added this prop definition
 }
 
 export const MobileListView = ({
@@ -65,7 +65,7 @@ export const MobileListView = ({
             <div className="flex gap-4">
               <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                 <ImageResolver
-                  image_map_url={app.image_map_url}
+                  imageMapUrl={app.image_map_url}
                   image={app.image}
                   title={app.title || app.description || ''}
                   applicationId={app.id}

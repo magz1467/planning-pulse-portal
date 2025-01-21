@@ -1,117 +1,77 @@
 import { useState } from 'react';
-import { supabase } from "@/integrations/supabase/client";
 import { Application } from "@/types/planning";
+import { supabase } from "@/integrations/supabase/client";
 import { transformApplicationData } from '@/utils/applicationTransforms';
 import { LatLngTuple } from 'leaflet';
-import { useApplicationError } from './use-application-error';
-import { useApplicationStatus } from './use-application-status';
-import { toast } from "@/components/ui/use-toast";
 
 export const useApplicationsFetch = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const { error, setError, handleError } = useApplicationError();
-  const { statusCounts, calculateStatusCounts } = useApplicationStatus();
 
   const fetchApplicationsInRadius = async (
     center: LatLngTuple,
     radius: number,
     page = 0,
-    pageSize = 100,
-    retryCount = 0
+    pageSize = 100
   ) => {
-    // Don't proceed if coordinates are invalid
-    if (!center || !center[0] || !center[1]) {
-      console.log('Invalid coordinates provided:', center);
-      toast({
-        title: "Invalid Location",
-        description: "Please provide a valid location to search",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
-    setError(null);
-    console.log('🔍 Starting fetch with params:', { 
-      center, 
-      radius, 
-      page, 
-      pageSize,
-      timestamp: new Date().toISOString()
-    });
+    console.log('🔍 Fetching applications:', { center, radius, page, pageSize });
 
     try {
-      const { data, error: rpcError } = await supabase.rpc(
-        'get_applications_with_counts_optimized',
-        {
-          center_lat: center[0],
+      const { data, error } = await supabase
+        .rpc('get_applications_with_counts_optimized', {
           center_lng: center[1],
+          center_lat: center[0],
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
-        }
-      );
+        });
 
-      if (rpcError) {
-        // Handle timeout errors specifically
-        if (rpcError.message.includes('statement timeout') || rpcError.code === '57014') {
-          if (retryCount < 3) {
-            console.log(`Retry attempt ${retryCount + 1} after timeout`);
-            // Wait a bit before retrying with exponential backoff
-            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
-            return fetchApplicationsInRadius(center, radius, page, pageSize, retryCount + 1);
-          }
-          toast({
-            title: "Search Timeout",
-            description: "The search took too long. Please try a smaller radius or different location.",
-            variant: "destructive",
-          });
-        } else {
-          handleError(rpcError);
-        }
-        return;
+      if (error) {
+        console.error('Error fetching applications:', error);
+        throw error;
       }
 
-      if (!data || !Array.isArray(data)) {
-        console.log('⚠️ No applications found or invalid response:', data);
+      if (!data) {
+        console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      // Extract applications from the response
-      const { applications: appsData, total_count } = data[0] || { applications: [], total_count: 0 };
+      const { applications: appsData, total_count, status_counts } = data[0];
 
-      console.log(`📦 Received ${appsData?.length || 0} raw applications`);
+      console.log(`📦 Raw applications data:`, appsData?.map(app => ({
+        id: app.id,
+        class_3: app.class_3,
+        title: app.title
+      })));
 
       const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
-        .filter((app): app is Application => app !== null)
-        // Sort by final_impact_score in descending order
-        .sort((a, b) => {
-          const scoreA = a.final_impact_score || 0;
-          const scoreB = b.final_impact_score || 0;
-          return scoreB - scoreA;
-        });
+        .filter((app): app is Application => app !== null);
 
       console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
         id: app.id,
         class_3: app.class_3,
-        title: app.title,
-        final_impact_score: app.final_impact_score
+        title: app.title
       })));
 
       setApplications(transformedApplications || []);
       setTotalCount(total_count || 0);
-      calculateStatusCounts(transformedApplications || []);
 
     } catch (error: any) {
-      handleError(error);
+      console.error('Failed to fetch applications:', error);
+      // Show more detailed error information
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
     } finally {
       setIsLoading(false);
-      console.log('🏁 Fetch completed');
     }
   };
 
@@ -119,8 +79,6 @@ export const useApplicationsFetch = () => {
     applications,
     isLoading,
     totalCount,
-    statusCounts,
-    error,
     fetchApplicationsInRadius,
   };
 };
