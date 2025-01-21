@@ -46,8 +46,8 @@ export const SearchSection = ({
         />
       </div>
 
-      {onFilterChange && isMobile && (
-        <div className="px-4">
+      {onFilterChange && (
+        <div className="w-full">
           <FilterBar 
             onFilterChange={onFilterChange}
             onSortChange={onSortChange}
