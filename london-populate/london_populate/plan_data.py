@@ -4,7 +4,7 @@ from typing import Generator
 
 SOURCES = [
     "lpa_name",
-    "lpa_app_no",
+    "lpa_app_no", 
     "last_updated",
     "valid_date",
     "decision_date",
@@ -16,7 +16,6 @@ URL = "https://planningdata.london.gov.uk/api-guest/applications/_search"
 
 HEADERS = {"X-API-AllowRequest": "be2rmRnt&",
            "Content-Type": "application/json"}
-
 
 def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
     """
@@ -48,6 +47,7 @@ def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
                     ]
                 }
             },
+            "_source": SOURCES + ["centroid", "geom"]  # Add geom field to source
         }
 
         # Add search_after for pagination if we're not on the first page
@@ -70,8 +70,13 @@ def fetch_planning_data_paginated(size: int = 100) -> Generator[Any, Any, Any]:
                 print("No more hits found, breaking loop")
                 break
 
-            # yield records
-            yield from (hit["_source"] for hit in hits)
+            # Transform and yield records
+            for hit in hits:
+                source = hit["_source"]
+                # Ensure centroid is present and properly formatted
+                if "centroid" in source and isinstance(source["centroid"], dict):
+                    source["geom"] = source["centroid"]  # Use centroid as geometry
+                yield source
 
             # Update total fetched
             total_fetched += len(hits)
