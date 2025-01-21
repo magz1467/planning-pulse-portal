@@ -1,24 +1,36 @@
-import { Link, useNavigate } from "react-router-dom";
+import { FilterBar } from "@/components/FilterBar";
+import { SortType } from "@/hooks/use-sort-applications";
 
-export const DashboardHeader = () => {
-  const navigate = useNavigate();
+interface DashboardHeaderProps {
+  onFilterChange: (filterType: string, value: string) => void;
+  onSortChange: (sortType: SortType) => void;
+  activeFilters: {
+    status?: string;
+    type?: string;
+  };
+  activeSort: SortType;
+  isMapView: boolean;
+  onToggleView: () => void;
+}
 
+export const DashboardHeader = ({
+  onFilterChange,
+  onSortChange,
+  activeFilters,
+  activeSort,
+  isMapView,
+  onToggleView
+}: DashboardHeaderProps) => {
   return (
-    <header className="bg-white">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold font-playfair" 
-              style={{
-                color: "#af5662", // Honeysuckle
-                letterSpacing: "0.05em",
-                textTransform: "lowercase"
-              }}>
-              nimbygram
-            </span>
-          </Link>
-        </div>
-      </div>
-    </header>
+    <div className="border-b bg-white">
+      <FilterBar 
+        onFilterChange={onFilterChange}
+        onSortChange={onSortChange}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+        isMapView={isMapView}
+        onToggleView={onToggleView}
+      />
+    </div>
   );
 };

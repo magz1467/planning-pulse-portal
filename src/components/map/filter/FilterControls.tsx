@@ -19,6 +19,12 @@ interface FilterControlsProps {
   applications?: any[];
   isMapView: boolean;
   onToggleView: () => void;
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
 }
 
 export const FilterControls = ({
@@ -29,7 +35,8 @@ export const FilterControls = ({
   isMobile,
   applications,
   isMapView,
-  onToggleView
+  onToggleView,
+  statusCounts
 }: FilterControlsProps) => {
   const sortButtonText = (() => {
     if (activeSort === 'closingSoon') return 'Closing Soon';
@@ -47,6 +54,7 @@ export const FilterControls = ({
             activeFilters={activeFilters}
             isMobile={isMobile}
             applications={applications}
+            statusCounts={statusCounts}
           />
         </ErrorBoundary>
 

@@ -64,6 +64,8 @@ export const FilterBar = ({
           isMobile={isMobile}
           applications={applications}
           statusCounts={statusCounts}
+          isMapView={isMapView || false}
+          onToggleView={() => onToggleView?.()}
         />
 
         {onToggleView && (
