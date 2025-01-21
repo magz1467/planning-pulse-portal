@@ -4,7 +4,7 @@ import { FullScreenDetails } from "./FullScreenDetails";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
-import { Drawer } from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 
 interface MobileApplicationCardsProps {
@@ -66,7 +66,7 @@ export const MobileApplicationCards = ({
             application={selectedApp}
             onClick={() => setIsDrawerOpen(true)}
           />
-          <Drawer.Content className="h-[85vh] px-4">
+          <DrawerContent className="h-[85vh] px-4">
             <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
             <PlanningApplicationList
               applications={applications}
@@ -77,7 +77,7 @@ export const MobileApplicationCards = ({
               }}
               activeSort="newest"
             />
-          </Drawer.Content>
+          </DrawerContent>
         </Drawer>
       </>
     );
