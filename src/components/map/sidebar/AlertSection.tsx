@@ -1,4 +1,4 @@
-import { Bell } from "lucide-react";
+import { BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -31,24 +31,29 @@ export const AlertSection = ({ postcode, onShowEmailDialog }: AlertSectionProps)
     <div className="p-4 border-b bg-white">
       <div className="flex items-center justify-between p-3 bg-[#f6c8cc]/20 rounded-lg">
         <div className="flex items-center gap-2">
-          <Bell className="text-[#af5662]" size={16} />
+          <BellRing className="text-[#af5662]" size={16} />
           <h3 className="font-playfair font-bold text-[#af5662]">Your Feed</h3>
         </div>
         {session ? (
           <Button 
             size="sm"
-            className="h-8"
+            variant="outline"
+            className="h-8 border-[#f6c8cc] hover:bg-[#f6c8cc]/20 hover:text-[#af5662] text-[#af5662]"
             onClick={onShowEmailDialog}
           >
-            <Bell className="h-4 w-4" />
+            <BellRing className="h-4 w-4" />
           </Button>
         ) : (
           <Link 
             to="/auth" 
             state={{ from: location.pathname, postcode: postcode }}
           >
-            <Button size="sm" className="h-8">
-              <Bell className="h-4 w-4" />
+            <Button 
+              size="sm"
+              variant="outline"
+              className="h-8 border-[#f6c8cc] hover:bg-[#f6c8cc]/20 hover:text-[#af5662] text-[#af5662]"
+            >
+              <BellRing className="h-4 w-4" />
             </Button>
           </Link>
         )}
