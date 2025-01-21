@@ -7,9 +7,10 @@ import { useComments } from './hooks/useComments';
 
 interface CommentListProps {
   applicationId: number;
+  showExisting?: boolean;
 }
 
-export const CommentList = ({ applicationId }: CommentListProps) => {
+export const CommentList = ({ applicationId, showExisting = true }: CommentListProps) => {
   const { comments = [], isLoading, currentUserId, setComments } = useComments(applicationId);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export const CommentList = ({ applicationId }: CommentListProps) => {
   return (
     <div className="space-y-4">
       <CommentForm applicationId={applicationId} setComments={setComments} />
-      {topLevelComments?.map((comment) => (
+      {showExisting && topLevelComments?.map((comment) => (
         <CommentItem 
           key={comment.id} 
           comment={comment}

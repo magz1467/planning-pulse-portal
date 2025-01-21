@@ -15,6 +15,13 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
     <Card className="p-6 border-2 border-primary/20 shadow-sm">
       <div className="space-y-4">
         <div className="border-b border-primary/10 pb-4">
+          <h3 className="font-playfair text-2xl text-primary mb-2">Comments</h3>
+          <p className="text-muted-foreground text-sm">
+            Let everyone know what you think or ask any questions
+          </p>
+        </div>
+        <CommentList applicationId={applicationId} showExisting={showComments} />
+        <div className="border-t border-primary/10 pt-4">
           <Button 
             variant="link" 
             onClick={() => setShowComments(!showComments)}
@@ -23,13 +30,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
             <MessageCircle className="h-5 w-5" />
             {showComments ? 'Hide comments' : 'Show comments'}
           </Button>
-          {showComments && (
-            <p className="text-muted-foreground text-sm mt-2">
-              Let everyone know what you think or ask any questions
-            </p>
-          )}
         </div>
-        {showComments && <CommentList applicationId={applicationId} />}
       </div>
     </Card>
   );
