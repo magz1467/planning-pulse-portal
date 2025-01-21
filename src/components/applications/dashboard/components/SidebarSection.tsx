@@ -1,7 +1,6 @@
-import { DashboardLayout } from "./DashboardLayout";
-import { DesktopSidebar } from "@/components/map/DesktopSidebar";
-import { MobileListDetailsView } from "@/components/map/mobile/MobileListDetailsView";
 import { Application } from "@/types/planning";
+import { DesktopSidebar } from "@/components/map/DesktopSidebar";
+import { MobileListContainer } from "@/components/map/mobile/MobileListContainer";
 
 interface SidebarSectionProps {
   isMobile: boolean;
@@ -42,32 +41,40 @@ export const SidebarSection = ({
   onSelectApplication,
   onClose,
 }: SidebarSectionProps) => {
-  if (isMobile && !isMapView) {
+  if (!coordinates) return null;
+
+  if (!isMobile) {
     return (
-      <MobileListDetailsView
+      <div className="w-[50%] h-full overflow-hidden border-r border-gray-200 bg-white">
+        <DesktopSidebar
+          applications={applications}
+          selectedApplication={selectedId}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={onFilterChange}
+          onSortChange={onSortChange}
+          onSelectApplication={onSelectApplication}
+          onClose={onClose}
+          statusCounts={statusCounts}
+        />
+      </div>
+    );
+  }
+
+  if (!isMapView) {
+    return (
+      <MobileListContainer
         applications={applications}
         selectedApplication={selectedId}
         postcode={postcode}
         onSelectApplication={onSelectApplication}
+        onShowEmailDialog={() => {}}
+        hideFilterBar={true}
         onClose={onClose}
       />
     );
   }
 
-  return (
-    <div className="w-[400px] bg-white border-r overflow-hidden">
-      <DesktopSidebar
-        applications={applications}
-        selectedApplication={selectedId}
-        postcode={postcode}
-        activeFilters={activeFilters}
-        activeSort={activeSort}
-        onFilterChange={onFilterChange}
-        onSortChange={onSortChange}
-        onSelectApplication={onSelectApplication}
-        onClose={onClose}
-        statusCounts={statusCounts}
-      />
-    </div>
-  );
+  return null;
 };
