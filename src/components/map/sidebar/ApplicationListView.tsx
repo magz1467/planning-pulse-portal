@@ -1,14 +1,13 @@
 import { Application } from "@/types/planning";
-import { PlanningApplicationList } from "@/components/PlanningApplicationList";
-import { AlertSection } from "./AlertSection";
 import { FilterBar } from "@/components/FilterBar";
+import { AlertSection } from "./AlertSection";
 import { SortType } from "@/hooks/use-sort-applications";
-import { Button } from "@/components/ui/button";
 
 interface ApplicationListViewProps {
   applications: Application[];
+  selectedApplication?: number | null;
   postcode: string;
-  onSelectApplication: (id: number | null) => void;
+  onSelectApplication: (id: number) => void;
   onShowEmailDialog: () => void;
   onFilterChange?: (filterType: string, value: string) => void;
   onSortChange?: (sortType: SortType) => void;
@@ -27,48 +26,46 @@ interface ApplicationListViewProps {
 
 export const ApplicationListView = ({
   applications,
+  selectedApplication,
   postcode,
   onSelectApplication,
   onShowEmailDialog,
   onFilterChange,
-  activeFilters = {},
   onSortChange,
+  activeFilters,
   activeSort,
-  statusCounts
+  statusCounts,
 }: ApplicationListViewProps) => {
   return (
-    <div className="flex flex-col h-[calc(100%-56px)] overflow-hidden">
+    <div className="h-full flex flex-col">
+      <AlertSection 
+        postcode={postcode} 
+        onShowEmailDialog={onShowEmailDialog} 
+      />
+      
       <div className="flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-10 bg-white">
-          <div className="p-4 bg-primary/5 border-b">
-            <div className="flex flex-col space-y-2">
-              <h2 className="font-playfair text-2xl text-primary mb-2">Your Feed for Your Area</h2>
-              <p className="text-sm text-gray-600">
-                Showing high-impact developments recently listed near {postcode ? postcode : 'you'}. These applications may significantly affect your neighborhood.
-              </p>
-              <Button 
-                onClick={onShowEmailDialog}
-                className="w-full bg-primary hover:bg-primary-dark text-white"
-              >
-                Get Alerts
-              </Button>
+        {applications.map((app) => (
+          <div
+            key={app.id}
+            className="p-4 border-b cursor-pointer hover:bg-gray-50"
+            onClick={() => onSelectApplication(app.id)}
+          >
+            <h3 className="font-semibold text-primary truncate">
+              {app.ai_title || app.description}
+            </h3>
+            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+              {app.address}
+            </p>
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-xs px-2 py-1 rounded-full bg-gray-100">
+                {app.status}
+              </span>
+              <span className="text-xs text-gray-500">
+                {app.distance}
+              </span>
             </div>
           </div>
-          <FilterBar 
-            onFilterChange={onFilterChange}
-            onSortChange={onSortChange}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            applications={applications}
-            statusCounts={statusCounts}
-          />
-        </div>
-        <PlanningApplicationList
-          applications={applications}
-          postcode={postcode}
-          onSelectApplication={onSelectApplication}
-          activeSort={activeSort}
-        />
+        ))}
       </div>
     </div>
   );
