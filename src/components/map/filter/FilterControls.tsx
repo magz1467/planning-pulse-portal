@@ -2,7 +2,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StatusFilter } from "./StatusFilter";
 import { SortDropdown } from "./SortDropdown"; 
 import { Button } from "@/components/ui/button";
-import { List, Map } from "lucide-react";
+import { List } from "lucide-react";
 import { ClassificationFilters } from "./ClassificationFilters";
 import { SortType } from "@/hooks/use-sort-applications";
 
