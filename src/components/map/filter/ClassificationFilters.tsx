@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Award, Film, Trees, Hammer, Home, House } from "lucide-react";
+import { Award, Film, Hammer, Home, House, Trees } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ClassificationFiltersProps {
-  onFilterChange?: (filterType: string, value: string) => void;
+  onFilterChange: (filterType: string, value: string) => void;
   activeFilter?: string;
 }
 
@@ -12,46 +12,76 @@ export const ClassificationFilters = ({
   onFilterChange,
   activeFilter,
 }: ClassificationFiltersProps) => {
-  const [selectedFilter, setSelectedFilter] = useState<string | null>(
-    activeFilter || null
-  );
-
   const filters = [
-    { id: "high-impact", label: "High Impact", icon: Award },
-    { id: "entertainment", label: "Entertainment", icon: Film },
-    { id: "trees", label: "Trees", icon: Trees },
-    { id: "demolition", label: "Demolition", icon: Hammer },
-    { id: "housing", label: "Housing", icon: House },
-    { id: "extensions", label: "Extensions", icon: Home },
+    {
+      label: "High Impact",
+      value: "high_impact",
+      icon: Award,
+      description: "Impact scores above 70",
+    },
+    {
+      label: "Entertainment",
+      value: "entertainment",
+      icon: Film,
+      description: "Entertainment venues",
+    },
+    {
+      label: "Trees",
+      value: "trees",
+      icon: Trees,
+      description: "Tree-related applications",
+    },
+    {
+      label: "Demolition",
+      value: "demolition",
+      icon: Hammer,
+      description: "Demolition works",
+    },
+    {
+      label: "Housing",
+      value: "housing",
+      icon: House,
+      description: "New build houses",
+    },
+    {
+      label: "Extensions",
+      value: "home_extension",
+      icon: Home,
+      description: "Home extensions",
+    },
+    {
+      label: "Landscaping",
+      value: "landscaping",
+      icon: Trees,
+      description: "Landscaping works",
+    },
+    {
+      label: "Other",
+      value: "other",
+      icon: House,
+      description: "Other applications",
+    }
   ];
 
-  const handleFilterClick = (filterId: string) => {
-    const newFilter = selectedFilter === filterId ? null : filterId;
-    setSelectedFilter(newFilter);
-    if (onFilterChange) {
-      onFilterChange("classification", newFilter || "");
-    }
-  };
-
   return (
-    <div className="flex gap-2 w-full">
+    <div className="flex items-center gap-2 p-2 overflow-x-auto scrollbar-hide">
       {filters.map((filter) => {
         const Icon = filter.icon;
+        const isActive = activeFilter === filter.value;
+        
         return (
           <Button
-            key={filter.id}
-            variant="outline"
-            size="sm"
+            key={filter.value}
+            variant={isActive ? "default" : "outline"}
             className={cn(
-              "flex items-center gap-2 whitespace-nowrap transition-colors flex-1",
-              selectedFilter === filter.id
-                ? "bg-primary text-white hover:bg-primary/90"
-                : "hover:bg-gray-100"
+              "flex flex-col items-center gap-1 py-2 h-auto min-w-[80px] whitespace-nowrap",
+              isActive && "bg-primary text-primary-foreground",
+              !isActive && "hover:bg-primary/5"
             )}
-            onClick={() => handleFilterClick(filter.id)}
+            onClick={() => onFilterChange("classification", isActive ? "" : filter.value)}
           >
-            <Icon className="h-4 w-4" />
-            {filter.label}
+            <Icon className="h-5 w-5" />
+            <span className="text-xs font-medium">{filter.label}</span>
           </Button>
         );
       })}

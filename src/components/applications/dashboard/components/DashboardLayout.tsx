@@ -1,102 +1,143 @@
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { MapContentLayout } from "@/components/map/MapContentLayout";
+import { DashboardHeader } from "./DashboardHeader";
+import { SearchSection } from "./SearchSection";
+import { LoadingOverlay } from "./LoadingOverlay";
+import { MapSection } from "./MapSection";
+import { SidebarSection } from "./SidebarSection";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Application } from "@/types/planning";
-import { FilterBar } from "@/components/FilterBar";
-import { SearchSection } from "@/components/applications/dashboard/components/SearchSection";
-import { ClassificationFilters } from "@/components/map/filter/ClassificationFilters";
+import { Chatbot } from "@/components/Chatbot";
+import { Button } from "@/components/ui/button";
+import { MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { MapAction } from "@/types/map-reducer";
 
-interface DashboardLayoutProps {
-  applications: Application[];
+export interface DashboardLayoutProps {
   selectedId: number | null;
-  isMapView: boolean;
-  coordinates: [number, number];
   activeFilters: {
     status?: string;
     type?: string;
-    classification?: string;
   };
   activeSort: 'closingSoon' | 'newest' | null;
+  isMapView: boolean;
+  setIsMapView: (value: boolean) => void;
   postcode: string;
+  coordinates: [number, number] | null;
   isLoading: boolean;
+  applications: Application[];
   filteredApplications: Application[];
-  handleMarkerClick: (id: number) => void;
+  statusCounts?: {
+    'Under Review': number;
+    'Approved': number;
+    'Declined': number;
+    'Other': number;
+  };
+  handleMarkerClick: (id: number | null) => void;
   handleFilterChange: (filterType: string, value: string) => void;
   handlePostcodeSelect: (postcode: string) => void;
   handleSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
-  setIsMapView: (value: boolean) => void;
 }
 
-export const DashboardLayout = ({
-  applications,
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   selectedId,
-  isMapView,
-  coordinates,
   activeFilters,
   activeSort,
+  isMapView,
+  setIsMapView,
   postcode,
+  coordinates,
   isLoading,
+  applications,
   filteredApplications,
+  statusCounts,
   handleMarkerClick,
   handleFilterChange,
   handlePostcodeSelect,
   handleSortChange,
-  setIsMapView,
-}: DashboardLayoutProps) => {
+}) => {
   const isMobile = useIsMobile();
+  const [showChatbot, setShowChatbot] = useState(false);
+
+  const handleClose = () => {
+    handleMarkerClick(null);
+  };
+
+  const dispatch = (action: MapAction) => {
+    if (action.type === 'SELECT_APPLICATION') {
+      handleMarkerClick(action.payload);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
-      <SearchSection
+    <div className="h-screen w-full flex flex-col relative">
+      <DashboardHeader />
+
+      <SearchSection 
         onPostcodeSelect={handlePostcodeSelect}
-        onFilterChange={handleFilterChange}
+        onFilterChange={coordinates ? handleFilterChange : undefined}
         onSortChange={handleSortChange}
         activeFilters={activeFilters}
         activeSort={activeSort}
         isMapView={isMapView}
-        onToggleView={() => setIsMapView(!isMapView)}
+        onToggleView={isMobile ? () => {
+          setIsMapView(!isMapView);
+          if (isMapView) {
+            handleMarkerClick(null);
+          }
+        } : undefined}
         applications={applications}
+        statusCounts={statusCounts}
       />
-      <div className="w-full bg-white border-b px-4 py-2">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          <ClassificationFilters 
+
+      <div className="flex-1 relative w-full">
+        <div className="absolute inset-0 flex" style={{ zIndex: 10 }}>
+          <SidebarSection
+            isMobile={isMobile}
+            isMapView={isMapView}
+            applications={filteredApplications}
+            selectedId={selectedId}
+            postcode={postcode}
+            coordinates={coordinates as [number, number]}
+            activeFilters={activeFilters}
+            activeSort={activeSort}
+            statusCounts={statusCounts}
             onFilterChange={handleFilterChange}
-            activeFilter={activeFilters.classification}
+            onSortChange={handleSortChange}
+            onSelectApplication={handleMarkerClick}
+            onClose={handleClose}
           />
+
+          {(!isMobile || isMapView) && (
+            <MapSection
+              applications={filteredApplications}
+              selectedId={selectedId}
+              coordinates={coordinates as [number, number]}
+              isMobile={isMobile}
+              isMapView={isMapView}
+              dispatch={dispatch}
+            />
+          )}
         </div>
       </div>
-      {!isMobile && (
-        <FilterBar
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          isMapView={isMapView}
-          onToggleView={() => setIsMapView(!isMapView)}
-          applications={applications}
-        />
+
+      {isLoading && <LoadingOverlay />}
+
+      {/* Chatbot Toggle Button */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <Button
+          onClick={() => setShowChatbot(!showChatbot)}
+          size="icon"
+          className="h-12 w-12 rounded-full shadow-lg"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </Button>
+      </div>
+
+      {/* Chatbot Panel */}
+      {showChatbot && (
+        <div className="fixed bottom-20 right-4 w-96 bg-white rounded-lg shadow-xl z-50 p-4">
+          <Chatbot />
+        </div>
       )}
-      <ErrorBoundary>
-        <MapContentLayout
-          isLoading={isLoading}
-          coordinates={coordinates}
-          postcode={postcode}
-          selectedApplication={selectedId}
-          filteredApplications={filteredApplications}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          isMapView={isMapView}
-          isMobile={isMobile}
-          dispatch={({ type, id }) => {
-            if (type === 'SELECT_APPLICATION' && id) {
-              handleMarkerClick(id);
-            }
-          }}
-          onFilterChange={handleFilterChange}
-          onSortChange={handleSortChange}
-          onToggleView={() => setIsMapView(!isMapView)}
-        />
-      </ErrorBoundary>
     </div>
   );
 };
