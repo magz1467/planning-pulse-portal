@@ -29,29 +29,26 @@ export const AlertSection = ({ postcode, onShowEmailDialog }: AlertSectionProps)
 
   return (
     <div className="p-4 border-b bg-white">
-      <div className="bg-primary/5 rounded-lg p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Bell className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold text-primary">Get Updates for This Area</h3>
+      <div className="flex items-center justify-between p-3 bg-[#9b87f5]/5 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Bell className="text-[#9b87f5]" size={16} />
+          <h3 className="font-playfair text-[#9b87f5]">Your Feed</h3>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
-          Stay informed about new planning applications near {postcode}
-        </p>
         {session ? (
           <Button 
-            className="w-full"
+            size="sm"
+            className="h-8"
             onClick={onShowEmailDialog}
           >
-            Get Alerts
+            <Bell className="h-4 w-4" />
           </Button>
         ) : (
           <Link 
             to="/auth" 
-            className="w-full"
             state={{ from: location.pathname, postcode: postcode }}
           >
-            <Button className="w-full">
-              Sign in to get alerts
+            <Button size="sm" className="h-8">
+              <Bell className="h-4 w-4" />
             </Button>
           </Link>
         )}
