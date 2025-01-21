@@ -13,12 +13,20 @@ export const transformApplicationData = (
   // Extract coordinates from geometry
   let coordinates: [number, number] | null = null;
   
-  if (app.geom && typeof app.geom === 'object') {
+  if (app.geom) {
     try {
-      coordinates = [
-        parseFloat(app.geom.coordinates[1]),
-        parseFloat(app.geom.coordinates[0])
-      ];
+      // Handle both GeoJSON and raw coordinate formats
+      if (typeof app.geom === 'object' && app.geom.type === 'Point') {
+        coordinates = [
+          parseFloat(app.geom.coordinates[1]),
+          parseFloat(app.geom.coordinates[0])
+        ];
+      } else if (typeof app.geom === 'object' && Array.isArray(app.geom.coordinates)) {
+        coordinates = [
+          parseFloat(app.geom.coordinates[1]),
+          parseFloat(app.geom.coordinates[0])
+        ];
+      }
       console.log('📍 Coordinates extracted:', coordinates);
     } catch (e) {
       console.warn('⚠️ Error extracting coordinates:', e);
@@ -26,7 +34,7 @@ export const transformApplicationData = (
       return null;
     }
   } else {
-    console.warn('⚠️ Missing or invalid geometry for application:', app.application_id);
+    console.warn('⚠️ Missing geometry for application:', app.application_id);
     console.groupEnd();
     return null;
   }
