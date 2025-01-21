@@ -18,7 +18,8 @@ export const useApplicationsFetch = () => {
     center: LatLngTuple,
     radius: number,
     page = 0,
-    pageSize = 100
+    pageSize = 100,
+    retryCount = 0
   ) => {
     // Don't proceed if coordinates are invalid
     if (!center || !center[0] || !center[1]) {
@@ -55,7 +56,13 @@ export const useApplicationsFetch = () => {
 
       if (rpcError) {
         // Handle timeout errors specifically
-        if (rpcError.message.includes('statement timeout')) {
+        if (rpcError.message.includes('statement timeout') || rpcError.code === '57014') {
+          if (retryCount < 3) {
+            console.log(`Retry attempt ${retryCount + 1} after timeout`);
+            // Wait a bit before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+            return fetchApplicationsInRadius(center, radius, page, pageSize, retryCount + 1);
+          }
           toast({
             title: "Search Timeout",
             description: "The search took too long. Please try a smaller radius or different location.",
