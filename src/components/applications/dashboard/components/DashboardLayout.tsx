@@ -5,6 +5,7 @@ import { DashboardHeader } from "./DashboardHeader";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SortType } from "@/hooks/use-sort-applications";
+import { SearchSection } from "./SearchSection";
 
 interface DashboardLayoutProps {
   applications: Application[];
@@ -46,6 +47,11 @@ export const DashboardLayout = ({
 
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
+      <SearchSection 
+        onPostcodeSelect={handlePostcodeSelect}
+        applications={applications}
+      />
+      
       <DashboardHeader 
         onFilterChange={handleFilterChange}
         onSortChange={handleSortChange}
