@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { ApplicationMetadata } from "./planning-details/ApplicationMetadata";
 import { ApplicationActions } from "./planning-details/ApplicationActions";
 import { ApplicationContent } from "./planning-details/ApplicationContent";
+import { X } from "lucide-react";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -110,8 +111,16 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div className="p-6 space-y-4 pb-20">
-      <div className="flex justify-between items-start">
+    <div className="p-6 space-y-4 pb-20 relative">
+      <button 
+        onClick={onClose}
+        className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors z-50"
+        aria-label="Close details"
+      >
+        <X className="h-5 w-5 text-gray-500" />
+      </button>
+
+      <div className="flex justify-between items-start pt-8">
         <div className="flex-1">
           <ApplicationMetadata 
             application={currentApplication}
