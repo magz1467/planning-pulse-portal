@@ -29,10 +29,10 @@ export const AlertSection = ({ postcode, onShowEmailDialog }: AlertSectionProps)
 
   return (
     <div className="p-4 border-b bg-white">
-      <div className="flex items-center justify-between p-3 bg-[#9b87f5]/5 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-[#f6c8cc]/5 rounded-lg">
         <div className="flex items-center gap-2">
-          <Bell className="text-[#9b87f5]" size={16} />
-          <h3 className="font-playfair text-[#9b87f5]">Your Feed</h3>
+          <Bell className="text-[#f6c8cc]" size={16} />
+          <h3 className="font-playfair text-[#f6c8cc]">Your Feed</h3>
         </div>
         {session ? (
           <Button 
