@@ -28,6 +28,12 @@ export const useApplicationsData = () => {
     page = 0,
     pageSize = 100
   ) => {
+    // Don't proceed if coordinates are invalid
+    if (!center || !center[0] || !center[1]) {
+      console.log('Invalid coordinates provided:', center);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     console.log('🔍 Starting fetch with params:', { 
@@ -49,12 +55,12 @@ export const useApplicationsData = () => {
         'get_applications_with_counts_optimized',
         {
           center_lat: center[0],
-          center_lng: center[1], 
+          center_lng: center[1],
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
         }
-      ).timeout(30000); // 30 second timeout
+      );
 
       if (error) {
         console.error('❌ Error fetching applications:', error);
@@ -88,12 +94,19 @@ export const useApplicationsData = () => {
 
       const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
-        .filter((app): app is Application => app !== null);
+        .filter((app): app is Application => app !== null)
+        // Sort by final_impact_score in descending order
+        .sort((a, b) => {
+          const scoreA = a.final_impact_score || 0;
+          const scoreB = b.final_impact_score || 0;
+          return scoreB - scoreA;
+        });
 
       console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
         id: app.id,
         class_3: app.class_3,
-        title: app.title
+        title: app.title,
+        final_impact_score: app.final_impact_score
       })));
 
       setApplications(transformedApplications || []);
