@@ -94,6 +94,11 @@ export const FilterBar = ({
               </Button>
             </SortDropdown>
           </ErrorBoundary>
+
+          <ClassificationFilters 
+            onFilterChange={handleFilterChange}
+            activeFilter={activeFilters.classification}
+          />
         </div>
 
         {onToggleView && (
@@ -104,11 +109,6 @@ export const FilterBar = ({
           </div>
         )}
       </div>
-      
-      <ClassificationFilters 
-        onFilterChange={handleFilterChange}
-        activeFilter={activeFilters.classification}
-      />
     </div>
   );
 };
