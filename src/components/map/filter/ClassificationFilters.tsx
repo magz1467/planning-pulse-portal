@@ -17,48 +17,56 @@ export const ClassificationFilters = ({
       label: "High Impact",
       value: "high_impact",
       icon: Award,
+      color: "#af5662", // Honeysuckle
       description: "Impact scores above 70",
     },
     {
       label: "Entertainment",
       value: "entertainment",
       icon: Film,
+      color: "#8bc5be", // Tiffany Blue
       description: "Entertainment venues",
     },
     {
       label: "Trees",
       value: "trees",
       icon: Trees,
+      color: "#af5662", // Honeysuckle
       description: "Tree-related applications",
     },
     {
       label: "Demolition",
       value: "demolition",
       icon: Hammer,
+      color: "#8bc5be", // Tiffany Blue
       description: "Demolition works",
     },
     {
       label: "Housing",
       value: "housing",
       icon: House,
+      color: "#af5662", // Honeysuckle
       description: "New build houses",
     },
     {
       label: "Extensions",
       value: "home_extension",
       icon: Home,
+      color: "#8bc5be", // Tiffany Blue
       description: "Home extensions",
     },
     {
       label: "Landscaping",
       value: "landscaping",
       icon: Trees,
+      color: "#af5662", // Honeysuckle
       description: "Landscaping works",
     },
     {
       label: "Other",
       value: "other",
       icon: House,
+      color: "#8bc5be", // Tiffany Blue
       description: "Other applications",
     }
   ];
@@ -80,7 +88,10 @@ export const ClassificationFilters = ({
             )}
             onClick={() => onFilterChange("classification", isActive ? "" : filter.value)}
           >
-            <Icon className="h-5 w-5" />
+            <Icon 
+              className="h-5 w-5" 
+              style={{ color: filter.color }}
+            />
             <span className="text-xs font-medium">{filter.label}</span>
           </Button>
         );
