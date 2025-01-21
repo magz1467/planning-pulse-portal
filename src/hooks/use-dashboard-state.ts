@@ -9,8 +9,11 @@ import { useFilterState } from "./use-filter-state";
 import { useDashboardURL } from "./dashboard/use-dashboard-url";
 import { useSearchState } from "./dashboard/use-search-state";
 import { useSearchLogging } from "./dashboard/use-search-logging";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 export const useDashboardState = () => {
+  const navigate = useNavigate();
   const { 
     initialPostcode, 
     initialTab, 
