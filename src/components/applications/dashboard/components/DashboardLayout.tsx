@@ -48,7 +48,7 @@ export const DashboardLayout = ({
 
   return (
     <>
-      {!isMapView && <Header />}
+      <Header />
       <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
         <SearchSection 
           onPostcodeSelect={handlePostcodeSelect}
@@ -62,7 +62,7 @@ export const DashboardLayout = ({
           activeFilters={activeFilters}
           activeSort={activeSort || 'newest'}
           isMapView={isMapView}
-          onToggleView={() => setIsMapView(!isMapView)}
+          onToggleView={isMobile ? () => setIsMapView(!isMapView) : undefined}
         />
         
         <div className="flex flex-1 min-h-0 relative">
