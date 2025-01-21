@@ -82,7 +82,7 @@ export const ClassificationFilters = ({
             key={filter.value}
             variant={isActive ? "default" : "outline"}
             className={cn(
-              "flex flex-col items-center gap-1 py-2 h-auto min-w-[80px] whitespace-nowrap",
+              "flex flex-col items-center gap-1 py-2 h-auto min-w-[80px] whitespace-nowrap bg-transparent",
               isActive && "bg-primary text-primary-foreground",
               !isActive && "hover:bg-primary/5"
             )}
