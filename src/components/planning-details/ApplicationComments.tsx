@@ -28,7 +28,7 @@ export const ApplicationComments = ({ applicationId }: ApplicationCommentsProps)
             className="p-0 h-auto font-playfair text-primary flex items-center gap-2 hover:text-primary/80"
           >
             <MessageCircle className="h-5 w-5" />
-            {showComments ? 'Hide comments' : 'Show comments'}
+            {showComments ? 'Hide my feed' : 'Show my feed'}
           </Button>
         </div>
       </div>
