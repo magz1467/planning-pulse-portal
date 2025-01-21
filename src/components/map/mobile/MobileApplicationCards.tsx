@@ -65,18 +65,26 @@ export const MobileApplicationCards = ({
 
     return (
       <>
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <Drawer 
+          open={isDrawerOpen} 
+          onOpenChange={setIsDrawerOpen}
+          modal={false}
+          snapPoints={[0.2, 0.5, 0.8, 1]}
+          activeSnapPoint={0.2}
+        >
           <div 
-            className="fixed bottom-0 left-0 right-0 z-[1000]"
+            className="fixed bottom-0 left-0 right-0 z-[1000] touch-none"
             onClick={() => setShowFullDetails(true)}
           >
             <MiniCard
               application={selectedApp}
-              onClick={() => setShowFullDetails(true)}
+              onClick={() => setIsDrawerOpen(true)}
             />
           </div>
           
-          <DrawerContent className="h-[85vh] px-4">
+          <DrawerContent 
+            className="h-[85vh] px-4 fixed bottom-0 left-0 right-0 z-[1001]"
+          >
             <DrawerHeader>
               <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
               <DrawerTitle className="sr-only">Applications List</DrawerTitle>
