@@ -42,37 +42,39 @@ export const FilterControls = ({
   })();
 
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto pb-2 hide-scrollbar">
-      <ErrorBoundary>
-        <StatusFilter
-          onFilterChange={onFilterChange}
-          activeFilters={activeFilters}
-          isMobile={isMobile}
-          applications={applications}
-          statusCounts={statusCounts}
-        />
-      </ErrorBoundary>
+    <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar w-full">
+      <div className="flex items-center gap-1.5 min-w-max">
+        <ErrorBoundary>
+          <StatusFilter
+            onFilterChange={onFilterChange}
+            activeFilters={activeFilters}
+            isMobile={isMobile}
+            applications={applications}
+            statusCounts={statusCounts}
+          />
+        </ErrorBoundary>
 
-      <ErrorBoundary>
-        <SortDropdown
-          activeSort={activeSort}
-          onSortChange={onSortChange}
-        >
-          <Button
-            variant="outline"
-            size={isMobile ? "sm" : "default"}
-            className="flex items-center gap-1.5 whitespace-nowrap"
+        <ErrorBoundary>
+          <SortDropdown
+            activeSort={activeSort}
+            onSortChange={onSortChange}
           >
-            <ArrowDownAZ className="h-4 w-4" />
-            {sortButtonText}
-          </Button>
-        </SortDropdown>
-      </ErrorBoundary>
+            <Button
+              variant="outline"
+              size={isMobile ? "sm" : "default"}
+              className="flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <ArrowDownAZ className="h-4 w-4" />
+              {sortButtonText}
+            </Button>
+          </SortDropdown>
+        </ErrorBoundary>
 
-      <ClassificationFilters 
-        onFilterChange={onFilterChange}
-        activeFilter={activeFilters.classification}
-      />
+        <ClassificationFilters 
+          onFilterChange={onFilterChange}
+          activeFilter={activeFilters.classification}
+        />
+      </div>
     </div>
   );
 };
