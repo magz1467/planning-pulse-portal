@@ -10,35 +10,20 @@ export const transformApplicationData = (
   console.group(`🔄 Transforming application ${app.application_id}`);
   console.log('Raw application data:', app);
   
+  const geomObj = app.geom;
   let coordinates: [number, number] | null = null;
 
-  // Handle both geometry types that could come from Supabase
-  if (app.geom) {
-    if (typeof app.geom === 'object' && 'coordinates' in app.geom) {
-      // Handle GeoJSON format
-      coordinates = [
-        app.geom.coordinates[1] as number,
-        app.geom.coordinates[0] as number
-      ];
-    } else if (typeof app.geom === 'string') {
-      // Handle EWKT format
-      try {
-        const match = app.geom.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
-        if (match) {
-          coordinates = [parseFloat(match[2]), parseFloat(match[1])];
-        }
-      } catch (e) {
-        console.warn('Failed to parse EWKT geometry:', e);
-      }
-    }
+  if (geomObj && typeof geomObj === 'object' && 'coordinates' in geomObj) {
+    coordinates = [
+      geomObj.coordinates[1] as number,
+      geomObj.coordinates[0] as number
+    ];
+    console.log('📍 Coordinates extracted:', coordinates);
+  } else {
+    console.warn('⚠️ Missing or invalid geometry for application:', app.application_id);
+    console.groupEnd();
+    return null;
   }
-
-  // Additional debug logging
-  console.log('Geometry data:', {
-    raw: app.geom,
-    parsed: coordinates,
-    type: typeof app.geom
-  });
 
   if (!coordinates) {
     console.warn('⚠️ No valid coordinates for application:', app.application_id);
