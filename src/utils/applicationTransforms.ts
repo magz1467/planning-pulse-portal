@@ -10,23 +10,29 @@ export const transformApplicationData = (
   console.group(`🔄 Transforming application ${app.application_id}`);
   console.log('Raw application data:', app);
   
-  const geomObj = app.geom;
+  // Extract coordinates from geometry
   let coordinates: [number, number] | null = null;
-
-  if (geomObj && typeof geomObj === 'object' && 'coordinates' in geomObj) {
-    coordinates = [
-      geomObj.coordinates[1] as number,
-      geomObj.coordinates[0] as number
-    ];
-    console.log('📍 Coordinates extracted:', coordinates);
+  
+  if (app.geom && typeof app.geom === 'object') {
+    try {
+      coordinates = [
+        parseFloat(app.geom.coordinates[1]),
+        parseFloat(app.geom.coordinates[0])
+      ];
+      console.log('📍 Coordinates extracted:', coordinates);
+    } catch (e) {
+      console.warn('⚠️ Error extracting coordinates:', e);
+      console.groupEnd();
+      return null;
+    }
   } else {
     console.warn('⚠️ Missing or invalid geometry for application:', app.application_id);
     console.groupEnd();
     return null;
   }
 
-  if (!coordinates) {
-    console.warn('⚠️ No valid coordinates for application:', app.application_id);
+  if (!coordinates || isNaN(coordinates[0]) || isNaN(coordinates[1])) {
+    console.warn('⚠️ Invalid coordinates for application:', app.application_id);
     console.groupEnd();
     return null;
   }
