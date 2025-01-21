@@ -33,14 +33,14 @@ export const useApplicationsFetch = () => {
         throw error;
       }
 
-      if (!data) {
+      if (!data || !data[0]) {
         console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      const { applications: appsData, total_count, status_counts } = data[0];
+      const { applications: appsData, total_count } = data[0];
 
       console.log(`📦 Raw applications data:`, appsData?.map(app => ({
         id: app.id,
