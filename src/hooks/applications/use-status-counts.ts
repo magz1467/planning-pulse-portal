@@ -28,5 +28,6 @@ export const calculateStatusCounts = (applications: Application[]): StatusCounts
     }
   });
 
+  console.log('📊 Status counts:', counts);
   return counts;
 };
