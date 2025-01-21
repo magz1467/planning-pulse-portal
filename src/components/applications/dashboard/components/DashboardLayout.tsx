@@ -48,7 +48,7 @@ export const DashboardLayout = ({
 
   return (
     <>
-      <Header />
+      {!isMobile && <Header />}
       <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
         <SearchSection 
           onPostcodeSelect={handlePostcodeSelect}
