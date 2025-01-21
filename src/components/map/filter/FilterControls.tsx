@@ -2,10 +2,9 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StatusFilter } from "./StatusFilter";
 import { SortDropdown } from "./SortDropdown"; 
 import { Button } from "@/components/ui/button";
-import { ArrowDownAZ, ListFilter, List } from "lucide-react";
+import { List, Map } from "lucide-react";
 import { ClassificationFilters } from "./ClassificationFilters";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterControlsProps {
   onFilterChange: (filterType: string, value: string) => void;
@@ -18,14 +17,8 @@ interface FilterControlsProps {
   activeSort: SortType;
   isMobile: boolean;
   applications?: any[];
-  statusCounts?: {
-    'Under Review': number;
-    'Approved': number;
-    'Declined': number;
-    'Other': number;
-  };
-  isMapView?: boolean;
-  onToggleView?: () => void;
+  isMapView: boolean;
+  onToggleView: () => void;
 }
 
 export const FilterControls = ({
@@ -35,7 +28,6 @@ export const FilterControls = ({
   activeSort,
   isMobile,
   applications,
-  statusCounts,
   isMapView,
   onToggleView
 }: FilterControlsProps) => {
@@ -48,14 +40,13 @@ export const FilterControls = ({
 
   return (
     <div className="flex overflow-x-auto hide-scrollbar w-full no-wrap">
-      <div className="flex items-center gap-1.5 flex-nowrap">
+      <div className="flex items-center gap-1.5 flex-nowrap min-w-max">
         <ErrorBoundary>
           <StatusFilter
             onFilterChange={onFilterChange}
             activeFilters={activeFilters}
             isMobile={isMobile}
             applications={applications}
-            statusCounts={statusCounts}
           />
         </ErrorBoundary>
 
@@ -80,7 +71,6 @@ export const FilterControls = ({
                 size={isMobile ? "sm" : "default"}
                 className="flex items-center gap-1.5 whitespace-nowrap"
               >
-                <ArrowDownAZ className="h-4 w-4" />
                 {sortButtonText}
               </Button>
             </SortDropdown>

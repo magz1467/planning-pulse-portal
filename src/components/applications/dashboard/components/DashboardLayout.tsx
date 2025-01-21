@@ -74,11 +74,13 @@ export const DashboardLayout = ({
         
         <SidebarSection 
           isMobile={isMobile}
+          isMapView={isMapView}
           applications={filteredApplications}
-          selectedApplication={selectedId}
+          selectedId={selectedId}
           postcode={postcode}
+          coordinates={coordinates as [number, number]}
           activeFilters={activeFilters}
-          activeSort={activeSort}
+          activeSort={activeSort as "closingSoon" | "newest"}
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}
           onSelectApplication={handleMarkerClick}
@@ -91,7 +93,11 @@ export const DashboardLayout = ({
           coordinates={coordinates}
           applications={filteredApplications}
           selectedId={selectedId}
-          handleMarkerClick={handleMarkerClick}
+          dispatch={(action) => {
+            if (action.type === 'SELECT_APPLICATION') {
+              handleMarkerClick(action.payload);
+            }
+          }}
         />
       </div>
     </div>
