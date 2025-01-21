@@ -48,8 +48,8 @@ export const useApplicationsData = () => {
       const { data, error } = await supabase.rpc(
         'get_applications_with_counts_optimized',
         {
-          center_lat: center[0],
           center_lng: center[1],
+          center_lat: center[0],
           radius_meters: radius,
           page_size: pageSize,
           page_number: page
@@ -79,15 +79,23 @@ export const useApplicationsData = () => {
         return;
       }
 
-      console.log(`📦 Received ${data.length} raw applications`);
+      // Extract applications from the response
+      const { applications: appsData, total_count } = data[0] || { applications: [], total_count: 0 };
 
-      const transformedApplications = data
+      console.log(`📦 Received ${appsData?.length || 0} raw applications`);
+
+      const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
-      console.log('✨ Transformed applications count:', transformedApplications.length);
+      console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
+        id: app.id,
+        class_3: app.class_3,
+        title: app.title
+      })));
 
       setApplications(transformedApplications || []);
+      setTotalCount(total_count || 0);
 
       // Calculate status counts
       const counts = {
@@ -112,24 +120,6 @@ export const useApplicationsData = () => {
 
       setStatusCounts(counts);
       console.log('📊 Status counts:', counts);
-
-      // Get total count
-      const { data: countData, error: countError } = await supabase.rpc(
-        'get_applications_count_within_radius',
-        {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: radius
-        }
-      );
-
-      if (countError) {
-        console.error('❌ Error fetching count:', countError);
-        setTotalCount(0);
-      } else {
-        console.log('📈 Total count:', countData);
-        setTotalCount(countData || 0);
-      }
 
     } catch (error: any) {
       console.error('💥 Failed to fetch applications:', {
