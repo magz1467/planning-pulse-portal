@@ -1,13 +1,8 @@
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { ArrowDownAZ } from "lucide-react";
-import { SortDropdown } from "./map/filter/SortDropdown";
-import { StatusFilter } from "./map/filter/StatusFilter";
 import { ViewToggle } from "./map/filter/ViewToggle";
-import { ClassificationFilters } from "./map/filter/ClassificationFilters";
+import { FilterControls } from "./map/filter/FilterControls";
 import { SortType } from "@/hooks/use-sort-applications";
-import { useCallback, useMemo } from "react";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { useCallback } from "react";
 
 interface FilterBarProps {
   onFilterChange?: (filterType: string, value: string) => void;
@@ -58,54 +53,22 @@ export const FilterBar = ({
     }
   }, [onSortChange]);
 
-  const sortButtonText = useMemo(() => {
-    if (activeSort === 'closingSoon') return 'Closing Soon';
-    if (activeSort === 'newest') return 'Newest';
-    if (activeSort === 'impact') return 'Highest Impact';
-    return 'Sort';
-  }, [activeSort]);
-
   return (
     <div className="flex flex-col bg-white border-b">
-      <div className="flex items-center gap-1.5 p-1.5">
-        <div className="flex items-center gap-1.5">
-          <ErrorBoundary>
-            <StatusFilter
-              onFilterChange={handleFilterChange}
-              activeFilters={activeFilters}
-              isMobile={isMobile}
-              applications={applications}
-              statusCounts={statusCounts}
-            />
-          </ErrorBoundary>
-
-          <ErrorBoundary>
-            <SortDropdown
-              activeSort={activeSort}
-              onSortChange={handleSortChange}
-            >
-              <Button
-                variant="outline"
-                size={isMobile ? "sm" : "default"}
-                className="flex items-center gap-1.5"
-              >
-                <ArrowDownAZ className="h-4 w-4" />
-                {sortButtonText}
-              </Button>
-            </SortDropdown>
-          </ErrorBoundary>
-
-          <ClassificationFilters 
-            onFilterChange={handleFilterChange}
-            activeFilter={activeFilters.classification}
-          />
-        </div>
+      <div className="flex items-center justify-between p-1.5">
+        <FilterControls 
+          onFilterChange={handleFilterChange}
+          onSortChange={handleSortChange}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          isMobile={isMobile}
+          applications={applications}
+          statusCounts={statusCounts}
+        />
 
         {onToggleView && (
           <div className="ml-auto">
-            <ErrorBoundary>
-              <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
-            </ErrorBoundary>
+            <ViewToggle isMapView={isMapView} onToggle={onToggleView} />
           </div>
         )}
       </div>
