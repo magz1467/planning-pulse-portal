@@ -38,14 +38,9 @@ export const useApplicationsData = () => {
     });
 
     try {
-      console.log('📍 Calling Supabase RPC with coordinates:', {
-        lat: center[0],
-        lng: center[1],
-        radius_meters: radius
-      });
-
-      const { data: applications, error } = await supabase
-        .rpc('get_applications_within_radius', {
+      // Single RPC call to get both applications and counts
+      const { data, error } = await supabase
+        .rpc('get_applications_with_counts_optimized', {
           center_lng: center[1],
           center_lat: center[0],
           radius_meters: radius,
@@ -54,32 +49,37 @@ export const useApplicationsData = () => {
         });
 
       if (error) {
-        console.error('❌ Error fetching applications:', error);
-        setError({
-          message: 'Error fetching applications',
-          details: error.message
-        });
+        console.error('Error fetching applications:', error);
+        throw error;
+      }
+
+      if (!data || !data[0]) {
+        console.log('No applications found');
         setApplications([]);
         setTotalCount(0);
         return;
       }
 
-      if (!applications || !Array.isArray(applications)) {
-        console.log('⚠️ No applications found or invalid response:', applications);
-        setApplications([]);
-        setTotalCount(0);
-        return;
-      }
+      const { applications: appsData, total_count, status_counts } = data[0];
 
-      console.log(`📦 Received ${applications.length} raw applications`);
+      console.log(`📦 Raw applications data:`, appsData?.map(app => ({
+        id: app.id,
+        class_3: app.class_3,
+        title: app.title
+      })));
 
-      const transformedApplications = applications
+      const transformedApplications = appsData
         ?.map(app => transformApplicationData(app, center))
         .filter((app): app is Application => app !== null);
 
-      console.log('✨ Transformed applications count:', transformedApplications.length);
+      console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
+        id: app.id,
+        class_3: app.class_3,
+        title: app.title
+      })));
 
       setApplications(transformedApplications || []);
+      setTotalCount(total_count || 0);
 
       // Calculate status counts
       const counts = {
@@ -105,25 +105,10 @@ export const useApplicationsData = () => {
       setStatusCounts(counts);
       console.log('📊 Status counts:', counts);
 
-      // Get total count
-      const { data: countData, error: countError } = await supabase
-        .rpc('get_applications_count_within_radius', {
-          center_lng: center[1],
-          center_lat: center[0],
-          radius_meters: radius
-        });
-
-      if (countError) {
-        console.error('❌ Error fetching count:', countError);
-        setTotalCount(0);
-      } else {
-        console.log('📈 Total count:', countData);
-        setTotalCount(countData || 0);
-      }
-
     } catch (error: any) {
-      console.error('💥 Failed to fetch applications:', {
-        error,
+      console.error('Failed to fetch applications:', error);
+      // Show more detailed error information
+      console.error('Error details:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
