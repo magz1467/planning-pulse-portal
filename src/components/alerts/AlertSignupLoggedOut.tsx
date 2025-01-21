@@ -9,7 +9,7 @@ export const AlertSignupLoggedOut = () => {
         <div className="flex items-center gap-2">
           <Bell className="text-primary" size={20} />
           <div>
-            <h3 className="font-medium text-primary">Planning Alerts</h3>
+            <h3 className="font-medium text-primary">Your Feed for Your Area</h3>
             <p className="text-sm text-gray-600">Get notified about new applications</p>
           </div>
         </div>
