@@ -42,7 +42,7 @@ export const FilterControls = ({
   })();
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-1.5 overflow-x-auto pb-2 hide-scrollbar">
       <ErrorBoundary>
         <StatusFilter
           onFilterChange={onFilterChange}
@@ -61,7 +61,7 @@ export const FilterControls = ({
           <Button
             variant="outline"
             size={isMobile ? "sm" : "default"}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 whitespace-nowrap"
           >
             <ArrowDownAZ className="h-4 w-4" />
             {sortButtonText}
