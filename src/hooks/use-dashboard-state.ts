@@ -10,10 +10,11 @@ import { useDashboardURL } from "./dashboard/use-dashboard-url";
 import { useSearchState } from "./dashboard/use-search-state";
 import { useSearchLogging } from "./dashboard/use-search-logging";
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const useDashboardState = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { 
     initialPostcode, 
     initialTab, 
@@ -59,7 +60,7 @@ export const useDashboardState = () => {
         variant: "destructive",
       });
     }
-  }, [error]);
+  }, [error, toast]);
 
   // Handle coordinates updates and search
   useEffect(() => {
@@ -95,7 +96,7 @@ export const useDashboardState = () => {
         setIsSearching(false);
       }
     }
-  }, [coordinates]);
+  }, [coordinates, isSearching, navigate, searchPoint, setIsSearching, setSearchPoint, toast, fetchApplicationsInRadius]);
 
   // Handle search completion and logging
   useEffect(() => {
@@ -106,7 +107,7 @@ export const useDashboardState = () => {
       setSearchStartTime(null);
       setIsSearching(false);
     }
-  }, [isLoadingApps, isLoadingCoords, searchStartTime]);
+  }, [isLoadingApps, isLoadingCoords, searchStartTime, postcode, initialTab, logSearch, setSearchStartTime, setIsSearching]);
 
   const handleSortChange = (sortType: SortType) => {
     console.log('Changing sort to:', sortType);
