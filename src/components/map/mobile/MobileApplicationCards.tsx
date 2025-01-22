@@ -4,7 +4,7 @@ import { PlanningApplicationDetails } from "@/components/PlanningApplicationDeta
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
-import { 
+import {
   Drawer,
   DrawerContent,
   DrawerHeader,
@@ -27,6 +27,7 @@ export const MobileApplicationCards = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { toast } = useToast();
 
+  // Reset states when selection changes
   useEffect(() => {
     if (selectedId === null) {
       setShowFullDetails(false);
@@ -34,39 +35,35 @@ export const MobileApplicationCards = ({
     }
   }, [selectedId]);
 
-  const handleCommentSubmit = (content: string) => {
-    console.log("New comment:", content);
-    toast({
-      title: "Comment Submitted",
-      description: "Your comment has been recorded",
-    });
-  };
-
+  // Early return for empty state
   if (!applications.length) {
     return <EmptyState />;
   }
 
-  if (showFullDetails && selectedId) {
-    const selectedApp = applications.find(app => app.id === selectedId);
-    if (!selectedApp) return null;
-    
+  // Get selected application if there is one
+  const selectedApp = selectedId ? applications.find(app => app.id === selectedId) : null;
+  if (selectedId && !selectedApp) return null;
+
+  // Handle closing details view
+  const handleClose = () => {
+    setShowFullDetails(false);
+    onSelectApplication(null);
+  };
+
+  // Render full details view
+  if (showFullDetails && selectedApp) {
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <PlanningApplicationDetails
           application={selectedApp}
-          onClose={() => {
-            setShowFullDetails(false);
-            onSelectApplication(null);
-          }}
+          onClose={handleClose}
         />
       </div>
     );
   }
 
-  if (selectedId) {
-    const selectedApp = applications.find(app => app.id === selectedId);
-    if (!selectedApp) return null;
-
+  // Render mini card with drawer
+  if (selectedApp) {
     return (
       <>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
