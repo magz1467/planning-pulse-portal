@@ -26,7 +26,7 @@ export const ApplicationDetailView = ({
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <ApplicationDetails application={application} onClose={onClose} />
+        <ApplicationDetails application={application} />
       </div>
     </div>
   );

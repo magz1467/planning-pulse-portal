@@ -41,9 +41,8 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-8 pt-8 text-sm text-gray-400">
-          <p>© {new Date().getFullYear()} Nimbygram Ltd. All rights reserved.</p>
-          <p className="mt-2">Nimbygram Ltd is registered in England and Wales.</p>
-          <p className="mt-2">85 Great Portland Street, London W1W 7LT</p>
+          <p>© {new Date().getFullYear()} NimbyGram Ltd. All rights reserved.</p>
+          <p className="mt-2">NimbyGram Ltd is registered in England and Wales.</p>
         </div>
       </div>
     </footer>
