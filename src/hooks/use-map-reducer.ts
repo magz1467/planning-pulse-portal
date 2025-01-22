@@ -1,5 +1,5 @@
 import { Application } from "@/types/planning";
-import { MapState, MapAction } from "@/types/map-reducer";
+import { MapState, MapAction } from "@/types/application-types";
 import { useReducer } from 'react';
 
 const initialState: MapState = {
@@ -7,7 +7,8 @@ const initialState: MapState = {
   applications: [],
   isMapView: true,
   coordinates: [51.5074, -0.1278], // Default to London coordinates
-  activeSort: null
+  activeSort: null,
+  activeFilters: {}
 };
 
 function mapReducer(state: MapState, action: MapAction): MapState {
@@ -38,6 +39,11 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return {
         ...state,
         activeSort: action.payload
+      };
+    case 'SET_FILTERS':
+      return {
+        ...state,
+        activeFilters: action.payload
       };
     default:
       return state;

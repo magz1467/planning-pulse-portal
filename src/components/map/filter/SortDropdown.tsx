@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SortType } from "@/types/map-reducer";
+import { SortType } from "@/types/application-types";
 
 interface SortDropdownProps {
   children: React.ReactNode;

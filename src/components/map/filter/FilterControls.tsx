@@ -4,27 +4,18 @@ import { SortDropdown } from "./SortDropdown";
 import { Button } from "@/components/ui/button";
 import { List } from "lucide-react";
 import { ClassificationFilters } from "./ClassificationFilters";
-import { SortType } from "@/types/map-reducer";
+import { SortType, FilterType, StatusCounts } from "@/types/application-types";
 
 interface FilterControlsProps {
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: SortType) => void;
-  activeFilters: {
-    status?: string;
-    type?: string;
-    classification?: string;
-  };
+  activeFilters: FilterType;
   activeSort: SortType;
   isMobile: boolean;
   applications?: any[];
   isMapView: boolean;
-  onToggleView: () => void;
-  statusCounts?: {
-    'Under Review': number;
-    'Approved': number;
-    'Declined': number;
-    'Other': number;
-  };
+  onToggleView?: () => void;
+  statusCounts?: StatusCounts;
 }
 
 export const FilterControls = ({
