@@ -89,7 +89,6 @@ export const useApplicationState = (initialPostcode = ''): ApplicationState & Ap
     setActiveSort(sortType);
   };
 
-  // Handle coordinate updates and fetch applications
   useEffect(() => {
     if (!coordinates) return;
     
@@ -99,10 +98,8 @@ export const useApplicationState = (initialPostcode = ''): ApplicationState & Ap
 
     if (isInitialSearch || isNewSearch) {
       try {
-        const [lat, lng] = coordinates;
-        const tuple: [number, number] = [lat, lng];
-        setSearchPoint(tuple);
-        fetchApplicationsInRadius(tuple, 1000);
+        setSearchPoint(coordinates);
+        fetchApplicationsInRadius(coordinates, 1000);
       } catch (error) {
         console.error('Search error:', error);
         toast({
@@ -115,7 +112,6 @@ export const useApplicationState = (initialPostcode = ''): ApplicationState & Ap
     }
   }, [coordinates, searchPoint, fetchApplicationsInRadius, toast]);
 
-  // Handle search completion
   useEffect(() => {
     if (searchStartTime && !isLoadingApps && !isLoadingCoords) {
       setSearchStartTime(null);
