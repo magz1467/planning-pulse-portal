@@ -1,3 +1,5 @@
+import { Application } from "./planning";
+
 export interface MapState {
   selectedId: number | null;
   applications: Application[];
