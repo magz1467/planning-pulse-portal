@@ -59,6 +59,7 @@ export const DesktopSidebar = ({
       {selectedApplication === null ? (
         <ApplicationListView
           applications={applications}
+          selectedApplication={selectedApplication}
           postcode={postcode}
           onSelectApplication={onSelectApplication}
           onShowEmailDialog={() => setShowEmailDialog(true)}
