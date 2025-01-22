@@ -1,17 +1,13 @@
-import { RouterProvider, createHashRouter } from "react-router-dom";
-import { routes } from "@/routes/routes";
-import { ScrollToTop } from "@/components/ScrollToTop";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
+import { routes } from "@/routes/routes";
 
-// Create router with routes
-const router = createHashRouter(routes);
+const router = createBrowserRouter(routes);
 
 function App() {
   return (
     <>
-      <RouterProvider router={router}>
-        <ScrollToTop />
-      </RouterProvider>
+      <RouterProvider router={router} />
       <Toaster />
     </>
   );
