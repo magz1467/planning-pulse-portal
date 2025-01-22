@@ -5,22 +5,21 @@ interface ApplicationMetadataProps {
   onShowEmailDialog: () => void;
 }
 
-export const ApplicationMetadata = ({ 
-  application,
-  onShowEmailDialog
-}: ApplicationMetadataProps) => {
+export const ApplicationMetadata = ({ application, onShowEmailDialog }: ApplicationMetadataProps) => {
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-3xl font-semibold">
-          {application.engaging_title || application.title || application.reference}
-        </h2>
-        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100">
-          <span className="text-sm font-medium">Impact Score:</span>
-          <span className="text-sm font-semibold">
-            {application.final_impact_score ?? 'Not available'}
-          </span>
-        </div>
+      <h1 className="text-xl font-semibold">{application.title || application.description}</h1>
+      <p className="text-gray-600">{application.address}</p>
+      <div className="flex gap-2">
+        <span className="text-sm bg-primary-light text-primary px-2 py-1 rounded">
+          {application.status}
+        </span>
+        <button
+          onClick={onShowEmailDialog}
+          className="text-sm text-primary hover:text-primary-dark"
+        >
+          Get Updates
+        </button>
       </div>
     </div>
   );

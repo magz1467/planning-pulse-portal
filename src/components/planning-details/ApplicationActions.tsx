@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 interface ApplicationActionsProps {
   applicationId: number;
   onShowPetitionDialog: () => void;
@@ -7,16 +9,16 @@ interface ApplicationActionsProps {
 export const ApplicationActions = ({
   applicationId,
   onShowPetitionDialog,
-  onShowFeedbackDialog
+  onShowFeedbackDialog,
 }: ApplicationActionsProps) => {
   return (
-    <div className="flex items-center gap-2">
-      <button onClick={onShowPetitionDialog} className="text-sm text-gray-600 hover:text-gray-900">
+    <div className="flex gap-4">
+      <Button onClick={onShowPetitionDialog} variant="outline">
         Start Petition
-      </button>
-      <button onClick={onShowFeedbackDialog} className="text-sm text-gray-600 hover:text-gray-900">
+      </Button>
+      <Button onClick={onShowFeedbackDialog} variant="outline">
         Give Feedback
-      </button>
+      </Button>
     </div>
   );
 };

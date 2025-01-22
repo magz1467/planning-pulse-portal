@@ -3,18 +3,18 @@ import { PlanningApplicationDetails } from "@/components/PlanningApplicationDeta
 
 interface ApplicationFullScreenProps {
   application: Application;
-  onClose: () => void;
+  onDismiss: () => void;
 }
 
 export const ApplicationFullScreen = ({
   application,
-  onClose,
+  onDismiss,
 }: ApplicationFullScreenProps) => {
   return (
     <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
       <PlanningApplicationDetails
         application={application}
-        onClose={onClose}
+        onDismiss={onDismiss}
       />
     </div>
   );

@@ -3,18 +3,18 @@ import { PlanningApplicationDetails } from "@/components/PlanningApplicationDeta
 
 interface ApplicationDetailViewProps {
   application: Application;
-  onClose: () => void;
+  onDismiss: () => void;
 }
 
 export const ApplicationDetailView = ({
   application,
-  onClose,
+  onDismiss,
 }: ApplicationDetailViewProps) => {
   return (
     <div className="h-full overflow-auto">
       <PlanningApplicationDetails
         application={application}
-        onClose={onClose}
+        onDismiss={onDismiss}
       />
     </div>
   );

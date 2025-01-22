@@ -3,19 +3,19 @@ import { PlanningApplicationDetails } from "@/components/PlanningApplicationDeta
 
 interface FullScreenDetailsProps {
   application: Application;
-  onClose: () => void;
+  onDismiss: () => void;
 }
 
 export const FullScreenDetails = ({
   application,
-  onClose,
+  onDismiss,
 }: FullScreenDetailsProps) => {
   return (
     <div className="flex flex-col h-full max-h-[100dvh] overflow-hidden">
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <PlanningApplicationDetails
           application={application}
-          onClose={onClose}
+          onDismiss={onDismiss}
         />
       </div>
     </div>
