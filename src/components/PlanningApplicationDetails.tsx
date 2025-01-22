@@ -108,14 +108,10 @@ export const PlanningApplicationDetails = ({
 
   return (
     <div className="p-6 space-y-4 pb-20">
-      <div className="flex justify-between items-start pt-8">
-        <div className="flex-1">
-          <ApplicationMetadata 
-            application={currentApplication}
-            onShowEmailDialog={() => setShowEmailDialog(true)}
-          />
-        </div>
-      </div>
+      <ApplicationMetadata 
+        application={currentApplication}
+        onShowEmailDialog={() => setShowEmailDialog(true)}
+      />
       
       <ApplicationActions 
         applicationId={currentApplication.id}

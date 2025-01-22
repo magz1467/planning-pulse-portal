@@ -43,6 +43,11 @@ export const SidebarSection = ({
 }: SidebarSectionProps) => {
   if (!coordinates) return null;
 
+  const handleClose = () => {
+    onSelectApplication(null);
+    onClose();
+  };
+
   if (!isMobile) {
     return (
       <div className="w-[50%] h-full overflow-hidden border-r border-gray-200 bg-white">
@@ -55,7 +60,7 @@ export const SidebarSection = ({
           onFilterChange={onFilterChange}
           onSortChange={onSortChange}
           onSelectApplication={onSelectApplication}
-          onClose={onClose}
+          onClose={handleClose}
           statusCounts={statusCounts}
         />
       </div>
@@ -71,7 +76,7 @@ export const SidebarSection = ({
         onSelectApplication={onSelectApplication}
         onShowEmailDialog={() => {}}
         hideFilterBar={true}
-        onClose={onClose}
+        onClose={handleClose}
       />
     );
   }
