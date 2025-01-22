@@ -5,16 +5,14 @@ export const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // If there's a hash in the URL, scroll to that element
     if (hash) {
       const element = document.querySelector(hash);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
-        return;
       }
+    } else {
+      window.scrollTo(0, 0);
     }
-    // Otherwise scroll to top
-    window.scrollTo(0, 0);
   }, [pathname, hash]);
 
   return null;
