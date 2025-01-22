@@ -1,10 +1,11 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
-import { ApplicationMetadata } from "./ApplicationMetadata";
-import { ApplicationActions } from "./ApplicationActions";
-import { ApplicationContent } from "./ApplicationContent";
+import { ApplicationMetadata } from "./planning-details/ApplicationMetadata";
+import { ApplicationActions } from "./planning-details/ApplicationActions";
+import { ApplicationContent } from "./planning-details/ApplicationContent";
 import { EmailDialog } from "@/components/EmailDialog";
-import { ApplicationDialogs } from "./ApplicationDialogs";
+import { ApplicationDialogs } from "./planning-details/ApplicationDialogs";
+import { X } from "lucide-react";
 
 interface PlanningApplicationDetailsProps {
   application: Application;
@@ -30,7 +31,17 @@ export const PlanningApplicationDetails = ({
   };
 
   return (
-    <div className="p-6 space-y-4 pb-20">
+    <div className="p-6 space-y-4 pb-20 relative">
+      {onDismiss && (
+        <button 
+          onClick={onDismiss}
+          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="Close details"
+        >
+          <X className="h-5 w-5 text-gray-500" />
+        </button>
+      )}
+      
       <ApplicationMetadata 
         application={currentApplication}
         onShowEmailDialog={() => setShowEmailDialog(true)}
@@ -58,12 +69,6 @@ export const PlanningApplicationDetails = ({
         showFeedbackDialog={showFeedbackDialog}
         setShowFeedbackDialog={setShowFeedbackDialog}
       />
-
-      {onDismiss && (
-        <button onClick={onDismiss} className="mt-4 text-blue-500">
-          Dismiss
-        </button>
-      )}
     </div>
   );
 };
