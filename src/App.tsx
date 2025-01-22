@@ -3,14 +3,24 @@ import { routes } from "@/routes/routes";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Toaster } from "@/components/ui/toaster";
 
-// Create router with routes that preserve their original elements
-const router = createHashRouter(routes);
+// Wrap each route with ScrollToTop
+const routesWithScroll = routes.map(route => ({
+  ...route,
+  element: (
+    <>
+      <ScrollToTop />
+      {route.element}
+    </>
+  ),
+}));
+
+// Create router with wrapped routes
+const router = createHashRouter(routesWithScroll);
 
 function App() {
   return (
     <>
       <RouterProvider router={router} />
-      <ScrollToTop />
       <Toaster />
     </>
   );
