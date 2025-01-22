@@ -2,16 +2,13 @@ import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSavedApplications } from "@/hooks/use-saved-applications";
-import { EmailDialog } from "./EmailDialog";
-import { FeedbackEmailDialog } from "./FeedbackEmailDialog";
-import { AuthRequiredDialog } from "./AuthRequiredDialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ApplicationMetadata } from "./planning-details/ApplicationMetadata";
 import { ApplicationActions } from "./planning-details/ApplicationActions";
 import { ApplicationContent } from "./planning-details/ApplicationContent";
+import { ApplicationDialogs } from "./planning-details/ApplicationDialogs";
+import { ApplicationFeedbackSection } from "./planning-details/ApplicationFeedbackSection";
 
 interface PlanningApplicationDetailsProps {
   application?: Application;
@@ -135,34 +132,23 @@ export const PlanningApplicationDetails = ({
         onFeedback={handleFeedback}
       />
 
-      <Card className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold">Is this your development?</h3>
-            <p className="text-sm text-gray-600">Click here to verify and see full feedback</p>
-          </div>
-          <Button variant="outline" onClick={() => setShowFeedbackDialog(true)}>
-            Get feedback
-          </Button>
-        </div>
-      </Card>
-
-      <EmailDialog 
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        onSubmit={handleEmailSubmit}
-        postcode={currentApplication?.postcode || ''}
+      <ApplicationFeedbackSection
+        feedback={feedback}
+        feedbackStats={feedbackStats}
+        onFeedback={handleFeedback}
+        applicationId={currentApplication.id}
       />
 
-      <FeedbackEmailDialog
-        open={showFeedbackDialog}
-        onOpenChange={setShowFeedbackDialog}
-        onSubmit={handleFeedbackEmailSubmit}
-      />
-
-      <AuthRequiredDialog
-        open={showAuthDialog}
-        onOpenChange={setShowAuthDialog}
+      <ApplicationDialogs
+        showEmailDialog={showEmailDialog}
+        setShowEmailDialog={setShowEmailDialog}
+        showFeedbackDialog={showFeedbackDialog}
+        setShowFeedbackDialog={setShowFeedbackDialog}
+        showAuthDialog={showAuthDialog}
+        setShowAuthDialog={setShowAuthDialog}
+        onEmailSubmit={handleEmailSubmit}
+        onFeedbackEmailSubmit={handleFeedbackEmailSubmit}
+        postcode={currentApplication.postcode}
       />
     </div>
   );
