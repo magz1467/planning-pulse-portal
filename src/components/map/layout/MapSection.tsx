@@ -7,11 +7,10 @@ import { MapAction } from "@/types/map-reducer";
 interface MapSectionProps {
   isMobile: boolean;
   isMapView: boolean;
-  coordinates: [number, number];
+  coordinates: [number, number] | null;
   applications: Application[];
   selectedId: number | null;
   dispatch: React.Dispatch<MapAction>;
-  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapSection = memo(({
@@ -21,7 +20,6 @@ export const MapSection = memo(({
   applications,
   selectedId,
   dispatch,
-  onCenterChange,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
@@ -45,7 +43,6 @@ export const MapSection = memo(({
           selectedId={selectedId}
           coordinates={coordinates}
           onMarkerClick={handleMarkerClick}
-          onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards

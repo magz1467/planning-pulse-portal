@@ -3,30 +3,28 @@ import { Map, List } from "lucide-react";
 
 interface ViewToggleProps {
   isMapView: boolean;
-  onToggle: () => void;
+  onToggleView: () => void;
 }
 
-export const ViewToggle = ({ isMapView, onToggle }: ViewToggleProps) => {
+export const ViewToggle = ({ isMapView, onToggleView }: ViewToggleProps) => {
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onToggle}
-        className={isMapView ? "text-primary" : "text-gray-500"}
-      >
-        <Map className="h-5 w-5 mr-1" />
-        Map
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onToggle}
-        className={!isMapView ? "text-primary" : "text-gray-500"}
-      >
-        <List className="h-5 w-5 mr-1" />
-        Feed
-      </Button>
-    </div>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={onToggleView}
+      className="flex items-center gap-1.5"
+    >
+      {isMapView ? (
+        <>
+          <List className="h-4 w-4" />
+          List View
+        </>
+      ) : (
+        <>
+          <Map className="h-4 w-4" />
+          Map View
+        </>
+      )}
+    </Button>
   );
 };
