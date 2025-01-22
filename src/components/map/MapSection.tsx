@@ -11,7 +11,6 @@ interface MapSectionProps {
   applications: Application[];
   selectedId: number | null;
   dispatch: React.Dispatch<MapAction>;
-  onCenterChange?: (center: [number, number]) => void;
 }
 
 export const MapSection = ({
@@ -21,7 +20,6 @@ export const MapSection = ({
   applications,
   selectedId,
   dispatch,
-  onCenterChange,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
@@ -45,7 +43,6 @@ export const MapSection = ({
           selectedId={selectedId}
           coordinates={coordinates}
           onMarkerClick={handleMarkerClick}
-          onCenterChange={onCenterChange}
         />
         {isMobile && selectedId && (
           <MobileApplicationCards

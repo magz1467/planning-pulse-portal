@@ -1,16 +1,14 @@
-import { Application } from "./planning";
-
-export type MapState = {
+export interface MapState {
   selectedId: number | null;
   applications: Application[];
   isMapView: boolean;
-  coordinates: [number, number] | null;
-  activeSort: "closingSoon" | "newest" | null;
-};
+  coordinates: [number, number];
+  activeSort: 'closingSoon' | 'newest' | null;
+}
 
-export type MapAction = 
+export type MapAction =
   | { type: 'SELECT_APPLICATION'; payload: number | null }
   | { type: 'SET_APPLICATIONS'; payload: Application[] }
   | { type: 'TOGGLE_VIEW' }
   | { type: 'SET_COORDINATES'; payload: [number, number] }
-  | { type: 'SET_SORT'; payload: "closingSoon" | "newest" | null };
+  | { type: 'SET_SORT'; payload: 'closingSoon' | 'newest' | null };
