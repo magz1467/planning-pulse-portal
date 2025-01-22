@@ -1,6 +1,6 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
-import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
+import { FullScreenDetails } from "./FullScreenDetails";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
@@ -54,9 +54,15 @@ export const MobileApplicationCards = ({
   if (showFullDetails && selectedApp) {
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
-        <PlanningApplicationDetails
+        <FullScreenDetails
           application={selectedApp}
           onClose={handleClose}
+          onCommentSubmit={(content: string) => {
+            toast({
+              title: "Comment Submitted",
+              description: "Your comment has been recorded",
+            });
+          }}
         />
       </div>
     );
