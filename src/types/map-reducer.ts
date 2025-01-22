@@ -5,7 +5,7 @@ export interface MapState {
   applications: Application[];
   isMapView: boolean;
   coordinates: [number, number];
-  activeSort: 'closingSoon' | 'newest' | null;
+  activeSort: 'closingSoon' | 'newest' | 'impact' | null;
 }
 
 export type MapAction =
@@ -13,4 +13,4 @@ export type MapAction =
   | { type: 'SET_APPLICATIONS'; payload: Application[] }
   | { type: 'TOGGLE_VIEW' }
   | { type: 'SET_COORDINATES'; payload: [number, number] }
-  | { type: 'SET_SORT'; payload: 'closingSoon' | 'newest' | null };
+  | { type: 'SET_SORT'; payload: 'closingSoon' | 'newest' | 'impact' | null };
