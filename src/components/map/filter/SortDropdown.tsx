@@ -1,59 +1,45 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Check } from "lucide-react";
-import { SortType } from "@/hooks/use-sort-applications";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SortType } from "@/types/map-reducer";
 
 interface SortDropdownProps {
-  children?: React.ReactNode;
-  activeSort?: SortType;
-  onSortChange?: (sortType: SortType) => void;
+  children: React.ReactNode;
+  activeSort: SortType;
+  onSortChange: (sortType: SortType) => void;
 }
 
-export const SortDropdown = ({ 
-  children, 
-  activeSort, 
-  onSortChange 
-}: SortDropdownProps) => {
-  const handleSort = (sortType: SortType) => {
-    if (!onSortChange) return;
-    onSortChange(sortType);
-  };
-
+export const SortDropdown = ({ children, activeSort, onSortChange }: SortDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {children}
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        align="end" 
-        className="bg-white border border-gray-200 shadow-lg rounded-md z-50"
-      >
-        <DropdownMenuItem 
-          onClick={() => handleSort(null)} 
-          className="flex items-center justify-between hover:bg-gray-100 cursor-pointer"
-        >
-          Default
-          {activeSort === null && <Check className="h-4 w-4 ml-2" />}
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => handleSort('newest')} 
-          className="flex items-center justify-between hover:bg-gray-100 cursor-pointer"
+      <DropdownMenuContent align="start" className="w-[200px]">
+        <DropdownMenuItem
+          className="justify-between"
+          onClick={() => onSortChange('newest')}
         >
           Newest
-          {activeSort === 'newest' && <Check className="h-4 w-4 ml-2" />}
+          {activeSort === 'newest' && <span>✓</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => handleSort('closingSoon')} 
-          className="flex items-center justify-between hover:bg-gray-100 cursor-pointer"
+        <DropdownMenuItem
+          className="justify-between"
+          onClick={() => onSortChange('closingSoon')}
         >
           Closing Soon
-          {activeSort === 'closingSoon' && <Check className="h-4 w-4 ml-2" />}
+          {activeSort === 'closingSoon' && <span>✓</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => handleSort('impact')} 
-          className="flex items-center justify-between hover:bg-gray-100 cursor-pointer"
+        <DropdownMenuItem
+          className="justify-between"
+          onClick={() => onSortChange('impact')}
         >
           Highest Impact
-          {activeSort === 'impact' && <Check className="h-4 w-4 ml-2" />}
+          {activeSort === 'impact' && <span>✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

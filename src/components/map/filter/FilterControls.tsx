@@ -4,7 +4,7 @@ import { SortDropdown } from "./SortDropdown";
 import { Button } from "@/components/ui/button";
 import { List } from "lucide-react";
 import { ClassificationFilters } from "./ClassificationFilters";
-import { SortType } from "@/hooks/use-sort-applications";
+import { SortType } from "@/types/map-reducer";
 
 interface FilterControlsProps {
   onFilterChange: (filterType: string, value: string) => void;

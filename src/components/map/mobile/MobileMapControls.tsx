@@ -1,7 +1,6 @@
 import { Application } from "@/types/planning";
-import { MapAction } from "@/types/map-reducer";
+import { MapAction, SortType } from "@/types/map-reducer";
 import { FilterControls } from "../filter/FilterControls";
-import { SortType } from "@/hooks/use-sort-applications";
 
 interface MobileMapControlsProps {
   applications: Application[];
@@ -26,7 +25,6 @@ export const MobileMapControls = ({
   statusCounts
 }: MobileMapControlsProps) => {
   const handleFilterChange = (filterType: string, value: string) => {
-    // Filter logic will be handled by the parent component
     console.log('Filter changed:', filterType, value);
   };
 
