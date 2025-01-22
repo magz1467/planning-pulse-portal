@@ -1,5 +1,6 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
+import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
@@ -9,7 +10,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 
 interface MobileApplicationCardsProps {
@@ -42,13 +42,14 @@ export const MobileApplicationCards = ({
     });
   };
 
-  const selectedApp = applications.find(app => app.id === selectedId);
-
   if (!applications.length) {
     return <EmptyState />;
   }
 
-  if (showFullDetails && selectedApp) {
+  if (showFullDetails && selectedId) {
+    const selectedApp = applications.find(app => app.id === selectedId);
+    if (!selectedApp) return null;
+    
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
         <PlanningApplicationDetails
@@ -62,7 +63,10 @@ export const MobileApplicationCards = ({
     );
   }
 
-  if (selectedApp) {
+  if (selectedId) {
+    const selectedApp = applications.find(app => app.id === selectedId);
+    if (!selectedApp) return null;
+
     return (
       <>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
