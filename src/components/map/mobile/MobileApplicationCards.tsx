@@ -48,21 +48,21 @@ export const MobileApplicationCards = ({
     return <EmptyState />;
   }
 
-  if (selectedApp) {
-    if (showFullDetails) {
-      return (
-        <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
-          <PlanningApplicationDetails
-            application={selectedApp}
-            onClose={() => {
-              setShowFullDetails(false);
-              onSelectApplication(null);
-            }}
-          />
-        </div>
-      );
-    }
+  if (showFullDetails && selectedApp) {
+    return (
+      <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
+        <PlanningApplicationDetails
+          application={selectedApp}
+          onClose={() => {
+            setShowFullDetails(false);
+            onSelectApplication(null);
+          }}
+        />
+      </div>
+    );
+  }
 
+  if (selectedApp) {
     return (
       <>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
