@@ -5,11 +5,14 @@ import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
 import { 
   Drawer,
+  DrawerClose,
   DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
-import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
 
 interface MobileApplicationCardsProps {
@@ -48,44 +51,27 @@ export const MobileApplicationCards = ({
     return <EmptyState />;
   }
 
-  if (selectedApp) {
-    if (showFullDetails) {
-      return (
-        <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
-          <PlanningApplicationDetails
-            application={selectedApp}
-            onClose={() => {
-              setShowFullDetails(false);
-              onSelectApplication(null);
-            }}
-          />
-        </div>
-      );
-    }
-
+  if (selectedApp && !showFullDetails) {
     return (
       <>
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <MiniCard
             application={selectedApp}
-            onClick={() => setShowFullDetails(true)}
+            onClick={() => setIsDrawerOpen(true)}
           />
           <DrawerContent className="h-[85vh] px-4">
             <DrawerHeader>
               <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
-              <DrawerTitle className="sr-only">Applications List</DrawerTitle>
             </DrawerHeader>
-            <div className="overflow-y-auto h-full pb-8">
-              <PlanningApplicationList
-                applications={applications}
-                postcode=""
-                onSelectApplication={(id) => {
-                  onSelectApplication(id);
-                  setIsDrawerOpen(false);
-                }}
-                activeSort="newest"
-              />
-            </div>
+            <PlanningApplicationList
+              applications={applications}
+              postcode=""
+              onSelectApplication={(id) => {
+                onSelectApplication(id);
+                setIsDrawerOpen(false);
+              }}
+              activeSort="newest"
+            />
           </DrawerContent>
         </Drawer>
       </>
