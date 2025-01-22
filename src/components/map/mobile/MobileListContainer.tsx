@@ -10,7 +10,7 @@ interface MobileListContainerProps {
   onSelectApplication: (id: number | null) => void;
   onShowEmailDialog: () => void;
   hideFilterBar?: boolean;
-  onDismiss: () => void;
+  onClose: () => void;
 }
 
 export const MobileListContainer = ({
@@ -20,7 +20,7 @@ export const MobileListContainer = ({
   onSelectApplication,
   onShowEmailDialog,
   hideFilterBar = false,
-  onDismiss,
+  onClose,
 }: MobileListContainerProps) => {
   const [showDetails, setShowDetails] = useState(false);
   
@@ -29,9 +29,9 @@ export const MobileListContainer = ({
     setShowDetails(true);
   };
 
-  const handleDismiss = () => {
+  const handleCloseDetails = () => {
     setShowDetails(false);
-    onDismiss();
+    onSelectApplication(null);
   };
 
   const selectedApp = applications.find(app => app.id === selectedApplication);
@@ -40,7 +40,7 @@ export const MobileListContainer = ({
     return (
       <MobileDetailsView 
         application={selectedApp}
-        onDismiss={handleDismiss}
+        onClose={handleCloseDetails}
       />
     );
   }
@@ -53,7 +53,7 @@ export const MobileListContainer = ({
       onSelectApplication={handleSelectApplication}
       onShowEmailDialog={onShowEmailDialog}
       hideFilterBar={hideFilterBar}
-      onDismiss={onDismiss}
+      onClose={onClose}
     />
   );
 };

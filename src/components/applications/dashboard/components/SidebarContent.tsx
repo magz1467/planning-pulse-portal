@@ -23,7 +23,7 @@ interface SidebarContentProps {
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number | null) => void;
-  onDismiss: () => void;
+  onClose: () => void;
 }
 
 export const SidebarContent = ({
@@ -39,7 +39,7 @@ export const SidebarContent = ({
   onFilterChange,
   onSortChange,
   onSelectApplication,
-  onDismiss,
+  onClose,
 }: SidebarContentProps) => {
   if (!coordinates) return null;
 
@@ -54,7 +54,7 @@ export const SidebarContent = ({
         onFilterChange={onFilterChange}
         onSortChange={onSortChange}
         onSelectApplication={onSelectApplication}
-        onDismiss={onDismiss}
+        onClose={onClose}
         statusCounts={statusCounts}
       />
     );
@@ -69,7 +69,7 @@ export const SidebarContent = ({
         onSelectApplication={onSelectApplication}
         onShowEmailDialog={() => {}}
         hideFilterBar={true}
-        onDismiss={onDismiss}
+        onClose={onClose}
       />
     );
   }

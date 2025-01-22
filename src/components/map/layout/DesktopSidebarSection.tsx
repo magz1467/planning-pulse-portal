@@ -1,7 +1,5 @@
 import { Application } from "@/types/planning";
 import { DesktopSidebar } from "../DesktopSidebar";
-import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
-import { SortType } from "@/hooks/use-sort-applications";
 
 interface DesktopSidebarSectionProps {
   isMobile: boolean;
@@ -12,11 +10,11 @@ interface DesktopSidebarSectionProps {
     status?: string;
     type?: string;
   };
-  activeSort: SortType;
+  activeSort: 'closingSoon' | 'newest' | null;
   onFilterChange: (filterType: string, value: string) => void;
-  onSortChange: (sortType: SortType) => void;
-  onSelectApplication: (id: number) => void;
-  onDismiss: () => void;
+  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
+  onSelectApplication: (id: number | null) => void;
+  onClose: () => void;
 }
 
 export const DesktopSidebarSection = ({
@@ -29,33 +27,21 @@ export const DesktopSidebarSection = ({
   onFilterChange,
   onSortChange,
   onSelectApplication,
-  onDismiss
+  onClose,
 }: DesktopSidebarSectionProps) => {
   if (isMobile) return null;
 
-  const selectedApp = applications.find(app => app.id === selectedApplication);
-
   return (
-    <div className="w-[400px] flex-shrink-0 border-r bg-white overflow-y-auto">
-      {selectedApp ? (
-        <PlanningApplicationDetails
-          application={selectedApp}
-          onDismiss={onDismiss}
-        />
-      ) : (
-        <DesktopSidebar
-          applications={applications}
-          selectedApplication={selectedApplication}
-          postcode={postcode}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          onFilterChange={onFilterChange}
-          onSortChange={onSortChange}
-          onSelectApplication={onSelectApplication}
-          onShowEmailDialog={() => {}}
-          onDismiss={onDismiss}
-        />
-      )}
-    </div>
+    <DesktopSidebar
+      applications={applications}
+      selectedApplication={selectedApplication}
+      postcode={postcode}
+      activeFilters={activeFilters}
+      activeSort={activeSort}
+      onFilterChange={onFilterChange}
+      onSortChange={onSortChange}
+      onSelectApplication={onSelectApplication}
+      onClose={onClose}
+    />
   );
 };

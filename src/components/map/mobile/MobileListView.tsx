@@ -12,7 +12,7 @@ interface MobileListViewProps {
   onSelectApplication: (id: number) => void;
   onShowEmailDialog: () => void;
   hideFilterBar?: boolean;
-  onDismiss: () => void;
+  onClose?: () => void;  // Added this prop definition
 }
 
 export const MobileListView = ({
@@ -22,7 +22,7 @@ export const MobileListView = ({
   onSelectApplication,
   onShowEmailDialog,
   hideFilterBar,
-  onDismiss
+  onClose
 }: MobileListViewProps) => {
   const [showAlerts, setShowAlerts] = useState(true);
 

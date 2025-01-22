@@ -54,7 +54,7 @@ export const MapContentLayout = ({
     });
   };
 
-  const handleDismiss = () => {
+  const handleClose = () => {
     dispatch({ type: 'SELECT_APPLICATION', payload: null });
   };
 
@@ -80,7 +80,7 @@ export const MapContentLayout = ({
           onFilterChange={onFilterChange}
           onSortChange={onSortChange}
           onSelectApplication={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
-          onDismiss={handleDismiss}
+          onClose={handleClose}
         />
         
         <MapSection 
@@ -99,7 +99,7 @@ export const MapContentLayout = ({
             postcode={postcode}
             onSelectApplication={(id) => dispatch({ type: 'SELECT_APPLICATION', payload: id })}
             onShowEmailDialog={() => setShowEmailDialog(true)}
-            onDismiss={handleDismiss}
+            onClose={handleClose}
           />
         )}
       </div>

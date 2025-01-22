@@ -46,10 +46,6 @@ export const DashboardLayout = ({
 }: DashboardLayoutProps) => {
   const isMobile = useIsMobile();
 
-  const handleDismiss = () => {
-    handleMarkerClick(null);
-  };
-
   return (
     <>
       {!isMobile && <Header />}
@@ -84,7 +80,7 @@ export const DashboardLayout = ({
             onFilterChange={handleFilterChange}
             onSortChange={handleSortChange}
             onSelectApplication={handleMarkerClick}
-            onDismiss={handleDismiss}
+            onClose={() => handleMarkerClick(null)}
           />
           
           <MapSection 

@@ -1,12 +1,6 @@
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { SortType } from "@/hooks/use-sort-applications";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Check } from "lucide-react";
+import { SortType } from "@/hooks/use-sort-applications";
 
 interface SortDropdownProps {
   children?: React.ReactNode;
@@ -21,12 +15,7 @@ export const SortDropdown = ({
 }: SortDropdownProps) => {
   const handleSort = (sortType: SortType) => {
     if (!onSortChange) return;
-    // If clicking the same sort type, clear it
-    if (sortType === activeSort) {
-      onSortChange(null);
-    } else {
-      onSortChange(sortType);
-    }
+    onSortChange(sortType);
   };
 
   return (

@@ -48,6 +48,7 @@ export const MobileApplicationCards = ({
             setShowFullDetails(false);
             onSelectApplication(null);
           }}
+          onCommentSubmit={handleCommentSubmit}
         />
       </div>
     );
