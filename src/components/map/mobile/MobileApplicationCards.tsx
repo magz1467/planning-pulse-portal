@@ -1,6 +1,5 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
-import { FullScreenDetails } from "./FullScreenDetails";
 import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
@@ -11,6 +10,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { PlanningApplicationList } from "@/components/PlanningApplicationList";
+import { PlanningApplicationDetails } from "@/components/PlanningApplicationDetails";
 
 interface MobileApplicationCardsProps {
   applications: Application[];
@@ -35,14 +35,8 @@ export const MobileApplicationCards = ({
     }
   }, [selectedId]);
 
-  // Early return for empty state
-  if (!applications.length) {
-    return <EmptyState />;
-  }
-
   // Get selected application if there is one
   const selectedApp = selectedId ? applications.find(app => app.id === selectedId) : null;
-  if (selectedId && !selectedApp) return null;
 
   // Handle closing details view
   const handleClose = () => {
@@ -50,60 +44,58 @@ export const MobileApplicationCards = ({
     onSelectApplication(null);
   };
 
+  // Early return for empty state
+  if (!applications.length) {
+    return <EmptyState />;
+  }
+
+  // Early return if no selected app
+  if (!selectedApp) return null;
+
   // Render full details view
-  if (showFullDetails && selectedApp) {
+  if (showFullDetails) {
     return (
       <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
-        <FullScreenDetails
+        <PlanningApplicationDetails
           application={selectedApp}
           onClose={handleClose}
-          onCommentSubmit={(content: string) => {
-            toast({
-              title: "Comment Submitted",
-              description: "Your comment has been recorded",
-            });
-          }}
         />
       </div>
     );
   }
 
   // Render mini card with drawer
-  if (selectedApp) {
-    return (
-      <>
-        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <div 
-            className="fixed bottom-0 left-0 right-0 z-[1000]"
+  return (
+    <>
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-[1000]"
+          onClick={() => setShowFullDetails(true)}
+        >
+          <MiniCard
+            application={selectedApp}
             onClick={() => setShowFullDetails(true)}
-          >
-            <MiniCard
-              application={selectedApp}
-              onClick={() => setShowFullDetails(true)}
+          />
+        </div>
+        
+        <DrawerContent className="h-[85vh] px-4">
+          <DrawerHeader>
+            <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
+            <DrawerTitle className="sr-only">Applications List</DrawerTitle>
+          </DrawerHeader>
+          <div className="overflow-y-auto h-full pb-8">
+            <PlanningApplicationList
+              applications={applications}
+              postcode=""
+              onSelectApplication={(id) => {
+                onSelectApplication(id);
+                setIsDrawerOpen(false);
+              }}
+              activeSort="newest"
             />
           </div>
-          
-          <DrawerContent className="h-[85vh] px-4">
-            <DrawerHeader>
-              <div className="h-2 w-[100px] rounded-full bg-muted mx-auto mb-4 mt-2" />
-              <DrawerTitle className="sr-only">Applications List</DrawerTitle>
-            </DrawerHeader>
-            <div className="overflow-y-auto h-full pb-8">
-              <PlanningApplicationList
-                applications={applications}
-                postcode=""
-                onSelectApplication={(id) => {
-                  onSelectApplication(id);
-                  setIsDrawerOpen(false);
-                }}
-                activeSort="newest"
-              />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      </>
-    );
-  }
-
-  return null;
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
 };
