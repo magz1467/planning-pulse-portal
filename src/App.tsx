@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, ScrollRestoration } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { routes } from "@/routes/routes";
 
@@ -8,6 +8,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <ScrollRestoration />
       <Toaster />
     </>
   );
