@@ -23,7 +23,7 @@ interface SidebarSectionProps {
   onFilterChange: (filterType: string, value: string) => void;
   onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
   onSelectApplication: (id: number | null) => void;
-  onClose: () => void;
+  onDismiss: () => void;
 }
 
 export const SidebarSection = ({
@@ -39,14 +39,9 @@ export const SidebarSection = ({
   onFilterChange,
   onSortChange,
   onSelectApplication,
-  onClose,
+  onDismiss,
 }: SidebarSectionProps) => {
   if (!coordinates) return null;
-
-  const handleClose = () => {
-    onSelectApplication(null);
-    onClose();
-  };
 
   if (!isMobile) {
     return (
@@ -60,7 +55,7 @@ export const SidebarSection = ({
           onFilterChange={onFilterChange}
           onSortChange={onSortChange}
           onSelectApplication={onSelectApplication}
-          onClose={handleClose}
+          onDismiss={onDismiss}
           statusCounts={statusCounts}
         />
       </div>
@@ -76,7 +71,7 @@ export const SidebarSection = ({
         onSelectApplication={onSelectApplication}
         onShowEmailDialog={() => {}}
         hideFilterBar={true}
-        onClose={handleClose}
+        onDismiss={onDismiss}
       />
     );
   }
