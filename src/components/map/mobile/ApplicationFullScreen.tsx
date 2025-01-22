@@ -6,16 +6,20 @@ interface ApplicationFullScreenProps {
   onDismiss: () => void;
 }
 
-export const ApplicationFullScreen = ({
+export const ApplicationFullScreen = ({ 
   application,
   onDismiss,
 }: ApplicationFullScreenProps) => {
   return (
-    <div className="fixed inset-0 bg-white z-[2000] overflow-auto">
-      <PlanningApplicationDetails
-        application={application}
-        onDismiss={onDismiss}
-      />
+    <div className="fixed inset-0 z-[2000] bg-white animate-in slide-in-from-bottom duration-300">
+      <div className="h-full flex flex-col bg-white">
+        <div className="flex-1 overflow-y-auto">
+          <PlanningApplicationDetails
+            application={application}
+            onDismiss={onDismiss}
+          />
+        </div>
+      </div>
     </div>
   );
 };
