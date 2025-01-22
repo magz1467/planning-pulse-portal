@@ -4,7 +4,6 @@ import { PlanningApplicationDetails } from "@/components/PlanningApplicationDeta
 interface FullScreenDetailsProps {
   application: Application;
   onClose: () => void;
-  onCommentSubmit: (content: string) => void;
 }
 
 export const FullScreenDetails = ({
