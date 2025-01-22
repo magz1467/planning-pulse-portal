@@ -25,7 +25,7 @@ export const MobileApplicationCards = ({
     }
   }, [selectedId]);
 
-  const handleClose = () => {
+  const handleDismiss = () => {
     setShowFullDetails(false);
     onSelectApplication(null);
   };
@@ -40,7 +40,7 @@ export const MobileApplicationCards = ({
     return (
       <ApplicationFullScreen
         application={selectedApp}
-        onClose={handleClose}
+        onDismiss={handleDismiss}
       />
     );
   }
