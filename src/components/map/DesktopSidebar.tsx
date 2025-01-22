@@ -1,86 +1,55 @@
 import { Application } from "@/types/planning";
-import { EmailDialog } from "@/components/EmailDialog";
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { FilterBar } from "@/components/FilterBar";
+import { AlertSection } from "./sidebar/AlertSection";
+import { SortType } from "@/hooks/use-sort-applications";
 import { ApplicationListView } from "./sidebar/ApplicationListView";
-import { ApplicationDetailView } from "./sidebar/ApplicationDetailView";
 
-interface DesktopSidebarProps {
+export interface DesktopSidebarProps {
   applications: Application[];
-  selectedApplication: number | null;
+  selectedApplication?: number | null;
   postcode: string;
-  activeFilters: {
+  onSelectApplication: (id: number) => void;
+  onShowEmailDialog: () => void;
+  onFilterChange?: (filterType: string, value: string) => void;
+  onSortChange?: (sortType: SortType) => void;
+  activeFilters?: {
     status?: string;
     type?: string;
   };
-  activeSort: 'closingSoon' | 'newest' | null;
-  onFilterChange: (filterType: string, value: string) => void;
-  onSortChange: (sortType: 'closingSoon' | 'newest' | null) => void;
-  onSelectApplication: (id: number | null) => void;
+  activeSort?: SortType;
   onDismiss: () => void;
-  statusCounts?: {
-    'Under Review': number;
-    'Approved': number;
-    'Declined': number;
-    'Other': number;
-  };
 }
 
 export const DesktopSidebar = ({
   applications,
   selectedApplication,
   postcode,
-  activeFilters,
-  activeSort,
+  onSelectApplication,
+  onShowEmailDialog,
   onFilterChange,
   onSortChange,
-  onSelectApplication,
-  onDismiss,
-  statusCounts
+  activeFilters,
+  activeSort,
+  onDismiss
 }: DesktopSidebarProps) => {
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const { toast } = useToast();
-
-  const selectedApplicationData = selectedApplication
-    ? applications.find((app) => app.id === selectedApplication)
-    : null;
-
-  const handleEmailSubmit = (radius: string) => {
-    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
-    toast({
-      title: "Subscription pending",
-      description: `We've sent a confirmation email to your registered email. Please check your inbox and click the link to confirm your subscription for planning alerts within ${radiusText} of ${postcode}. The email might take a few minutes to arrive.`,
-      duration: 5000,
-    });
-  };
-
   return (
-    <div className="w-full h-full overflow-hidden">
-      {selectedApplication === null ? (
-        <ApplicationListView
-          applications={applications}
-          selectedApplication={selectedApplication}
-          postcode={postcode}
-          onSelectApplication={onSelectApplication}
-          onShowEmailDialog={() => setShowEmailDialog(true)}
-          onFilterChange={onFilterChange}
-          onSortChange={onSortChange}
-          activeFilters={activeFilters}
-          activeSort={activeSort}
-          statusCounts={statusCounts}
-        />
-      ) : selectedApplicationData && (
-        <ApplicationDetailView
-          application={selectedApplicationData}
-          onDismiss={onDismiss}
-        />
-      )}
-
-      <EmailDialog 
-        open={showEmailDialog}
-        onOpenChange={setShowEmailDialog}
-        onSubmit={handleEmailSubmit}
+    <div className="h-full flex flex-col">
+      <AlertSection 
+        postcode={postcode} 
+        onShowEmailDialog={onShowEmailDialog} 
+      />
+      
+      <ApplicationListView
+        applications={applications}
+        selectedApplication={selectedApplication}
         postcode={postcode}
+        onSelectApplication={onSelectApplication}
+        onShowEmailDialog={onShowEmailDialog}
+        onFilterChange={onFilterChange}
+        onSortChange={onSortChange}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+        onDismiss={onDismiss}
       />
     </div>
   );
