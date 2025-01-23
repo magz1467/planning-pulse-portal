@@ -39,13 +39,15 @@ serve(async (req) => {
     const apiKey = Deno.env.get('SEARCHLAND_API_KEY')
 
     if (!apiKey) {
+      console.error('Searchland API key not found in environment variables')
       throw new Error('Searchland API key not found')
     }
 
     console.log('Fetching Searchland data with bbox:', bbox)
+    console.log('API Key exists:', !!apiKey)
 
     const response = await fetch(
-      `https://api.searchland.co.uk/v1/planning/applications?bbox=${bbox}&limit=5`,
+      `https://api.searchland.co.uk/v1/planning/applications?bbox=${bbox}&limit=50`,
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -54,7 +56,11 @@ serve(async (req) => {
       }
     )
 
+    console.log('Searchland API response status:', response.status)
+
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Searchland API error response:', errorText)
       throw new Error(`Searchland API error: ${response.statusText}`)
     }
 
@@ -100,7 +106,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({ applications: data.features }),
       { 
         headers: { 
           ...corsHeaders,
@@ -110,7 +116,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in fetch-searchland-data:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
