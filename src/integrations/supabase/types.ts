@@ -939,16 +939,67 @@ export type Database = {
       }
       searchland_applications: {
         Row: {
+          address: string | null
+          agent_details: Json | null
+          applicant_name: string | null
+          application_reference: string | null
+          application_type: string | null
+          constraints: Json | null
+          consultation_end_date: string | null
           created_at: string
+          decision_date: string | null
+          decision_details: Json | null
+          description: string | null
           id: number
+          location: unknown | null
+          raw_data: Json | null
+          source_url: string | null
+          status: string | null
+          submission_date: string | null
+          url: string | null
+          ward: string | null
         }
         Insert: {
+          address?: string | null
+          agent_details?: Json | null
+          applicant_name?: string | null
+          application_reference?: string | null
+          application_type?: string | null
+          constraints?: Json | null
+          consultation_end_date?: string | null
           created_at?: string
+          decision_date?: string | null
+          decision_details?: Json | null
+          description?: string | null
           id?: number
+          location?: unknown | null
+          raw_data?: Json | null
+          source_url?: string | null
+          status?: string | null
+          submission_date?: string | null
+          url?: string | null
+          ward?: string | null
         }
         Update: {
+          address?: string | null
+          agent_details?: Json | null
+          applicant_name?: string | null
+          application_reference?: string | null
+          application_type?: string | null
+          constraints?: Json | null
+          consultation_end_date?: string | null
           created_at?: string
+          decision_date?: string | null
+          decision_details?: Json | null
+          description?: string | null
           id?: number
+          location?: unknown | null
+          raw_data?: Json | null
+          source_url?: string | null
+          status?: string | null
+          submission_date?: string | null
+          url?: string | null
+          ward?: string | null
         }
         Relationships: []
       }
