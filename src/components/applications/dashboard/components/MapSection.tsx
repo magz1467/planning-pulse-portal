@@ -1,59 +1,57 @@
-import { Application } from "@/types/planning";
-import { MapView } from "./MapView";
-import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { useCallback, memo } from "react";
-import { MapAction } from "@/types/map-reducer";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { DashboardLayout } from "./DashboardLayout";
+import { useLocation } from "react-router-dom";
+import { useApplicationState } from "@/hooks/applications/use-application-state";
+import { useEffect } from "react";
 
-interface MapSectionProps {
-  isMobile: boolean;
-  isMapView: boolean;
-  coordinates: [number, number] | null;
-  applications: Application[];
-  selectedId: number | null;
-  dispatch: React.Dispatch<MapAction>;
-}
+export const ApplicationsDashboardMap = () => {
+  const location = useLocation();
+  const searchPostcode = location.state?.postcode;
+  
+  const {
+    selectedId,
+    activeFilters,
+    activeSort,
+    isMapView,
+    postcode,
+    coordinates,
+    isLoading,
+    applications,
+    filteredApplications,
+    statusCounts,
+    handleMarkerClick,
+    handleFilterChange,
+    handlePostcodeSelect,
+    handleSortChange,
+    setIsMapView
+  } = useApplicationState(searchPostcode);
 
-export const MapSection = memo(({
-  isMobile,
-  isMapView,
-  coordinates,
-  applications,
-  selectedId,
-  dispatch,
-}: MapSectionProps) => {
-  const handleMarkerClick = useCallback((id: number | null) => {
-    console.log('MapSection handleMarkerClick:', id);
-    dispatch({ type: 'SELECT_APPLICATION', payload: id });
-  }, [dispatch]);
-
-  if (!coordinates || (!isMobile && !isMapView)) return null;
+  // Select first application when applications are loaded on mobile
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && filteredApplications?.length > 0 && !selectedId && !isLoading) {
+      handleMarkerClick(filteredApplications[0].id);
+    }
+  }, [filteredApplications, selectedId, isLoading, handleMarkerClick]);
 
   return (
-    <div 
-      className="flex-1 relative"
-      style={{ 
-        height: isMobile ? 'calc(100vh - 120px)' : '100%',
-        position: 'relative',
-        zIndex: 1
-      }}
-    >
-      <div className="absolute inset-0">
-        <MapView
-          applications={applications}
-          selectedId={selectedId}
-          coordinates={coordinates}
-          onMarkerClick={handleMarkerClick}
-        />
-        {isMobile && selectedId && (
-          <MobileApplicationCards
-            applications={applications}
-            selectedId={selectedId}
-            onSelectApplication={handleMarkerClick}
-          />
-        )}
-      </div>
-    </div>
+    <ErrorBoundary>
+      <DashboardLayout
+        applications={applications}
+        selectedId={selectedId}
+        isMapView={isMapView}
+        coordinates={coordinates as [number, number]}
+        activeFilters={activeFilters}
+        activeSort={activeSort}
+        postcode={postcode}
+        isLoading={isLoading}
+        filteredApplications={filteredApplications}
+        handleMarkerClick={handleMarkerClick}
+        handleFilterChange={handleFilterChange}
+        handlePostcodeSelect={handlePostcodeSelect}
+        handleSortChange={handleSortChange}
+        setIsMapView={(value) => setIsMapView(value)}
+      />
+    </ErrorBoundary>
   );
-});
-
-MapSection.displayName = 'MapSection';
+};
