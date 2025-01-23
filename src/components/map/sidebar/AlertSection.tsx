@@ -32,7 +32,7 @@ export const AlertSection = ({ postcode, onShowEmailDialog }: AlertSectionProps)
       <div className="flex items-center justify-between p-3 bg-[#f6c8cc]/20 rounded-lg">
         <div className="flex items-center gap-2">
           <BellRing className="text-[#af5662]" size={16} />
-          <h3 className="font-playfair font-bold text-[#af5662]">Your Feed</h3>
+          <h3 className="font-playfair font-bold text-[#af5662]">🔥 💬 What's got the neighbourhood talking near you</h3>
         </div>
         {session ? (
           <Button 
