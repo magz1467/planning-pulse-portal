@@ -68,6 +68,13 @@ export const useApplicationState = (initialPostcode = '') => {
     }
   }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
+  // Set default sort to 'newest' when applications are loaded
+  useEffect(() => {
+    if (applications?.length > 0 && !activeSort) {
+      handleSortChange('newest');
+    }
+  }, [applications, activeSort, handleSortChange]);
+
   const filteredApplications = useFilteredApplications(
     applications || [],
     activeFilters,
