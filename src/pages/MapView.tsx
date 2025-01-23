@@ -13,7 +13,7 @@ const MapView = () => {
   const isMobile = useIsMobile();
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isMapView, setIsMapView] = useState(true);
   const [activeSort, setActiveSort] = useState<SortType>(null);
   const [coordinates, setCoordinates] = useState<[number, number]>([51.5074, -0.1278]); // Default to London
@@ -50,6 +50,7 @@ const MapView = () => {
           description: "Please try again later",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
 
@@ -130,9 +131,7 @@ const MapView = () => {
         variant: "destructive"
       });
     } finally {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1500);
+      setIsLoading(false);
     }
   };
 
@@ -147,6 +146,7 @@ const MapView = () => {
     }
 
     try {
+      setIsLoading(true);
       // Convert postcode to coordinates using a geocoding service
       const response = await fetch(
         `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
@@ -174,6 +174,8 @@ const MapView = () => {
         description: "Could not process your search. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
