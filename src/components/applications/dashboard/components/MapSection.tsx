@@ -13,7 +13,7 @@ interface MapSectionProps {
   dispatch: React.Dispatch<MapAction>;
 }
 
-export const MapSection = memo(({
+const MapSectionComponent = memo(({
   isMobile,
   isMapView,
   coordinates,
@@ -56,4 +56,6 @@ export const MapSection = memo(({
   );
 });
 
-MapSection.displayName = 'MapSection';
+MapSectionComponent.displayName = 'MapSection';
+
+export const MapSection = MapSectionComponent;
