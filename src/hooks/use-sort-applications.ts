@@ -91,7 +91,8 @@ export const useApplicationSorting = ({ type, applications }: SortConfig) => {
       sorted = sortByImpactScore(applications);
       break;
     default:
-      sorted = applications;
+      // Make impact score the default sort
+      sorted = sortByImpactScore(applications);
   }
 
   console.log('Number of applications after sort:', sorted.length);

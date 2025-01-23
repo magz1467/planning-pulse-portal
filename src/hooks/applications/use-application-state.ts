@@ -68,10 +68,10 @@ export const useApplicationState = (initialPostcode = '') => {
     }
   }, [isLoadingApps, isLoadingCoords, searchStartTime]);
 
-  // Set default sort to 'newest' when applications are loaded
+  // Set default sort to 'impact' when applications are loaded
   useEffect(() => {
     if (applications?.length > 0 && !activeSort) {
-      handleSortChange('newest');
+      handleSortChange('impact');
     }
   }, [applications, activeSort, handleSortChange]);
 
