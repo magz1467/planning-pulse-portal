@@ -1,9 +1,7 @@
 import { Application } from "@/types/planning";
 import { isWithinNextSevenDays } from "@/utils/dateUtils";
-import { SortType } from "@/types/application-types";
 
-// Re-export the type so other files can use it
-export type { SortType };
+export type SortType = 'closingSoon' | 'newest' | 'impact' | null;
 
 interface SortConfig {
   type: SortType;
