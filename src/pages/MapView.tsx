@@ -57,15 +57,15 @@ const MapView = () => {
       const transformedData = response?.applications?.map((item: any) => ({
         id: item.id || Math.random(),
         title: item.description || 'No description available',
+        description: item.description || '',
         address: item.address || 'No address available',
         status: item.status || 'Under Review',
         reference: item.application_reference || '',
-        description: item.description || '',
         submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
         coordinates: item.location?.coordinates ? 
           [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
           coordinates,
-        postcode: 'N/A',
+        postcode: item.postcode || 'N/A',
         applicant: item.applicant_name || 'Not specified',
         decisionDue: item.decision_date?.toString() || '',
         type: item.application_type || 'Planning Application',
@@ -75,13 +75,15 @@ const MapView = () => {
         image: undefined,
         image_map_url: undefined,
         ai_title: undefined,
-        last_date_consultation_comments: undefined,
-        valid_date: undefined,
+        last_date_consultation_comments: item.consultation_end_date?.toString(),
+        valid_date: item.submission_date?.toString(),
         centroid: undefined,
         impact_score: null,
         impact_score_details: undefined,
-        impacted_services: undefined
-      })) || [];
+        impacted_services: undefined,
+        final_impact_score: null,
+        engaging_title: item.description
+      } as Application)) || [];
 
       // Calculate status counts
       const counts = transformedData.reduce((acc, app) => {
@@ -105,6 +107,21 @@ const MapView = () => {
 
       setStatusCounts(counts);
       setApplications(transformedData);
+      
+      if (transformedData.length === 0) {
+        toast({
+          title: "No applications found",
+          description: "Try searching in a different area",
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: "Applications loaded",
+          description: `Found ${transformedData.length} applications in this area`,
+          variant: "default"
+        });
+      }
+
     } catch (error) {
       console.error('💥 Error in fetchSearchlandData:', error);
       toast({
