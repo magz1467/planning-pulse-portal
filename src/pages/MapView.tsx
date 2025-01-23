@@ -7,6 +7,7 @@ import { Application } from "@/types/planning";
 import { toast } from "@/components/ui/use-toast";
 import { FilterBar } from "@/components/FilterBar";
 import { SortType } from "@/hooks/use-sort-applications";
+import { PostcodeSearch } from "@/components/PostcodeSearch";
 
 const MapView = () => {
   const isMobile = useIsMobile();
@@ -15,6 +16,7 @@ const MapView = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMapView, setIsMapView] = useState(true);
   const [activeSort, setActiveSort] = useState<SortType>(null);
+  const [coordinates, setCoordinates] = useState<[number, number]>([51.5074, -0.1278]); // Default to London
   const [activeFilters, setActiveFilters] = useState<{
     status?: string;
     type?: string;
@@ -32,101 +34,131 @@ const MapView = () => {
     'Other': 0
   });
 
-  useEffect(() => {
-    const fetchSearchlandData = async () => {
-      console.log('🔍 Starting to fetch Searchland data...');
-      setIsLoading(true);
-      
-      try {
-        const { data: response, error } = await supabase.functions.invoke('fetch-searchland-data', {
-          body: {
-            bbox: '-0.5,51.3,-0.1,51.5' // London area
-          }
-        });
+  const fetchSearchlandData = async (bbox: string) => {
+    console.log('🔍 Starting to fetch Searchland data...', bbox);
+    setIsLoading(true);
+    
+    try {
+      const { data: response, error } = await supabase.functions.invoke('fetch-searchland-data', {
+        body: { bbox }
+      });
 
-        if (error) {
-          console.error('❌ Error fetching Searchland data:', error);
-          toast({
-            title: "Error loading applications",
-            description: "Please try again later",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        // Transform the data to match the Application type
-        const transformedData = response?.applications?.map((item: any) => ({
-          id: item.id || Math.random(),
-          title: item.description || 'No description available',
-          address: item.address || 'No address available',
-          status: item.status || 'Under Review',
-          reference: item.application_reference || '',
-          description: item.description || '',
-          submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
-          coordinates: item.location?.coordinates ? 
-            [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
-            [51.5074, -0.1278] as [number, number],
-          postcode: 'N/A',
-          applicant: item.applicant_name || 'Not specified',
-          decisionDue: item.decision_date?.toString() || '',
-          type: item.application_type || 'Planning Application',
-          ward: item.ward || 'Not specified',
-          officer: 'Not assigned',
-          consultationEnd: item.consultation_end_date?.toString() || '',
-          image: undefined,
-          image_map_url: undefined,
-          ai_title: undefined,
-          last_date_consultation_comments: undefined,
-          valid_date: undefined,
-          centroid: undefined,
-          impact_score: null,
-          impact_score_details: undefined,
-          impacted_services: undefined
-        })) || [];
-
-        console.log('✨ Transformed data:', {
-          totalTransformed: transformedData.length,
-          firstItem: transformedData[0]
-        });
-
-        // Calculate status counts
-        const counts = transformedData.reduce((acc, app) => {
-          const status = app.status.toLowerCase();
-          if (status.includes('review') || status.includes('pending')) {
-            acc['Under Review']++;
-          } else if (status.includes('approved')) {
-            acc['Approved']++;
-          } else if (status.includes('declined') || status.includes('refused')) {
-            acc['Declined']++;
-          } else {
-            acc['Other']++;
-          }
-          return acc;
-        }, {
-          'Under Review': 0,
-          'Approved': 0,
-          'Declined': 0,
-          'Other': 0
-        });
-
-        setStatusCounts(counts);
-        setApplications(transformedData);
-      } catch (error) {
-        console.error('💥 Error in fetchSearchlandData:', error);
+      if (error) {
+        console.error('❌ Error fetching Searchland data:', error);
         toast({
           title: "Error loading applications",
           description: "Please try again later",
           variant: "destructive"
         });
-      } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
+        return;
       }
-    };
 
-    fetchSearchlandData();
-  }, []);
+      // Transform the data to match the Application type
+      const transformedData = response?.applications?.map((item: any) => ({
+        id: item.id || Math.random(),
+        title: item.description || 'No description available',
+        address: item.address || 'No address available',
+        status: item.status || 'Under Review',
+        reference: item.application_reference || '',
+        description: item.description || '',
+        submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
+        coordinates: item.location?.coordinates ? 
+          [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
+          coordinates,
+        postcode: 'N/A',
+        applicant: item.applicant_name || 'Not specified',
+        decisionDue: item.decision_date?.toString() || '',
+        type: item.application_type || 'Planning Application',
+        ward: item.ward || 'Not specified',
+        officer: 'Not assigned',
+        consultationEnd: item.consultation_end_date?.toString() || '',
+        image: undefined,
+        image_map_url: undefined,
+        ai_title: undefined,
+        last_date_consultation_comments: undefined,
+        valid_date: undefined,
+        centroid: undefined,
+        impact_score: null,
+        impact_score_details: undefined,
+        impacted_services: undefined
+      })) || [];
+
+      // Calculate status counts
+      const counts = transformedData.reduce((acc, app) => {
+        const status = app.status.toLowerCase();
+        if (status.includes('review') || status.includes('pending')) {
+          acc['Under Review']++;
+        } else if (status.includes('approved')) {
+          acc['Approved']++;
+        } else if (status.includes('declined') || status.includes('refused')) {
+          acc['Declined']++;
+        } else {
+          acc['Other']++;
+        }
+        return acc;
+      }, {
+        'Under Review': 0,
+        'Approved': 0,
+        'Declined': 0,
+        'Other': 0
+      });
+
+      setStatusCounts(counts);
+      setApplications(transformedData);
+    } catch (error) {
+      console.error('💥 Error in fetchSearchlandData:', error);
+      toast({
+        title: "Error loading applications",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1500);
+    }
+  };
+
+  const handlePostcodeSelect = async (postcode: string) => {
+    if (!postcode) {
+      toast({
+        title: "Invalid Postcode",
+        description: "Please enter a valid postcode to search",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Convert postcode to coordinates using a geocoding service
+      const response = await fetch(
+        `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`
+      );
+      const data = await response.json();
+
+      if (data.status === 200 && data.result) {
+        const { longitude, latitude } = data.result;
+        setCoordinates([latitude, longitude]);
+        
+        // Create a bounding box around the postcode (roughly 2km)
+        const bbox = `${longitude - 0.02},${latitude - 0.02},${longitude + 0.02},${latitude + 0.02}`;
+        await fetchSearchlandData(bbox);
+      } else {
+        toast({
+          title: "Invalid Postcode",
+          description: "Could not find coordinates for this postcode",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error geocoding postcode:', error);
+      toast({
+        title: "Error",
+        description: "Could not process your search. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleFilterChange = (filterType: string, value: string) => {
     setActiveFilters(prev => {
@@ -153,6 +185,13 @@ const MapView = () => {
   return (
     <ErrorBoundary>
       <div className="flex flex-col h-screen">
+        <div className="p-4 bg-white border-b">
+          <PostcodeSearch
+            onSelect={handlePostcodeSelect}
+            placeholder="Search postcode to find planning applications"
+            className="w-full max-w-xl mx-auto mb-4"
+          />
+        </div>
         <FilterBar 
           onFilterChange={handleFilterChange}
           onSortChange={handleSortChange}
@@ -166,7 +205,7 @@ const MapView = () => {
         <MapContent 
           applications={applications}
           selectedId={selectedId}
-          coordinates={[51.5074, -0.1278]} // Default to London coordinates
+          coordinates={coordinates}
           isMobile={isMobile}
           isMapView={isMapView}
           onMarkerClick={(id) => {
