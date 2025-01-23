@@ -30,7 +30,7 @@ interface SearchlandResponse {
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders })
   }
 
@@ -46,8 +46,9 @@ serve(async (req) => {
     console.log('Fetching Searchland data with bbox:', bbox)
     console.log('API Key exists:', !!apiKey)
 
+    // Updated API endpoint with v2
     const response = await fetch(
-      `https://api.searchland.co.uk/v1/planning/applications?bbox=${bbox}&limit=50`,
+      `https://api.searchland.co.uk/v2/planning/applications/search?bbox=${bbox}&limit=50`,
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -61,7 +62,7 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Searchland API error response:', errorText)
-      throw new Error(`Searchland API error: ${response.statusText}`)
+      throw new Error(`Searchland API error: ${response.status} - ${errorText}`)
     }
 
     const data: SearchlandResponse = await response.json()
@@ -118,13 +119,13 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in fetch-searchland-data:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        context: 'Failed to fetch or process Searchland data'
+      }),
       { 
         status: 500,
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json'}
       }
     )
   }
