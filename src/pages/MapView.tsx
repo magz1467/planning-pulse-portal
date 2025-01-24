@@ -35,55 +35,37 @@ const MapView = () => {
   });
   const { toast } = useToast();
 
-  const fetchSearchlandData = async (bbox: string) => {
-    console.log('🔍 Starting to fetch Searchland data...', bbox);
+  const fetchPins = async (bbox: string) => {
+    console.log('🔍 Starting to fetch pins...', bbox);
     setIsLoading(true);
     
     try {
-      const { data: response, error } = await supabase.functions.invoke('fetch-searchland-data', {
+      const { data: response, error } = await supabase.functions.invoke('fetch-searchland-pins', {
         body: { bbox }
       });
 
       if (error) {
-        console.error('❌ Error fetching Searchland data:', error);
+        console.error('❌ Error fetching pins:', error);
         throw error;
       }
 
-      if (!response?.applications) {
-        throw new Error('No applications data received');
+      if (!response?.pins) {
+        throw new Error('No pins data received');
       }
 
-      // Transform the data to match the Application type
-      const transformedData = response.applications?.map((item: any) => ({
-        id: item.id || Math.random(),
-        title: item.description || 'No description available',
-        description: item.description || '',
-        address: item.address || 'No address available',
-        status: item.status || 'Under Review',
-        reference: item.application_reference || '',
-        submissionDate: item.submission_date ? new Date(item.submission_date).toISOString() : '',
-        coordinates: item.location?.coordinates ? 
-          [item.location.coordinates[1], item.location.coordinates[0]] as [number, number] :
+      // Transform pins to Application format
+      const transformedData = response.pins?.map((pin: any) => ({
+        id: pin.id || Math.random(),
+        title: 'Planning Application',
+        description: pin.reference || 'No reference available',
+        address: 'Location details pending',
+        status: pin.status || 'Under Review',
+        reference: pin.reference || '',
+        coordinates: pin.coordinates ? 
+          [pin.coordinates[1], pin.coordinates[0]] as [number, number] :
           coordinates,
-        postcode: item.postcode || 'N/A',
-        applicant: item.applicant_name || 'Not specified',
-        decisionDue: item.decision_date?.toString() || '',
-        type: item.application_type || 'Planning Application',
-        ward: item.ward || 'Not specified',
-        officer: 'Not assigned',
-        consultationEnd: item.consultation_end_date?.toString() || '',
-        image: undefined,
-        image_map_url: undefined,
-        ai_title: undefined,
-        last_date_consultation_comments: item.consultation_end_date?.toString(),
-        valid_date: item.submission_date?.toString(),
-        centroid: undefined,
-        impact_score: null,
-        impact_score_details: undefined,
-        impacted_services: undefined,
-        final_impact_score: null,
-        engaging_title: item.description
-      } as Application)) || [];
+        postcode: 'N/A',
+      } as Application));
 
       // Calculate status counts
       const counts = transformedData.reduce((acc, app) => {
@@ -123,10 +105,9 @@ const MapView = () => {
       }
 
     } catch (error: any) {
-      console.error('💥 Error in fetchSearchlandData:', error);
+      console.error('💥 Error in fetchPins:', error);
       let errorMessage = "Error loading applications. Please try again later.";
       
-      // Handle specific error cases
       if (error.message?.includes('Not Found')) {
         errorMessage = "No planning applications found in this area. Try a different location.";
       } else if (error.message?.includes('API key')) {
@@ -174,7 +155,7 @@ const MapView = () => {
         
         // Create a bounding box around the postcode (roughly 2km)
         const bbox = `${longitude - 0.02},${latitude - 0.02},${longitude + 0.02},${latitude + 0.02}`;
-        await fetchSearchlandData(bbox);
+        await fetchPins(bbox);
       } else {
         toast({
           title: "Invalid Postcode",
