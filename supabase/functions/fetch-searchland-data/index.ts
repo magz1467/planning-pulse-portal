@@ -57,11 +57,11 @@ serve(async (req) => {
     }
     console.log('Request body:', JSON.stringify(requestBody))
 
-    // Using the correct endpoint and request structure
+    // Using the correct endpoint and request structure with Bearer token
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody)
