@@ -46,9 +46,9 @@ serve(async (req) => {
     console.log('Fetching Searchland data with bbox:', bbox)
     console.log('API Key exists:', !!apiKey)
 
-    // Updated API endpoint to include bbox parameter
+    // Updated API endpoint to use the correct path
     const response = await fetch(
-      `https://api.searchland.co.uk/v2/planning/applications?bbox=${bbox}`,
+      `https://api.searchland.co.uk/v2/planning/applications/search?bbox=${bbox}`,
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
