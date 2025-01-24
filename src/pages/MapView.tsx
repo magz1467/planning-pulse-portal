@@ -168,7 +168,8 @@ const MapView = () => {
         const { longitude, latitude } = data.result;
         setCoordinates([latitude, longitude]);
         
-        // Create a larger bounding box around the postcode (roughly 5km)
+        // Create a bounding box around the postcode (roughly 5km)
+        // Note: Order must be minLng,minLat,maxLng,maxLat for Searchland API
         const bbox = `${longitude - 0.05},${latitude - 0.05},${longitude + 0.05},${latitude + 0.05}`;
         await fetchPins(bbox);
       } else {
