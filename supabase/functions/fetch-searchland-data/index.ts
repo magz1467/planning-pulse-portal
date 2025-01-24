@@ -46,7 +46,7 @@ serve(async (req) => {
     console.log('Fetching Searchland data with bbox:', bbox)
     console.log('API Key exists:', !!apiKey)
 
-    // Updated API endpoint to use the correct path
+    // Using the correct endpoint with v2 prefix
     const response = await fetch(
       `https://api.searchland.co.uk/v2/planning/applications/search?bbox=${bbox}`,
       {
