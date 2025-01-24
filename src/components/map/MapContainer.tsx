@@ -1,7 +1,6 @@
 import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
 import { Application } from "@/types/planning";
-import { ApplicationMarkers } from "./ApplicationMarkers";
-import { useEffect, useRef, memo, useCallback } from "react";
+import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import mapboxgl from 'mapbox-gl';
