@@ -30,8 +30,8 @@ interface SearchlandResponse {
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders })
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -45,28 +45,34 @@ serve(async (req) => {
 
     console.log('Fetching Searchland data with bbox:', bbox)
     console.log('API Key exists:', !!apiKey)
+    console.log('API Key length:', apiKey.length)
+    console.log('First 4 chars of API key:', apiKey.substring(0, 4))
+
+    const url = 'https://api.searchland.co.uk/v2/planning/applications'
+    console.log('Request URL:', url)
+
+    const requestBody = {
+      bbox: bbox,
+      limit: 100
+    }
+    console.log('Request body:', JSON.stringify(requestBody))
 
     // Using the correct endpoint and request structure
-    const response = await fetch(
-      `https://api.searchland.co.uk/v2/planning/applications`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': apiKey,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bbox: bbox,
-          limit: 100
-        })
-      }
-    )
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    })
 
     console.log('Searchland API response status:', response.status)
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Searchland API error response:', errorText)
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
       throw new Error(`Searchland API error: ${response.status} - ${errorText}`)
     }
 
