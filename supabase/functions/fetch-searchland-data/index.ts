@@ -48,7 +48,7 @@ serve(async (req) => {
     console.log('API Key length:', apiKey.length)
     console.log('First 4 chars of API key:', apiKey.substring(0, 4))
 
-    const url = 'https://api.searchland.co.uk/v2/planning/applications'
+    const url = 'https://api.searchland.co.uk/v1/planning_applications/get'
     console.log('Request URL:', url)
 
     const requestBody = {
