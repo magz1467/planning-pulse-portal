@@ -4,7 +4,10 @@ import { ApplicationMarkers } from "./ApplicationMarkers";
 import { useEffect, useRef, memo, useCallback } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
+import mapboxgl from 'mapbox-gl';
+import { supabase } from "@/integrations/supabase/client";
 import "leaflet/dist/leaflet.css";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
   applications: Application[];
@@ -24,51 +27,81 @@ export const MapContainerComponent = memo(({
   onMapMove,
 }: MapContainerProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
+  const mapboxRef = useRef<mapboxgl.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (mapRef.current) {
-      console.log('🗺️ Setting map view to coordinates:', coordinates);
-      mapRef.current.setView(coordinates, 14);
-      // Add a slight delay to ensure the map recenters properly after resize
-      setTimeout(() => {
-        mapRef.current?.invalidateSize();
-      }, 100);
-    }
+    if (!mapContainerRef.current) return;
+
+    // Initialize Mapbox GL map
+    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN'; // Replace with your token
+    
+    mapboxRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [coordinates[1], coordinates[0]], // Mapbox uses [lng, lat]
+      zoom: 14
+    });
+
+    const map = mapboxRef.current;
+
+    map.on('load', async () => {
+      // Add vector tile source
+      map.addSource('planning-applications', {
+        type: 'vector',
+        tiles: [
+          `${supabase.functions.url('fetch-searchland-pins')}/{z}/{x}/{y}`
+        ],
+        minzoom: 10,
+        maxzoom: 16
+      });
+
+      // Add layer for planning applications
+      map.addLayer({
+        id: 'planning-applications',
+        type: 'circle',
+        source: 'planning-applications',
+        'source-layer': 'planning_applications',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': [
+            'match',
+            ['get', 'status'],
+            'approved', '#16a34a',
+            'refused', '#ea384c',
+            '#F97316' // default orange
+          ],
+          'circle-opacity': 0.8
+        }
+      });
+
+      // Handle clicks
+      map.on('click', 'planning-applications', (e) => {
+        if (!e.features?.length) return;
+        
+        const feature = e.features[0];
+        onMarkerClick(feature.properties.id);
+      });
+
+      // Change cursor on hover
+      map.on('mouseenter', 'planning-applications', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      
+      map.on('mouseleave', 'planning-applications', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
+
+    return () => {
+      mapboxRef.current?.remove();
+    };
   }, [coordinates]);
-
-  useEffect(() => {
-    if (mapRef.current && onMapMove) {
-      onMapMove(mapRef.current);
-    }
-  }, [onMapMove]);
-
-  const handleMarkerClick = useCallback((id: number) => {
-    console.log('Marker clicked in MapContainer:', id);
-    onMarkerClick(id);
-  }, [onMarkerClick]);
 
   return (
     <div className="w-full h-full relative">
-      <LeafletMapContainer
-        ref={mapRef}
-        center={coordinates}
-        zoom={14}
-        scrollWheelZoom={true}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer 
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          maxZoom={19}
-        />
-        <SearchLocationPin position={coordinates} />
-        <ApplicationMarkers
-          applications={applications}
-          baseCoordinates={coordinates}
-          onMarkerClick={handleMarkerClick}
-          selectedId={selectedId}
-        />
-      </LeafletMapContainer>
+      <div ref={mapContainerRef} style={{ height: "100%", width: "100%" }} />
+      <SearchLocationPin position={coordinates} />
     </div>
   );
 });
