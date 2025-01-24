@@ -168,8 +168,8 @@ const MapView = () => {
         const { longitude, latitude } = data.result;
         setCoordinates([latitude, longitude]);
         
-        // Create a bounding box around the postcode (roughly 2km)
-        const bbox = `${longitude - 0.02},${latitude - 0.02},${longitude + 0.02},${latitude + 0.02}`;
+        // Create a larger bounding box around the postcode (roughly 5km)
+        const bbox = `${longitude - 0.05},${latitude - 0.05},${longitude + 0.05},${latitude + 0.05}`;
         await fetchPins(bbox);
       } else {
         toast({
