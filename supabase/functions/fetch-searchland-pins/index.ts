@@ -18,11 +18,15 @@ serve(async (req) => {
 
   try {
     const { bbox } = await req.json()
-    console.log('Fetching Searchland pins for bbox:', bbox)
+    console.log('Received bbox string:', bbox)
 
     if (!bbox) {
       throw new Error('bbox parameter is required')
     }
+
+    // Convert bbox string "minLng,minLat,maxLng,maxLat" to array
+    const [minLng, minLat, maxLng, maxLat] = bbox.split(',').map(Number)
+    console.log('Parsed bbox coordinates:', { minLng, minLat, maxLng, maxLat })
 
     const SEARCHLAND_API_KEY = Deno.env.get('SEARCHLAND_API_KEY')
     if (!SEARCHLAND_API_KEY) {
@@ -38,7 +42,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bbox: bbox,
+          bbox: [minLng, minLat, maxLng, maxLat], // Send as array, not string
           // Only request fields needed for map pins
           fields: [
             "id",
@@ -58,6 +62,7 @@ serve(async (req) => {
 
     const data = await response.json()
     console.log(`Retrieved ${data.applications?.length || 0} pins from Searchland`)
+    console.log('First application:', data.applications?.[0])
 
     // Transform to simplified pin format
     const pins = data.applications?.map((app: SearchlandPin) => ({
