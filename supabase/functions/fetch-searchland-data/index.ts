@@ -46,12 +46,12 @@ serve(async (req) => {
     console.log('Fetching Searchland data with bbox:', bbox)
     console.log('API Key exists:', !!apiKey)
 
-    // Using the correct endpoint without /search
+    // Using the correct authorization header format
     const response = await fetch(
       `https://api.searchland.co.uk/v2/planning/applications?bbox=${bbox}`,
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey, // Removed 'Bearer ' prefix
           'Content-Type': 'application/json',
         },
       }
