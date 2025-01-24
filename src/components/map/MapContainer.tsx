@@ -1,4 +1,3 @@
-import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
 import { Application } from "@/types/planning";
 import { useEffect, useRef, memo } from "react";
 import { Map as LeafletMap } from "leaflet";
