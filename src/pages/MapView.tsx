@@ -4,7 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Application } from "@/types/planning";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { FilterBar } from "@/components/FilterBar";
 import { SortType } from "@/hooks/use-sort-applications";
 import { PostcodeSearch } from "@/components/PostcodeSearch";
@@ -33,6 +33,7 @@ const MapView = () => {
     'Declined': 0,
     'Other': 0
   });
+  const { toast } = useToast();
 
   const fetchSearchlandData = async (bbox: string) => {
     console.log('🔍 Starting to fetch Searchland data...', bbox);
@@ -45,17 +46,15 @@ const MapView = () => {
 
       if (error) {
         console.error('❌ Error fetching Searchland data:', error);
-        toast({
-          title: "Error loading applications",
-          description: "Please try again later",
-          variant: "destructive"
-        });
-        setIsLoading(false);
-        return;
+        throw error;
+      }
+
+      if (!response?.applications) {
+        throw new Error('No applications data received');
       }
 
       // Transform the data to match the Application type
-      const transformedData = response?.applications?.map((item: any) => ({
+      const transformedData = response.applications?.map((item: any) => ({
         id: item.id || Math.random(),
         title: item.description || 'No description available',
         description: item.description || '',
@@ -123,12 +122,28 @@ const MapView = () => {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('💥 Error in fetchSearchlandData:', error);
+      let errorMessage = "Error loading applications. Please try again later.";
+      
+      // Handle specific error cases
+      if (error.message?.includes('Not Found')) {
+        errorMessage = "No planning applications found in this area. Try a different location.";
+      } else if (error.message?.includes('API key')) {
+        errorMessage = "Authentication error. Please contact support.";
+      }
+      
       toast({
         title: "Error loading applications",
-        description: "Please try again later",
+        description: errorMessage,
         variant: "destructive"
+      });
+      setApplications([]);
+      setStatusCounts({
+        'Under Review': 0,
+        'Approved': 0,
+        'Declined': 0,
+        'Other': 0
       });
     } finally {
       setIsLoading(false);
