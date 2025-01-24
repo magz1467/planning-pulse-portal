@@ -50,8 +50,23 @@ const MapView = () => {
       }
 
       if (!response?.pins) {
-        throw new Error('No pins data received');
+        console.log('No pins data in response:', response);
+        setApplications([]);
+        setStatusCounts({
+          'Under Review': 0,
+          'Approved': 0,
+          'Declined': 0,
+          'Other': 0
+        });
+        toast({
+          title: "No applications found",
+          description: "Try searching in a different area",
+          variant: "default"
+        });
+        return;
       }
+
+      console.log(`📦 Received ${response.pins.length} pins from API`);
 
       // Transform pins to Application format
       const transformedData = response.pins?.map((pin: any) => ({
