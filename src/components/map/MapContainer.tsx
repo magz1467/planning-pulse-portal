@@ -42,17 +42,20 @@ export const MapContainerComponent = ({
         const apiKey = import.meta.env.VITE_SEARCHLAND_API_KEY;
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`https://api.searchland.co.uk/v1/maps/mvt/planning_applications/{z}/{x}/{y}?api_key=${apiKey}`],
+          tiles: [`https://api.searchland.co.uk/v1/maps/mvt/planning_applications/{z}/{x}/{y}`],
           minzoom: 10,
-          maxzoom: 16
+          maxzoom: 16,
+          tileSize: 512,
+          promoteId: 'id'
         });
 
+        // Add a custom layer for planning applications
         map.addLayer({
-          id: 'planning-applications',
-          type: 'circle',
-          source: 'planning-applications',
+          'id': 'planning-applications',
+          'type': 'circle',
+          'source': 'planning-applications',
           'source-layer': 'planning_applications',
-          paint: {
+          'paint': {
             'circle-radius': 6,
             'circle-color': [
               'match',
@@ -61,7 +64,9 @@ export const MapContainerComponent = ({
               'refused', '#ea384c',
               '#F97316' // default orange
             ],
-            'circle-opacity': 0.8
+            'circle-opacity': 0.8,
+            'circle-stroke-width': 1,
+            'circle-stroke-color': '#ffffff'
           }
         });
 
