@@ -1,8 +1,10 @@
-import { Application } from "@/types/planning";
 import { useEffect, useRef, memo } from "react";
-import { SearchLocationPin } from "./SearchLocationPin";
 import mapboxgl from 'mapbox-gl';
-import { supabase } from "@/integrations/supabase/client";
+import { Application } from "@/types/planning";
+import { SearchLocationPin } from "./SearchLocationPin";
+import { MapInitializer } from "./components/MapInitializer";
+import { VectorTileLayer } from "./components/VectorTileLayer";
+import { EventHandlers } from "./components/EventHandlers";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -26,97 +28,48 @@ export const MapContainerComponent = memo(({
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!mapContainerRef.current) return;
-
-    // Initialize Mapbox GL map
-    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29hZyIsImEiOiJjajhvb2NyOWYwNXRhMnJvMDNtYjh4NmdxIn0.wUpTbsVWQuPwRHDwpnCznA';
+    if (!mapRef.current) return;
     
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [coordinates[1], coordinates[0]], // Mapbox uses [lng, lat]
-      zoom: 14
-    });
-
     const map = mapRef.current;
-
-    map.on('load', async () => {
-      try {
-        // Get the function URL using the Supabase client
-        const response = await supabase.functions.invoke('fetch-searchland-pins', {
-          method: 'GET'
-        });
-
-        if (response.error) {
-          console.error('Failed to get function URL:', response.error);
-          return;
-        }
-
-        const url = response.data?.url;
-        if (!url) {
-          console.error('Failed to get function URL - no URL in response');
-          return;
-        }
-
-        // Add vector tile source
-        map.addSource('planning-applications', {
-          type: 'vector',
-          tiles: [
-            `${url}/{z}/{x}/{y}`
-          ],
-          minzoom: 10,
-          maxzoom: 16
-        });
-
-        // Add layer for planning applications
-        map.addLayer({
-          id: 'planning-applications',
-          type: 'circle',
-          source: 'planning-applications',
-          'source-layer': 'planning_applications',
-          paint: {
-            'circle-radius': 6,
-            'circle-color': [
-              'match',
-              ['get', 'status'],
-              'approved', '#16a34a',
-              'refused', '#ea384c',
-              '#F97316' // default orange
-            ],
-            'circle-opacity': 0.8
-          }
-        });
-
-        // Handle clicks
-        map.on('click', 'planning-applications', (e) => {
-          if (!e.features?.length) return;
-          
-          const feature = e.features[0];
-          onMarkerClick(feature.properties.id);
-        });
-
-        // Change cursor on hover
-        map.on('mouseenter', 'planning-applications', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-        
-        map.on('mouseleave', 'planning-applications', () => {
-          map.getCanvas().style.cursor = '';
-        });
-      } catch (error) {
-        console.error('Error initializing map:', error);
-      }
-    });
+    if (onMapMove) {
+      map.on('moveend', () => onMapMove(map));
+    }
+    if (onCenterChange) {
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        onCenterChange([center.lat, center.lng]);
+      });
+    }
 
     return () => {
-      mapRef.current?.remove();
+      if (onMapMove) map.off('moveend', () => onMapMove(map));
+      if (onCenterChange) {
+        map.off('moveend', () => {
+          const center = map.getCenter();
+          onCenterChange([center.lat, center.lng]);
+        });
+      }
     };
-  }, [coordinates]);
+  }, [onCenterChange, onMapMove]);
 
   return (
     <div className="w-full h-full relative">
       <div ref={mapContainerRef} style={{ height: "100%", width: "100%" }} />
       <SearchLocationPin position={coordinates} />
+      <MapInitializer 
+        mapContainer={mapContainerRef}
+        mapRef={mapRef}
+        coordinates={coordinates}
+      />
+      {mapRef.current && (
+        <>
+          <VectorTileLayer map={mapRef.current} />
+          <EventHandlers 
+            map={mapRef.current}
+            onMarkerClick={onMarkerClick}
+          />
+        </>
+      )}
     </div>
   );
 });
