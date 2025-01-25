@@ -47,11 +47,11 @@ export const MapContainerComponent = ({
       }
 
       try {
-        console.log('Adding vector tile source with URL:', `${supabaseUrl}/functions/fetch-searchland-mvt/{z}/{x}/{y}`);
+        console.log('Adding vector tile source with URL:', `${supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`);
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabaseUrl}/functions/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
