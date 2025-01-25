@@ -5,6 +5,7 @@ import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MapContainerProps {
   coordinates: [number, number];
@@ -32,10 +33,10 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Get Supabase URL from environment
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    // Get Supabase URL directly from the client
+    const supabaseUrl = supabase.supabaseUrl;
     if (!supabaseUrl) {
-      console.error('VITE_SUPABASE_URL is not defined');
+      console.error('Supabase URL is not available');
       return;
     }
 
@@ -50,7 +51,7 @@ export const MapContainerComponent = ({
       }
 
       try {
-        console.log('Adding source...');
+        console.log('Adding vector tile source...');
         
         // Add vector tile source with complete URL for fetch-searchland-mvt
         map.addSource('planning-applications', {
