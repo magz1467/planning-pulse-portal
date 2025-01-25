@@ -35,9 +35,15 @@ export const MapContainerComponent = ({
 
     // Add vector source for planning applications
     map.on('load', () => {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl) {
+        console.error('VITE_SUPABASE_URL is not defined');
+        return;
+      }
+
       map.addSource('planning-applications', {
         type: 'vector',
-        tiles: [`${process.env.VITE_SUPABASE_URL}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+        tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
         minzoom: 0,
         maxzoom: 14
       });
