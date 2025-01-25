@@ -29,7 +29,7 @@ export const MapContainerComponent = memo(({
     if (!mapContainerRef.current) return;
 
     // Initialize Mapbox GL map
-    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29nZXJhZ2h0eSIsImEiOiJjbHNhcGZxbWowMGRqMmpxdGp2NmRwZnZsIn0.1-LG9BDX6gXeOPECXiVLrw';
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29hZyIsImEiOiJjajhvb2NyOWYwNXRhMnJvMDNtYjh4NmdxIn0.wUpTbsVWQuPwRHDwpnCznA';
     
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
@@ -42,7 +42,7 @@ export const MapContainerComponent = memo(({
 
     map.on('load', async () => {
       // Add vector tile source
-      const functionUrl = supabase.functions.url('fetch-searchland-pins');
+      const functionUrl = String(supabase.functions.url('fetch-searchland-pins'));
       if (!functionUrl) {
         console.error('Failed to get function URL');
         return;
