@@ -34,8 +34,8 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Get Supabase URL from environment
-    const baseUrl = import.meta.env.VITE_SUPABASE_URL || supabase.supabaseUrl;
+    // Get Supabase URL - we know this is the correct URL since it's configured in the client
+    const baseUrl = 'https://jposqxdboetyioymfswd.supabase.co';
     if (!baseUrl) {
       console.error('Supabase URL not available');
       toast.error('Configuration error: Supabase URL not available');
