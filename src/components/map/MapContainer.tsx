@@ -46,7 +46,7 @@ export const MapContainerComponent = ({
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabase.supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
+          tiles: [`${(supabase as any).supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
