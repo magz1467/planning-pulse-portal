@@ -5,6 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const SEARCHLAND_API_KEY = Deno.env.get('SEARCHLAND_API_KEY')
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -12,12 +14,6 @@ serve(async (req) => {
   }
 
   try {
-    const searchlandApiKey = Deno.env.get('SEARCHLAND_API_KEY')
-    if (!searchlandApiKey) {
-      console.error('SEARCHLAND_API_KEY is not set')
-      throw new Error('SEARCHLAND_API_KEY is not set')
-    }
-
     // Extract z, x, y from URL path
     const url = new URL(req.url)
     const parts = url.pathname.split('/')
@@ -40,7 +36,7 @@ serve(async (req) => {
     // Forward request to Searchland
     const response = await fetch(searchlandUrl, {
       headers: {
-        'Authorization': `Bearer ${searchlandApiKey}`,
+        'Authorization': `Bearer ${SEARCHLAND_API_KEY}`,
       },
     })
 
@@ -64,11 +60,11 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       {
+        status: 500,
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json',
         },
-        status: 500,
       }
     )
   }
