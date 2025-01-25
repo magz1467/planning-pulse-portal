@@ -66,7 +66,7 @@ const MapView = () => {
         return;
       }
 
-      console.log(`📦 Received ${response.applications.length} pins from API`);
+      console.log(`📦 Received ${response.applications.length} applications from API`);
 
       // Transform pins to Application format
       const transformedData = response.applications?.map((pin: any) => ({

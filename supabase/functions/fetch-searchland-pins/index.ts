@@ -20,6 +20,11 @@ serve(async (req) => {
       throw new Error('Searchland API key not found')
     }
 
+    if (!bbox) {
+      console.error('Missing bbox parameter in request body')
+      throw new Error('Missing bbox parameter')
+    }
+
     console.log('Fetching Searchland data with bbox:', bbox)
     console.log('API Key exists:', !!apiKey)
     console.log('API Key length:', apiKey.length)
@@ -34,7 +39,6 @@ serve(async (req) => {
     }
     console.log('Request body:', JSON.stringify(requestBody))
 
-    // Using the correct endpoint and request structure with Bearer token
     const response = await fetch(url, {
       method: 'POST',
       headers: {
