@@ -27,7 +27,8 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       }
     };
 
-    mapRef.current = new mapboxgl.Map({
+    // Create the map instance without directly assigning to ref
+    const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
       center: [coordinates[1], coordinates[0]],
@@ -35,12 +36,21 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       transformRequest: transformRequest
     });
 
-    const map = mapRef.current;
+    // Use Object.defineProperty to set the ref
+    Object.defineProperty(mapRef, 'current', {
+      value: map,
+      writable: true
+    });
     
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
     
     return () => {
       map.remove();
+      // Use Object.defineProperty to clear the ref
+      Object.defineProperty(mapRef, 'current', {
+        value: null,
+        writable: true
+      });
     };
   }, []);
 
