@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 interface EventHandlersProps {
@@ -6,7 +6,7 @@ interface EventHandlersProps {
   onMarkerClick: (id: number) => void;
 }
 
-export const EventHandlers = ({ map, onMarkerClick }: EventHandlersProps) => {
+export const EventHandlers: React.FC<EventHandlersProps> = ({ map, onMarkerClick }) => {
   useEffect(() => {
     // Handle clicks
     const handleClick = (e: mapboxgl.MapMouseEvent & { features?: mapboxgl.MapboxGeoJSONFeature[] }) => {
