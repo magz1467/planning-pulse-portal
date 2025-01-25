@@ -42,11 +42,11 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding vector tile source...');
         
-        // Add vector tile source using Supabase Edge Function
-        const { data: { publicUrl } } = supabase.functions.getPublicUrl('fetch-searchland-mvt');
+        // Add vector tile source using Supabase Edge Function URL
+        const functionUrl = `${supabase.functions.url('fetch-searchland-mvt')}/{z}/{x}/{y}`;
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${publicUrl}/{z}/{x}/{y}`],
+          tiles: [functionUrl],
           minzoom: 0,
           maxzoom: 14
         });
