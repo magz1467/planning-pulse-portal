@@ -19,12 +19,11 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       }
 
       try {
-        // Fetch the Mapbox token from Supabase
-        const { data: { MAPBOX_PUBLIC_TOKEN }, error: tokenError } = 
-          await supabase.functions.invoke('get-mapbox-token');
-
-        if (tokenError || !MAPBOX_PUBLIC_TOKEN) {
-          console.error('Failed to fetch Mapbox token:', tokenError);
+        // Initialize map with env variable first
+        const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
+        
+        if (!token) {
+          console.error('Mapbox token not found');
           toast({
             title: "Map Error",
             description: "Unable to initialize map. Please check configuration.",
@@ -34,28 +33,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
         }
 
         // Set Mapbox token
-        mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
-
-        // Set up the authorization header for Searchland MVT requests
-        const transformRequest = async (url: string, resourceType: string) => {
-          if (url.includes('api.searchland.co.uk')) {
-            const { data: { SEARCHLAND_API_KEY }, error: searchlandError } = 
-              await supabase.functions.invoke('get-searchland-key');
-
-            if (searchlandError || !SEARCHLAND_API_KEY) {
-              console.error('Failed to fetch Searchland API key:', searchlandError);
-              return;
-            }
-
-            return {
-              url: url,
-              headers: {
-                'Authorization': `Bearer ${SEARCHLAND_API_KEY}`,
-                'Content-Type': 'application/x-protobuf'
-              }
-            };
-          }
-        };
+        mapboxgl.accessToken = token;
 
         try {
           // Create the map instance - note the coordinate order for Mapbox [lng, lat]
@@ -64,7 +42,6 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
             style: 'mapbox://styles/mapbox/light-v11',
             center: [coordinates[1], coordinates[0]], // Convert to [lng, lat]
             zoom: 13,
-            transformRequest: transformRequest as any
           });
 
           // Add navigation controls

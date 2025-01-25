@@ -32,66 +32,6 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Add vector source for planning applications
-    map.on('load', () => {
-      // Check if source already exists
-      if (!map.getSource('planning-applications')) {
-        console.log('Using coordinates:', {lat: coordinates[0], lng: coordinates[1]});
-
-        // Use Searchland's MVT endpoint directly
-        const apiKey = import.meta.env.VITE_SEARCHLAND_API_KEY;
-        map.addSource('planning-applications', {
-          type: 'vector',
-          tiles: [`https://api.searchland.co.uk/v1/maps/mvt/planning_applications/{z}/{x}/{y}`],
-          minzoom: 10,
-          maxzoom: 16,
-          tileSize: 512,
-          promoteId: 'id'
-        });
-
-        // Add a custom layer for planning applications
-        map.addLayer({
-          'id': 'planning-applications',
-          'type': 'circle',
-          'source': 'planning-applications',
-          'source-layer': 'planning_applications',
-          'paint': {
-            'circle-radius': 6,
-            'circle-color': [
-              'match',
-              ['get', 'status'],
-              'approved', '#16a34a',
-              'refused', '#ea384c',
-              '#F97316' // default orange
-            ],
-            'circle-opacity': 0.8,
-            'circle-stroke-width': 1,
-            'circle-stroke-color': '#ffffff'
-          }
-        });
-
-        // Add click handler for the pins
-        map.on('click', 'planning-applications', (e) => {
-          if (e.features && e.features[0]) {
-            const feature = e.features[0];
-            const id = feature.properties?.id;
-            if (id) {
-              onMarkerClick(id);
-            }
-          }
-        });
-
-        // Change cursor on hover
-        map.on('mouseenter', 'planning-applications', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mouseleave', 'planning-applications', () => {
-          map.getCanvas().style.cursor = '';
-        });
-      }
-    });
-
     // Load pins when moving map
     map.on('moveend', () => {
       if (onMapMove) {
@@ -102,7 +42,7 @@ export const MapContainerComponent = ({
       }
     });
 
-  }, [onMapMove, onMarkerClick, coordinates]);
+  }, [onMapMove]);
 
   return (
     <div className="w-full h-full relative">
