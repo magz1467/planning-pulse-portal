@@ -18,18 +18,21 @@ export const EventHandlers = ({ map, onMarkerClick }: EventHandlersProps) => {
     map.on('click', 'planning-applications', handleClick);
 
     // Change cursor on hover
-    map.on('mouseenter', 'planning-applications', () => {
+    const handleMouseEnter = () => {
       map.getCanvas().style.cursor = 'pointer';
-    });
+    };
     
-    map.on('mouseleave', 'planning-applications', () => {
+    const handleMouseLeave = () => {
       map.getCanvas().style.cursor = '';
-    });
+    };
+
+    map.on('mouseenter', 'planning-applications', handleMouseEnter);
+    map.on('mouseleave', 'planning-applications', handleMouseLeave);
 
     return () => {
       map.off('click', 'planning-applications', handleClick);
-      map.off('mouseenter', 'planning-applications');
-      map.off('mouseleave', 'planning-applications');
+      map.off('mouseenter', 'planning-applications', handleMouseEnter);
+      map.off('mouseleave', 'planning-applications', handleMouseLeave);
     };
   }, [map, onMarkerClick]);
 

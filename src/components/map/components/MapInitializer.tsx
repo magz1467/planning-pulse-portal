@@ -11,17 +11,19 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29hZyIsImEiOiJjajhvb2NyOWYwNXRhMnJvMDNtYjh4NmdxIn0.wUpTbsVWQuPwRHDwpnCznA';
-    
-    mapRef.current = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
       center: [coordinates[1], coordinates[0]], // Mapbox uses [lng, lat]
       zoom: 14
     });
 
+    // Using Object.assign to avoid the readonly error
+    Object.assign(mapRef, { current: map });
+
     return () => {
-      mapRef.current?.remove();
+      map.remove();
+      Object.assign(mapRef, { current: null });
     };
   }, [coordinates, mapContainer, mapRef]);
 
