@@ -27,6 +27,9 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       }
     };
 
+    // Set Mapbox token before creating map instance
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN || '';
+
     // Create the map instance without directly assigning to ref
     const map = new mapboxgl.Map({
       container: mapContainer.current,
