@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { supabase } from '@/integrations/supabase/client';
 
 interface VectorTileLayerProps {
   map: mapboxgl.Map;
