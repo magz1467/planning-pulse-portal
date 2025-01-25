@@ -28,7 +28,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     };
 
     // Set Mapbox token before creating map instance
-    mapboxgl.accessToken = apiKey || '';
+    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN || '';
 
     // Create the map instance
     const map = new mapboxgl.Map({
@@ -38,6 +38,9 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       zoom: 13,
       transformRequest: transformRequest
     });
+
+    // Add navigation controls
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // Use Object.defineProperty to set the map reference
     Object.defineProperty(mapRef, 'current', {
