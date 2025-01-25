@@ -102,7 +102,7 @@ export const MapContainerComponent = memo(({
   return (
     <div className="w-full h-full relative">
       <div ref={mapContainerRef} style={{ height: "100%", width: "100%" }} />
-      <SearchLocationPin position={coordinates} />
+      {coordinates && <SearchLocationPin position={coordinates} />}
     </div>
   );
 });
