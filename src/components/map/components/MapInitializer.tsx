@@ -58,7 +58,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
         };
 
         try {
-          // Create the map instance
+          // Create the map instance - note the coordinate order for Mapbox [lng, lat]
           const map = new mapboxgl.Map({
             container: mapContainer.current,
             style: 'mapbox://styles/mapbox/light-v11',
