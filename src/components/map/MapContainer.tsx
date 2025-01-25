@@ -52,7 +52,7 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding source...');
         
-        // Add vector tile source with complete URL
+        // Add vector tile source with complete URL for fetch-searchland-mvt
         map.addSource('planning-applications', {
           type: 'vector',
           tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
