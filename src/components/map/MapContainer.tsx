@@ -41,13 +41,14 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding source...');
         
-        // Add vector tile source with complete URL
+        // Get Supabase URL from environment
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
         if (!supabaseUrl) {
           console.error('VITE_SUPABASE_URL is not defined');
           return;
         }
 
+        // Add vector tile source with complete URL
         map.addSource('planning-applications', {
           type: 'vector',
           tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
