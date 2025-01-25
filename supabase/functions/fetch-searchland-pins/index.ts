@@ -6,7 +6,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -14,6 +13,7 @@ serve(async (req) => {
   try {
     const searchlandApiKey = Deno.env.get('SEARCHLAND_API_KEY')
     if (!searchlandApiKey) {
+      console.error('SEARCHLAND_API_KEY environment variable is not set')
       throw new Error('SEARCHLAND_API_KEY is not set')
     }
 
@@ -26,45 +26,53 @@ serve(async (req) => {
 
     if (!z || !x || !y) {
       console.error('Missing tile coordinates in URL:', url.pathname)
-      throw new Error('Missing tile coordinates in URL path')
+      throw new Error('Missing tile coordinates')
     }
 
     console.log(`Fetching tiles for z=${z} x=${x} y=${y}`)
 
     // Fetch MVT data from Searchland
     const searchlandUrl = `https://api.searchland.co.uk/v1/planning/applications/tiles/${z}/${x}/${y}`
+    console.log('Requesting Searchland API:', searchlandUrl)
+
     const response = await fetch(searchlandUrl, {
       headers: {
         'Authorization': `Bearer ${searchlandApiKey}`,
+        'Accept': 'application/x-protobuf',
       },
     })
 
     if (!response.ok) {
-      console.error('Searchland API error:', await response.text())
-      throw new Error(`Searchland API error: ${response.status}`)
+      const errorText = await response.text()
+      console.error('Searchland API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      })
+      throw new Error(`Searchland API error: ${response.status} - ${errorText}`)
     }
 
     // Get the MVT buffer
     const mvtBuffer = await response.arrayBuffer()
+    console.log('Successfully received MVT buffer of size:', mvtBuffer.byteLength)
 
     // Return MVT with proper headers
     return new Response(mvtBuffer, { 
       headers: { 
         ...corsHeaders,
         'Content-Type': 'application/x-protobuf',
-        'Content-Encoding': 'gzip'
       } 
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in fetch-searchland-pins:', error)
     return new Response(
       JSON.stringify({ error: error.message }), 
       { 
+        status: 500,
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'
-        },
-        status: 500
+        } 
       }
     )
   }
