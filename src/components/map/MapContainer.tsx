@@ -41,20 +41,12 @@ export const MapContainerComponent = ({
         return;
       }
 
-      const { data: { publicUrl } } = supabase.storage.from('').getPublicUrl('');
-      const baseUrl = publicUrl.split('/storage/')[0];
-      
-      if (!baseUrl) {
-        console.error('Could not determine Supabase URL');
-        return;
-      }
-
       try {
-        console.log('Adding vector tile source with URL:', `${baseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`);
+        console.log('Adding vector tile source...');
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
+          tiles: [`${supabase.supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
