@@ -32,6 +32,17 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
+    // Get Supabase URL from environment
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    if (!supabaseUrl) {
+      console.error('VITE_SUPABASE_URL is not defined');
+      return;
+    }
+
+    // Ensure URL starts with https://
+    const baseUrl = supabaseUrl.startsWith('https://') ? supabaseUrl : `https://${supabaseUrl}`;
+    console.log('Using Supabase URL:', baseUrl);
+
     map.on('load', async () => {
       if (sourceAddedRef.current) {
         console.log('Source already added, skipping...');
@@ -41,17 +52,10 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding source...');
         
-        // Get Supabase URL from environment
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        if (!supabaseUrl) {
-          console.error('VITE_SUPABASE_URL is not defined');
-          return;
-        }
-
         // Add vector tile source with complete URL
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 22
         });
