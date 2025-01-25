@@ -15,7 +15,7 @@ export const VectorTileLayer = ({ map, baseUrl }: VectorTileLayerProps) => {
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anonKey}`],
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.auth.anon.key}`],
           minzoom: 0,
           maxzoom: 22,
           scheme: "xyz",
