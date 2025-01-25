@@ -33,16 +33,16 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Get Supabase URL directly from the client
-    const supabaseUrl = supabase.supabaseUrl;
-    if (!supabaseUrl) {
+    // Get Supabase URL from config
+    const baseUrl = supabase.getClientConfig().endpoint;
+    if (!baseUrl) {
       console.error('Supabase URL is not available');
       return;
     }
 
     // Ensure URL starts with https://
-    const baseUrl = supabaseUrl.startsWith('https://') ? supabaseUrl : `https://${supabaseUrl}`;
-    console.log('Using Supabase URL:', baseUrl);
+    const supabaseUrl = baseUrl.startsWith('https://') ? baseUrl : `https://${baseUrl}`;
+    console.log('Using Supabase URL:', supabaseUrl);
 
     map.on('load', async () => {
       if (sourceAddedRef.current) {
@@ -56,7 +56,7 @@ export const MapContainerComponent = ({
         // Add vector tile source with complete URL for fetch-searchland-mvt
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 22
         });
