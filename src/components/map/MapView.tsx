@@ -8,7 +8,6 @@ interface MapViewProps {
   coordinates: [number, number];
   onMarkerClick: (id: number | null) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: any) => void;
 }
 
 export const MapView = memo(({
@@ -17,17 +16,15 @@ export const MapView = memo(({
   coordinates,
   onMarkerClick,
   onCenterChange,
-  onMapMove,
 }: MapViewProps) => {
   return (
     <div className="absolute inset-0">
       <MapContainerComponent
         applications={applications}
-        coordinates={coordinates}
         selectedId={selectedId}
+        coordinates={coordinates}
         onMarkerClick={onMarkerClick}
         onCenterChange={onCenterChange}
-        onMapMove={onMapMove}
       />
     </div>
   );

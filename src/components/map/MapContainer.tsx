@@ -1,10 +1,8 @@
-import { useEffect, useRef } from "react";
-import mapboxgl from 'mapbox-gl';
 import { Application } from "@/types/planning";
+import { useEffect, useRef, memo } from "react";
 import { SearchLocationPin } from "./SearchLocationPin";
-import { MapInitializer } from "./components/MapInitializer";
-import { VectorTileLayer } from "./components/VectorTileLayer";
-import { EventHandlers } from "./components/EventHandlers";
+import mapboxgl from 'mapbox-gl';
+import { supabase } from "@/integrations/supabase/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -16,7 +14,7 @@ interface MapContainerProps {
   onMapMove?: (map: any) => void;
 }
 
-export const MapContainerComponent = ({
+export const MapContainerComponent = memo(({
   coordinates,
   applications,
   selectedId,
@@ -28,40 +26,85 @@ export const MapContainerComponent = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!mapRef.current) return;
-    
-    const map = mapRef.current;
+    if (!mapContainerRef.current) return;
 
-    // Load pins when moving map
-    map.on('moveend', () => {
-      if (onMapMove) {
-        const bounds = map.getBounds();
-        const bbox = `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
-        console.log('Map moved, new bbox:', bbox);
-        onMapMove(map);
-      }
+    // Initialize Mapbox GL map
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29nZXJhZ2h0eSIsImEiOiJjbHNhcGZxbWowMGRqMmpxdGp2NmRwZnZsIn0.1-LG9BDX6gXeOPECXiVLrw';
+    
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [coordinates[1], coordinates[0]], // Mapbox uses [lng, lat]
+      zoom: 14
     });
 
-  }, [onMapMove]);
+    const map = mapRef.current;
+
+    map.on('load', async () => {
+      // Add vector tile source
+      const functionUrl = supabase.functions.url('fetch-searchland-pins');
+      if (!functionUrl) {
+        console.error('Failed to get function URL');
+        return;
+      }
+
+      map.addSource('planning-applications', {
+        type: 'vector',
+        tiles: [
+          `${functionUrl}/{z}/{x}/{y}`
+        ],
+        minzoom: 10,
+        maxzoom: 16
+      });
+
+      // Add layer for planning applications
+      map.addLayer({
+        id: 'planning-applications',
+        type: 'circle',
+        source: 'planning-applications',
+        'source-layer': 'planning_applications',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': [
+            'match',
+            ['get', 'status'],
+            'approved', '#16a34a',
+            'refused', '#ea384c',
+            '#F97316' // default orange
+          ],
+          'circle-opacity': 0.8
+        }
+      });
+
+      // Handle clicks
+      map.on('click', 'planning-applications', (e) => {
+        if (!e.features?.length) return;
+        
+        const feature = e.features[0];
+        onMarkerClick(feature.properties.id);
+      });
+
+      // Change cursor on hover
+      map.on('mouseenter', 'planning-applications', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      
+      map.on('mouseleave', 'planning-applications', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
+
+    return () => {
+      mapRef.current?.remove();
+    };
+  }, [coordinates]);
 
   return (
     <div className="w-full h-full relative">
       <div ref={mapContainerRef} style={{ height: "100%", width: "100%" }} />
       <SearchLocationPin position={coordinates} />
-      <MapInitializer 
-        mapContainer={mapContainerRef}
-        mapRef={mapRef}
-        coordinates={coordinates}
-      />
-      {mapRef.current && (
-        <>
-          <VectorTileLayer map={mapRef.current} />
-          <EventHandlers 
-            map={mapRef.current}
-            onMarkerClick={onMarkerClick}
-          />
-        </>
-      )}
     </div>
   );
-};
+});
+
+MapContainerComponent.displayName = 'MapContainerComponent';

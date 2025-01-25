@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,91 +12,55 @@ serve(async (req) => {
   }
 
   try {
-    let requestData;
-    try {
-      requestData = await req.json();
-    } catch (e) {
-      console.error('Error parsing request JSON:', e);
-      requestData = {};
+    // Extract z, x, y from the URL path
+    const url = new URL(req.url)
+    const parts = url.pathname.split('/')
+    const z = parts[parts.length - 3]
+    const x = parts[parts.length - 2]
+    const y = parts[parts.length - 1]
+
+    if (!z || !x || !y) {
+      throw new Error('Missing tile coordinates')
     }
 
-    const { bbox } = requestData;
-    const apiKey = Deno.env.get('SEARCHLAND_API_KEY')
+    console.log(`Fetching tile: z=${z}, x=${x}, y=${y}`)
 
-    if (!apiKey) {
-      console.error('Searchland API key not found in environment variables')
-      throw new Error('Searchland API key not found')
+    const searchlandApiKey = Deno.env.get('SEARCHLAND_API_KEY')
+    if (!searchlandApiKey) {
+      throw new Error('SEARCHLAND_API_KEY is not set')
     }
 
-    console.log('Request data:', requestData);
-    console.log('API Key exists:', !!apiKey);
-    console.log('API Key length:', apiKey.length);
-
-    if (!bbox) {
-      console.error('Missing bbox parameter in request');
-      throw new Error('Missing bbox parameter');
-    }
-
-    // Validate bbox format (minLng,minLat,maxLng,maxLat)
-    const bboxParts = bbox.split(',').map(Number);
-    if (bboxParts.length !== 4 || bboxParts.some(isNaN)) {
-      console.error('Invalid bbox format:', bbox);
-      throw new Error('Invalid bbox format. Expected: minLng,minLat,maxLng,maxLat');
-    }
-
-    const url = 'https://api.searchland.co.uk/v1/planning_applications/search';
-    
-    const requestBody = {
-      bbox,
-      limit: 100
-    }
-
-    console.log('Using bbox:', requestBody.bbox);
-    console.log('Request URL:', url);
-    console.log('Request body:', JSON.stringify(requestBody));
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody)
-    })
-
-    console.log('Searchland API response status:', response.status);
+    // Fetch MVT from Searchland
+    const response = await fetch(
+      `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${searchlandApiKey}`,
+        },
+      }
+    )
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Searchland API error response:', errorText);
-      console.error('Response headers:', Object.fromEntries(response.headers.entries()));
-      throw new Error(`Searchland API error: ${response.status} - ${errorText}`);
+      console.error('Searchland API error:', await response.text())
+      throw new Error(`Searchland API error: ${response.status}`)
     }
 
-    const data = await response.json();
-    console.log(`Received ${data.features?.length || 0} applications from Searchland`);
+    // Get the MVT buffer
+    const mvtBuffer = await response.arrayBuffer()
 
-    return new Response(
-      JSON.stringify({ applications: data.features }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        } 
-      }
-    )
-
+    // Return the MVT with appropriate headers
+    return new Response(mvtBuffer, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/x-protobuf',
+        'Content-Length': mvtBuffer.byteLength.toString(),
+      },
+    })
   } catch (error) {
-    console.error('Error in fetch-searchland-data:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        context: 'Failed to fetch or process Searchland data'
-      }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json'}
-      }
-    )
+    console.error('Error:', error)
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    })
   }
 })
