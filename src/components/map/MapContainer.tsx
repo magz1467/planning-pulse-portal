@@ -43,17 +43,18 @@ export const MapContainerComponent = memo(({
     map.on('load', async () => {
       try {
         // Get the function URL using the Supabase client
-        const { data: { url }, error } = await supabase.functions.invoke('fetch-searchland-pins', {
+        const response = await supabase.functions.invoke('fetch-searchland-pins', {
           method: 'GET'
         });
 
-        if (error) {
-          console.error('Failed to get function URL:', error);
+        if (response.error) {
+          console.error('Failed to get function URL:', response.error);
           return;
         }
 
+        const url = response.data?.url;
         if (!url) {
-          console.error('Failed to get function URL');
+          console.error('Failed to get function URL - no URL in response');
           return;
         }
 
