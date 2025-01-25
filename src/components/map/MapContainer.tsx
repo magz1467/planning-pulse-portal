@@ -4,7 +4,6 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
-import { supabase } from "@/integrations/supabase/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -45,7 +44,7 @@ export const MapContainerComponent = ({
         // Add vector tile source
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabase.supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
@@ -57,7 +56,7 @@ export const MapContainerComponent = ({
           source: 'planning-applications',
           'source-layer': 'planning_applications',
           paint: {
-            'circle-radius': 6,
+            'circle-radius': 8,
             'circle-color': [
               'match',
               ['get', 'status'],
@@ -65,7 +64,9 @@ export const MapContainerComponent = ({
               'refused', '#ea384c',
               '#F97316' // default orange
             ],
-            'circle-opacity': 0.8
+            'circle-opacity': 0.8,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
           }
         });
 
@@ -99,10 +100,6 @@ export const MapContainerComponent = ({
 
     // Load pins when moving map
     map.on('moveend', () => {
-      const bounds = map.getBounds();
-      const zoom = Math.floor(map.getZoom());
-      const center = map.getCenter();
-      
       if (onMapMove) {
         onMapMove(map);
       }
