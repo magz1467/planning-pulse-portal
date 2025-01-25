@@ -30,21 +30,17 @@ export const MapContainerComponent = ({
   const sourceAddedRef = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!mapRef.current) return;
-    
-    const map = mapRef.current;
-
-    // Get Supabase URL - we know this is the correct URL since it's configured in the client
-    const baseUrl = 'https://jposqxdboetyioymfswd.supabase.co';
-    if (!baseUrl) {
-      console.error('Supabase URL not available');
-      toast.error('Configuration error: Supabase URL not available');
+    if (!mapRef.current) {
+      console.log('Map not initialized yet, skipping effect...');
       return;
     }
+    
+    const map = mapRef.current;
+    console.log('Map initialized, setting up vector tiles...');
 
-    // Ensure URL starts with https://
-    const supabaseUrl = baseUrl.startsWith('https://') ? baseUrl : `https://${baseUrl}`;
-    console.log('Using Supabase URL:', supabaseUrl);
+    // Hardcode the Supabase URL since we know it
+    const baseUrl = 'https://jposqxdboetyioymfswd.supabase.co';
+    console.log('Using Supabase URL:', baseUrl);
 
     map.on('load', async () => {
       if (sourceAddedRef.current) {
@@ -58,12 +54,13 @@ export const MapContainerComponent = ({
         // Add vector tile source with complete URL for fetch-searchland-mvt
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 22
         });
 
         // Add layer for planning applications
+        console.log('Adding planning applications layer...');
         map.addLayer({
           'id': 'planning-applications',
           'type': 'circle',
@@ -88,18 +85,22 @@ export const MapContainerComponent = ({
 
         // Handle clicks on points
         map.on('click', 'planning-applications', (e) => {
+          console.log('Click event on planning application:', e);
           if (e.features && e.features[0].properties) {
             const id = e.features[0].properties.id;
+            console.log('Clicked application ID:', id);
             onMarkerClick(id);
           }
         });
 
         // Change cursor on hover
         map.on('mouseenter', 'planning-applications', () => {
+          console.log('Mouse entered planning applications layer');
           map.getCanvas().style.cursor = 'pointer';
         });
         
         map.on('mouseleave', 'planning-applications', () => {
+          console.log('Mouse left planning applications layer');
           map.getCanvas().style.cursor = '';
         });
 
@@ -111,9 +112,11 @@ export const MapContainerComponent = ({
 
     // Update when map moves
     map.on('moveend', () => {
+      console.log('Map move ended');
       if (!map) return;
 
       if (onMapMove) {
+        console.log('Calling onMapMove callback');
         onMapMove(map);
       }
     });
