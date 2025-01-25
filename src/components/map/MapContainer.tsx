@@ -28,24 +28,6 @@ export const MapContainerComponent = ({
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
-  const fetchPinsForTile = async (z: number, x: number, y: number) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('fetch-searchland-pins', {
-        body: { z, x, y }
-      });
-
-      if (error) {
-        console.error('Error fetching pins:', error);
-        return [];
-      }
-
-      return data.pins || [];
-    } catch (error) {
-      console.error('Error invoking function:', error);
-      return [];
-    }
-  };
-
   useEffect(() => {
     if (!mapRef.current) return;
     
@@ -55,8 +37,7 @@ export const MapContainerComponent = ({
     map.on('load', () => {
       map.addSource('planning-applications', {
         type: 'vector',
-        scheme: 'xyz',
-        tiles: [`${supabase.functions.url}/fetch-searchland-pins/{z}/{x}/{y}`],
+        tiles: [`${supabase.functions.url}/fetch-searchland-mvt/{z}/{x}/{y}`],
         minzoom: 0,
         maxzoom: 14
       });
@@ -86,12 +67,6 @@ export const MapContainerComponent = ({
       const zoom = Math.floor(map.getZoom());
       const center = map.getCenter();
       
-      // Convert bounds to tile coordinates
-      const tile = pointToTile(center.lng, center.lat, zoom);
-      if (tile) {
-        fetchPinsForTile(zoom, tile.x, tile.y);
-      }
-      
       if (onMapMove) {
         onMapMove(map);
       }
@@ -120,15 +95,3 @@ export const MapContainerComponent = ({
     </div>
   );
 };
-
-// Helper function to convert lat/lng to tile coordinates
-function pointToTile(lon: number, lat: number, z: number) {
-  if (isNaN(lon) || isNaN(lat) || isNaN(z)) return null;
-  
-  const tile = {
-    x: Math.floor((lon + 180) / 360 * Math.pow(2, z)),
-    y: Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z))
-  };
-  
-  return tile;
-}
