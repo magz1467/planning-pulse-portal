@@ -11,6 +11,7 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
       try {
         // Add vector tile source for planning applications
         if (!map.getSource('planning-applications')) {
+          console.log('🏗️ Adding vector tile source');
           map.addSource('planning-applications', {
             type: 'vector',
             tiles: ['https://api.searchland.co.uk/v1/maps/mvt/planning_applications/{z}/{x}/{y}'],
@@ -19,6 +20,7 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
           });
 
           // Add circle layer for planning applications
+          console.log('🎨 Adding planning applications layer');
           map.addLayer({
             'id': 'planning-applications',
             'type': 'circle',
@@ -42,11 +44,10 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
           // Add click handler for the pins
           map.on('click', 'planning-applications', (e) => {
             if (e.features && e.features[0]) {
-              console.log('Clicked feature:', e.features[0]);
+              console.log('📌 Clicked feature:', e.features[0]);
               const id = e.features[0].properties?.id;
               if (id) {
-                // Handle click event
-                console.log('Clicked application ID:', id);
+                console.log('🎯 Clicked application ID:', id);
               }
             }
           });
@@ -61,11 +62,16 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
           });
         }
       } catch (error) {
-        console.error('Error initializing vector layer:', error);
+        console.error('❌ Error initializing vector layer:', error);
       }
     };
 
-    map.on('load', initializeVectorLayer);
+    // Only initialize after map is loaded
+    if (map.loaded()) {
+      initializeVectorLayer();
+    } else {
+      map.on('load', initializeVectorLayer);
+    }
 
     return () => {
       if (map.getLayer('planning-applications')) {
