@@ -32,12 +32,22 @@ serve(async (req) => {
     console.log('API Key exists:', !!apiKey);
     console.log('API Key length:', apiKey.length);
 
+    if (!bbox) {
+      console.error('Missing bbox parameter in request');
+      throw new Error('Missing bbox parameter');
+    }
+
+    // Validate bbox format (minLng,minLat,maxLng,maxLat)
+    const bboxParts = bbox.split(',').map(Number);
+    if (bboxParts.length !== 4 || bboxParts.some(isNaN)) {
+      console.error('Invalid bbox format:', bbox);
+      throw new Error('Invalid bbox format. Expected: minLng,minLat,maxLng,maxLat');
+    }
+
     const url = 'https://api.searchland.co.uk/v1/planning_applications/search';
     
-    // Default to central London if no bbox provided
-    const defaultBbox = "-0.1278,51.5074,-0.1277,51.5075";
     const requestBody = {
-      bbox: bbox || defaultBbox,
+      bbox,
       limit: 100
     }
 
