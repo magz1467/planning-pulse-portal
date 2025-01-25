@@ -1,18 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, RefObject } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { RefObject } from 'react';
+import { LatLngTuple } from 'leaflet';
 
 interface MapInitializerProps {
   mapContainer: RefObject<HTMLDivElement>;
   mapRef: RefObject<mapboxgl.Map>;
-  coordinates: [number, number];
+  coordinates: LatLngTuple;
 }
 
 export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitializerProps) => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const apiKey = import.meta.env.VITE_SEARCHLAND_API_KEY;
+    const apiKey = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
     
     // Set up the authorization header for Searchland MVT requests
     const transformRequest = (url: string, resourceType: string) => {
@@ -28,9 +28,9 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     };
 
     // Set Mapbox token before creating map instance
-    mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN || '';
+    mapboxgl.accessToken = apiKey || '';
 
-    // Create the map instance without directly assigning to ref
+    // Create the map instance
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
@@ -39,17 +39,15 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       transformRequest: transformRequest
     });
 
-    // Use Object.defineProperty to set the ref
+    // Use Object.defineProperty to set the map reference
     Object.defineProperty(mapRef, 'current', {
       value: map,
       writable: true
     });
     
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    
     return () => {
       map.remove();
-      // Use Object.defineProperty to clear the ref
+      // Use Object.defineProperty to clear the map reference
       Object.defineProperty(mapRef, 'current', {
         value: null,
         writable: true
