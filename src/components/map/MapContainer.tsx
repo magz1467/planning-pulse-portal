@@ -39,7 +39,7 @@ export const MapContainerComponent = ({
         console.log('Using coordinates:', {lat: coordinates[0], lng: coordinates[1]});
 
         // Use Searchland's MVT endpoint directly
-        const apiKey = process.env.SEARCHLAND_API_KEY;
+        const apiKey = import.meta.env.VITE_SEARCHLAND_API_KEY;
         map.addSource('planning-applications', {
           type: 'vector',
           tiles: [`https://api.searchland.co.uk/v1/maps/mvt/planning_applications/{z}/{x}/{y}?api_key=${apiKey}`],
