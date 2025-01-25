@@ -75,27 +75,6 @@ export const MapContainerComponent = ({
           }
         });
 
-        // Add click handler for vector tiles
-        map.on('click', 'planning-applications', (e) => {
-          if (e.features && e.features[0]) {
-            const feature = e.features[0];
-            const id = feature.properties?.id;
-            if (id) {
-              console.log('Vector tile feature clicked:', id);
-              onMarkerClick(id);
-            }
-          }
-        });
-
-        // Change cursor on hover
-        map.on('mouseenter', 'planning-applications', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mouseleave', 'planning-applications', () => {
-          map.getCanvas().style.cursor = '';
-        });
-
         sourceAddedRef.current = true;
         console.log('Successfully added vector tile source and layer');
       } catch (error) {
