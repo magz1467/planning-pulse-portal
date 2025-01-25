@@ -14,6 +14,7 @@ serve(async (req) => {
   try {
     const searchlandApiKey = Deno.env.get('SEARCHLAND_API_KEY')
     if (!searchlandApiKey) {
+      console.error('SEARCHLAND_API_KEY is not set')
       throw new Error('SEARCHLAND_API_KEY is not set')
     }
 
@@ -25,6 +26,7 @@ serve(async (req) => {
     const y = parts[parts.length - 1]
 
     if (!z || !x || !y) {
+      console.error('Invalid tile coordinates:', { z, x, y })
       throw new Error('Invalid tile coordinates')
     }
 
@@ -32,6 +34,8 @@ serve(async (req) => {
 
     // Construct Searchland MVT URL
     const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}`
+
+    console.log('Requesting from Searchland:', searchlandUrl)
 
     // Forward request to Searchland
     const response = await fetch(searchlandUrl, {
@@ -41,7 +45,8 @@ serve(async (req) => {
     })
 
     if (!response.ok) {
-      console.error('Searchland API error:', await response.text())
+      const errorText = await response.text()
+      console.error('Searchland API error:', errorText)
       throw new Error(`Searchland API error: ${response.status}`)
     }
 
