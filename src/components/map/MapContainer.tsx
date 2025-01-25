@@ -42,15 +42,16 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding vector tile source...');
         
-        // Construct the vector tile URL using Supabase project URL
-        const functionUrl = `${supabase.supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`;
-        
-        // Add vector tile source
+        // Add vector tile source with authentication headers
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [functionUrl],
+          tiles: [`https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
-          maxzoom: 14
+          maxzoom: 14,
+          tileSize: 512,
+          attribution: '© Planning Data',
+          scheme: 'xyz',
+          promoteId: 'id'
         });
 
         // Add vector tile layer
