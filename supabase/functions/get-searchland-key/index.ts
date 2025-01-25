@@ -2,14 +2,14 @@ import { serve } from 'https://deno.fresh.dev/std@v1/http/server.ts'
 
 serve(async (req) => {
   try {
-    const MAPBOX_PUBLIC_TOKEN = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
+    const SEARCHLAND_API_KEY = Deno.env.get('SEARCHLAND_API_KEY')
     
-    if (!MAPBOX_PUBLIC_TOKEN) {
-      throw new Error('MAPBOX_PUBLIC_TOKEN not found')
+    if (!SEARCHLAND_API_KEY) {
+      throw new Error('SEARCHLAND_API_KEY not found')
     }
 
     return new Response(
-      JSON.stringify({ MAPBOX_PUBLIC_TOKEN }),
+      JSON.stringify({ SEARCHLAND_API_KEY }),
       { headers: { 'Content-Type': 'application/json' } }
     )
   } catch (error) {
