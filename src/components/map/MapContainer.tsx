@@ -41,57 +41,65 @@ export const MapContainerComponent = memo(({
     const map = mapRef.current;
 
     map.on('load', async () => {
-      // Add vector tile source
-      const functionUrl = String(supabase.functions.url('fetch-searchland-pins'));
-      if (!functionUrl) {
-        console.error('Failed to get function URL');
-        return;
-      }
+      try {
+        // Get the function URL using the Supabase client
+        const { data: { url } } = await supabase.functions.invoke('fetch-searchland-pins', {
+          method: 'GET'
+        });
 
-      map.addSource('planning-applications', {
-        type: 'vector',
-        tiles: [
-          `${functionUrl}/{z}/{x}/{y}`
-        ],
-        minzoom: 10,
-        maxzoom: 16
-      });
-
-      // Add layer for planning applications
-      map.addLayer({
-        id: 'planning-applications',
-        type: 'circle',
-        source: 'planning-applications',
-        'source-layer': 'planning_applications',
-        paint: {
-          'circle-radius': 6,
-          'circle-color': [
-            'match',
-            ['get', 'status'],
-            'approved', '#16a34a',
-            'refused', '#ea384c',
-            '#F97316' // default orange
-          ],
-          'circle-opacity': 0.8
+        if (!url) {
+          console.error('Failed to get function URL');
+          return;
         }
-      });
 
-      // Handle clicks
-      map.on('click', 'planning-applications', (e) => {
-        if (!e.features?.length) return;
+        // Add vector tile source
+        map.addSource('planning-applications', {
+          type: 'vector',
+          tiles: [
+            `${url}/{z}/{x}/{y}`
+          ],
+          minzoom: 10,
+          maxzoom: 16
+        });
+
+        // Add layer for planning applications
+        map.addLayer({
+          id: 'planning-applications',
+          type: 'circle',
+          source: 'planning-applications',
+          'source-layer': 'planning_applications',
+          paint: {
+            'circle-radius': 6,
+            'circle-color': [
+              'match',
+              ['get', 'status'],
+              'approved', '#16a34a',
+              'refused', '#ea384c',
+              '#F97316' // default orange
+            ],
+            'circle-opacity': 0.8
+          }
+        });
+
+        // Handle clicks
+        map.on('click', 'planning-applications', (e) => {
+          if (!e.features?.length) return;
+          
+          const feature = e.features[0];
+          onMarkerClick(feature.properties.id);
+        });
+
+        // Change cursor on hover
+        map.on('mouseenter', 'planning-applications', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
         
-        const feature = e.features[0];
-        onMarkerClick(feature.properties.id);
-      });
-
-      // Change cursor on hover
-      map.on('mouseenter', 'planning-applications', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      
-      map.on('mouseleave', 'planning-applications', () => {
-        map.getCanvas().style.cursor = '';
-      });
+        map.on('mouseleave', 'planning-applications', () => {
+          map.getCanvas().style.cursor = '';
+        });
+      } catch (error) {
+        console.error('Error initializing map:', error);
+      }
     });
 
     return () => {
