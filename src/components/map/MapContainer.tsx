@@ -46,7 +46,7 @@ export const MapContainerComponent = ({
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${(supabase as any).supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
+          tiles: [`${(supabase as any).supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
@@ -55,7 +55,7 @@ export const MapContainerComponent = ({
           id: 'planning-applications',
           type: 'circle',
           source: 'planning-applications',
-          'source-layer': 'planning',
+          'source-layer': 'planning_applications',
           paint: {
             'circle-radius': 6,
             'circle-color': [
@@ -67,6 +67,27 @@ export const MapContainerComponent = ({
             ],
             'circle-opacity': 0.8
           }
+        });
+
+        // Add click handler for vector tiles
+        map.on('click', 'planning-applications', (e) => {
+          if (e.features && e.features[0]) {
+            const feature = e.features[0];
+            const id = feature.properties?.id;
+            if (id) {
+              console.log('Vector tile feature clicked:', id);
+              onMarkerClick(id);
+            }
+          }
+        });
+
+        // Change cursor on hover
+        map.on('mouseenter', 'planning-applications', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'planning-applications', () => {
+          map.getCanvas().style.cursor = '';
         });
 
         sourceAddedRef.current = true;
@@ -87,7 +108,7 @@ export const MapContainerComponent = ({
       }
     });
 
-  }, [onMapMove]);
+  }, [onMapMove, onMarkerClick]);
 
   return (
     <div className="w-full h-full relative">
