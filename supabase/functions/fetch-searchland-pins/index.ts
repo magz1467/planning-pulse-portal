@@ -12,7 +12,15 @@ serve(async (req) => {
   }
 
   try {
-    const { bbox } = await req.json()
+    let requestData;
+    try {
+      requestData = await req.json();
+    } catch (e) {
+      console.error('Error parsing request JSON:', e);
+      requestData = {};
+    }
+
+    const { bbox } = requestData;
     const apiKey = Deno.env.get('SEARCHLAND_API_KEY')
 
     if (!apiKey) {
@@ -20,24 +28,22 @@ serve(async (req) => {
       throw new Error('Searchland API key not found')
     }
 
-    if (!bbox) {
-      console.error('Missing bbox parameter in request body')
-      throw new Error('Missing bbox parameter')
-    }
+    console.log('Request data:', requestData);
+    console.log('API Key exists:', !!apiKey);
+    console.log('API Key length:', apiKey.length);
 
-    console.log('Fetching Searchland data with bbox:', bbox)
-    console.log('API Key exists:', !!apiKey)
-    console.log('API Key length:', apiKey.length)
-    console.log('First 4 chars of API key:', apiKey.substring(0, 4))
-
-    const url = 'https://api.searchland.co.uk/v1/planning_applications/search'
-    console.log('Request URL:', url)
-
+    const url = 'https://api.searchland.co.uk/v1/planning_applications/search';
+    
+    // Default to central London if no bbox provided
+    const defaultBbox = "-0.1278,51.5074,-0.1277,51.5075";
     const requestBody = {
-      bbox: bbox,
+      bbox: bbox || defaultBbox,
       limit: 100
     }
-    console.log('Request body:', JSON.stringify(requestBody))
+
+    console.log('Using bbox:', requestBody.bbox);
+    console.log('Request URL:', url);
+    console.log('Request body:', JSON.stringify(requestBody));
 
     const response = await fetch(url, {
       method: 'POST',
@@ -48,17 +54,17 @@ serve(async (req) => {
       body: JSON.stringify(requestBody)
     })
 
-    console.log('Searchland API response status:', response.status)
+    console.log('Searchland API response status:', response.status);
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Searchland API error response:', errorText)
-      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
-      throw new Error(`Searchland API error: ${response.status} - ${errorText}`)
+      const errorText = await response.text();
+      console.error('Searchland API error response:', errorText);
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+      throw new Error(`Searchland API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json()
-    console.log(`Received ${data.features?.length || 0} applications from Searchland`)
+    const data = await response.json();
+    console.log(`Received ${data.features?.length || 0} applications from Searchland`);
 
     return new Response(
       JSON.stringify({ applications: data.features }),
@@ -71,7 +77,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in fetch-searchland-data:', error)
+    console.error('Error in fetch-searchland-data:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message,
