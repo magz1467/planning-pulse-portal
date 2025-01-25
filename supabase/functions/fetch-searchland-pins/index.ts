@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,55 +12,61 @@ serve(async (req) => {
   }
 
   try {
-    // Extract z, x, y from the URL path
-    const url = new URL(req.url)
-    const parts = url.pathname.split('/')
-    const z = parts[parts.length - 3]
-    const x = parts[parts.length - 2]
-    const y = parts[parts.length - 1]
-
-    if (!z || !x || !y) {
-      throw new Error('Missing tile coordinates')
+    const { bbox, z, x, y } = await req.json()
+    
+    if (!bbox && (!z || !x || !y)) {
+      throw new Error('Missing required parameters: either bbox or tile coordinates (z,x,y) must be provided')
     }
 
-    console.log(`Fetching tile: z=${z}, x=${x}, y=${y}`)
+    console.log(`Fetching pins with params:`, { bbox, z, x, y })
 
     const searchlandApiKey = Deno.env.get('SEARCHLAND_API_KEY')
     if (!searchlandApiKey) {
       throw new Error('SEARCHLAND_API_KEY is not set')
     }
 
-    // Fetch MVT from Searchland
-    const response = await fetch(
-      `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${searchlandApiKey}`,
-        },
-      }
-    )
+    // Construct the appropriate URL based on provided parameters
+    const baseUrl = 'https://api.searchland.co.uk/v1/planning/applications'
+    const url = bbox 
+      ? `${baseUrl}?bbox=${bbox}`
+      : `${baseUrl}/tiles/${z}/${x}/${y}`
+
+    console.log('Requesting Searchland API:', url)
+
+    // Fetch data from Searchland
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${searchlandApiKey}`,
+      },
+    })
 
     if (!response.ok) {
       console.error('Searchland API error:', await response.text())
       throw new Error(`Searchland API error: ${response.status}`)
     }
 
-    // Get the MVT buffer
-    const mvtBuffer = await response.arrayBuffer()
+    const data = await response.json()
 
-    // Return the MVT with appropriate headers
-    return new Response(mvtBuffer, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/x-protobuf',
-        'Content-Length': mvtBuffer.byteLength.toString(),
-      },
-    })
+    return new Response(
+      JSON.stringify({ pins: data.features }),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        } 
+      }
+    )
   } catch (error) {
     console.error('Error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
+    return new Response(
+      JSON.stringify({ error: error.message }), 
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        },
+        status: 500
+      }
+    )
   }
 })
