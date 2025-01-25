@@ -42,70 +42,21 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding source...');
         
-        // Add GeoJSON source
+        // Add vector tile source
         map.addSource('planning-applications', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: []
-          },
-          cluster: true,
-          clusterMaxZoom: 14,
-          clusterRadius: 50
+          type: 'vector',
+          tiles: [`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          minzoom: 0,
+          maxzoom: 22
         });
 
-        // Add cluster layer
+        // Add layer for planning applications
         map.addLayer({
-          id: 'clusters',
-          type: 'circle',
-          source: 'planning-applications',
-          filter: ['has', 'point_count'],
-          paint: {
-            'circle-color': [
-              'step',
-              ['get', 'point_count'],
-              '#F97316', // Orange for small clusters
-              10,
-              '#16a34a', // Green for medium clusters
-              30,
-              '#ea384c'  // Red for large clusters
-            ],
-            'circle-radius': [
-              'step',
-              ['get', 'point_count'],
-              20,
-              10,
-              30,
-              30,
-              40
-            ]
-          }
-        });
-
-        // Add cluster count layer
-        map.addLayer({
-          id: 'cluster-count',
-          type: 'symbol',
-          source: 'planning-applications',
-          filter: ['has', 'point_count'],
-          layout: {
-            'text-field': '{point_count_abbreviated}',
-            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-            'text-size': 12
-          },
-          paint: {
-            'text-color': '#ffffff'
-          }
-        });
-
-        // Add unclustered point layer
-        map.addLayer({
-          id: 'unclustered-point',
-          type: 'circle',
-          source: 'planning-applications',
-          filter: ['!', ['has', 'point_count']],
-          paint: {
-            'circle-radius': 8,
+          'id': 'planning-applications',
+          'type': 'circle',
+          'source': 'planning-applications',
+          'source-layer': 'planning',
+          'paint': {
             'circle-color': [
               'match',
               ['get', 'status'],
@@ -113,7 +64,7 @@ export const MapContainerComponent = ({
               'refused', '#ea384c',
               '#F97316' // default orange
             ],
-            'circle-opacity': 0.8,
+            'circle-radius': 8,
             'circle-stroke-width': 2,
             'circle-stroke-color': '#ffffff'
           }
@@ -122,23 +73,8 @@ export const MapContainerComponent = ({
         sourceAddedRef.current = true;
         console.log('Successfully added source and layers');
 
-        // Handle clicks on clusters
-        map.on('click', 'clusters', (e) => {
-          const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
-          const clusterId = features[0].properties.cluster_id;
-          const source = map.getSource('planning-applications') as mapboxgl.GeoJSONSource;
-          source.getClusterExpansionZoom(clusterId, (err, zoom) => {
-            if (err) return;
-
-            map.easeTo({
-              center: (features[0].geometry as any).coordinates,
-              zoom: zoom
-            });
-          });
-        });
-
-        // Handle clicks on individual points
-        map.on('click', 'unclustered-point', (e) => {
+        // Handle clicks on points
+        map.on('click', 'planning-applications', (e) => {
           if (e.features && e.features[0].properties) {
             const id = e.features[0].properties.id;
             onMarkerClick(id);
@@ -146,17 +82,11 @@ export const MapContainerComponent = ({
         });
 
         // Change cursor on hover
-        map.on('mouseenter', 'clusters', () => {
+        map.on('mouseenter', 'planning-applications', () => {
           map.getCanvas().style.cursor = 'pointer';
         });
-        map.on('mouseleave', 'clusters', () => {
-          map.getCanvas().style.cursor = '';
-        });
-
-        map.on('mouseenter', 'unclustered-point', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-        map.on('mouseleave', 'unclustered-point', () => {
+        
+        map.on('mouseleave', 'planning-applications', () => {
           map.getCanvas().style.cursor = '';
         });
 
@@ -171,11 +101,13 @@ export const MapContainerComponent = ({
 
       const bounds = map.getBounds();
       try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
         const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-searchland-data`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabase.auth.session()?.access_token}`
+            'Authorization': `Bearer ${session?.access_token}`
           },
           body: JSON.stringify({
             bbox: [
@@ -192,9 +124,9 @@ export const MapContainerComponent = ({
         }
 
         const data = await response.json();
-        const source = map.getSource('planning-applications') as mapboxgl.GeoJSONSource;
+        const source = map.getSource('planning-applications');
         
-        if (source) {
+        if (source && 'setData' in source) {
           source.setData({
             type: 'FeatureCollection',
             features: data.applications.map((app: any) => ({
