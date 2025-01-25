@@ -6,6 +6,7 @@ import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface MapContainerProps {
   coordinates: [number, number];
@@ -36,7 +37,8 @@ export const MapContainerComponent = ({
     // Get Supabase URL from environment
     const baseUrl = import.meta.env.VITE_SUPABASE_URL;
     if (!baseUrl) {
-      console.error('Supabase URL is not available');
+      console.error('Supabase URL environment variable (VITE_SUPABASE_URL) is not set');
+      toast.error('Configuration error: Supabase URL not available');
       return;
     }
 
@@ -103,6 +105,7 @@ export const MapContainerComponent = ({
 
       } catch (error) {
         console.error('Error adding source:', error);
+        toast.error('Error loading planning application data');
       }
     });
 
