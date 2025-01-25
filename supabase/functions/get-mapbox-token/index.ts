@@ -1,36 +1,41 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders } from "../_shared/cors.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
     const token = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
-    
     if (!token) {
-      throw new Error('Mapbox token not configured')
+      throw new Error('MAPBOX_PUBLIC_TOKEN is not set')
     }
 
     return new Response(
-      JSON.stringify({ token }),
+      JSON.stringify({ token }), 
       { 
-        headers: {
+        headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'
-        }
+        } 
       }
     )
   } catch (error) {
+    console.error('Error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message }), 
       { 
-        status: 500,
-        headers: {
+        headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'
-        }
+        },
+        status: 500
       }
     )
   }

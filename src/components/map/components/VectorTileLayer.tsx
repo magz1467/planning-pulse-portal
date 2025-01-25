@@ -11,12 +11,14 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
       try {
         // Add vector tile source
         map.addSource('planning-applications', {
-          type: 'vector',
-          tiles: [
-            `${window.location.origin}/api/tiles/{z}/{x}/{y}`
-          ],
-          minzoom: 10,
-          maxzoom: 16
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          },
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 50
         });
 
         // Add layer for planning applications
@@ -24,7 +26,6 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
           id: 'planning-applications',
           type: 'circle',
           source: 'planning-applications',
-          'source-layer': 'planning_applications',
           paint: {
             'circle-radius': 6,
             'circle-color': [
