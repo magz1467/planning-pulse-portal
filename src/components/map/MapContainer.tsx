@@ -33,8 +33,8 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Get Supabase URL from config
-    const baseUrl = supabase.getClientConfig().endpoint;
+    // Get Supabase URL from the client
+    const baseUrl = supabase.supabaseUrl;
     if (!baseUrl) {
       console.error('Supabase URL is not available');
       return;
