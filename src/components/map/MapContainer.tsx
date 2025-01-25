@@ -36,30 +36,22 @@ export const MapContainerComponent = ({
     map.on('load', () => {
       // Check if source already exists
       if (!map.getSource('planning-applications')) {
-        // Get the base URL for the Edge Function
-        const functionUrl = 'https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-pins'
+        console.log('Using coordinates:', {lat: coordinates[0], lng: coordinates[1]});
 
-        // Calculate bbox with a reasonable radius (roughly 5km)
-        const [lat, lng] = coordinates;
-        const radius = 0.05; // roughly 5km in degrees
-        const bbox = `${lng - radius},${lat - radius},${lng + radius},${lat + radius}`;
-
-        console.log('Initial bbox:', bbox);
-        console.log('Using coordinates:', {lat, lng});
-
+        // Use Searchland's MVT endpoint directly
+        const apiKey = process.env.SEARCHLAND_API_KEY;
         map.addSource('planning-applications', {
           type: 'vector',
-          scheme: 'xyz',
-          tiles: [`${functionUrl}/{z}/{x}/{y}?bbox=${encodeURIComponent(bbox)}`],
-          minzoom: 0,
-          maxzoom: 14
+          tiles: [`https://api.searchland.co.uk/v1/maps/mvt/planning_applications/{z}/{x}/{y}?api_key=${apiKey}`],
+          minzoom: 10,
+          maxzoom: 16
         });
 
         map.addLayer({
           id: 'planning-applications',
           type: 'circle',
           source: 'planning-applications',
-          'source-layer': 'planning',
+          'source-layer': 'planning_applications',
           paint: {
             'circle-radius': 6,
             'circle-color': [
