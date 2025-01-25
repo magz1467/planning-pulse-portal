@@ -34,34 +34,57 @@ export const MapContainerComponent = ({
 
     // Add vector source for planning applications
     map.on('load', () => {
-      // Get the base URL for the Edge Function
-      const functionUrl = 'https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-pins'
+      // Check if source already exists
+      if (!map.getSource('planning-applications')) {
+        // Get the base URL for the Edge Function
+        const functionUrl = 'https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-pins'
 
-      map.addSource('planning-applications', {
-        type: 'vector',
-        scheme: 'xyz',
-        tiles: [`${functionUrl}/{z}/{x}/{y}`],
-        minzoom: 0,
-        maxzoom: 14
-      });
+        map.addSource('planning-applications', {
+          type: 'vector',
+          scheme: 'xyz',
+          tiles: [`${functionUrl}/{z}/{x}/{y}`],
+          minzoom: 0,
+          maxzoom: 14
+        });
 
-      map.addLayer({
-        id: 'planning-applications',
-        type: 'circle',
-        source: 'planning-applications',
-        'source-layer': 'planning',
-        paint: {
-          'circle-radius': 6,
-          'circle-color': [
-            'match',
-            ['get', 'status'],
-            'approved', '#16a34a',
-            'refused', '#ea384c',
-            '#F97316' // default orange
-          ],
-          'circle-opacity': 0.8
-        }
-      });
+        map.addLayer({
+          id: 'planning-applications',
+          type: 'circle',
+          source: 'planning-applications',
+          'source-layer': 'planning',
+          paint: {
+            'circle-radius': 6,
+            'circle-color': [
+              'match',
+              ['get', 'status'],
+              'approved', '#16a34a',
+              'refused', '#ea384c',
+              '#F97316' // default orange
+            ],
+            'circle-opacity': 0.8
+          }
+        });
+
+        // Add click handler for the pins
+        map.on('click', 'planning-applications', (e) => {
+          if (e.features && e.features[0]) {
+            const feature = e.features[0];
+            const id = feature.properties?.id;
+            if (id) {
+              onMarkerClick(id);
+            }
+          }
+        });
+
+        // Change cursor on hover
+        map.on('mouseenter', 'planning-applications', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'planning-applications', () => {
+          map.getCanvas().style.cursor = '';
+        });
+      }
     });
 
     // Load pins when moving map
@@ -71,7 +94,7 @@ export const MapContainerComponent = ({
       }
     });
 
-  }, [onMapMove]);
+  }, [onMapMove, onMarkerClick]);
 
   return (
     <div className="w-full h-full relative">
