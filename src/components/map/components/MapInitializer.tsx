@@ -14,23 +14,8 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       if (!mapContainer.current) return;
 
       try {
-        // Get Mapbox token from Supabase Edge Function
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token')
-        
-        if (error) {
-          console.error('Error fetching Mapbox token:', error)
-          return
-        }
-
-        const { token } = data as { token: string }
-        
-        if (!token) {
-          console.error('No Mapbox token returned')
-          return
-        }
-
-        // Set the token
-        mapboxgl.accessToken = token
+        // Set the token directly for now
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29hZyIsImEiOiJjajhvb2NyOWYwNXRhMnJvMDNtYjh4NmdxIn0.wUpTbsVWQuPwRHDwpnCznA';
 
         const map = new mapboxgl.Map({
           container: mapContainer.current,
