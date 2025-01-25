@@ -1,21 +1,21 @@
 import { Application } from "@/types/planning";
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, memo } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { SearchLocationPin } from "./SearchLocationPin";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
-  coordinates: [number, number];
   applications: Application[];
-  selectedId?: number | null;
+  coordinates: [number, number];
+  selectedId: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
   onMapMove?: (map: any) => void;
 }
 
 export const MapContainerComponent = memo(({
-  coordinates,
   applications,
+  coordinates,
   selectedId,
   onMarkerClick,
   onCenterChange,
