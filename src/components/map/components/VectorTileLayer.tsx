@@ -10,26 +10,11 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
   useEffect(() => {
     const initializeVectorLayer = async () => {
       try {
-        // First get the base URL for tiles
-        const { data: urlData, error: urlError } = await supabase.functions.invoke('fetch-searchland-pins', {
-          method: 'GET'
-        });
-
-        if (urlError) {
-          console.error('Failed to get function URL:', urlError);
-          return;
-        }
-
-        if (!urlData?.url) {
-          console.error('Failed to get function URL - no URL in response');
-          return;
-        }
-
         // Add vector tile source
         map.addSource('planning-applications', {
           type: 'vector',
           tiles: [
-            `${urlData.url}/{z}/{x}/{y}`
+            `${window.location.origin}/api/tiles/{z}/{x}/{y}`
           ],
           minzoom: 10,
           maxzoom: 16
