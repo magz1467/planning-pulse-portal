@@ -40,11 +40,12 @@ export const MapContainerComponent = ({
         const functionUrl = 'https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-pins'
 
         // Calculate bbox with a reasonable radius (roughly 5km)
-        const [lng, lat] = coordinates;
+        const [lat, lng] = coordinates;
         const radius = 0.05; // roughly 5km in degrees
         const bbox = `${lng - radius},${lat - radius},${lng + radius},${lat + radius}`;
 
         console.log('Initial bbox:', bbox);
+        console.log('Using coordinates:', {lat, lng});
 
         map.addSource('planning-applications', {
           type: 'vector',
