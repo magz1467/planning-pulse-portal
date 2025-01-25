@@ -2,7 +2,6 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MapContent } from "@/components/map/MapContent";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Application } from "@/types/planning";
 import { useToast } from "@/hooks/use-toast";
 import { FilterBar } from "@/components/FilterBar";
@@ -35,117 +34,6 @@ const MapView = () => {
   });
   const { toast } = useToast();
 
-  const fetchPins = async (bbox: string) => {
-    console.log('🔍 Starting to fetch pins...', bbox);
-    setIsLoading(true);
-    
-    try {
-      const { data: response, error } = await supabase.functions.invoke('fetch-searchland-pins', {
-        body: { bbox }
-      });
-
-      if (error) {
-        console.error('❌ Error fetching pins:', error);
-        throw error;
-      }
-
-      if (!response?.pins) {
-        console.log('No pins data in response:', response);
-        setApplications([]);
-        setStatusCounts({
-          'Under Review': 0,
-          'Approved': 0,
-          'Declined': 0,
-          'Other': 0
-        });
-        toast({
-          title: "No applications found",
-          description: "Try searching in a different area",
-          variant: "default"
-        });
-        return;
-      }
-
-      console.log(`📦 Received ${response.pins.length} pins from API`);
-
-      // Transform pins to Application format
-      const transformedData = response.pins?.map((pin: any) => ({
-        id: pin.id || Math.random(),
-        title: 'Planning Application',
-        description: pin.reference || 'No reference available',
-        address: 'Location details pending',
-        status: pin.status || 'Under Review',
-        reference: pin.reference || '',
-        coordinates: pin.coordinates ? 
-          [pin.coordinates[1], pin.coordinates[0]] as [number, number] :
-          coordinates,
-        postcode: 'N/A',
-      } as Application));
-
-      // Calculate status counts
-      const counts = transformedData.reduce((acc, app) => {
-        const status = app.status.toLowerCase();
-        if (status.includes('review') || status.includes('pending')) {
-          acc['Under Review']++;
-        } else if (status.includes('approved')) {
-          acc['Approved']++;
-        } else if (status.includes('declined') || status.includes('refused')) {
-          acc['Declined']++;
-        } else {
-          acc['Other']++;
-        }
-        return acc;
-      }, {
-        'Under Review': 0,
-        'Approved': 0,
-        'Declined': 0,
-        'Other': 0
-      });
-
-      setStatusCounts(counts);
-      setApplications(transformedData);
-      
-      if (transformedData.length === 0) {
-        toast({
-          title: "No applications found",
-          description: "Try searching in a different area",
-          variant: "default"
-        });
-      } else {
-        toast({
-          title: "Applications loaded",
-          description: `Found ${transformedData.length} applications in this area`,
-          variant: "default"
-        });
-      }
-
-    } catch (error: any) {
-      console.error('💥 Error in fetchPins:', error);
-      let errorMessage = "Error loading applications. Please try again later.";
-      
-      if (error.message?.includes('Not Found')) {
-        errorMessage = "No planning applications found in this area. Try a different location.";
-      } else if (error.message?.includes('API key')) {
-        errorMessage = "Authentication error. Please contact support.";
-      }
-      
-      toast({
-        title: "Error loading applications",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      setApplications([]);
-      setStatusCounts({
-        'Under Review': 0,
-        'Approved': 0,
-        'Declined': 0,
-        'Other': 0
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handlePostcodeSelect = async (postcode: string) => {
     if (!postcode) {
       toast({
@@ -168,10 +56,11 @@ const MapView = () => {
         const { longitude, latitude } = data.result;
         setCoordinates([latitude, longitude]);
         
-        // Create a bounding box around the postcode (roughly 5km)
-        // Note: Order must be minLng,minLat,maxLng,maxLat for Searchland API
-        const bbox = `${longitude - 0.05},${latitude - 0.05},${longitude + 0.05},${latitude + 0.05}`;
-        await fetchPins(bbox);
+        toast({
+          title: "Location Updated",
+          description: "Map view has been updated to your selected location",
+          variant: "default"
+        });
       } else {
         toast({
           title: "Invalid Postcode",
