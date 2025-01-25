@@ -12,29 +12,28 @@ serve(async (req) => {
   }
 
   try {
-    const { bbox, z, x, y } = await req.json()
-    
-    if (!bbox && (!z || !x || !y)) {
-      throw new Error('Missing required parameters: either bbox or tile coordinates (z,x,y) must be provided')
-    }
-
-    console.log(`Fetching pins with params:`, { bbox, z, x, y })
-
     const searchlandApiKey = Deno.env.get('SEARCHLAND_API_KEY')
     if (!searchlandApiKey) {
       throw new Error('SEARCHLAND_API_KEY is not set')
     }
 
-    // Construct the appropriate URL based on provided parameters
-    const baseUrl = 'https://api.searchland.co.uk/v1/planning/applications'
-    const url = bbox 
-      ? `${baseUrl}?bbox=${bbox}`
-      : `${baseUrl}/tiles/${z}/${x}/${y}`
+    // Extract tile coordinates from URL path
+    const url = new URL(req.url)
+    const parts = url.pathname.split('/')
+    const z = parts[parts.length - 3]
+    const x = parts[parts.length - 2]
+    const y = parts[parts.length - 1]
 
-    console.log('Requesting Searchland API:', url)
+    if (!z || !x || !y) {
+      console.error('Missing tile coordinates in URL:', url.pathname)
+      throw new Error('Missing tile coordinates in URL path')
+    }
 
-    // Fetch data from Searchland
-    const response = await fetch(url, {
+    console.log(`Fetching tiles for z=${z} x=${x} y=${y}`)
+
+    // Fetch MVT data from Searchland
+    const searchlandUrl = `https://api.searchland.co.uk/v1/planning/applications/tiles/${z}/${x}/${y}`
+    const response = await fetch(searchlandUrl, {
       headers: {
         'Authorization': `Bearer ${searchlandApiKey}`,
       },
@@ -45,17 +44,17 @@ serve(async (req) => {
       throw new Error(`Searchland API error: ${response.status}`)
     }
 
-    const data = await response.json()
+    // Get the MVT buffer
+    const mvtBuffer = await response.arrayBuffer()
 
-    return new Response(
-      JSON.stringify({ pins: data.features }),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        } 
-      }
-    )
+    // Return MVT with proper headers
+    return new Response(mvtBuffer, { 
+      headers: { 
+        ...corsHeaders,
+        'Content-Type': 'application/x-protobuf',
+        'Content-Encoding': 'gzip'
+      } 
+    })
   } catch (error) {
     console.error('Error:', error)
     return new Response(
