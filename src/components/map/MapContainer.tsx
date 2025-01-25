@@ -54,16 +54,13 @@ export const MapContainerComponent = ({
         // Add vector tile source with complete URL for fetch-searchland-mvt and authorization headers
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anon.key}`],
           minzoom: 0,
           maxzoom: 22,
-          // Add Supabase anonymous key to tile requests
           scheme: "xyz",
           tileSize: 512,
           attribution: "",
-          promoteId: "id",
-          // Add headers for authorization
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.supabaseKey}`]
+          promoteId: "id"
         });
 
         // Add layer for planning applications
