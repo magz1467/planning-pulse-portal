@@ -1,19 +1,17 @@
 import { Application } from "@/types/planning";
 import { useEffect, useRef, memo } from "react";
-import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
 import mapboxgl from 'mapbox-gl';
 import { supabase } from "@/integrations/supabase/client";
-import "leaflet/dist/leaflet.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
-  applications: Application[];
   coordinates: [number, number];
+  applications: Application[];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: LeafletMap) => void;
+  onMapMove?: (map: any) => void;
 }
 
 export const MapContainerComponent = memo(({
@@ -24,31 +22,36 @@ export const MapContainerComponent = memo(({
   onCenterChange,
   onMapMove,
 }: MapContainerProps) => {
-  const mapRef = useRef<LeafletMap | null>(null);
-  const mapboxRef = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
     // Initialize Mapbox GL map
-    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN'; // Replace with your token
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29nZXJhZ2h0eSIsImEiOiJjbHNhcGZxbWowMGRqMmpxdGp2NmRwZnZsIn0.1-LG9BDX6gXeOPECXiVLrw';
     
-    mapboxRef.current = new mapboxgl.Map({
+    mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: 'mapbox://styles/mapbox/light-v11',
       center: [coordinates[1], coordinates[0]], // Mapbox uses [lng, lat]
       zoom: 14
     });
 
-    const map = mapboxRef.current;
+    const map = mapRef.current;
 
     map.on('load', async () => {
       // Add vector tile source
+      const functionUrl = supabase.functions.url('fetch-searchland-pins');
+      if (!functionUrl) {
+        console.error('Failed to get function URL');
+        return;
+      }
+
       map.addSource('planning-applications', {
         type: 'vector',
         tiles: [
-          `${supabase.functions.url('fetch-searchland-pins')}/{z}/{x}/{y}`
+          `${functionUrl}/{z}/{x}/{y}`
         ],
         minzoom: 10,
         maxzoom: 16
@@ -92,7 +95,7 @@ export const MapContainerComponent = memo(({
     });
 
     return () => {
-      mapboxRef.current?.remove();
+      mapRef.current?.remove();
     };
   }, [coordinates]);
 
