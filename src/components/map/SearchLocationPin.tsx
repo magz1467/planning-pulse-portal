@@ -1,4 +1,3 @@
-import { MapPin } from "lucide-react";
 import { Marker } from "react-leaflet";
 import L from "leaflet";
 
