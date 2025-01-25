@@ -14,7 +14,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     if (!mapContainer.current) return;
 
     // Set Mapbox token before creating map instance
-    const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
+    const token = import.meta.env.MAPBOX_PUBLIC_TOKEN;
     if (!token) {
       console.error('Mapbox token is not set');
       toast({
@@ -31,7 +31,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     // Set up the authorization header for Searchland MVT requests
     const transformRequest = (url: string, resourceType: string) => {
       if (url.includes('api.searchland.co.uk')) {
-        const searchlandKey = import.meta.env.VITE_SEARCHLAND_API_KEY;
+        const searchlandKey = import.meta.env.SEARCHLAND_API_KEY;
         if (!searchlandKey) {
           console.error('Searchland API key is not set');
           return;
