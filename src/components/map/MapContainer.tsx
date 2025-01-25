@@ -33,9 +33,7 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Add vector source for planning applications
     map.on('load', () => {
-      // Check if source already exists
       if (sourceAddedRef.current) {
         console.log('Vector tile source already added, skipping...');
         return;
@@ -44,13 +42,15 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding vector tile source...');
         
+        // Add vector tile source
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${(supabase as any).supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${supabase.supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
 
+        // Add vector tile layer
         map.addLayer({
           id: 'planning-applications',
           type: 'circle',
