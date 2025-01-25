@@ -4,6 +4,7 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
+import { supabase } from "@/integrations/supabase/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -32,7 +33,7 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    map.on('load', () => {
+    map.on('load', async () => {
       if (sourceAddedRef.current) {
         console.log('Vector tile source already added, skipping...');
         return;
@@ -41,10 +42,10 @@ export const MapContainerComponent = ({
       try {
         console.log('Adding vector tile source...');
         
-        // Add vector tile source using Supabase URL
+        // Add vector tile source using Supabase Edge Function
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${supabase.functions.url}/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
