@@ -35,31 +35,75 @@ export const MapContainerComponent = ({
 
     map.on('load', async () => {
       if (sourceAddedRef.current) {
-        console.log('Vector tile source already added, skipping...');
+        console.log('Source already added, skipping...');
         return;
       }
 
       try {
-        console.log('Adding vector tile source...');
+        console.log('Adding source...');
         
-        // Add vector tile source with authentication headers
+        // Add GeoJSON source
         map.addSource('planning-applications', {
-          type: 'vector',
-          tiles: [`${import.meta.env.VITE_SUPABASE_URL || 'https://jposqxdboetyioymfswd.supabase.co'}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
-          minzoom: 0,
-          maxzoom: 14,
-          tileSize: 512,
-          attribution: '© Planning Data',
-          scheme: 'xyz',
-          promoteId: 'id'
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          },
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 50
         });
 
-        // Add vector tile layer
+        // Add cluster layer
         map.addLayer({
-          id: 'planning-applications',
+          id: 'clusters',
           type: 'circle',
           source: 'planning-applications',
-          'source-layer': 'planning_applications',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': [
+              'step',
+              ['get', 'point_count'],
+              '#F97316', // Orange for small clusters
+              10,
+              '#16a34a', // Green for medium clusters
+              30,
+              '#ea384c'  // Red for large clusters
+            ],
+            'circle-radius': [
+              'step',
+              ['get', 'point_count'],
+              20,
+              10,
+              30,
+              30,
+              40
+            ]
+          }
+        });
+
+        // Add cluster count layer
+        map.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'planning-applications',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 12
+          },
+          paint: {
+            'text-color': '#ffffff'
+          }
+        });
+
+        // Add unclustered point layer
+        map.addLayer({
+          id: 'unclustered-point',
+          type: 'circle',
+          source: 'planning-applications',
+          filter: ['!', ['has', 'point_count']],
           paint: {
             'circle-radius': 8,
             'circle-color': [
@@ -76,14 +120,98 @@ export const MapContainerComponent = ({
         });
 
         sourceAddedRef.current = true;
-        console.log('Successfully added vector tile source and layer');
+        console.log('Successfully added source and layers');
+
+        // Handle clicks on clusters
+        map.on('click', 'clusters', (e) => {
+          const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+          const clusterId = features[0].properties.cluster_id;
+          const source = map.getSource('planning-applications') as mapboxgl.GeoJSONSource;
+          source.getClusterExpansionZoom(clusterId, (err, zoom) => {
+            if (err) return;
+
+            map.easeTo({
+              center: (features[0].geometry as any).coordinates,
+              zoom: zoom
+            });
+          });
+        });
+
+        // Handle clicks on individual points
+        map.on('click', 'unclustered-point', (e) => {
+          if (e.features && e.features[0].properties) {
+            const id = e.features[0].properties.id;
+            onMarkerClick(id);
+          }
+        });
+
+        // Change cursor on hover
+        map.on('mouseenter', 'clusters', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'clusters', () => {
+          map.getCanvas().style.cursor = '';
+        });
+
+        map.on('mouseenter', 'unclustered-point', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'unclustered-point', () => {
+          map.getCanvas().style.cursor = '';
+        });
+
       } catch (error) {
-        console.error('Error adding vector tile source:', error);
+        console.error('Error adding source:', error);
       }
     });
 
-    // Load pins when moving map
-    map.on('moveend', () => {
+    // Update source data when map moves
+    map.on('moveend', async () => {
+      if (!map) return;
+
+      const bounds = map.getBounds();
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-searchland-data`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabase.auth.session()?.access_token}`
+          },
+          body: JSON.stringify({
+            bbox: [
+              bounds.getWest(),
+              bounds.getSouth(),
+              bounds.getEast(),
+              bounds.getNorth()
+            ]
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const source = map.getSource('planning-applications') as mapboxgl.GeoJSONSource;
+        
+        if (source) {
+          source.setData({
+            type: 'FeatureCollection',
+            features: data.applications.map((app: any) => ({
+              type: 'Feature',
+              geometry: app.geometry,
+              properties: {
+                id: app.properties.application_reference,
+                status: app.properties.status.toLowerCase(),
+                description: app.properties.description
+              }
+            }))
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+
       if (onMapMove) {
         onMapMove(map);
       }
