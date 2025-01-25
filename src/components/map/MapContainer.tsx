@@ -33,8 +33,8 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Get Supabase URL from the client
-    const baseUrl = supabase.supabaseUrl;
+    // Get Supabase URL from environment
+    const baseUrl = import.meta.env.VITE_SUPABASE_URL;
     if (!baseUrl) {
       console.error('Supabase URL is not available');
       return;
