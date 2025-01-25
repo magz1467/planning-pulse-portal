@@ -4,7 +4,6 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
-import { supabase } from "@/integrations/supabase/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -101,54 +100,9 @@ export const MapContainerComponent = ({
       }
     });
 
-    // Update source data when map moves
-    map.on('moveend', async () => {
+    // Update when map moves
+    map.on('moveend', () => {
       if (!map) return;
-
-      const bounds = map.getBounds();
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-searchland-data`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session?.access_token}`
-          },
-          body: JSON.stringify({
-            bbox: [
-              bounds.getWest(),
-              bounds.getSouth(),
-              bounds.getEast(),
-              bounds.getNorth()
-            ]
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const source = map.getSource('planning-applications');
-        
-        if (source && 'setData' in source) {
-          source.setData({
-            type: 'FeatureCollection',
-            features: data.applications.map((app: any) => ({
-              type: 'Feature',
-              geometry: app.geometry,
-              properties: {
-                id: app.properties.application_reference,
-                status: app.properties.status.toLowerCase(),
-                description: app.properties.description
-              }
-            }))
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
 
       if (onMapMove) {
         onMapMove(map);
