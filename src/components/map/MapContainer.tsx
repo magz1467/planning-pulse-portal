@@ -4,6 +4,7 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
+import { VectorTileLayer } from "./components/VectorTileLayer";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,7 +28,6 @@ export const MapContainerComponent = ({
 }: MapContainerProps) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const sourceAddedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -43,18 +43,13 @@ export const MapContainerComponent = ({
     console.log('Using Supabase URL:', baseUrl);
 
     map.on('load', async () => {
-      if (sourceAddedRef.current) {
-        console.log('Source already added, skipping...');
-        return;
-      }
-
       try {
         console.log('Adding vector tile source...');
         
-        // Add vector tile source with complete URL for fetch-searchland-mvt and authorization headers
+        // Add vector tile source with complete URL for fetch-searchland-mvt
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anon.key}`],
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anonKey}`],
           minzoom: 0,
           maxzoom: 22,
           scheme: "xyz",
@@ -84,7 +79,6 @@ export const MapContainerComponent = ({
           }
         });
 
-        sourceAddedRef.current = true;
         console.log('Successfully added source and layers');
 
         // Handle clicks on points

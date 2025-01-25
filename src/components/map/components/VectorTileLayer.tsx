@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
 interface VectorTileLayerProps {
   map: mapboxgl.Map;
@@ -16,7 +15,7 @@ export const VectorTileLayer = ({ map, baseUrl }: VectorTileLayerProps) => {
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anon.key}`],
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anonKey}`],
           minzoom: 0,
           maxzoom: 22,
           scheme: "xyz",
@@ -48,7 +47,6 @@ export const VectorTileLayer = ({ map, baseUrl }: VectorTileLayerProps) => {
         console.log('Successfully added source and layers');
       } catch (error) {
         console.error('Error adding vector tile source:', error);
-        toast.error('Error loading planning application data');
       }
     };
 
