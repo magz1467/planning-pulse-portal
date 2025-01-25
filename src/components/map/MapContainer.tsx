@@ -39,10 +39,17 @@ export const MapContainerComponent = ({
         // Get the base URL for the Edge Function
         const functionUrl = 'https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-pins'
 
+        // Calculate bbox with a reasonable radius (roughly 5km)
+        const [lng, lat] = coordinates;
+        const radius = 0.05; // roughly 5km in degrees
+        const bbox = `${lng - radius},${lat - radius},${lng + radius},${lat + radius}`;
+
+        console.log('Initial bbox:', bbox);
+
         map.addSource('planning-applications', {
           type: 'vector',
           scheme: 'xyz',
-          tiles: [`${functionUrl}/{z}/{x}/{y}`],
+          tiles: [`${functionUrl}/{z}/{x}/{y}?bbox=${encodeURIComponent(bbox)}`],
           minzoom: 0,
           maxzoom: 14
         });
@@ -90,11 +97,14 @@ export const MapContainerComponent = ({
     // Load pins when moving map
     map.on('moveend', () => {
       if (onMapMove) {
+        const bounds = map.getBounds();
+        const bbox = `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
+        console.log('Map moved, new bbox:', bbox);
         onMapMove(map);
       }
     });
 
-  }, [onMapMove, onMarkerClick]);
+  }, [onMapMove, onMarkerClick, coordinates]);
 
   return (
     <div className="w-full h-full relative">
