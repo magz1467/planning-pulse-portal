@@ -1,6 +1,7 @@
 import { useEffect, RefObject } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { LatLngTuple } from 'leaflet';
+import { toast } from '@/components/ui/use-toast';
 
 interface MapInitializerProps {
   mapContainer: RefObject<HTMLDivElement>;
@@ -15,22 +16,26 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     // Set Mapbox token before creating map instance
     const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
     if (!token) {
-      console.error('Mapbox token is not set. Please check your environment variables.');
+      console.error('Mapbox token is not set');
+      toast({
+        title: "Map Error",
+        description: "Unable to initialize map. Please check configuration.",
+        variant: "destructive"
+      });
       return;
     }
-    console.log('🗺️ Initializing map with token:', token ? 'Token present' : 'No token');
+
+    console.log('🗺️ Initializing map with coordinates:', coordinates);
     mapboxgl.accessToken = token;
 
     // Set up the authorization header for Searchland MVT requests
     const transformRequest = (url: string, resourceType: string) => {
-      console.log('🔒 Transform request for URL:', url);
       if (url.includes('api.searchland.co.uk')) {
         const searchlandKey = import.meta.env.VITE_SEARCHLAND_API_KEY;
         if (!searchlandKey) {
           console.error('Searchland API key is not set');
           return;
         }
-        console.log('🔑 Adding Searchland authorization header');
         return {
           url: url,
           headers: {
@@ -41,13 +46,12 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       }
     };
 
-    // Create the map instance
     try {
-      console.log('📍 Creating map at coordinates:', coordinates);
+      // Create the map instance
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/light-v11',
-        center: [coordinates[1], coordinates[0]],
+        center: [coordinates[1], coordinates[0]], // Convert to [lng, lat]
         zoom: 13,
         transformRequest: transformRequest
       });
@@ -63,6 +67,11 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       // Log any map errors
       map.on('error', (e) => {
         console.error('🚨 Map error:', e);
+        toast({
+          title: "Map Error",
+          description: "There was an error loading the map. Please try refreshing.",
+          variant: "destructive"
+        });
       });
 
       // Use Object.defineProperty to set the map reference
@@ -72,6 +81,11 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       });
     } catch (error) {
       console.error('❌ Error creating map:', error);
+      toast({
+        title: "Map Error",
+        description: "Failed to initialize map. Please try again later.",
+        variant: "destructive"
+      });
     }
     
     return () => {
