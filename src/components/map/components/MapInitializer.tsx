@@ -12,15 +12,13 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const apiKey = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
-    
     // Set up the authorization header for Searchland MVT requests
     const transformRequest = (url: string, resourceType: string) => {
       if (url.includes('api.searchland.co.uk')) {
         return {
           url: url,
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
+            'Authorization': `Bearer ${import.meta.env.VITE_SEARCHLAND_API_KEY}`,
             'Content-Type': 'application/x-protobuf'
           }
         };
@@ -28,7 +26,12 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     };
 
     // Set Mapbox token before creating map instance
-    mapboxgl.accessToken = apiKey || '';
+    const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
+    if (!token) {
+      console.error('Mapbox token is not set. Please check your environment variables.');
+      return;
+    }
+    mapboxgl.accessToken = token;
 
     // Create the map instance
     const map = new mapboxgl.Map({
