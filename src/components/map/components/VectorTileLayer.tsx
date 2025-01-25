@@ -1,33 +1,37 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface VectorTileLayerProps {
   map: mapboxgl.Map;
+  baseUrl: string;
 }
 
-export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
+export const VectorTileLayer = ({ map, baseUrl }: VectorTileLayerProps) => {
   useEffect(() => {
-    const initializeVectorLayer = async () => {
+    const setupVectorTiles = async () => {
       try {
-        // Add vector tile source
+        console.log('Adding vector tile source...');
+        
         map.addSource('planning-applications', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: []
-          },
-          cluster: true,
-          clusterMaxZoom: 14,
-          clusterRadius: 50
+          type: 'vector',
+          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}?apikey=${supabase.anon.key}`],
+          minzoom: 0,
+          maxzoom: 22,
+          scheme: "xyz",
+          tileSize: 512,
+          attribution: "",
+          promoteId: "id"
         });
 
-        // Add layer for planning applications
+        console.log('Adding planning applications layer...');
         map.addLayer({
-          id: 'planning-applications',
-          type: 'circle',
-          source: 'planning-applications',
-          paint: {
-            'circle-radius': 6,
+          'id': 'planning-applications',
+          'type': 'circle',
+          'source': 'planning-applications',
+          'source-layer': 'planning',
+          'paint': {
             'circle-color': [
               'match',
               ['get', 'status'],
@@ -35,25 +39,21 @@ export const VectorTileLayer = ({ map }: VectorTileLayerProps) => {
               'refused', '#ea384c',
               '#F97316' // default orange
             ],
-            'circle-opacity': 0.8
+            'circle-radius': 8,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
           }
         });
+
+        console.log('Successfully added source and layers');
       } catch (error) {
-        console.error('Error initializing vector layer:', error);
+        console.error('Error adding vector tile source:', error);
+        toast.error('Error loading planning application data');
       }
     };
 
-    map.on('load', initializeVectorLayer);
-
-    return () => {
-      if (map.getLayer('planning-applications')) {
-        map.removeLayer('planning-applications');
-      }
-      if (map.getSource('planning-applications')) {
-        map.removeSource('planning-applications');
-      }
-    };
-  }, [map]);
+    map.on('load', setupVectorTiles);
+  }, [map, baseUrl]);
 
   return null;
 };
