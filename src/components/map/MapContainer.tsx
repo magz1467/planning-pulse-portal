@@ -3,10 +3,8 @@ import mapboxgl from 'mapbox-gl';
 import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
-import { VectorTileLayer } from "./components/VectorTileLayer";
 import { EventHandlers } from "./components/EventHandlers";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { supabase } from "@/integrations/supabase/client";
 
 interface MapContainerProps {
   coordinates: [number, number];
@@ -27,6 +25,7 @@ export const MapContainerComponent = ({
 }: MapContainerProps) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const sourceAddedRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -35,38 +34,49 @@ export const MapContainerComponent = ({
 
     // Add vector source for planning applications
     map.on('load', () => {
+      // Check if source already exists
+      if (sourceAddedRef.current) {
+        console.log('Vector tile source already added, skipping...');
+        return;
+      }
+
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       if (!supabaseUrl) {
         console.error('VITE_SUPABASE_URL is not defined');
         return;
       }
 
-      console.log('Adding vector tile source with URL:', `${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`);
+      try {
+        map.addSource('planning-applications', {
+          type: 'vector',
+          tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          minzoom: 0,
+          maxzoom: 14
+        });
 
-      map.addSource('planning-applications', {
-        type: 'vector',
-        tiles: [`${supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
-        minzoom: 0,
-        maxzoom: 14
-      });
+        map.addLayer({
+          id: 'planning-applications',
+          type: 'circle',
+          source: 'planning-applications',
+          'source-layer': 'planning',
+          paint: {
+            'circle-radius': 6,
+            'circle-color': [
+              'match',
+              ['get', 'status'],
+              'approved', '#16a34a',
+              'refused', '#ea384c',
+              '#F97316' // default orange
+            ],
+            'circle-opacity': 0.8
+          }
+        });
 
-      map.addLayer({
-        id: 'planning-applications',
-        type: 'circle',
-        source: 'planning-applications',
-        'source-layer': 'planning',
-        paint: {
-          'circle-radius': 6,
-          'circle-color': [
-            'match',
-            ['get', 'status'],
-            'approved', '#16a34a',
-            'refused', '#ea384c',
-            '#F97316' // default orange
-          ],
-          'circle-opacity': 0.8
-        }
-      });
+        sourceAddedRef.current = true;
+        console.log('Successfully added vector tile source and layer');
+      } catch (error) {
+        console.error('Error adding vector tile source:', error);
+      }
     });
 
     // Load pins when moving map
@@ -93,7 +103,6 @@ export const MapContainerComponent = ({
       />
       {mapRef.current && (
         <>
-          <VectorTileLayer map={mapRef.current} />
           <EventHandlers 
             map={mapRef.current}
             onMarkerClick={onMarkerClick}
