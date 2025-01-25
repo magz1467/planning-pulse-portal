@@ -1644,6 +1644,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      fetch_searchland_mvt: {
+        Args: {
+          z: number
+          x: number
+          y: number
+        }
+        Returns: string
+      }
       geography:
         | {
             Args: {

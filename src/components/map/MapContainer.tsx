@@ -4,6 +4,7 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
+import { supabase } from "@/integrations/supabase/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -40,18 +41,20 @@ export const MapContainerComponent = ({
         return;
       }
 
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      if (!supabaseUrl) {
-        console.error('VITE_SUPABASE_URL is not defined');
+      const { data: { publicUrl } } = supabase.storage.from('').getPublicUrl('');
+      const baseUrl = publicUrl.split('/storage/')[0];
+      
+      if (!baseUrl) {
+        console.error('Could not determine Supabase URL');
         return;
       }
 
       try {
-        console.log('Adding vector tile source with URL:', `${supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`);
+        console.log('Adding vector tile source with URL:', `${baseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`);
         
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabaseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
+          tiles: [`${baseUrl}/rest/v1/rpc/fetch_searchland_mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14
         });
