@@ -45,7 +45,7 @@ export const MapContainerComponent = ({
         // Add vector tile source with authentication headers
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${supabase.supabaseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: [`${process.env.VITE_SUPABASE_URL || 'https://jposqxdboetyioymfswd.supabase.co'}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
           minzoom: 0,
           maxzoom: 14,
           tileSize: 512,
