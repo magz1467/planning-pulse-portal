@@ -26,8 +26,8 @@ serve(async (req) => {
 
     console.log(`Fetching MVT tile: z=${z}, x=${x}, y=${y}`)
 
-    // Construct Searchland MVT URL with point geometry type
-    const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point`
+    // Construct Searchland MVT URL with point geometry type and simplified parameters
+    const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point&simplify=true`
 
     console.log('Requesting from Searchland:', searchlandUrl)
 
@@ -46,6 +46,9 @@ serve(async (req) => {
 
     // Get the MVT binary data
     const mvtData = await response.arrayBuffer()
+
+    // Log successful response
+    console.log(`Successfully fetched tile z=${z}/x=${x}/y=${y}, size=${mvtData.byteLength} bytes`)
 
     return new Response(mvtData, {
       headers: {

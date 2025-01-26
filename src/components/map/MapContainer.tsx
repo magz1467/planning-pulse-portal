@@ -47,7 +47,7 @@ export const MapContainerComponent = ({
         promoteId: "id"
       });
 
-      // Add the planning applications layer
+      // Add the planning applications layer with circle styling
       map.addLayer({
         'id': 'planning-applications',
         'type': 'circle',
