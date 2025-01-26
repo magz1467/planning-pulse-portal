@@ -2,7 +2,7 @@ import { Application } from "@/types/planning";
 import { MapHeader } from "./MapHeader";
 import { EmailDialog } from "@/components/EmailDialog";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MobileListContainer } from "./mobile/MobileListContainer";
 import { MapSection } from "./layout/MapSection";
 import { DesktopSidebarSection } from "./layout/DesktopSidebarSection";
@@ -46,6 +46,7 @@ export const MapContentLayout = ({
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
 
+  // Use the error handling hook
   useErrorHandling(isLoading, filteredApplications.length, !!coordinates);
 
   const handleEmailSubmit = (radius: string) => {
