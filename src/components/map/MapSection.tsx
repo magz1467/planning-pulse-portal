@@ -11,6 +11,7 @@ interface MapSectionProps {
   applications: Application[];
   selectedId: number | null;
   dispatch: React.Dispatch<MapAction>;
+  postcode: string;
 }
 
 export const MapSection = ({
@@ -20,6 +21,7 @@ export const MapSection = ({
   applications,
   selectedId,
   dispatch,
+  postcode,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
@@ -49,6 +51,7 @@ export const MapSection = ({
             applications={applications}
             selectedId={selectedId}
             onSelectApplication={handleMarkerClick}
+            postcode={postcode}
           />
         )}
       </div>

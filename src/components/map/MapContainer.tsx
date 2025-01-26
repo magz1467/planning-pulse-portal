@@ -15,7 +15,7 @@ interface MapContainerProps {
   onMapMove?: (map: LeafletMap) => void;
 }
 
-export const MapContainerComponent = memo(({
+export const MapContainer = memo(({
   coordinates,
   applications,
   selectedId,
@@ -73,4 +73,4 @@ export const MapContainerComponent = memo(({
   );
 });
 
-MapContainerComponent.displayName = 'MapContainerComponent';
+MapContainer.displayName = 'MapContainer';

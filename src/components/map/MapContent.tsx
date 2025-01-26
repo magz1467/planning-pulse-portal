@@ -1,5 +1,6 @@
 import { MobileApplicationCards } from "./mobile/MobileApplicationCards";
 import { MapContainer } from "./MapContainer";
+import { Application } from "@/types/planning";
 
 interface MapContentProps {
   applications: Application[];

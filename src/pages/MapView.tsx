@@ -114,6 +114,7 @@ const MapView = () => {
           setSelectedId(id);
         }}
         isLoading={isLoading}
+        postcode="SW1A 1AA" // Default London postcode
       />
     </ErrorBoundary>
   );
