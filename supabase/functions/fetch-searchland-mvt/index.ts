@@ -39,6 +39,9 @@ serve(async (req) => {
       throw new Error('Invalid coordinates provided');
     }
 
+    // Log valid coordinates for debugging
+    console.log('Processing tile request:', { z, x, y });
+
     // Get the MVT data from Mapbox
     const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN');
     if (!mapboxToken) {
