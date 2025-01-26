@@ -5,8 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const SEARCHLAND_API_KEY = Deno.env.get('SEARCHLAND_API_KEY')
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -28,15 +26,15 @@ serve(async (req) => {
 
     console.log(`Fetching MVT tile: z=${z}, x=${x}, y=${y}`)
 
-    // Construct Searchland MVT URL
-    const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}`
+    // Construct Searchland MVT URL with point geometry type
+    const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point`
 
     console.log('Requesting from Searchland:', searchlandUrl)
 
     // Forward request to Searchland
     const response = await fetch(searchlandUrl, {
       headers: {
-        'Authorization': `Bearer ${SEARCHLAND_API_KEY}`,
+        'Authorization': `Bearer ${Deno.env.get('SEARCHLAND_API_KEY')}`,
       },
     })
 

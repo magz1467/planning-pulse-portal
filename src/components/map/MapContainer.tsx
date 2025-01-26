@@ -35,12 +35,13 @@ export const MapContainerComponent = ({
 
     // Add vector tile source if it doesn't exist
     if (!map.getSource('planning-applications')) {
+      console.log('Adding vector tile source...');
       map.addSource('planning-applications', {
         type: 'vector',
         tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
         minzoom: 0,
         maxzoom: 22,
-        tolerance: 0 // This helps with geometry simplification
+        tolerance: 0
       });
 
       // Add the planning applications layer
@@ -50,6 +51,7 @@ export const MapContainerComponent = ({
         'source': 'planning-applications',
         'source-layer': 'planning',
         'paint': {
+          'circle-radius': 8,
           'circle-color': [
             'match',
             ['get', 'status'],
@@ -57,7 +59,6 @@ export const MapContainerComponent = ({
             'refused', '#ea384c',
             '#F97316' // default orange
           ],
-          'circle-radius': 8,
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff'
         }
