@@ -94,16 +94,18 @@ export const MapContainerComponent = ({
 
     // Update when map moves
     const moveEndHandler = () => {
-      if (!map) return;
+      if (!mapRef.current) return;
       if (onMapMove) {
-        onMapMove(map);
+        onMapMove(mapRef.current);
       }
     };
 
     map.on('moveend', moveEndHandler);
 
     return () => {
-      if (!map) return;
+      if (!mapRef.current) return;
+      
+      const map = mapRef.current;
       
       map.off('moveend', moveEndHandler);
       
