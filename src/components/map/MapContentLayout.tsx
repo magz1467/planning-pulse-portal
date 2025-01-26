@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { MapHeader } from "./MapHeader";
 import { EmailDialog } from "@/components/EmailDialog";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { MobileListContainer } from "./mobile/MobileListContainer";
 import { MapSection } from "./layout/MapSection";
