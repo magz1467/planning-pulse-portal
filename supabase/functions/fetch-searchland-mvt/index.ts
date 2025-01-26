@@ -66,32 +66,6 @@ serve(async (req) => {
       for (let i = 0; i < layer.length; i++) {
         const feature = layer.feature(i)
         console.log(`Feature ${i} type: ${feature.type}`)
-        
-        // Convert type 4 (MULTIPOINT) to type 1 (POINT)
-        if (feature.type === 4) {
-          // Take first point of multipoint
-          const geometry = feature.loadGeometry()
-          if (geometry && geometry.length > 0 && geometry[0].length > 0) {
-            feature.type = 1
-            feature.geometry = [geometry[0][0]]
-          }
-        }
-
-        // Convert MultiPolygon to Polygon if needed
-        if (feature.type === "MultiPolygon") {
-          try {
-            const geojson = feature.toGeoJSON()
-            const flattened = turf.flatten(geojson)
-            // Take the first polygon if multiple exist
-            if (flattened.features.length > 0) {
-              const polygon = flattened.features[0]
-              feature.geometry = polygon.geometry.coordinates
-              feature.type = "Polygon"
-            }
-          } catch (error) {
-            console.error('Error converting MultiPolygon:', error)
-          }
-        }
       }
     })
 

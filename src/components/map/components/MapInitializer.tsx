@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { initializeMap } from '../utils/mapUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MapInitializerProps {
   mapContainer: React.RefObject<HTMLDivElement>;
@@ -15,8 +15,21 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       if (!mapContainer.current || mapRef.current) return;
 
       try {
+        // Get Mapbox token from Supabase
+        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
+        if (error) throw error;
+
+        mapboxgl.accessToken = token;
+
         // Create new map instance
-        const map = await initializeMap(mapContainer.current, coordinates);
+        const map = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: 'mapbox://styles/mapbox/light-v11',
+          center: [coordinates[1], coordinates[0]],
+          zoom: 13,
+          pitch: 0,
+          bearing: 0,
+        });
         
         // Add navigation controls
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
