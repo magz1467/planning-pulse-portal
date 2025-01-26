@@ -37,17 +37,16 @@ export const MapContainerComponent = ({
     if (!map.getSource('planning-applications')) {
       const setupVectorTiles = async () => {
         try {
-          const baseUrl = `${window.location.protocol}//${window.location.host}`;
-          console.log('Adding vector tile source with URL:', baseUrl);
+          console.log('Adding vector tile source...');
           
           map.addSource('planning-applications', {
             type: 'vector',
-            tiles: [`${baseUrl}/api/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+            tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
             minzoom: 0,
-            maxzoom: 22,
-            tolerance: 0
+            maxzoom: 22
           });
 
+          console.log('Adding planning applications layer...');
           map.addLayer({
             'id': 'planning-applications',
             'type': 'circle',
