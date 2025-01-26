@@ -26,6 +26,7 @@ export const MapContainerComponent = ({
 }: MapContainerProps) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<{ [key: number]: mapboxgl.Marker }>({});
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -34,62 +35,43 @@ export const MapContainerComponent = ({
     }
     
     const map = mapRef.current;
-    console.log('Map initialized, setting up vector tiles...');
 
-    map.on('load', async () => {
-      try {
-        // Add vector tile source with complete URL
-        map.addSource('planning-applications', {
-          type: 'vector',
-          tiles: ['https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}'],
-          minzoom: 0,
-          maxzoom: 22,
-          scheme: "xyz",
-          tileSize: 512
-        });
+    // Clear existing markers
+    Object.values(markersRef.current).forEach(marker => marker.remove());
+    markersRef.current = {};
 
-        // Add circle layer for planning applications
-        map.addLayer({
-          'id': 'planning-applications',
-          'type': 'circle',
-          'source': 'planning-applications',
-          'source-layer': 'planning',
-          'paint': {
-            'circle-color': [
-              'match',
-              ['get', 'status'],
-              'approved', '#16a34a',
-              'refused', '#ea384c',
-              '#F97316' // default orange
-            ],
-            'circle-radius': 8,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ffffff'
-          }
-        });
+    // Add markers for each application
+    applications.forEach(app => {
+      if (!app.coordinates) return;
 
-        // Handle clicks on points
-        map.on('click', 'planning-applications', (e) => {
-          if (e.features && e.features[0].properties) {
-            const id = e.features[0].properties.id;
-            console.log('Clicked application ID:', id);
-            onMarkerClick(id);
-          }
-        });
+      const el = document.createElement('div');
+      el.className = 'marker';
+      el.style.width = '16px';
+      el.style.height = '16px';
+      el.style.borderRadius = '50%';
+      el.style.border = '2px solid white';
+      el.style.cursor = 'pointer';
 
-        // Change cursor on hover
-        map.on('mouseenter', 'planning-applications', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-        
-        map.on('mouseleave', 'planning-applications', () => {
-          map.getCanvas().style.cursor = '';
-        });
-
-      } catch (error) {
-        console.error('Error adding source:', error);
-        toast.error('Error loading planning application data');
+      // Set color based on status
+      if (app.status?.toLowerCase().includes('approved')) {
+        el.style.backgroundColor = '#16a34a';
+      } else if (app.status?.toLowerCase().includes('refused')) {
+        el.style.backgroundColor = '#ea384c';
+      } else {
+        el.style.backgroundColor = '#F97316';
       }
+
+      // Create and store marker
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([app.coordinates[1], app.coordinates[0]])
+        .addTo(map);
+
+      // Add click handler
+      el.addEventListener('click', () => {
+        onMarkerClick(app.id);
+      });
+
+      markersRef.current[app.id] = marker;
     });
 
     // Update when map moves
@@ -100,7 +82,7 @@ export const MapContainerComponent = ({
       }
     });
 
-  }, [onMapMove, onMarkerClick]);
+  }, [applications, onMapMove, onMarkerClick]);
 
   return (
     <div className="w-full h-full relative">
