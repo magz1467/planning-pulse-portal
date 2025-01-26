@@ -26,6 +26,7 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
         const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
         if (error) throw error;
         
+        console.log('🗺️ Initializing map with token:', token ? 'Token received' : 'No token');
         mapboxgl.accessToken = token;
 
         map.current = new mapboxgl.Map({
@@ -36,9 +37,10 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
         });
 
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        console.log('🗺️ Map initialized successfully');
 
       } catch (error) {
-        console.error('Error initializing map:', error);
+        console.error('❌ Error initializing map:', error);
       }
     };
 
@@ -55,6 +57,8 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
   useEffect(() => {
     if (!map.current || !coordinates || isLoading) return;
 
+    console.log('📍 Updating map with coordinates:', coordinates);
+
     // Update map center
     map.current.flyTo({
       center: coordinates,
@@ -64,10 +68,12 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
 
     // Update search pin
     if (searchPinRef.current) {
+      console.log('🔄 Removing existing search pin');
       searchPinRef.current.remove();
     }
 
     // Create new search pin
+    console.log('📌 Creating new search pin at:', coordinates);
     const el = document.createElement('div');
     el.className = 'flex items-center justify-center w-6 h-6 animate-bounce';
     el.innerHTML = `
@@ -83,6 +89,7 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
     // Fetch nearby applications
     const fetchApplications = async () => {
       try {
+        console.log('🔍 Fetching applications near:', coordinates);
         const { data, error } = await supabase.functions.invoke('fetch-searchland-search', {
           body: {
             lat: coordinates[1],
@@ -94,17 +101,24 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
 
         if (error) throw error;
 
+        console.log('📦 Received applications data:', data);
         if (data?.data) {
           setApplications(data.data);
           
           // Clear existing markers
+          console.log('🧹 Clearing existing markers');
           Object.values(markersRef.current).forEach(marker => marker.remove());
           markersRef.current = {};
 
           // Add new markers
+          console.log('📍 Adding new markers for applications');
           data.data.forEach((app: any) => {
-            if (!app.location?.coordinates) return;
+            if (!app.location?.coordinates) {
+              console.warn('⚠️ Application missing coordinates:', app.id);
+              return;
+            }
             
+            console.log('📌 Creating marker for application:', app.id, 'at:', app.location.coordinates);
             const el = document.createElement('div');
             el.className = 'w-6 h-6 bg-white rounded-full border-2 border-primary shadow-lg';
             
@@ -125,7 +139,7 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
           });
         }
       } catch (error) {
-        console.error('Error fetching applications:', error);
+        console.error('❌ Error fetching applications:', error);
       }
     };
 
