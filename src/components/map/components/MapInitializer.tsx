@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { LatLngTuple } from 'leaflet';
 import { initializeMap } from '../utils/mapUtils';
 
 interface MapInitializerProps {
   mapContainer: React.RefObject<HTMLDivElement>;
   mapRef: React.MutableRefObject<mapboxgl.Map | null>;
-  coordinates: LatLngTuple;
+  coordinates: [number, number];
 }
 
 export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitializerProps) => {
