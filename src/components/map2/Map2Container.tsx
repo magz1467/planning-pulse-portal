@@ -113,17 +113,22 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
           // Add new markers
           console.log('📍 Adding new markers for applications');
           data.data.forEach((app: any) => {
-            if (!app.location?.coordinates) {
-              console.warn('⚠️ Application missing coordinates:', app.id);
+            // Check for coordinates in the correct location of the response
+            const appCoords = app.location?.coordinates || 
+                            (app.centroid?.coordinates) || 
+                            (app.geom?.coordinates);
+
+            if (!appCoords) {
+              console.warn('⚠️ Application missing coordinates:', app.id, 'Raw location data:', app.location);
               return;
             }
             
-            console.log('📌 Creating marker for application:', app.id, 'at:', app.location.coordinates);
+            console.log('📌 Creating marker for application:', app.id, 'at:', appCoords);
             const el = document.createElement('div');
             el.className = 'w-6 h-6 bg-white rounded-full border-2 border-primary shadow-lg';
             
             const marker = new mapboxgl.Marker(el)
-              .setLngLat([app.location.coordinates[0], app.location.coordinates[1]])
+              .setLngLat(appCoords)
               .setPopup(
                 new mapboxgl.Popup({ offset: 25 })
                   .setHTML(`
