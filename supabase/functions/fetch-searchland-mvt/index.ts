@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import VectorTile from '@mapbox/vector-tile'
+import Protobuf from 'pbf'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -49,16 +51,41 @@ serve(async (req) => {
     }
 
     // Get the MVT binary data
-    const mvtData = await response.arrayBuffer()
+    const mvtBuffer = await response.arrayBuffer()
+    
+    // Parse the vector tile
+    const tile = new VectorTile(new Protobuf(mvtBuffer))
+    
+    // Log tile layers and features for debugging
+    Object.keys(tile.layers).forEach(layerName => {
+      const layer = tile.layers[layerName]
+      console.log(`Layer: ${layerName}, features: ${layer.length}`)
+      
+      // Inspect feature types
+      for (let i = 0; i < layer.length; i++) {
+        const feature = layer.feature(i)
+        console.log(`Feature ${i} type: ${feature.type}`)
+        
+        // Convert type 4 (MULTIPOINT) to type 1 (POINT)
+        if (feature.type === 4) {
+          // Take first point of multipoint
+          const geometry = feature.loadGeometry()
+          if (geometry && geometry.length > 0 && geometry[0].length > 0) {
+            feature.type = 1
+            feature.geometry = [geometry[0][0]]
+          }
+        }
+      }
+    })
 
     // Log successful response with details
-    console.log(`Successfully fetched tile z=${z}/x=${x}/y=${y}:`, {
-      size: mvtData.byteLength,
+    console.log(`Successfully processed tile z=${z}/x=${x}/y=${y}:`, {
+      size: mvtBuffer.byteLength,
       contentType: response.headers.get('content-type'),
       status: response.status
     })
 
-    return new Response(mvtData, {
+    return new Response(mvtBuffer, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/x-protobuf',
