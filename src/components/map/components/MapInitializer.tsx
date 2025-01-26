@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { supabase } from '@/integrations/supabase/client';
 import { LatLngTuple } from 'leaflet';
+import { initializeMap } from '../utils/mapUtils';
 
 interface MapInitializerProps {
   mapContainer: React.RefObject<HTMLDivElement>;
@@ -11,28 +11,14 @@ interface MapInitializerProps {
 
 export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitializerProps) => {
   useEffect(() => {
-    const initializeMap = async () => {
+    const initializeMapInstance = async () => {
       // Don't initialize if container is missing or map already exists
       if (!mapContainer.current || mapRef.current) return;
 
       try {
-        // Get Mapbox token from Supabase
-        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
-        
-        if (error) throw error;
-        
-        mapboxgl.accessToken = token;
-
         // Create new map instance
-        const map = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/light-v11',
-          center: [coordinates[1], coordinates[0]], // Convert to [lng, lat]
-          zoom: 13,
-          pitch: 0,
-          bearing: 0,
-        });
-
+        const map = await initializeMap(mapContainer.current, coordinates);
+        
         // Add navigation controls
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
         
@@ -49,7 +35,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       }
     };
 
-    initializeMap();
+    initializeMapInstance();
 
     // Cleanup function
     return () => {
