@@ -1,20 +1,20 @@
 import { Application } from "@/types/planning";
 import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { MapAction } from "@/types/map-reducer";
 
 interface MapSectionProps {
   isMobile: boolean;
   isMapView: boolean;
-  coordinates: [number, number];
+  coordinates: [number, number] | null;
   applications: Application[];
   selectedId: number | null;
   dispatch: React.Dispatch<MapAction>;
   postcode: string;
 }
 
-export const MapSection = ({
+export const MapSection = memo(({
   isMobile,
   isMapView,
   coordinates,
@@ -57,4 +57,6 @@ export const MapSection = ({
       </div>
     </div>
   );
-};
+});
+
+MapSection.displayName = 'MapSection';

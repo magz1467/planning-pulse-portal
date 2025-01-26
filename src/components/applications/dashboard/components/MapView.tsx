@@ -1,4 +1,4 @@
-import { MapContainerComponent } from "@/components/map/MapContainer";
+import { MapContainer } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
 import { memo } from "react";
 
@@ -6,9 +6,8 @@ interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
   coordinates: [number, number];
-  onMarkerClick: (id: number) => void;
+  onMarkerClick: (id: number | null) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: any) => void;
 }
 
 export const MapView = memo(({
@@ -17,17 +16,15 @@ export const MapView = memo(({
   coordinates,
   onMarkerClick,
   onCenterChange,
-  onMapMove,
 }: MapViewProps) => {
   return (
     <div className="absolute inset-0">
-      <MapContainerComponent
+      <MapContainer
         applications={applications}
-        coordinates={coordinates}
         selectedId={selectedId}
+        coordinates={coordinates}
         onMarkerClick={onMarkerClick}
         onCenterChange={onCenterChange}
-        onMapMove={onMapMove}
       />
     </div>
   );

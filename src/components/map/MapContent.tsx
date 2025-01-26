@@ -30,7 +30,6 @@ export const MapContent = ({
         selectedId={selectedId}
         coordinates={coordinates}
         onMarkerClick={onMarkerClick}
-        isLoading={isLoading}
       />
       {isMobile && (
         <MobileApplicationCards

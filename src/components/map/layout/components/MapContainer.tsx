@@ -1,5 +1,5 @@
 import { Application } from "@/types/planning";
-import { MapContainerComponent } from "../../MapContainer";
+import { MapContainer as MapContainerBase } from "../../MapContainer";
 import { MobileApplicationCards } from "../../mobile/MobileApplicationCards";
 
 interface MapContainerProps {
@@ -9,6 +9,7 @@ interface MapContainerProps {
   applications: Application[];
   selectedApplication: number | null;
   onMarkerClick: (id: number | null) => void;
+  postcode: string;
 }
 
 export const MapContainer = ({
@@ -18,6 +19,7 @@ export const MapContainer = ({
   applications,
   selectedApplication,
   onMarkerClick,
+  postcode,
 }: MapContainerProps) => {
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
@@ -31,7 +33,7 @@ export const MapContainer = ({
       }}
     >
       <div className="absolute inset-0">
-        <MapContainerComponent
+        <MapContainerBase
           coordinates={coordinates}
           applications={applications}
           selectedId={selectedApplication}
@@ -42,6 +44,7 @@ export const MapContainer = ({
             applications={applications}
             selectedId={selectedApplication}
             onSelectApplication={onMarkerClick}
+            postcode={postcode}
           />
         )}
       </div>

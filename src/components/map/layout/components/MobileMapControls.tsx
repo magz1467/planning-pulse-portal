@@ -6,12 +6,14 @@ interface MobileMapControlsProps {
   applications: Application[];
   selectedId: number | null;
   onSelectApplication: (id: number | null) => void;
+  postcode: string;
 }
 
 export const MobileMapControls = ({
   applications,
   selectedId,
   onSelectApplication,
+  postcode,
 }: MobileMapControlsProps) => {
   const handleSelectApplication = useCallback((id: number | null) => {
     console.log('MobileMapControls handleSelectApplication:', id);
@@ -23,6 +25,7 @@ export const MobileMapControls = ({
       applications={applications}
       selectedId={selectedId}
       onSelectApplication={handleSelectApplication}
+      postcode={postcode}
     />
   );
 };
