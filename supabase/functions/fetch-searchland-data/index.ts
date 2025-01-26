@@ -1,142 +1,85 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { corsHeaders } from "../_shared/cors.ts"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-interface SearchlandResponse {
-  features: Array<{
-    type: string;
-    properties: {
-      application_reference: string;
-      description: string;
-      status: string;
-      decision_date?: string;
-      submission_date?: string;
-      address?: string;
-      ward?: string;
-      consultation_end_date?: string;
-      application_type?: string;
-      applicant_name?: string;
-    };
-    geometry?: {
-      type: string;
-      coordinates: [number, number];
-    };
-  }>;
+interface SearchlandRequestBody {
+  coordinates: {
+    lat: number
+    lng: number
+  }
+  radius: number
 }
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { bbox } = await req.json()
+    // Get API key from environment
     const apiKey = Deno.env.get('SEARCHLAND_API_KEY')
-
     if (!apiKey) {
-      console.error('Searchland API key not found in environment variables')
-      throw new Error('Searchland API key not found')
+      throw new Error('Missing SEARCHLAND_API_KEY')
     }
 
-    console.log('Fetching Searchland data with bbox:', bbox)
-    console.log('API Key exists:', !!apiKey)
-    console.log('API Key length:', apiKey.length)
-    console.log('First 4 chars of API key:', apiKey.substring(0, 4))
+    // Parse request body
+    const { coordinates, radius } = await req.json() as SearchlandRequestBody
 
-    const url = 'https://api.searchland.co.uk/v1/planning_applications/search'
-    console.log('Request URL:', url)
+    console.log('Fetching Searchland data:', { coordinates, radius })
 
-    const requestBody = {
-      bbox: bbox,
-      limit: 100
-    }
-    console.log('Request body:', JSON.stringify(requestBody))
-
-    // Using the correct endpoint and request structure with Bearer token
-    const response = await fetch(url, {
+    // Call Searchland API
+    const response = await fetch('https://api.searchland.co.uk/v1/planning_applications/search', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        coordinates: {
+          lat: coordinates.lat,
+          lng: coordinates.lng
+        },
+        radius: radius || 1000, // Default 1km radius
+        limit: 100,
+        offset: 0,
+        sort: {
+          field: "submission_date",
+          direction: "desc"
+        }
+      })
     })
 
-    console.log('Searchland API response status:', response.status)
-
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Searchland API error response:', errorText)
-      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
-      throw new Error(`Searchland API error: ${response.status} - ${errorText}`)
+      console.error('Searchland API error:', await response.text())
+      throw new Error(`Searchland API error: ${response.status}`)
     }
 
-    const data: SearchlandResponse = await response.json()
-    console.log(`Received ${data.features?.length || 0} applications from Searchland`)
-
-    // Store in Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase credentials not found')
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
-    // Store each application
-    for (const feature of data.features) {
-      const { error } = await supabase
-        .from('searchland_applications')
-        .upsert({
-          application_reference: feature.properties.application_reference,
-          description: feature.properties.description,
-          status: feature.properties.status,
-          decision_date: feature.properties.decision_date,
-          submission_date: feature.properties.submission_date,
-          address: feature.properties.address,
-          ward: feature.properties.ward,
-          consultation_end_date: feature.properties.consultation_end_date,
-          application_type: feature.properties.application_type,
-          applicant_name: feature.properties.applicant_name,
-          location: feature.geometry ? 
-            `POINT(${feature.geometry.coordinates[0]} ${feature.geometry.coordinates[1]})` : 
-            null,
-          raw_data: feature
-        }, {
-          onConflict: 'application_reference'
-        })
-
-      if (error) {
-        console.error('Error storing application:', error)
-      }
-    }
+    const data = await response.json()
+    console.log('Searchland API response:', { 
+      count: data?.results?.length,
+      firstResult: data?.results?.[0]
+    })
 
     return new Response(
-      JSON.stringify({ applications: data.features }),
+      JSON.stringify(data),
       { 
-        headers: { 
+        headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
-        } 
+        }
       }
     )
 
   } catch (error) {
     console.error('Error in fetch-searchland-data:', error)
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        context: 'Failed to fetch or process Searchland data'
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json'}
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     )
   }
