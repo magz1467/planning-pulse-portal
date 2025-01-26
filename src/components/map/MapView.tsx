@@ -6,7 +6,7 @@ interface MapViewProps {
   applications: Application[];
   selectedId: number | null;
   coordinates: [number, number];
-  onMarkerClick: (id: number | null) => void;
+  onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
   onMapMove?: (map: any) => void;
 }
