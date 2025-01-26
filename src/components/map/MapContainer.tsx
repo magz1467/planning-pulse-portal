@@ -35,56 +35,64 @@ export const MapContainerComponent = ({
 
     // Add vector tile source and layer
     if (!map.getSource('planning-applications')) {
-      const functionUrl = supabase.functions.invoke('fetch-searchland-mvt').url;
-      
-      console.log('Adding vector tile source with URL:', functionUrl);
-      
-      map.addSource('planning-applications', {
-        type: 'vector',
-        tiles: [`${functionUrl}/{z}/{x}/{y}`],
-        minzoom: 0,
-        maxzoom: 22
-      });
+      const setupVectorTiles = async () => {
+        try {
+          const { data: { functionUrl } } = await supabase.functions.invoke('fetch-searchland-mvt');
+          
+          console.log('Adding vector tile source with URL:', functionUrl);
+          
+          map.addSource('planning-applications', {
+            type: 'vector',
+            tiles: [`${functionUrl}/{z}/{x}/{y}`],
+            minzoom: 0,
+            maxzoom: 22
+          });
 
-      map.addLayer({
-        'id': 'planning-applications',
-        'type': 'circle',
-        'source': 'planning-applications',
-        'source-layer': 'planning',
-        'paint': {
-          'circle-radius': 8,
-          'circle-color': [
-            'match',
-            ['get', 'status'],
-            'approved', '#16a34a',
-            'refused', '#ea384c',
-            '#F97316'
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff'
+          map.addLayer({
+            'id': 'planning-applications',
+            'type': 'circle',
+            'source': 'planning-applications',
+            'source-layer': 'planning',
+            'paint': {
+              'circle-radius': 8,
+              'circle-color': [
+                'match',
+                ['get', 'status'],
+                'approved', '#16a34a',
+                'refused', '#ea384c',
+                '#F97316' // default orange
+              ],
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#ffffff'
+            }
+          });
+
+          // Add click handler for the vector tile layer
+          map.on('click', 'planning-applications', async (e) => {
+            if (e.features && e.features[0]) {
+              const feature = e.features[0];
+              const id = feature.properties?.id;
+              if (id) {
+                console.log('Feature clicked:', feature);
+                onMarkerClick(id);
+              }
+            }
+          });
+
+          // Change cursor on hover
+          map.on('mouseenter', 'planning-applications', () => {
+            map.getCanvas().style.cursor = 'pointer';
+          });
+          
+          map.on('mouseleave', 'planning-applications', () => {
+            map.getCanvas().style.cursor = '';
+          });
+        } catch (error) {
+          console.error('Error adding vector tile source:', error);
         }
-      });
+      };
 
-      // Add click handler for the vector tile layer
-      map.on('click', 'planning-applications', async (e) => {
-        if (e.features && e.features[0]) {
-          const feature = e.features[0];
-          const id = feature.properties?.id;
-          if (id) {
-            console.log('Feature clicked:', feature);
-            onMarkerClick(id);
-          }
-        }
-      });
-
-      // Change cursor on hover
-      map.on('mouseenter', 'planning-applications', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
-      
-      map.on('mouseleave', 'planning-applications', () => {
-        map.getCanvas().style.cursor = '';
-      });
+      setupVectorTiles();
     }
 
     // Update when map moves
