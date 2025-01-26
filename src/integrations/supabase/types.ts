@@ -1243,6 +1243,27 @@ export type Database = {
         }
         Relationships: []
       }
+      waiting_list: {
+        Row: {
+          created_at: string
+          email: string
+          id: number
+          postcode: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: never
+          postcode: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: never
+          postcode?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       geography_columns: {

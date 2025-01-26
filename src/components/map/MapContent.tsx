@@ -1,8 +1,5 @@
-import { Application } from "@/types/planning";
-import { MapView } from "./MapView";
-import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
-import { LoadingOverlay } from "@/components/applications/dashboard/components/LoadingOverlay";
-import { memo, useCallback } from 'react';
+import { MobileApplicationCards } from "./mobile/MobileApplicationCards";
+import { MapContainer } from "./MapContainer";
 
 interface MapContentProps {
   applications: Application[];
@@ -10,68 +7,38 @@ interface MapContentProps {
   coordinates: [number, number];
   isMobile: boolean;
   isMapView: boolean;
-  onMarkerClick: (id: number | null) => void;
-  onCenterChange?: (center: [number, number]) => void;
-  isLoading?: boolean;
+  onMarkerClick: (id: number) => void;
+  isLoading: boolean;
+  postcode: string;
 }
 
-export const MapContent = memo(({
+export const MapContent = ({
   applications,
   selectedId,
   coordinates,
   isMobile,
   isMapView,
   onMarkerClick,
-  onCenterChange,
-  isLoading = false,
+  isLoading,
+  postcode,
 }: MapContentProps) => {
-  console.log('🗺️ MapContent rendering:', {
-    applicationsCount: applications.length,
-    selectedId,
-    coordinates,
-    isMobile,
-    isMapView,
-    isLoading
-  });
-
-  const handleMarkerClick = useCallback((id: number | null) => {
-    console.log('MapContent handleMarkerClick:', id);
-    onMarkerClick(id);
-  }, [onMarkerClick]);
-
-  if (!coordinates || (!isMobile && !isMapView)) {
-    console.log('⚠️ MapContent early return - missing coordinates or view conditions not met');
-    return null;
-  }
-
   return (
-    <div className="flex-1 relative h-full">
-      {isLoading && <LoadingOverlay />}
-      <div 
-        className="absolute inset-0"
-        style={{ 
-          height: isMobile ? 'calc(100vh - 120px)' : '100%',
-          position: 'relative',
-          zIndex: 1
-        }}
-      >
-        <MapView
+    <div className="relative w-full h-full">
+      <MapContainer
+        applications={applications}
+        selectedId={selectedId}
+        coordinates={coordinates}
+        onMarkerClick={onMarkerClick}
+        isLoading={isLoading}
+      />
+      {isMobile && (
+        <MobileApplicationCards
           applications={applications}
           selectedId={selectedId}
-          coordinates={coordinates}
-          onMarkerClick={handleMarkerClick}
-          onCenterChange={onCenterChange}
+          onSelectApplication={onMarkerClick}
+          postcode={postcode}
         />
-        {isMobile && selectedId && (
-          <MobileApplicationCards
-            applications={applications}
-            selectedId={selectedId}
-            onSelectApplication={handleMarkerClick}
-          />
-        )}
-      </div>
+      )}
     </div>
   );
-});
-
-MapContent.displayName = 'MapContent';
+};

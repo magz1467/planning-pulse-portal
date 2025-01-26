@@ -1,7 +1,7 @@
 import { Application } from "@/types/planning";
 import { useState, useEffect } from "react";
 import { FullScreenDetails } from "./FullScreenDetails";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { EmptyState } from "./EmptyState";
 import { MiniCard } from "./MiniCard";
 import { Flame } from "lucide-react";
@@ -12,12 +12,14 @@ interface MobileApplicationCardsProps {
   applications: Application[];
   selectedId: number | null;
   onSelectApplication: (id: number | null) => void;
+  postcode: string;
 }
 
 export const MobileApplicationCards = ({
   applications,
   selectedId,
   onSelectApplication,
+  postcode,
 }: MobileApplicationCardsProps) => {
   const [showFullDetails, setShowFullDetails] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -41,7 +43,7 @@ export const MobileApplicationCards = ({
   const selectedApp = applications.find(app => app.id === selectedId);
 
   if (!applications.length) {
-    return <EmptyState />;
+    return <EmptyState postcode={postcode} />;
   }
 
   if (showFullDetails && selectedApp) {
@@ -90,7 +92,7 @@ export const MobileApplicationCards = ({
           <div className="flex-1 overflow-y-auto bg-white">
             <PlanningApplicationList
               applications={applications}
-              postcode=""
+              postcode={postcode}
               onSelectApplication={(id) => {
                 onSelectApplication(id);
                 setIsDrawerOpen(false);
