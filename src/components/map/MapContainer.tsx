@@ -37,17 +37,28 @@ export const MapContainerComponent = ({
     if (!map.getSource('planning-applications')) {
       const setupVectorTiles = async () => {
         try {
-          const { data: { functionUrl } } = await supabase.functions.invoke('fetch-searchland-mvt');
-          
-          if (!functionUrl) {
+          // Get current map view
+          const zoom = Math.floor(map.getZoom());
+          const center = map.getCenter();
+          const tileCoords = getTileCoordinates(center.lng, center.lat, zoom);
+
+          const { data, error } = await supabase.functions.invoke('fetch-searchland-mvt', {
+            body: {
+              z: tileCoords.z,
+              x: tileCoords.x,
+              y: tileCoords.y
+            }
+          });
+
+          if (error || !data?.functionUrl) {
             throw new Error('Function URL not returned from edge function');
           }
           
-          console.log('Adding vector tile source with URL:', functionUrl);
+          console.log('Adding vector tile source with URL:', data.functionUrl);
           
           map.addSource('planning-applications', {
             type: 'vector',
-            tiles: [`${functionUrl}/{z}/{x}/{y}`],
+            tiles: [`${data.functionUrl}/{z}/{x}/{y}`],
             minzoom: 0,
             maxzoom: 22
           });
@@ -139,3 +150,15 @@ export const MapContainerComponent = ({
     </div>
   );
 };
+
+// Helper function to convert lat/lng to tile coordinates
+function getTileCoordinates(lon: number, lat: number, zoom: number) {
+  const n = Math.pow(2, zoom);
+  const xtile = Math.floor((lon + 180) / 360 * n);
+  const ytile = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n);
+  return {
+    x: xtile,
+    y: ytile,
+    z: zoom
+  };
+}
