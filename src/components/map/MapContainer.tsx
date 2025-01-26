@@ -4,9 +4,7 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { EventHandlers } from "./components/EventHandlers";
-import { VectorTileLayer } from "./components/VectorTileLayer";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface MapContainerProps {
@@ -38,28 +36,19 @@ export const MapContainerComponent = ({
     const map = mapRef.current;
     console.log('Map initialized, setting up vector tiles...');
 
-    // Hardcode the Supabase URL since we know it
-    const baseUrl = 'https://jposqxdboetyioymfswd.supabase.co';
-    console.log('Using Supabase URL:', baseUrl);
-
     map.on('load', async () => {
       try {
-        console.log('Adding vector tile source...');
-        
-        // Add vector tile source with complete URL for fetch-searchland-mvt
+        // Add vector tile source with complete URL
         map.addSource('planning-applications', {
           type: 'vector',
-          tiles: [`${baseUrl}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          tiles: ['https://jposqxdboetyioymfswd.supabase.co/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}'],
           minzoom: 0,
           maxzoom: 22,
           scheme: "xyz",
-          tileSize: 512,
-          attribution: "",
-          promoteId: "id"
+          tileSize: 512
         });
 
-        // Add layer for planning applications
-        console.log('Adding planning applications layer...');
+        // Add circle layer for planning applications
         map.addLayer({
           'id': 'planning-applications',
           'type': 'circle',
@@ -79,11 +68,8 @@ export const MapContainerComponent = ({
           }
         });
 
-        console.log('Successfully added source and layers');
-
         // Handle clicks on points
         map.on('click', 'planning-applications', (e) => {
-          console.log('Click event on planning application:', e);
           if (e.features && e.features[0].properties) {
             const id = e.features[0].properties.id;
             console.log('Clicked application ID:', id);
@@ -93,12 +79,10 @@ export const MapContainerComponent = ({
 
         // Change cursor on hover
         map.on('mouseenter', 'planning-applications', () => {
-          console.log('Mouse entered planning applications layer');
           map.getCanvas().style.cursor = 'pointer';
         });
         
         map.on('mouseleave', 'planning-applications', () => {
-          console.log('Mouse left planning applications layer');
           map.getCanvas().style.cursor = '';
         });
 
@@ -110,11 +94,8 @@ export const MapContainerComponent = ({
 
     // Update when map moves
     map.on('moveend', () => {
-      console.log('Map move ended');
       if (!map) return;
-
       if (onMapMove) {
-        console.log('Calling onMapMove callback');
         onMapMove(map);
       }
     });
@@ -131,12 +112,10 @@ export const MapContainerComponent = ({
         coordinates={coordinates}
       />
       {mapRef.current && (
-        <>
-          <EventHandlers 
-            map={mapRef.current}
-            onMarkerClick={onMarkerClick}
-          />
-        </>
+        <EventHandlers 
+          map={mapRef.current}
+          onMarkerClick={onMarkerClick}
+        />
       )}
     </div>
   );
