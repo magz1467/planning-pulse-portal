@@ -53,8 +53,9 @@ serve(async (req) => {
     })
 
     if (!searchlandResponse.ok) {
-      console.error('SearchLand API error:', await searchlandResponse.text())
-      throw new Error('Failed to fetch from SearchLand API')
+      const errorText = await searchlandResponse.text()
+      console.error('SearchLand API error:', errorText)
+      throw new Error(`SearchLand API failed with status ${searchlandResponse.status}: ${errorText}`)
     }
 
     const data = await searchlandResponse.json()
@@ -81,6 +82,7 @@ serve(async (req) => {
 
     if (insertError) {
       console.error('Error inserting applications:', insertError)
+      throw insertError
     }
 
     // Generate MVT from the database
