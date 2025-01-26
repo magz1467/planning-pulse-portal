@@ -1,0 +1,3 @@
+project_id = "jposqxdboetyioymfswd"
+[secrets]
+SEARCHLAND_API_KEY = "SEARCHLAND_API_KEY"
