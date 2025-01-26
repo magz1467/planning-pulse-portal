@@ -768,6 +768,33 @@ export type Database = {
         }
         Relationships: []
       }
+      hp22_applications: {
+        Row: {
+          address: string | null
+          calculated_date_received: string | null
+          calculated_decision: string | null
+          created_at: string | null
+          id: string
+          proposal: string | null
+        }
+        Insert: {
+          address?: string | null
+          calculated_date_received?: string | null
+          calculated_decision?: string | null
+          created_at?: string | null
+          id: string
+          proposal?: string | null
+        }
+        Update: {
+          address?: string | null
+          calculated_date_received?: string | null
+          calculated_decision?: string | null
+          created_at?: string | null
+          id?: string
+          proposal?: string | null
+        }
+        Relationships: []
+      }
       impact_criteria: {
         Row: {
           category: string
