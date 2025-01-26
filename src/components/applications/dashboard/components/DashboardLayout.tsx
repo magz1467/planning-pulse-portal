@@ -94,6 +94,7 @@ export const DashboardLayout = ({
                 handleMarkerClick(action.payload);
               }
             }}
+            postcode={postcode}
           />
         </div>
       </div>
