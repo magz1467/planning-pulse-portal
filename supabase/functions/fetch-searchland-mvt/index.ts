@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import VectorTile from '@mapbox/vector-tile'
 import Protobuf from 'pbf'
+import * as turf from '@turf/turf'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -73,6 +74,22 @@ serve(async (req) => {
           if (geometry && geometry.length > 0 && geometry[0].length > 0) {
             feature.type = 1
             feature.geometry = [geometry[0][0]]
+          }
+        }
+
+        // Convert MultiPolygon to Polygon if needed
+        if (feature.type === "MultiPolygon") {
+          try {
+            const geojson = feature.toGeoJSON()
+            const flattened = turf.flatten(geojson)
+            // Take the first polygon if multiple exist
+            if (flattened.features.length > 0) {
+              const polygon = flattened.features[0]
+              feature.geometry = polygon.geometry.coordinates
+              feature.type = "Polygon"
+            }
+          } catch (error) {
+            console.error('Error converting MultiPolygon:', error)
           }
         }
       }
