@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
@@ -103,6 +104,14 @@ export const MapContainerComponent = ({
 
     return () => {
       map.off('moveend', moveEndHandler);
+      
+      // Proper cleanup of Mapbox layers and sources
+      if (map.getLayer('planning-applications')) {
+        map.removeLayer('planning-applications');
+      }
+      if (map.getSource('planning-applications')) {
+        map.removeSource('planning-applications');
+      }
     };
 
   }, [applications, onMapMove, onMarkerClick]);
