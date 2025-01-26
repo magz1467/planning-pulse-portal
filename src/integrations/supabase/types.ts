@@ -862,34 +862,37 @@ export type Database = {
       }
       planning_applications: {
         Row: {
-          application_number: string | null
-          category: string | null
+          address: Json | null
+          council_reference: string
+          created_at: string | null
+          decision: string | null
           description: string | null
-          geom: unknown | null
-          id: number
-          region: string | null
-          status: string | null
-          submitted_date: string | null
+          geometry: unknown | null
+          id: string
+          raw_data: Json | null
+          validated_date: string | null
         }
         Insert: {
-          application_number?: string | null
-          category?: string | null
+          address?: Json | null
+          council_reference: string
+          created_at?: string | null
+          decision?: string | null
           description?: string | null
-          geom?: unknown | null
-          id?: number
-          region?: string | null
-          status?: string | null
-          submitted_date?: string | null
+          geometry?: unknown | null
+          id?: string
+          raw_data?: Json | null
+          validated_date?: string | null
         }
         Update: {
-          application_number?: string | null
-          category?: string | null
+          address?: Json | null
+          council_reference?: string
+          created_at?: string | null
+          decision?: string | null
           description?: string | null
-          geom?: unknown | null
-          id?: number
-          region?: string | null
-          status?: string | null
-          submitted_date?: string | null
+          geometry?: unknown | null
+          id?: string
+          raw_data?: Json | null
+          validated_date?: string | null
         }
         Relationships: []
       }

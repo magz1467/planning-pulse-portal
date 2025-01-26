@@ -3,6 +3,7 @@ import { MapView } from "./MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { useCallback, memo } from "react";
 import { MapAction } from "@/types/map-reducer";
+import { EmptyStateWithEmail } from "./EmptyStateWithEmail";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -29,6 +30,11 @@ export const MapSection = memo(({
   }, [dispatch]);
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
+
+  // Show empty state if no applications
+  if (!applications.length) {
+    return <EmptyStateWithEmail postcode={postcode} />;
+  }
 
   return (
     <div 
