@@ -4,6 +4,7 @@ import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicatio
 import { useCallback, memo } from "react";
 import { MapAction } from "@/types/map-reducer";
 import { EmptyStateWithEmail } from "./EmptyStateWithEmail";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapSectionProps {
   isMobile: boolean;
@@ -24,6 +25,8 @@ export const MapSection = memo(({
   dispatch,
   postcode,
 }: MapSectionProps) => {
+  const { toast } = useToast();
+  
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
     dispatch({ type: 'SELECT_APPLICATION', payload: id });
@@ -31,10 +34,15 @@ export const MapSection = memo(({
 
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
-  // Show empty state if no applications
-  if (applications.length === 0) {
+  // Show empty state if no applications and coordinates are valid
+  if (coordinates && applications.length === 0) {
+    toast({
+      title: "No results found",
+      description: "We couldn't find any planning applications in this area yet.",
+    });
+    
     return (
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
         <EmptyStateWithEmail postcode={postcode} />
       </div>
     );
