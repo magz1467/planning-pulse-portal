@@ -113,13 +113,31 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
           // Add new markers
           console.log('📍 Adding new markers for applications');
           data.data.forEach((app: any) => {
-            // Check for coordinates in the correct location of the response
-            const appCoords = app.location?.coordinates || 
-                            (app.centroid?.coordinates) || 
-                            (app.geom?.coordinates);
+            // Log the entire application object for debugging
+            console.log('🔍 Processing application:', {
+              id: app.id,
+              location: app.location,
+              centroid: app.centroid,
+              geom: app.geom,
+              raw: app
+            });
+
+            // Check for coordinates in multiple possible locations
+            let appCoords = null;
+            
+            if (app.location?.coordinates) {
+              appCoords = app.location.coordinates;
+              console.log('📍 Found coordinates in location:', appCoords);
+            } else if (app.centroid?.coordinates) {
+              appCoords = app.centroid.coordinates;
+              console.log('📍 Found coordinates in centroid:', appCoords);
+            } else if (app.geom?.coordinates) {
+              appCoords = app.geom.coordinates;
+              console.log('📍 Found coordinates in geom:', appCoords);
+            }
 
             if (!appCoords) {
-              console.warn('⚠️ Application missing coordinates:', app.id, 'Raw location data:', app.location);
+              console.warn('⚠️ Application missing coordinates:', app.id, 'Full application data:', app);
               return;
             }
             
