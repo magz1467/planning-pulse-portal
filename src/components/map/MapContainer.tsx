@@ -39,6 +39,10 @@ export const MapContainerComponent = ({
         try {
           const { data: { functionUrl } } = await supabase.functions.invoke('fetch-searchland-mvt');
           
+          if (!functionUrl) {
+            throw new Error('Function URL not returned from edge function');
+          }
+          
           console.log('Adding vector tile source with URL:', functionUrl);
           
           map.addSource('planning-applications', {
