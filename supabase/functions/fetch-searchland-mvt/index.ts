@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import Pbf from 'https://esm.sh/pbf@3.2.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
