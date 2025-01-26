@@ -37,11 +37,6 @@ export const MapContainerComponent = ({
     if (!map.getSource('planning-applications')) {
       const setupVectorTiles = async () => {
         try {
-          // Get current map view
-          const zoom = Math.floor(map.getZoom());
-          const center = map.getCenter();
-          const tileCoords = getTileCoordinates(center.lng, center.lat, zoom);
-
           const baseUrl = `${window.location.protocol}//${window.location.host}`;
           console.log('Adding vector tile source with URL:', baseUrl);
           
@@ -49,7 +44,8 @@ export const MapContainerComponent = ({
             type: 'vector',
             tiles: [`${baseUrl}/api/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
             minzoom: 0,
-            maxzoom: 22
+            maxzoom: 22,
+            tolerance: 0
           });
 
           map.addLayer({
@@ -139,15 +135,3 @@ export const MapContainerComponent = ({
     </div>
   );
 };
-
-// Helper function to convert lat/lng to tile coordinates
-function getTileCoordinates(lon: number, lat: number, zoom: number) {
-  const n = Math.pow(2, zoom);
-  const xtile = Math.floor((lon + 180) / 360 * n);
-  const ytile = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n);
-  return {
-    x: xtile,
-    y: ytile,
-    z: zoom
-  };
-}
