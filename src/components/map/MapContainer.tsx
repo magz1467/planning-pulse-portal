@@ -1,20 +1,21 @@
-import { useEffect, useRef } from "react";
-import mapboxgl from 'mapbox-gl';
+import { MapContainer as LeafletMapContainer, TileLayer } from 'react-leaflet';
+import { Application } from "@/types/planning";
+import { ApplicationMarkers } from "./ApplicationMarkers";
+import { useEffect, useRef, memo, useCallback } from "react";
+import { Map as LeafletMap } from "leaflet";
 import { SearchLocationPin } from "./SearchLocationPin";
-import { MapInitializer } from "./components/MapInitializer";
-import { supabase } from "@/integrations/supabase/client";
-import "mapbox-gl/dist/mapbox-gl.css";
+import "leaflet/dist/leaflet.css";
 
 interface MapContainerProps {
+  applications: Application[];
   coordinates: [number, number];
-  applications: any[];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;
-  onMapMove?: (map: any) => void;
+  onMapMove?: (map: LeafletMap) => void;
 }
 
-export const MapContainerComponent = ({
+export const MapContainerComponent = memo(({
   coordinates,
   applications,
   selectedId,
@@ -22,122 +23,54 @@ export const MapContainerComponent = ({
   onCenterChange,
   onMapMove,
 }: MapContainerProps) => {
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
-    if (!mapRef.current) {
-      console.log('Map not initialized yet, skipping effect...');
-      return;
+    if (mapRef.current) {
+      console.log('🗺️ Setting map view to coordinates:', coordinates);
+      mapRef.current.setView(coordinates, 14);
+      // Add a slight delay to ensure the map recenters properly after resize
+      setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 100);
     }
-    
-    const map = mapRef.current;
+  }, [coordinates]);
 
-    // Add vector tile source and layer
-    if (!map.getSource('planning-applications')) {
-      const setupVectorTiles = async () => {
-        try {
-          console.log('Adding vector tile source...');
-          
-          // Get the Supabase project URL
-          const { data: { functionUrl }, error } = await supabase.functions.invoke('fetch-searchland-mvt');
-          
-          if (error) {
-            throw new Error('Function URL not returned from edge function');
-          }
-
-          map.addSource('planning-applications', {
-            type: 'vector',
-            tiles: [`${functionUrl}/{z}/{x}/{y}`],
-            minzoom: 0,
-            maxzoom: 22
-          });
-
-          console.log('Adding planning applications layer...');
-          map.addLayer({
-            'id': 'planning-applications',
-            'type': 'circle',
-            'source': 'planning-applications',
-            'source-layer': 'planning',
-            'paint': {
-              'circle-radius': 8,
-              'circle-color': [
-                'match',
-                ['get', 'status'],
-                'approved', '#16a34a',
-                'refused', '#ea384c',
-                '#F97316' // default orange
-              ],
-              'circle-stroke-width': 2,
-              'circle-stroke-color': '#ffffff'
-            }
-          });
-
-          // Add click handler for the vector tile layer
-          map.on('click', 'planning-applications', async (e) => {
-            if (e.features && e.features[0]) {
-              const feature = e.features[0];
-              const id = feature.properties?.id;
-              if (id) {
-                console.log('Feature clicked:', feature);
-                onMarkerClick(id);
-              }
-            }
-          });
-
-          // Change cursor on hover
-          map.on('mouseenter', 'planning-applications', () => {
-            map.getCanvas().style.cursor = 'pointer';
-          });
-          
-          map.on('mouseleave', 'planning-applications', () => {
-            map.getCanvas().style.cursor = '';
-          });
-        } catch (error) {
-          console.error('Error adding vector tile source:', error);
-        }
-      };
-
-      setupVectorTiles();
+  useEffect(() => {
+    if (mapRef.current && onMapMove) {
+      onMapMove(mapRef.current);
     }
+  }, [onMapMove]);
 
-    // Update when map moves
-    const moveEndHandler = () => {
-      if (!mapRef.current) return;
-      if (onMapMove) {
-        onMapMove(mapRef.current);
-      }
-    };
-
-    map.on('moveend', moveEndHandler);
-
-    return () => {
-      if (!mapRef.current) return;
-      
-      const map = mapRef.current;
-      
-      map.off('moveend', moveEndHandler);
-      
-      // Proper cleanup of Mapbox layers and sources
-      if (map.getLayer('planning-applications')) {
-        map.removeLayer('planning-applications');
-      }
-      if (map.getSource('planning-applications')) {
-        map.removeSource('planning-applications');
-      }
-    };
-
-  }, [applications, onMapMove, onMarkerClick]);
+  const handleMarkerClick = useCallback((id: number) => {
+    console.log('Marker clicked in MapContainer:', id);
+    onMarkerClick(id);
+  }, [onMarkerClick]);
 
   return (
     <div className="w-full h-full relative">
-      <div ref={mapContainerRef} style={{ height: "100%", width: "100%" }} />
-      <SearchLocationPin position={coordinates} />
-      <MapInitializer 
-        mapContainer={mapContainerRef}
-        mapRef={mapRef}
-        coordinates={coordinates}
-      />
+      <LeafletMapContainer
+        ref={mapRef}
+        center={coordinates}
+        zoom={14}
+        scrollWheelZoom={true}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer 
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          maxZoom={19}
+        />
+        <SearchLocationPin position={coordinates} />
+        <ApplicationMarkers
+          applications={applications}
+          baseCoordinates={coordinates}
+          onMarkerClick={handleMarkerClick}
+          selectedId={selectedId}
+        />
+      </LeafletMapContainer>
     </div>
   );
-};
+});
+
+MapContainerComponent.displayName = 'MapContainerComponent';
