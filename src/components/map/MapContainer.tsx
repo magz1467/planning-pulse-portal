@@ -39,7 +39,8 @@ export const MapContainerComponent = ({
         type: 'vector',
         tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
         minzoom: 0,
-        maxzoom: 22
+        maxzoom: 22,
+        tolerance: 0 // This helps with geometry simplification
       });
 
       // Add the planning applications layer
