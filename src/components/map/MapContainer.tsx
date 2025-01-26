@@ -35,7 +35,7 @@ export const MapContainerComponent = ({
 
     // Add vector tile source and layer
     if (!map.getSource('planning-applications')) {
-      const functionUrl = `${supabase.functions.url}/fetch-searchland-mvt`;
+      const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-searchland-mvt`;
       
       console.log('Adding vector tile source with URL:', functionUrl);
       
