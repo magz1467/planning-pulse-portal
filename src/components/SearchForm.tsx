@@ -83,7 +83,7 @@ export const SearchForm = ({ activeTab, onSearch }: SearchFormProps) => {
       />
       <Button 
         type="submit" 
-        className="w-full bg-primary hover:bg-primary-dark text-white py-6 text-lg font-semibold rounded-xl shadow-sm"
+        className="w-full bg-secondary hover:bg-secondary/90 text-white py-6 text-lg font-semibold rounded-xl shadow-sm"
       >
         <Search className="w-5 h-5 mr-2" />
         Show my feed
