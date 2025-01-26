@@ -35,11 +35,12 @@ export const MapContainerComponent = ({
 
     // Add vector tile source and layer
     if (!map.getSource('planning-applications')) {
-      console.log('Adding vector tile source with URL:', supabase.functions.url('fetch-searchland-mvt'));
+      const functionUrl = `${supabase.functions.url}/fetch-searchland-mvt`;
+      console.log('Adding vector tile source with URL:', functionUrl);
       
       map.addSource('planning-applications', {
         type: 'vector',
-        tiles: [`${supabase.functions.url('fetch-searchland-mvt')}/{z}/{x}/{y}`],
+        tiles: [`${functionUrl}/{z}/{x}/{y}`],
         minzoom: 0,
         maxzoom: 22
       });
