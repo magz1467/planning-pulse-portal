@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MapHeader } from "../MapHeader";
-import { MapContainer } from "./components/MapContainer";
+import { MapContainer } from "../MapContainer";
 import { EmailDialogWrapper } from "./components/EmailDialogWrapper";
 import { DesktopSidebar } from "../DesktopSidebar";
 import { MobileListContainer } from "../mobile/MobileListContainer";
@@ -39,12 +39,6 @@ export const MapLayout = ({
   onSortChange,
   onToggleView,
 }: MapLayoutProps) => {
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  
-  const handleClose = () => {
-    onMarkerClick(null);
-  };
-
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
       <MapHeader 
@@ -67,7 +61,7 @@ export const MapLayout = ({
             onFilterChange={onFilterChange}
             onSortChange={onSortChange}
             onSelectApplication={onMarkerClick}
-            onClose={handleClose}
+            onClose={() => onMarkerClick(null)}
           />
         )}
         
@@ -76,8 +70,9 @@ export const MapLayout = ({
           isMapView={isMapView}
           coordinates={coordinates}
           applications={filteredApplications}
-          selectedApplication={selectedApplication}
+          selectedId={selectedApplication}
           onMarkerClick={onMarkerClick}
+          postcode={postcode}
         />
         
         {isMobile && !isMapView && (
@@ -86,15 +81,15 @@ export const MapLayout = ({
             selectedApplication={selectedApplication}
             postcode={postcode}
             onSelectApplication={onMarkerClick}
-            onShowEmailDialog={() => setShowEmailDialog(true)}
-            onClose={handleClose}
+            onShowEmailDialog={() => {}}
+            onClose={() => onMarkerClick(null)}
           />
         )}
       </div>
 
       <EmailDialogWrapper
-        showEmailDialog={showEmailDialog}
-        setShowEmailDialog={setShowEmailDialog}
+        showEmailDialog={false}
+        setShowEmailDialog={() => {}}
         postcode={postcode}
       />
     </div>

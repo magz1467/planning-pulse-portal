@@ -1,5 +1,5 @@
 import { Application } from "@/types/planning";
-import { MapView } from "./MapView";
+import { MapView } from "../MapView";
 import { MobileApplicationCards } from "@/components/map/mobile/MobileApplicationCards";
 import { useCallback, memo } from "react";
 import { MapAction } from "@/types/map-reducer";
@@ -11,6 +11,7 @@ interface MapSectionProps {
   applications: Application[];
   selectedId: number | null;
   dispatch: React.Dispatch<MapAction>;
+  postcode: string;
 }
 
 export const MapSection = memo(({
@@ -20,6 +21,7 @@ export const MapSection = memo(({
   applications,
   selectedId,
   dispatch,
+  postcode,
 }: MapSectionProps) => {
   const handleMarkerClick = useCallback((id: number | null) => {
     console.log('MapSection handleMarkerClick:', id);
@@ -49,6 +51,7 @@ export const MapSection = memo(({
             applications={applications}
             selectedId={selectedId}
             onSelectApplication={handleMarkerClick}
+            postcode={postcode}
           />
         )}
       </div>

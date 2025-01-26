@@ -1,4 +1,4 @@
-import { MapContainerComponent } from "@/components/map/MapContainer";
+import { MapContainer } from "@/components/map/MapContainer";
 import { Application } from "@/types/planning";
 import { memo } from "react";
 
@@ -19,7 +19,7 @@ export const MapView = memo(({
 }: MapViewProps) => {
   return (
     <div className="absolute inset-0">
-      <MapContainerComponent
+      <MapContainer
         applications={applications}
         selectedId={selectedId}
         coordinates={coordinates}
