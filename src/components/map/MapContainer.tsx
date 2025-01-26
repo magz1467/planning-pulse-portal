@@ -41,7 +41,10 @@ export const MapContainerComponent = ({
         tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
         minzoom: 0,
         maxzoom: 22,
-        tolerance: 0
+        scheme: "xyz",
+        tileSize: 512,
+        attribution: "",
+        promoteId: "id"
       });
 
       // Add the planning applications layer
