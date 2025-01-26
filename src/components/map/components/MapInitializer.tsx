@@ -1,16 +1,18 @@
 import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { supabase } from '@/integrations/supabase/client';
+import { LatLngTuple } from 'leaflet';
 
 interface MapInitializerProps {
   mapContainer: React.RefObject<HTMLDivElement>;
   mapRef: React.MutableRefObject<mapboxgl.Map | null>;
-  coordinates: [number, number];
+  coordinates: LatLngTuple;
 }
 
 export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitializerProps) => {
   useEffect(() => {
     const initializeMap = async () => {
+      // Don't initialize if container is missing or map already exists
       if (!mapContainer.current || mapRef.current) return;
 
       try {
@@ -21,6 +23,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
         
         mapboxgl.accessToken = token;
 
+        // Create new map instance
         const map = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/light-v11',
@@ -30,11 +33,16 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
           bearing: 0,
         });
 
+        // Add navigation controls
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        
+        // Store map reference
         mapRef.current = map;
 
         // Wait for map to load before allowing interactions
-        await new Promise(resolve => map.on('load', resolve));
+        await new Promise<void>((resolve) => {
+          map.once('load', () => resolve());
+        });
 
       } catch (error) {
         console.error('Error initializing map:', error);
@@ -43,9 +51,15 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
 
     initializeMap();
 
+    // Cleanup function
     return () => {
       if (mapRef.current && !mapRef.current._removed) {
         try {
+          // Remove all markers first
+          const markers = mapRef.current.getCanvasContainer().getElementsByClassName('marker');
+          Array.from(markers).forEach(marker => marker.remove());
+          
+          // Remove map instance
           mapRef.current.remove();
           mapRef.current = null;
         } catch (error) {

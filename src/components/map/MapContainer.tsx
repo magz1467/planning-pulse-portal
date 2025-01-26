@@ -4,7 +4,6 @@ import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { toast } from "sonner";
 
 interface MapContainerProps {
   coordinates: [number, number];
@@ -36,7 +35,9 @@ export const MapContainerComponent = ({
     const map = mapRef.current;
 
     // Clear existing markers
-    Object.values(markersRef.current).forEach(marker => marker.remove());
+    Object.values(markersRef.current).forEach(marker => {
+      if (marker) marker.remove();
+    });
     markersRef.current = {};
 
     // Add markers for each application
@@ -74,12 +75,18 @@ export const MapContainerComponent = ({
     });
 
     // Update when map moves
-    map.on('moveend', () => {
+    const moveEndHandler = () => {
       if (!map) return;
       if (onMapMove) {
         onMapMove(map);
       }
-    });
+    };
+
+    map.on('moveend', moveEndHandler);
+
+    return () => {
+      map.off('moveend', moveEndHandler);
+    };
 
   }, [applications, onMapMove, onMarkerClick]);
 

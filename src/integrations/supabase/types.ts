@@ -860,6 +860,39 @@ export type Database = {
           },
         ]
       }
+      planning_applications: {
+        Row: {
+          application_number: string | null
+          category: string | null
+          description: string | null
+          geom: unknown | null
+          id: number
+          region: string | null
+          status: string | null
+          submitted_date: string | null
+        }
+        Insert: {
+          application_number?: string | null
+          category?: string | null
+          description?: string | null
+          geom?: unknown | null
+          id?: number
+          region?: string | null
+          status?: string | null
+          submitted_date?: string | null
+        }
+        Update: {
+          application_number?: string | null
+          category?: string | null
+          description?: string | null
+          geom?: unknown | null
+          id?: number
+          region?: string | null
+          status?: string | null
+          submitted_date?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
