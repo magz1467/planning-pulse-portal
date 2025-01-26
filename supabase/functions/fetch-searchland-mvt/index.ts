@@ -26,12 +26,12 @@ serve(async (req) => {
 
     console.log(`Fetching MVT tile: z=${z}, x=${x}, y=${y}`)
 
-    // Construct Searchland MVT URL with point geometry type and simplified parameters
-    const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point&simplify=true`
+    // Construct Searchland MVT URL with explicit point geometry and forced simplification
+    const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point&simplify=true&force_point=true`
 
     console.log('Requesting from Searchland:', searchlandUrl)
 
-    // Forward request to Searchland
+    // Forward request to Searchland with detailed error handling
     const response = await fetch(searchlandUrl, {
       headers: {
         'Authorization': `Bearer ${Deno.env.get('SEARCHLAND_API_KEY')}`,
@@ -40,15 +40,23 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Searchland API error:', errorText)
-      throw new Error(`Searchland API error: ${response.status}`)
+      console.error('Searchland API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      })
+      throw new Error(`Searchland API error: ${response.status} - ${errorText}`)
     }
 
     // Get the MVT binary data
     const mvtData = await response.arrayBuffer()
 
-    // Log successful response
-    console.log(`Successfully fetched tile z=${z}/x=${x}/y=${y}, size=${mvtData.byteLength} bytes`)
+    // Log successful response with details
+    console.log(`Successfully fetched tile z=${z}/x=${x}/y=${y}:`, {
+      size: mvtData.byteLength,
+      contentType: response.headers.get('content-type'),
+      status: response.status
+    })
 
     return new Response(mvtData, {
       headers: {
@@ -57,9 +65,16 @@ serve(async (req) => {
       },
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error processing MVT request:', {
+      error: error.message,
+      stack: error.stack
+    })
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Error processing vector tile request'
+      }),
       {
         status: 500,
         headers: {

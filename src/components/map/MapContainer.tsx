@@ -36,56 +36,63 @@ export const MapContainerComponent = ({
     // Add vector tile source if it doesn't exist
     if (!map.getSource('planning-applications')) {
       console.log('Adding vector tile source...');
-      map.addSource('planning-applications', {
-        type: 'vector',
-        tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
-        minzoom: 0,
-        maxzoom: 22,
-        scheme: "xyz",
-        tileSize: 512,
-        attribution: "",
-        promoteId: "id"
-      });
-
-      // Add the planning applications layer with circle styling
-      map.addLayer({
-        'id': 'planning-applications',
-        'type': 'circle',
-        'source': 'planning-applications',
-        'source-layer': 'planning',
-        'paint': {
-          'circle-radius': 8,
-          'circle-color': [
-            'match',
-            ['get', 'status'],
-            'approved', '#16a34a',
-            'refused', '#ea384c',
-            '#F97316' // default orange
-          ],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff'
-        }
-      });
-
-      // Add click handler for the vector tile layer
-      map.on('click', 'planning-applications', (e) => {
-        if (e.features && e.features[0]) {
-          const feature = e.features[0];
-          const id = feature.properties?.id;
-          if (id) {
-            onMarkerClick(id);
-          }
-        }
-      });
-
-      // Change cursor on hover
-      map.on('mouseenter', 'planning-applications', () => {
-        map.getCanvas().style.cursor = 'pointer';
-      });
       
-      map.on('mouseleave', 'planning-applications', () => {
-        map.getCanvas().style.cursor = '';
-      });
+      try {
+        map.addSource('planning-applications', {
+          type: 'vector',
+          tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          minzoom: 0,
+          maxzoom: 22,
+          scheme: "xyz",
+          tileSize: 512,
+          attribution: "",
+          promoteId: "id",
+          tolerance: 0 // Force high precision
+        });
+
+        // Add the planning applications layer with simplified circle styling
+        map.addLayer({
+          'id': 'planning-applications',
+          'type': 'circle',
+          'source': 'planning-applications',
+          'source-layer': 'planning',
+          'paint': {
+            'circle-radius': 8,
+            'circle-color': [
+              'match',
+              ['get', 'status'],
+              'approved', '#16a34a',
+              'refused', '#ea384c',
+              '#F97316' // default orange
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
+          }
+        });
+
+        // Add click handler for the vector tile layer
+        map.on('click', 'planning-applications', (e) => {
+          if (e.features && e.features[0]) {
+            const feature = e.features[0];
+            const id = feature.properties?.id;
+            if (id) {
+              console.log('Feature clicked:', feature);
+              onMarkerClick(id);
+            }
+          }
+        });
+
+        // Change cursor on hover
+        map.on('mouseenter', 'planning-applications', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        
+        map.on('mouseleave', 'planning-applications', () => {
+          map.getCanvas().style.cursor = '';
+        });
+      } catch (error) {
+        console.error('Error setting up vector tiles:', error);
+      }
     }
 
     // Update when map moves
