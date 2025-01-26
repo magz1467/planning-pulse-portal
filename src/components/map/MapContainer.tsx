@@ -42,9 +42,12 @@ export const MapContainerComponent = ({
           const center = map.getCenter();
           const tileCoords = getTileCoordinates(center.lng, center.lat, zoom);
 
+          const baseUrl = `${window.location.protocol}//${window.location.host}`;
+          console.log('Adding vector tile source with URL:', baseUrl);
+          
           map.addSource('planning-applications', {
             type: 'vector',
-            tiles: [`${window.location.origin}/api/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+            tiles: [`${baseUrl}/api/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
             minzoom: 0,
             maxzoom: 22
           });
