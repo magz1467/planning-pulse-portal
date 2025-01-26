@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import VectorTile from '@mapbox/vector-tile'
 import Pbf from 'https://esm.sh/pbf@3.2.1'
-import * as turf from 'https://cdn.skypack.dev/@turf/turf?dts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,7 +27,7 @@ serve(async (req) => {
 
     console.log(`Fetching MVT tile: z=${z}, x=${x}, y=${y}`)
 
-    // Construct Searchland MVT URL with explicit point geometry and forced simplification
+    // Construct Searchland MVT URL
     const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point&simplify=true&force_point=true`
 
     console.log('Requesting from Searchland:', searchlandUrl)
@@ -54,21 +52,6 @@ serve(async (req) => {
     // Get the MVT binary data
     const mvtBuffer = await response.arrayBuffer()
     
-    // Parse the vector tile
-    const tile = new VectorTile(new Pbf(mvtBuffer))
-    
-    // Log tile layers and features for debugging
-    Object.keys(tile.layers).forEach(layerName => {
-      const layer = tile.layers[layerName]
-      console.log(`Layer: ${layerName}, features: ${layer.length}`)
-      
-      // Inspect feature types
-      for (let i = 0; i < layer.length; i++) {
-        const feature = layer.feature(i)
-        console.log(`Feature ${i} type: ${feature.type}`)
-      }
-    })
-
     // Log successful response with details
     console.log(`Successfully processed tile z=${z}/x=${x}/y=${y}:`, {
       size: mvtBuffer.byteLength,
