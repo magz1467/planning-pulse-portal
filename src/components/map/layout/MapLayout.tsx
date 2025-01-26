@@ -1,16 +1,18 @@
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Application } from "@/types/planning";
 import { MapHeader } from "../MapHeader";
-import { MapContainer } from "../MapContainer";
-import { EmailDialogWrapper } from "./components/EmailDialogWrapper";
-import { DesktopSidebar } from "../DesktopSidebar";
+import { EmailDialog } from "@/components/EmailDialog";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 import { MobileListContainer } from "../mobile/MobileListContainer";
+import { MapSection } from "./MapSection";
+import { DesktopSidebarSection } from "./DesktopSidebarSection";
 
 interface MapLayoutProps {
   isLoading: boolean;
   coordinates: [number, number];
   postcode: string;
   selectedApplication: number | null;
-  filteredApplications: any[];
+  filteredApplications: Application[];
   activeFilters: {
     status?: string;
     type?: string;
@@ -39,6 +41,22 @@ export const MapLayout = ({
   onSortChange,
   onToggleView,
 }: MapLayoutProps) => {
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const { toast } = useToast();
+
+  const handleEmailSubmit = (radius: string) => {
+    const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
+    toast({
+      title: "Subscription pending",
+      description: `You will now receive planning alerts within ${radiusText} of ${postcode}`,
+      duration: 5000,
+    });
+  };
+
+  const handleClose = () => {
+    onMarkerClick(null);
+  };
+
   return (
     <div className="flex flex-col h-[100dvh] w-full overflow-hidden">
       <MapHeader 
@@ -51,27 +69,30 @@ export const MapLayout = ({
       />
       
       <div className="flex flex-1 min-h-0 relative">
-        {!isMobile && (
-          <DesktopSidebar
-            applications={filteredApplications}
-            selectedApplication={selectedApplication}
-            postcode={postcode}
-            activeFilters={activeFilters}
-            activeSort={activeSort}
-            onFilterChange={onFilterChange}
-            onSortChange={onSortChange}
-            onSelectApplication={onMarkerClick}
-            onClose={() => onMarkerClick(null)}
-          />
-        )}
+        <DesktopSidebarSection 
+          isMobile={isMobile}
+          applications={filteredApplications}
+          selectedApplication={selectedApplication}
+          postcode={postcode}
+          activeFilters={activeFilters}
+          activeSort={activeSort}
+          onFilterChange={onFilterChange}
+          onSortChange={onSortChange}
+          onSelectApplication={onMarkerClick}
+          onClose={handleClose}
+        />
         
-        <MapContainer
+        <MapSection 
           isMobile={isMobile}
           isMapView={isMapView}
           coordinates={coordinates}
           applications={filteredApplications}
           selectedId={selectedApplication}
-          onMarkerClick={onMarkerClick}
+          dispatch={(action) => {
+            if (action.type === 'SELECT_APPLICATION') {
+              onMarkerClick(action.payload);
+            }
+          }}
           postcode={postcode}
         />
         
@@ -81,15 +102,16 @@ export const MapLayout = ({
             selectedApplication={selectedApplication}
             postcode={postcode}
             onSelectApplication={onMarkerClick}
-            onShowEmailDialog={() => {}}
-            onClose={() => onMarkerClick(null)}
+            onShowEmailDialog={() => setShowEmailDialog(true)}
+            onClose={handleClose}
           />
         )}
       </div>
 
-      <EmailDialogWrapper
-        showEmailDialog={false}
-        setShowEmailDialog={() => {}}
+      <EmailDialog 
+        open={showEmailDialog}
+        onOpenChange={setShowEmailDialog}
+        onSubmit={handleEmailSubmit}
         postcode={postcode}
       />
     </div>

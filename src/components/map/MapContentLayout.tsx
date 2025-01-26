@@ -90,6 +90,7 @@ export const MapContentLayout = ({
           applications={filteredApplications}
           selectedId={selectedApplication}
           dispatch={dispatch}
+          postcode={postcode}
         />
         
         {isMobile && !isMapView && (
