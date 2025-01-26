@@ -17,29 +17,7 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url)
-    const z = parseInt(url.searchParams.get('z') || '')
-    const x = parseInt(url.searchParams.get('x') || '')
-    const y = parseInt(url.searchParams.get('y') || '')
-
-    if (isNaN(z) || isNaN(x) || isNaN(y)) {
-      console.error('Invalid tile coordinates:', { z, x, y })
-      return new Response(
-        JSON.stringify({ error: 'Invalid tile coordinates' }),
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    console.log('Fetching tile:', { z, x, y })
-
-    // Convert tile coordinates to bounding box
-    const bbox = tileToLatLngBounds(x, y, z)
-    console.log('Bbox:', bbox)
-
-    // Fetch data from SearchLand API
+    // Fetch data from SearchLand API for London area
     const searchlandResponse = await fetch('https://api.searchland.co.uk/v1/planning/applications', {
       method: 'POST',
       headers: {
@@ -47,8 +25,10 @@ serve(async (req) => {
         'X-API-Key': SEARCHLAND_API_KEY!
       },
       body: JSON.stringify({
-        bbox: `${bbox.west},${bbox.south},${bbox.east},${bbox.north}`,
-        limit: 100
+        bbox: '-0.5,51.3,-0.1,51.5', // London area
+        limit: 100,
+        submitted_after: '2025-01-01',
+        submitted_before: '2025-12-31'
       })
     })
 
@@ -64,6 +44,17 @@ serve(async (req) => {
     // Initialize Supabase client
     const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!)
 
+    // Clear existing data
+    const { error: clearError } = await supabase
+      .from('planning_applications')
+      .delete()
+      .neq('id', 0) // Delete all rows
+
+    if (clearError) {
+      console.error('Error clearing table:', clearError)
+      throw clearError
+    }
+
     // Store the applications in the database
     const { error: insertError } = await supabase
       .from('planning_applications')
@@ -74,7 +65,7 @@ serve(async (req) => {
           submitted_date: app.submissionDate,
           description: app.description,
           category: app.type || 'Unknown',
-          region: app.address?.split(',').pop()?.trim() || 'Unknown',
+          region: app.address?.split(',').pop()?.trim() || 'London',
           geom: `SRID=4326;POINT(${app.location.coordinates[0]} ${app.location.coordinates[1]})`
         })),
         { onConflict: 'application_number' }
@@ -85,24 +76,18 @@ serve(async (req) => {
       throw insertError
     }
 
-    // Generate MVT from the database
-    const { data: mvt, error } = await supabase.rpc('fetch_searchland_mvt', {
-      z,
-      x,
-      y
-    })
-
-    if (error) {
-      console.error('Error generating MVT:', error)
-      throw error
-    }
-
-    return new Response(mvt, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/x-protobuf'
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: `Successfully imported ${data.length} applications`
+      }),
+      {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
-    })
+    )
 
   } catch (error) {
     console.error('Error:', error)
@@ -115,15 +100,3 @@ serve(async (req) => {
     )
   }
 })
-
-// Helper function to convert tile coordinates to lat/lng bounds
-function tileToLatLngBounds(x: number, y: number, z: number) {
-  const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z)
-  const north = (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))))
-  const south = (180 / Math.PI * Math.atan(0.5 * (Math.exp(n + Math.PI / Math.pow(2, z - 1)) - Math.exp(-n - Math.PI / Math.pow(2, z - 1)))))
-  
-  const west = (x / Math.pow(2, z) * 360 - 180)
-  const east = ((x + 1) / Math.pow(2, z) * 360 - 180)
-  
-  return { north, south, east, west }
-}
