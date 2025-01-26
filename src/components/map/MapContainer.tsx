@@ -41,7 +41,7 @@ export const MapContainerComponent = ({
     markersRef.current = {};
 
     // Add markers for each application
-    applications.forEach(app => {
+    applications.slice(0, 5).forEach(app => {
       if (!app.coordinates) return;
 
       const el = document.createElement('div');
