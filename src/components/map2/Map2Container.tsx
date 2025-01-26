@@ -47,8 +47,19 @@ export const Map2Container = ({ coordinates, isLoading }: Map2ContainerProps) =>
     initializeMap();
 
     return () => {
-      if (map.current) {
-        map.current.remove();
+      // Cleanup markers first
+      Object.values(markersRef.current).forEach(marker => marker.remove());
+      if (searchPinRef.current) {
+        searchPinRef.current.remove();
+      }
+      
+      // Only attempt to remove the map if it exists and is valid
+      if (map.current && !map.current._removed) {
+        try {
+          map.current.remove();
+        } catch (error) {
+          console.error('Error cleaning up map:', error);
+        }
       }
     };
   }, []);
