@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
+import mapboxgl from 'mapbox-gl';
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,7 +35,7 @@ export const MapContainerComponent = ({
 
     // Add vector tile source and layer
     if (!map.getSource('planning-applications')) {
-      const functionUrl = `${supabase.functions.url}/fetch-searchland-mvt`;
+      const functionUrl = supabase.functions.invoke('fetch-searchland-mvt').url;
       
       console.log('Adding vector tile source with URL:', functionUrl);
       
