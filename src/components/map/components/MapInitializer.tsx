@@ -11,7 +11,7 @@ interface MapInitializerProps {
 export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitializerProps) => {
   useEffect(() => {
     const initializeMap = async () => {
-      if (!mapContainer.current) return;
+      if (!mapContainer.current || mapRef.current) return;
 
       try {
         // Get Mapbox token from Supabase
@@ -24,7 +24,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
         const map = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/light-v11',
-          center: coordinates,
+          center: [coordinates[1], coordinates[0]], // Convert to [lng, lat]
           zoom: 13,
           pitch: 0,
           bearing: 0,
@@ -32,6 +32,9 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
 
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
         mapRef.current = map;
+
+        // Wait for map to load before allowing interactions
+        await new Promise(resolve => map.on('load', resolve));
 
       } catch (error) {
         console.error('Error initializing map:', error);
@@ -41,8 +44,13 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     initializeMap();
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
+      if (mapRef.current && !mapRef.current._removed) {
+        try {
+          mapRef.current.remove();
+          mapRef.current = null;
+        } catch (error) {
+          console.error('Error cleaning up map:', error);
+        }
       }
     };
   }, [mapContainer, mapRef, coordinates]);
