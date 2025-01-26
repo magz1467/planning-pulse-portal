@@ -7,6 +7,7 @@ import { MobileListContainer } from "./mobile/MobileListContainer";
 import { MapSection } from "./layout/MapSection";
 import { DesktopSidebarSection } from "./layout/DesktopSidebarSection";
 import { MapAction } from "@/types/map-reducer";
+import { useErrorHandling } from "@/hooks/use-error-handling";
 
 interface MapContentLayoutProps {
   isLoading: boolean;
@@ -44,6 +45,8 @@ export const MapContentLayout = ({
 }: MapContentLayoutProps) => {
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const { toast } = useToast();
+
+  useErrorHandling(isLoading, filteredApplications.length, !!coordinates);
 
   const handleEmailSubmit = (radius: string) => {
     const radiusText = radius === "1000" ? "1 kilometre" : `${radius} metres`;
