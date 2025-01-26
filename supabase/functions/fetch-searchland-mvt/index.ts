@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import VectorTile from '@mapbox/vector-tile'
 import Protobuf from 'pbf'
-import * as turf from '@turf/turf'
+import * as turf from 'https://cdn.skypack.dev/@turf/turf?dts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
