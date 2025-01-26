@@ -103,6 +103,8 @@ export const MapContainerComponent = ({
     map.on('moveend', moveEndHandler);
 
     return () => {
+      if (!map) return;
+      
       map.off('moveend', moveEndHandler);
       
       // Proper cleanup of Mapbox layers and sources
