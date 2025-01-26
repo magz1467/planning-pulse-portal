@@ -1,10 +1,10 @@
-import { useEffect, RefObject } from 'react';
+import { useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MapInitializerProps {
-  mapContainer: RefObject<HTMLDivElement>;
-  mapRef: RefObject<mapboxgl.Map>;
+  mapContainer: React.RefObject<HTMLDivElement>;
+  mapRef: React.RefObject<mapboxgl.Map>;
   coordinates: [number, number];
 }
 
@@ -14,30 +14,38 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
       if (!mapContainer.current) return;
 
       try {
-        // Set the token directly for now
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY29hZyIsImEiOiJjajhvb2NyOWYwNXRhMnJvMDNtYjh4NmdxIn0.wUpTbsVWQuPwRHDwpnCznA';
+        // Get Mapbox token from Supabase
+        const { data: { token }, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) throw error;
+        
+        mapboxgl.accessToken = token;
 
         const map = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/light-v11',
-          center: [coordinates[1], coordinates[0]], // Mapbox uses [lng, lat]
-          zoom: 14
+          center: coordinates,
+          zoom: 13,
+          pitch: 0,
+          bearing: 0,
         });
 
-        // Using Object.assign to avoid the readonly error
-        Object.assign(mapRef, { current: map });
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        mapRef.current = map;
 
-        return () => {
-          map.remove();
-          Object.assign(mapRef, { current: null });
-        };
-      } catch (err) {
-        console.error('Error initializing map:', err)
+      } catch (error) {
+        console.error('Error initializing map:', error);
       }
-    }
+    };
 
-    initializeMap()
-  }, [coordinates, mapContainer, mapRef]);
+    initializeMap();
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+      }
+    };
+  }, [mapContainer, mapRef, coordinates]);
 
   return null;
 };
