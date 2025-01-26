@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
+import { supabase } from "@/integrations/supabase/client";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -59,28 +60,28 @@ export const MapContainerComponent = ({
           'circle-stroke-color': '#ffffff'
         }
       });
-    }
 
-    // Add click handler for the vector tile layer
-    map.on('click', 'planning-applications', (e) => {
-      if (e.features && e.features[0]) {
-        const feature = e.features[0];
-        const id = feature.properties?.id;
-        if (id) {
-          console.log('Feature clicked:', feature);
-          onMarkerClick(id);
+      // Add click handler for the vector tile layer
+      map.on('click', 'planning-applications', async (e) => {
+        if (e.features && e.features[0]) {
+          const feature = e.features[0];
+          const id = feature.properties?.id;
+          if (id) {
+            console.log('Feature clicked:', feature);
+            onMarkerClick(id);
+          }
         }
-      }
-    });
+      });
 
-    // Change cursor on hover
-    map.on('mouseenter', 'planning-applications', () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-    
-    map.on('mouseleave', 'planning-applications', () => {
-      map.getCanvas().style.cursor = '';
-    });
+      // Change cursor on hover
+      map.on('mouseenter', 'planning-applications', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      
+      map.on('mouseleave', 'planning-applications', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    }
 
     // Update when map moves
     const moveEndHandler = () => {
