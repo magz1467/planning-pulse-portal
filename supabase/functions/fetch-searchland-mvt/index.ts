@@ -26,7 +26,7 @@ serve(async (req) => {
 
     console.log(`Fetching MVT tile: z=${z}, x=${x}, y=${y}`)
 
-    // Construct Searchland MVT URL
+    // Construct Searchland MVT URL with point geometry type
     const searchlandUrl = `https://api.searchland.co.uk/v1/maps/mvt/planning_applications/${z}/${x}/${y}?geometry_type=point&simplify=true&force_point=true`
 
     console.log('Requesting from Searchland:', searchlandUrl)
