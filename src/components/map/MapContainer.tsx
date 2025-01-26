@@ -1,10 +1,7 @@
-import { useEffect, useRef } from "react";
-import mapboxgl from 'mapbox-gl';
+import mapboxgl from "mapbox-gl";
 import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
-import L from 'leaflet';
-import 'leaflet.vectorgrid';
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -26,7 +23,6 @@ export const MapContainerComponent = ({
 }: MapContainerProps) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mvtLayerRef = useRef<any>(null);
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -36,52 +32,64 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Remove existing MVT layer if it exists
-    if (mvtLayerRef.current) {
-      map.removeLayer(mvtLayerRef.current);
+    // Add vector tile source if it doesn't exist
+    if (!map.getSource('planning-applications')) {
+      console.log('Adding vector tile source...');
+      
+      try {
+        map.addSource('planning-applications', {
+          type: 'vector',
+          tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+          minzoom: 0,
+          maxzoom: 22,
+          scheme: "xyz",
+          tolerance: 0 // Force high precision
+        });
+
+        // Add the planning applications layer with circle styling
+        map.addLayer({
+          'id': 'planning-applications',
+          'type': 'circle',
+          'source': 'planning-applications',
+          'source-layer': 'planning',
+          'paint': {
+            'circle-radius': 8,
+            'circle-color': [
+              'match',
+              ['get', 'status'],
+              'approved', '#16a34a',
+              'refused', '#ea384c',
+              '#F97316' // default orange
+            ],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
+          }
+        });
+
+        // Add click handler for the vector tile layer
+        map.on('click', 'planning-applications', (e) => {
+          if (e.features && e.features[0]) {
+            const feature = e.features[0];
+            const id = feature.properties?.id;
+            if (id) {
+              console.log('Feature clicked:', feature);
+              onMarkerClick(id);
+            }
+          }
+        });
+
+        // Change cursor on hover
+        map.on('mouseenter', 'planning-applications', () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        
+        map.on('mouseleave', 'planning-applications', () => {
+          map.getCanvas().style.cursor = '';
+        });
+      } catch (error) {
+        console.error('Error setting up vector tiles:', error);
+      }
     }
-
-    // Add vector tile source
-    const mvtLayer = L.vectorGrid.protobuf(
-      `${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`,
-      {
-        vectorTileLayerStyles: {
-          planning: {
-            color: "#F97316", // Default orange color
-            fillColor: "#F97316",
-            fillOpacity: 0.6,
-            weight: 1,
-            opacity: 0.8
-          }
-        },
-        getFeatureId: (feature) => {
-          if (feature.type === 4) { // Skip MULTIPOINT type
-            console.warn("Skipping unsupported geometry type: 4");
-            return null;
-          }
-          return feature.properties?.id;
-        },
-        interactive: true, // Make features clickable
-        rendererFactory: L.canvas.tile,
-        maxNativeZoom: 16,
-        tolerance: 5,
-        debug: 0
-      }
-    );
-
-    // Add click handler
-    mvtLayer.on('click', (e: any) => {
-      if (e.layer && e.layer.properties) {
-        console.log('MVT feature clicked:', e.layer.properties);
-        onMarkerClick(e.layer.properties.id);
-      }
-    });
-
-    // Store reference to layer for cleanup
-    mvtLayerRef.current = mvtLayer;
-
-    // Add the layer to map
-    mvtLayer.addTo(map);
 
     // Update when map moves
     const moveEndHandler = () => {
@@ -95,9 +103,6 @@ export const MapContainerComponent = ({
 
     return () => {
       map.off('moveend', moveEndHandler);
-      if (mvtLayerRef.current) {
-        map.removeLayer(mvtLayerRef.current);
-      }
     };
 
   }, [applications, onMapMove, onMarkerClick]);
