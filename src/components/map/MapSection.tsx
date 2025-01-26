@@ -32,8 +32,12 @@ export const MapSection = memo(({
   if (!coordinates || (!isMobile && !isMapView)) return null;
 
   // Show empty state if no applications
-  if (!applications.length) {
-    return <EmptyStateWithEmail postcode={postcode} />;
+  if (applications.length === 0) {
+    return (
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+        <EmptyStateWithEmail postcode={postcode} />
+      </div>
+    );
   }
 
   return (

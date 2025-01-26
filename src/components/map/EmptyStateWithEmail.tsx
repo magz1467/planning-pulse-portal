@@ -43,30 +43,28 @@ export const EmptyStateWithEmail = ({ postcode }: EmptyStateWithEmailProps) => {
   };
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-      <div className="w-full max-w-lg mx-4 bg-white p-6 rounded-lg shadow-lg border-2 border-[#af5662]">
-        <h3 className="text-xl font-semibold mb-2 text-[#af5662]">Coming soon to your area</h3>
-        <p className="text-gray-600 mb-4">
-          NimbyGram is only in London right now. Enter your email address to get an email for when your area comes online.
-        </p>
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="flex-1"
-          />
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="bg-[#af5662] hover:bg-[#af5662]/90"
-          >
-            {isSubmitting ? "Submitting..." : "Notify me"}
-          </Button>
-        </form>
-      </div>
+    <div className="w-full max-w-lg mx-4 bg-white p-6 rounded-lg shadow-lg border-2 border-[#af5662]">
+      <h3 className="text-xl font-semibold mb-2 text-[#af5662]">Coming soon to your area</h3>
+      <p className="text-gray-600 mb-4">
+        NimbyGram is only in London right now. Enter your email address to get an email for when your area comes online.
+      </p>
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="flex-1"
+        />
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          className="bg-[#af5662] hover:bg-[#af5662]/90"
+        >
+          {isSubmitting ? "Submitting..." : "Notify me"}
+        </Button>
+      </form>
     </div>
   );
 };
