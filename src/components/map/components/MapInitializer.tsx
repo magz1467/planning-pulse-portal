@@ -40,11 +40,6 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
     return () => {
       if (mapRef.current && !mapRef.current._removed) {
         try {
-          // Remove all markers first
-          const markers = mapRef.current.getCanvasContainer().getElementsByClassName('marker');
-          Array.from(markers).forEach(marker => marker.remove());
-          
-          // Remove map instance
           mapRef.current.remove();
           mapRef.current = null;
         } catch (error) {

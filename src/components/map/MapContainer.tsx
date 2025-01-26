@@ -3,7 +3,6 @@ import mapboxgl from "mapbox-gl";
 import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
-import { setupVectorTileSource } from "./utils/mapUtils";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
@@ -35,7 +34,33 @@ export const MapContainerComponent = ({
     const map = mapRef.current;
 
     // Add vector tile source and layer
-    setupVectorTileSource(map);
+    if (!map.getSource('planning-applications')) {
+      map.addSource('planning-applications', {
+        type: 'vector',
+        tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+        minzoom: 0,
+        maxzoom: 22
+      });
+
+      map.addLayer({
+        'id': 'planning-applications',
+        'type': 'circle',
+        'source': 'planning-applications',
+        'source-layer': 'planning',
+        'paint': {
+          'circle-radius': 8,
+          'circle-color': [
+            'match',
+            ['get', 'status'],
+            'approved', '#16a34a',
+            'refused', '#ea384c',
+            '#F97316'
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+    }
 
     // Add click handler for the vector tile layer
     map.on('click', 'planning-applications', (e) => {
