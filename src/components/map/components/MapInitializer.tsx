@@ -21,7 +21,7 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
         
         mapboxgl.accessToken = token;
 
-        mapRef.current = new mapboxgl.Map({
+        const map = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/light-v11',
           center: coordinates,
@@ -30,7 +30,8 @@ export const MapInitializer = ({ mapContainer, mapRef, coordinates }: MapInitial
           bearing: 0,
         });
 
-        mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        mapRef.current = map;
 
       } catch (error) {
         console.error('Error initializing map:', error);
