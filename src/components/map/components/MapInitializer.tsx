@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface MapInitializerProps {
   mapContainer: React.RefObject<HTMLDivElement>;
-  mapRef: React.RefObject<mapboxgl.Map>;
+  mapRef: React.MutableRefObject<mapboxgl.Map | null>;
   coordinates: [number, number];
 }
 
