@@ -30,58 +30,62 @@ export const fetchApplicationsInRadius = async ({
     timestamp: new Date().toISOString()
   });
 
-  const { data, error } = await supabase
-    .rpc('get_applications_with_counts_optimized', {
-      center_lng: center[1],
-      center_lat: center[0],
-      radius_meters: radius,
-      page_size: pageSize,
-      page_number: page
+  try {
+    const { data, error } = await supabase.functions.invoke('fetch-searchland-search', {
+      body: {
+        lat: center[0],
+        lng: center[1],
+        radius: radius,
+        page: page + 1, // Searchland API uses 1-based pagination
+        limit: pageSize
+      }
     });
 
-  if (error) {
-    console.error('Error fetching applications:', error);
+    if (error) {
+      console.error('Error fetching applications:', error);
+      throw error;
+    }
+
+    if (!data || !data.data) {
+      console.log('No applications found');
+      return {
+        applications: [],
+        totalCount: 0,
+        rawData: null
+      };
+    }
+
+    console.log(`📦 Raw applications data:`, data.data?.map(app => ({
+      id: app.id,
+      reference: app.reference,
+      description: app.description
+    })));
+
+    const transformedApplications = data.data
+      ?.map(app => transformApplicationData(app, center))
+      .filter((app): app is Application => app !== null);
+
+    console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
+      id: app.id,
+      class_3: app.class_3,
+      title: app.title,
+      final_impact_score: app.final_impact_score
+    })));
+
+    return {
+      applications: transformedApplications || [],
+      totalCount: data.total || 0,
+      rawData: data
+    };
+
+  } catch (error: any) {
+    console.error('Failed to fetch applications:', error);
+    console.error('Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     throw error;
   }
-
-  if (!data || !data[0]) {
-    console.log('No applications found');
-    return {
-      applications: [],
-      totalCount: 0,
-      rawData: null
-    };
-  }
-
-  const { applications: appsData, total_count } = data[0];
-
-  console.log(`📦 Raw applications data:`, appsData?.map(app => ({
-    id: app.id,
-    class_3: app.class_3,
-    title: app.title,
-    final_impact_score: app.final_impact_score
-  })));
-
-  const transformedApplications = appsData
-    ?.map(app => transformApplicationData(app, center))
-    .filter((app): app is Application => app !== null);
-
-  console.log('✨ Transformed applications:', transformedApplications?.map(app => ({
-    id: app.id,
-    class_3: app.class_3,
-    title: app.title,
-    final_impact_score: app.final_impact_score
-  })));
-
-  // Verify sorting
-  console.log('🔄 Verifying impact score ordering:', transformedApplications?.map(app => ({
-    id: app.id,
-    final_impact_score: app.final_impact_score
-  })));
-
-  return {
-    applications: transformedApplications || [],
-    totalCount: total_count || 0,
-    rawData: data[0]
-  };
-};
+}
