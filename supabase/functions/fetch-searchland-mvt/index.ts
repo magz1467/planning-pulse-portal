@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import VectorTile from '@mapbox/vector-tile'
-import Protobuf from 'pbf'
+import Pbf from 'https://esm.sh/pbf@3.2.1'
 import * as turf from 'https://cdn.skypack.dev/@turf/turf?dts'
 
 const corsHeaders = {
@@ -11,7 +11,7 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -55,7 +55,7 @@ serve(async (req) => {
     const mvtBuffer = await response.arrayBuffer()
     
     // Parse the vector tile
-    const tile = new VectorTile(new Protobuf(mvtBuffer))
+    const tile = new VectorTile(new Pbf(mvtBuffer))
     
     // Log tile layers and features for debugging
     Object.keys(tile.layers).forEach(layerName => {
