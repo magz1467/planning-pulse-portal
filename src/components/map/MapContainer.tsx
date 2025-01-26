@@ -3,7 +3,6 @@ import mapboxgl from 'mapbox-gl';
 import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
-import { EventHandlers } from "./components/EventHandlers";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { toast } from "sonner";
 
@@ -93,12 +92,6 @@ export const MapContainerComponent = ({
         mapRef={mapRef}
         coordinates={coordinates}
       />
-      {mapRef.current && (
-        <EventHandlers 
-          map={mapRef.current}
-          onMarkerClick={onMarkerClick}
-        />
-      )}
     </div>
   );
 };
