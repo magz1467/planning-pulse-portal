@@ -24,7 +24,6 @@ export const MapContainerComponent = ({
 }: MapContainerProps) => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<{ [key: number]: mapboxgl.Marker }>({});
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -34,45 +33,55 @@ export const MapContainerComponent = ({
     
     const map = mapRef.current;
 
-    // Clear existing markers
-    Object.values(markersRef.current).forEach(marker => {
-      if (marker) marker.remove();
-    });
-    markersRef.current = {};
-
-    // Add markers for each application
-    applications.forEach(app => {
-      if (!app.coordinates) return;
-
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.style.width = '16px';
-      el.style.height = '16px';
-      el.style.borderRadius = '50%';
-      el.style.border = '2px solid white';
-      el.style.cursor = 'pointer';
-
-      // Set color based on status
-      if (app.status?.toLowerCase().includes('approved')) {
-        el.style.backgroundColor = '#16a34a';
-      } else if (app.status?.toLowerCase().includes('refused')) {
-        el.style.backgroundColor = '#ea384c';
-      } else {
-        el.style.backgroundColor = '#F97316';
-      }
-
-      // Create and store marker
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([app.coordinates[1], app.coordinates[0]])
-        .addTo(map);
-
-      // Add click handler
-      el.addEventListener('click', () => {
-        onMarkerClick(app.id);
+    // Add vector tile source if it doesn't exist
+    if (!map.getSource('planning-applications')) {
+      map.addSource('planning-applications', {
+        type: 'vector',
+        tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+        minzoom: 0,
+        maxzoom: 22
       });
 
-      markersRef.current[app.id] = marker;
-    });
+      // Add the planning applications layer
+      map.addLayer({
+        'id': 'planning-applications',
+        'type': 'circle',
+        'source': 'planning-applications',
+        'source-layer': 'planning',
+        'paint': {
+          'circle-color': [
+            'match',
+            ['get', 'status'],
+            'approved', '#16a34a',
+            'refused', '#ea384c',
+            '#F97316' // default orange
+          ],
+          'circle-radius': 8,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+
+      // Add click handler for the vector tile layer
+      map.on('click', 'planning-applications', (e) => {
+        if (e.features && e.features[0]) {
+          const feature = e.features[0];
+          const id = feature.properties?.id;
+          if (id) {
+            onMarkerClick(id);
+          }
+        }
+      });
+
+      // Change cursor on hover
+      map.on('mouseenter', 'planning-applications', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      
+      map.on('mouseleave', 'planning-applications', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    }
 
     // Update when map moves
     const moveEndHandler = () => {
