@@ -12,6 +12,20 @@ serve(async (req) => {
   }
 
   try {
+    // For initial function URL request
+    if (req.method === 'POST') {
+      const functionUrl = `${req.url}/functions/v1/fetch-searchland-mvt`
+      return new Response(
+        JSON.stringify({ functionUrl }),
+        { 
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+    }
+
     // Extract z, x, y from URL path
     const url = new URL(req.url);
     const parts = url.pathname.split('/');

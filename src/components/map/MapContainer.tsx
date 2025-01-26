@@ -39,9 +39,16 @@ export const MapContainerComponent = ({
         try {
           console.log('Adding vector tile source...');
           
+          // Get the Supabase project URL
+          const { data: { functionUrl }, error } = await supabase.functions.invoke('fetch-searchland-mvt');
+          
+          if (error) {
+            throw new Error('Function URL not returned from edge function');
+          }
+
           map.addSource('planning-applications', {
             type: 'vector',
-            tiles: [`${window.location.origin}/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
+            tiles: [`${functionUrl}/{z}/{x}/{y}`],
             minzoom: 0,
             maxzoom: 22
           });
