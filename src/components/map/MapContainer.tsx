@@ -42,23 +42,9 @@ export const MapContainerComponent = ({
           const center = map.getCenter();
           const tileCoords = getTileCoordinates(center.lng, center.lat, zoom);
 
-          const { data, error } = await supabase.functions.invoke('fetch-searchland-mvt', {
-            body: {
-              z: tileCoords.z,
-              x: tileCoords.x,
-              y: tileCoords.y
-            }
-          });
-
-          if (error || !data?.functionUrl) {
-            throw new Error('Function URL not returned from edge function');
-          }
-          
-          console.log('Adding vector tile source with URL:', data.functionUrl);
-          
           map.addSource('planning-applications', {
             type: 'vector',
-            tiles: [`${data.functionUrl}/{z}/{x}/{y}`],
+            tiles: [`${window.location.origin}/api/functions/v1/fetch-searchland-mvt/{z}/{x}/{y}`],
             minzoom: 0,
             maxzoom: 22
           });

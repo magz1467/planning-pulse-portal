@@ -1,9 +1,9 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Content-Type': 'application/x-protobuf',
 }
 
 serve(async (req) => {
@@ -20,24 +20,38 @@ serve(async (req) => {
       throw new Error('Invalid coordinates provided')
     }
 
-    // Create MVT endpoint URL
-    const functionUrl = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/${z}/${x}/${y}.mvt`
-    
-    console.log('Generated MVT URL:', functionUrl)
+    // Get the MVT data from Mapbox
+    const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
+    if (!mapboxToken) {
+      throw new Error('Mapbox token not configured')
+    }
 
-    return new Response(
-      JSON.stringify({ functionUrl }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
+    const response = await fetch(
+      `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/${z}/${x}/${y}.mvt?access_token=${mapboxToken}`
     )
+
+    if (!response.ok) {
+      throw new Error(`Mapbox API error: ${response.status}`)
+    }
+
+    const mvtData = await response.arrayBuffer()
+    
+    return new Response(mvtData, {
+      headers: {
+        ...corsHeaders,
+        'Cache-Control': 'public, max-age=3600'
+      }
+    })
+
   } catch (error) {
     console.error('Error:', error.message)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        },
         status: 400,
       }
     )
