@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { Application } from "@/types/planning";
 import { SearchLocationPin } from "./SearchLocationPin";
 import { MapInitializer } from "./components/MapInitializer";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapContainerProps {
   coordinates: [number, number];
-  applications: Application[];
+  applications: any[];
   selectedId?: number | null;
   onMarkerClick: (id: number) => void;
   onCenterChange?: (center: [number, number]) => void;

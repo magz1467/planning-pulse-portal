@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { LatLngTuple } from "leaflet";
 
 export const useCoordinates = (postcode: string | undefined) => {
-  const [coordinates, setCoordinates] = useState<LatLngTuple | null>(null);
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -20,7 +19,7 @@ export const useCoordinates = (postcode: string | undefined) => {
         console.log('📍 Received postcode data:', data);
         
         if (isMounted && data.status === 200) {
-          const coords: LatLngTuple = [data.result.latitude, data.result.longitude];
+          const coords: [number, number] = [data.result.latitude, data.result.longitude];
           console.log('✅ Setting coordinates:', coords);
           setCoordinates(coords);
         }
