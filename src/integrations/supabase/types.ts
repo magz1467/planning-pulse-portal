@@ -225,6 +225,7 @@ export type Database = {
           development_type: string | null
           engaging_title: string | null
           epc_number: string | null
+          est_construction_cost: string | null
           final_impact_score: number | null
           geom: unknown | null
           id: string
@@ -292,6 +293,7 @@ export type Database = {
           development_type?: string | null
           engaging_title?: string | null
           epc_number?: string | null
+          est_construction_cost?: string | null
           final_impact_score?: number | null
           geom?: unknown | null
           id: string
@@ -359,6 +361,7 @@ export type Database = {
           development_type?: string | null
           engaging_title?: string | null
           epc_number?: string | null
+          est_construction_cost?: string | null
           final_impact_score?: number | null
           geom?: unknown | null
           id?: string
@@ -2353,6 +2356,7 @@ export type Database = {
           development_type: string | null
           engaging_title: string | null
           epc_number: string | null
+          est_construction_cost: string | null
           final_impact_score: number | null
           geom: unknown | null
           id: string
