@@ -887,6 +887,78 @@ export type Database = {
           },
         ]
       }
+      planning_api: {
+        Row: {
+          address: string | null
+          agent_address: string | null
+          agent_email: string | null
+          agent_name: string | null
+          agent_phone: string | null
+          applicant_address: string | null
+          applicant_name: string | null
+          created_at: string
+          description: string | null
+          docs_count: number | null
+          external_link: string | null
+          id: number
+          internal_link: string | null
+          keyval: string | null
+          latitude: number | null
+          longitude: number | null
+          lpa_id: string | null
+          lpa_name: string | null
+          postcode: string | null
+          reference: string | null
+          validated_date: string | null
+        }
+        Insert: {
+          address?: string | null
+          agent_address?: string | null
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
+          applicant_address?: string | null
+          applicant_name?: string | null
+          created_at?: string
+          description?: string | null
+          docs_count?: number | null
+          external_link?: string | null
+          id?: number
+          internal_link?: string | null
+          keyval?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          lpa_id?: string | null
+          lpa_name?: string | null
+          postcode?: string | null
+          reference?: string | null
+          validated_date?: string | null
+        }
+        Update: {
+          address?: string | null
+          agent_address?: string | null
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
+          applicant_address?: string | null
+          applicant_name?: string | null
+          created_at?: string
+          description?: string | null
+          docs_count?: number | null
+          external_link?: string | null
+          id?: number
+          internal_link?: string | null
+          keyval?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          lpa_id?: string | null
+          lpa_name?: string | null
+          postcode?: string | null
+          reference?: string | null
+          validated_date?: string | null
+        }
+        Relationships: []
+      }
       planning_applications: {
         Row: {
           address: Json | null
@@ -941,6 +1013,78 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      property_data_api: {
+        Row: {
+          address: string | null
+          agent_address: string | null
+          agent_company: string | null
+          agent_name: string | null
+          authority: string | null
+          category: string | null
+          created_at: string
+          dates_published_at: string | null
+          decision_rating: string | null
+          decision_text: string | null
+          distance: string | null
+          endpoint: string | null
+          est_construction_cost: string | null
+          id: number
+          lat: number | null
+          lng: number | null
+          postcode: string | null
+          proposal: string | null
+          reference: string | null
+          status: string | null
+          url: string | null
+        }
+        Insert: {
+          address?: string | null
+          agent_address?: string | null
+          agent_company?: string | null
+          agent_name?: string | null
+          authority?: string | null
+          category?: string | null
+          created_at?: string
+          dates_published_at?: string | null
+          decision_rating?: string | null
+          decision_text?: string | null
+          distance?: string | null
+          endpoint?: string | null
+          est_construction_cost?: string | null
+          id?: number
+          lat?: number | null
+          lng?: number | null
+          postcode?: string | null
+          proposal?: string | null
+          reference?: string | null
+          status?: string | null
+          url?: string | null
+        }
+        Update: {
+          address?: string | null
+          agent_address?: string | null
+          agent_company?: string | null
+          agent_name?: string | null
+          authority?: string | null
+          category?: string | null
+          created_at?: string
+          dates_published_at?: string | null
+          decision_rating?: string | null
+          decision_text?: string | null
+          distance?: string | null
+          endpoint?: string | null
+          est_construction_cost?: string | null
+          id?: number
+          lat?: number | null
+          lng?: number | null
+          postcode?: string | null
+          proposal?: string | null
+          reference?: string | null
+          status?: string | null
+          url?: string | null
         }
         Relationships: []
       }
