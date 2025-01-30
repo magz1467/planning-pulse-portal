@@ -6,12 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface PropertyData {
-  id: number;
-  url_documents: string;
-  pdf_urls: string[] | null;
-}
-
 // Helper function to delay execution
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
