@@ -63,34 +63,33 @@ Deno.serve(async (req) => {
       try {
         console.log(`Processing URL: ${record.url_documents}`)
         
-        const crawlResponse = await firecrawl.crawlUrl(record.url_documents, {
-          limit: 50, // Limit pages to crawl
+        // Use extract endpoint instead of crawl
+        const extractResponse = await firecrawl.extract(record.url_documents, {
+          instruction: "extract only and all the pdf links on this page",
           scrapeOptions: {
-            formats: ['pdf'], // Only look for PDFs
             selectors: [
-              'a[href$=".pdf"]', // Links ending in .pdf
-              'a[href*="/pdf/"]', // Links containing /pdf/
-              'a[href*="document"]', // Links containing "document"
-              'a[href*="planning"]', // Links containing "planning"
+              'a[href$=".pdf"]',
+              'a[href*="/pdf/"]',
+              'a[href*="document"]',
+              'a[href*="planning"]'
             ]
           }
         })
 
-        if (!crawlResponse.success) {
-          console.error(`Failed to crawl ${record.url_documents}:`, crawlResponse.error)
+        if (!extractResponse.success) {
+          console.error(`Failed to extract from ${record.url_documents}:`, extractResponse.error)
           results.failed++
           continue
         }
 
-        // Extract PDF URLs from the crawl response
-        const pdfUrls = crawlResponse.data
-          .filter(item => {
-            const url = item.url.toLowerCase()
-            return url.endsWith('.pdf') || 
-                   url.includes('/pdf/') ||
-                   (url.includes('document') && url.includes('planning'))
+        // Extract PDF URLs from the extract response
+        const pdfUrls = extractResponse.data.links
+          .filter(url => {
+            const urlLower = url.toLowerCase()
+            return urlLower.endsWith('.pdf') || 
+                   urlLower.includes('/pdf/') ||
+                   (urlLower.includes('document') && urlLower.includes('planning'))
           })
-          .map(item => item.url)
 
         console.log(`Found ${pdfUrls.length} PDF URLs for record ${record.id}`)
 
