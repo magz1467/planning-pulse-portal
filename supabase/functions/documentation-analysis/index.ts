@@ -47,13 +47,11 @@ async function logError(applicationId: number | null, originalUrl: string | null
   console.error('Logging error:', { applicationId, originalUrl, transformedUrl, error });
   
   await supabase
-    .from('processing_errors')
-    .insert({
-      application_id: applicationId,
-      original_url: originalUrl,
-      transformed_url: transformedUrl,
-      error: error.toString()
-    });
+    .from('property_data_api')
+    .update({
+      error_message: error.toString()
+    })
+    .eq('id', applicationId);
 }
 
 serve(async (req) => {
