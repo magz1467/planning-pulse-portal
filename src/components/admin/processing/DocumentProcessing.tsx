@@ -45,7 +45,7 @@ export const DocumentProcessing = () => {
       setProgress(100);
       toast({
         title: "Success!",
-        description: `${data.message}`,
+        description: `${data.message}. ${data.failed > 0 ? `Failed to process ${data.failed} records.` : ''}`,
       });
     } catch (error: any) {
       console.error('Error processing documents:', error);
