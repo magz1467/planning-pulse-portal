@@ -7,6 +7,7 @@ import { ScrapingGeneration } from "./processing/ScrapingGeneration";
 import { LandhawkDataFetching } from "./processing/LandhawkDataFetching";
 import { TrialDataFetching } from "./processing/TrialDataFetching";
 import { DocumentProcessing } from "./processing/DocumentProcessing";
+import { PdfRehosting } from "./processing/PdfRehosting";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -58,6 +59,10 @@ export const ManualProcessing = ({
       <Separator className="my-6" />
       
       <ScrapingGeneration />
+
+      <Separator className="my-6" />
+      
+      <PdfRehosting />
     </div>
   );
 };
