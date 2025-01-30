@@ -46,12 +46,60 @@ const transformUrl = (originalUrl: string): string | null => {
 async function logError(applicationId: number | null, originalUrl: string | null, transformedUrl: string | null, error: any) {
   console.error('Logging error:', { applicationId, originalUrl, transformedUrl, error });
   
-  await supabase
-    .from('property_data_api')
-    .update({
-      error_message: error.toString()
-    })
-    .eq('id', applicationId);
+  if (applicationId) {
+    await supabase
+      .from('property_data_api')
+      .update({
+        error_message: error.toString()
+      })
+      .eq('id', applicationId);
+  }
+}
+
+async function processRecord(record: any) {
+  try {
+    console.log('Processing record:', record);
+
+    if (!record?.url) {
+      throw new Error('Missing URL in record');
+    }
+
+    const transformedUrl = transformUrl(record.url);
+    if (!transformedUrl) {
+      throw new Error('URL transformation failed');
+    }
+
+    console.log('Transformed URL:', transformedUrl);
+
+    // Update database
+    const { error: updateError } = await supabase
+      .from('property_data_api')
+      .update({ url_documents: transformedUrl })
+      .eq('id', record.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    // Verify URL accessibility
+    const testResponse = await fetch(transformedUrl);
+    if (!testResponse.ok) {
+      throw new Error(`URL verification failed: ${testResponse.status}`);
+    }
+
+    return {
+      success: true,
+      original_url: record.url,
+      transformed_url: transformedUrl
+    };
+  } catch (error) {
+    await logError(record?.id || null, record?.url || null, null, error);
+    return {
+      success: false,
+      error: error.message,
+      record_id: record?.id
+    };
+  }
 }
 
 serve(async (req) => {
@@ -63,69 +111,53 @@ serve(async (req) => {
   try {
     console.log('Starting documentation analysis...');
     
-    // Get latest record
+    const { limit = 10 } = await req.json();
+    
+    // Get latest records
     const { data, error } = await supabase
       .from('property_data_api')
       .select('id, url')
+      .is('url_documents', null)  // Only get records that haven't been processed
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(limit);
 
-    if (error || !data?.url) {
-      console.error('Error fetching URL:', error);
-      throw new Error('Missing URL in record');
+    if (error) {
+      console.error('Error fetching URLs:', error);
+      throw error;
     }
 
-    console.log('Found record:', data);
-
-    // Transform URL
-    const transformedUrl = transformUrl(data.url);
-    if (!transformedUrl) {
-      console.error('URL transformation failed for:', data.url);
-      throw new Error('URL transformation failed');
+    if (!data?.length) {
+      return new Response(
+        JSON.stringify({ 
+          message: 'No records to process',
+          processed: 0
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    console.log('Transformed URL:', transformedUrl);
+    console.log(`Processing ${data.length} records...`);
 
-    // Update database
-    const { error: updateError } = await supabase
-      .from('property_data_api')
-      .update({ url_documents: transformedUrl })
-      .eq('id', data.id);
+    // Process all records in parallel
+    const results = await Promise.all(data.map(processRecord));
 
-    if (updateError) {
-      console.error('Error updating record:', updateError);
-      throw updateError;
-    }
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
 
-    // Verify URL accessibility
-    const testResponse = await fetch(transformedUrl);
-    if (!testResponse.ok) {
-      console.error('URL verification failed:', testResponse.status);
-      await logError(data.id, data.url, transformedUrl, testResponse.status);
-      throw new Error(`URL verification failed: ${testResponse.status}`);
-    }
-
-    console.log('Successfully processed URL');
+    console.log('Processing complete:', { successful, failed });
 
     return new Response(
       JSON.stringify({ 
-        success: true,
-        original_url: data.url,
-        transformed_url: transformedUrl
+        message: `Successfully processed ${successful} records, ${failed} failed`,
+        processed: successful,
+        failed,
+        results
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in documentation analysis:', error);
-    
-    await logError(
-      data?.id || null, 
-      data?.url || null, 
-      transformedUrl || null, 
-      error.message
-    );
     
     return new Response(
       JSON.stringify({ 
