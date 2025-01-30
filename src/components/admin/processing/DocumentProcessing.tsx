@@ -34,7 +34,7 @@ export const DocumentProcessing = () => {
 
       console.log('Documentation analysis response:', data);
 
-      if (data.processed === 0) {
+      if (!data || data.processed === 0) {
         toast({
           title: "No records to process",
           description: "All records have been processed",
