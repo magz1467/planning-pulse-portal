@@ -1,69 +1,57 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
 
 export const ScrapingGeneration = () => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  const handleScrape = async () => {
-    setIsProcessing(true);
-    setError(null);
-    
+  const handleScrapeDocuments = async () => {
     try {
-      // First get a real application to test with
-      const { data: applications, error: fetchError } = await supabase
-        .from('applications')
-        .select('*')
-        .not('url_planning_app', 'is', null)
-        .limit(1)
-        .single();
+      setIsProcessing(true);
+      setProgress(0);
+      
+      toast({
+        title: "Processing documents...",
+        description: "Scraping PDF URLs from document pages",
+      });
 
-      if (fetchError) {
-        throw new Error('Could not find a valid application to test scraping with');
-      }
-
-      if (!applications?.url_planning_app) {
-        throw new Error('No application found with a valid planning portal URL');
-      }
-
-      console.log('Testing scrape with application:', applications);
-
-      const { data, error: functionError } = await supabase.functions.invoke('scrape-planning-portal', {
-        body: { 
-          url: applications.url_planning_app,
-          applicationId: applications.application_id,
-          lpaAppNo: applications.lpa_app_no,
-          lpaName: applications.lpa_name,
-          description: applications.description
+      const { data, error } = await supabase.functions.invoke('firecrawl-pdf-scraper', {
+        method: 'POST',
+        body: {
+          limit: 10 // Process 10 records at a time
         }
       });
-
-      console.log('Function response:', { data, error: functionError });
-
-      if (functionError) {
-        throw new Error(functionError.message || 'Function error occurred');
+      
+      if (error) {
+        console.error('Error from firecrawl pdf scraper function:', error);
+        throw error;
       }
 
-      if (!data) {
-        throw new Error('No data returned from scraping function');
+      console.log('Firecrawl PDF scraper response:', data);
+
+      if (data.processed === 0) {
+        toast({
+          title: "No records to process",
+          description: "All records have been processed",
+        });
+        return;
       }
 
+      setProgress(100);
       toast({
-        title: "Success",
-        description: "Scraping completed successfully",
+        title: "Success!",
+        description: `${data.message}. ${data.failed > 0 ? `Failed to process ${data.failed} records.` : ''}`,
       });
-
-    } catch (error) {
-      console.error('Scraping error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to scrape planning portal';
-      setError(errorMessage);
+    } catch (error: any) {
+      console.error('Error scraping documents:', error);
       toast({
         title: "Error",
-        description: errorMessage,
+        description: error?.message || "Failed to scrape documents. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -72,26 +60,25 @@ export const ScrapingGeneration = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium mb-2">Planning Portal Scraping</h3>
+    <div className="space-y-2">
+      <h3 className="text-sm font-medium">PDF URL Scraping</h3>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button 
+          onClick={handleScrapeDocuments}
+          className="w-full sm:w-auto"
+          disabled={isProcessing}
+        >
+          <RefreshCw className={`mr-2 h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
+          {isProcessing ? 'Processing...' : 'Scrape PDF URLs'}
+        </Button>
+      </div>
       
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
+      {isProcessing && (
+        <Progress 
+          value={progress} 
+          className="h-2" 
+        />
       )}
-
-      <Button 
-        onClick={handleScrape}
-        disabled={isProcessing}
-        className="w-full md:w-auto"
-      >
-        {isProcessing ? "Processing..." : "Test Scrape Planning Portal"}
-      </Button>
-      
-      <p className="mt-2 text-sm text-muted-foreground">
-        Click to test the planning portal scraping functionality using a real application
-      </p>
     </div>
   );
 };
