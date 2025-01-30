@@ -27,6 +27,7 @@ export const ManualProcessing = ({
   const [isFetching500, setIsFetching500] = useState(false);
   const [isFetchingAll, setIsFetchingAll] = useState(false);
   const [isFetchingLandhawk, setIsFetchingLandhawk] = useState(false);
+  const [isProcessingDocs, setIsProcessingDocs] = useState(false);
 
   const handleFetchLandhawkData = async () => {
     try {
@@ -182,6 +183,44 @@ export const ManualProcessing = ({
     }
   };
 
+  const handleProcessDocuments = async () => {
+    try {
+      setIsProcessingDocs(true);
+      toast({
+        title: "Processing documents...",
+        description: "Converting summary URLs to document URLs",
+      });
+
+      const { data, error } = await supabase.functions.invoke('documentation-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (error) {
+        console.error('Error from documentation analysis function:', error);
+        throw error;
+      }
+
+      console.log('Documentation analysis response:', data);
+
+      toast({
+        title: "Success!",
+        description: data?.message || "Successfully processed document URLs",
+      });
+    } catch (error: any) {
+      console.error('Error processing documents:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process documents. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingDocs(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Manual Processing</h2>
@@ -220,6 +259,14 @@ export const ManualProcessing = ({
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isFetchingLandhawk ? 'animate-spin' : ''}`} />
             {isFetchingLandhawk ? 'Fetching...' : 'Fetch From Landhawk API'}
+          </Button>
+          <Button 
+            onClick={handleProcessDocuments}
+            className="w-full sm:w-auto"
+            disabled={isProcessingDocs}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isProcessingDocs ? 'animate-spin' : ''}`} />
+            {isProcessingDocs ? 'Processing...' : 'Process Document URLs'}
           </Button>
         </div>
       </div>
