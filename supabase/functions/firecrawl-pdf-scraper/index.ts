@@ -67,6 +67,12 @@ Deno.serve(async (req) => {
           limit: 50, // Limit pages to crawl
           scrapeOptions: {
             formats: ['pdf'], // Only look for PDFs
+            selectors: [
+              'a[href$=".pdf"]', // Links ending in .pdf
+              'a[href*="/pdf/"]', // Links containing /pdf/
+              'a[href*="document"]', // Links containing "document"
+              'a[href*="planning"]', // Links containing "planning"
+            ]
           }
         })
 
@@ -78,8 +84,15 @@ Deno.serve(async (req) => {
 
         // Extract PDF URLs from the crawl response
         const pdfUrls = crawlResponse.data
-          .filter(item => item.url.toLowerCase().endsWith('.pdf'))
+          .filter(item => {
+            const url = item.url.toLowerCase()
+            return url.endsWith('.pdf') || 
+                   url.includes('/pdf/') ||
+                   (url.includes('document') && url.includes('planning'))
+          })
           .map(item => item.url)
+
+        console.log(`Found ${pdfUrls.length} PDF URLs for record ${record.id}`)
 
         // Update the record with PDF URLs
         const { error: updateError } = await supabaseClient
