@@ -101,19 +101,17 @@ Deno.serve(async (req) => {
         console.log(`Processing URL: ${record.url_documents}`)
         
         try {
-          // Use extract endpoint with retry logic
+          // Use extract endpoint with retry logic and correct API format
           const extractResponse = await retryWithBackoff(async () => {
-            return await firecrawl.extract(record.url_documents, {
-              instruction: "extract only and all the pdf links on this page",
-              scrapeOptions: {
-                selectors: [
-                  'a[href$=".pdf"]',
-                  'a[href*="/pdf/"]',
-                  'a[href*="document"]',
-                  'a[href*="planning"]'
-                ]
-              }
-            })
+            return await firecrawl.extract({
+              urls: [record.url_documents],
+              selectors: [
+                'a[href$=".pdf"]',
+                'a[href*="/pdf/"]',
+                'a[href*="document"]',
+                'a[href*="planning"]'
+              ]
+            });
           });
 
           console.log('Extract response:', JSON.stringify(extractResponse, null, 2))
