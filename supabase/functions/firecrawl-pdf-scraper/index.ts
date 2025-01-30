@@ -61,49 +61,62 @@ Deno.serve(async (req) => {
     // Process each record
     for (const record of records) {
       try {
-        console.log(`Processing URL: ${record.url_documents}`)
-        
-        // Use extract endpoint instead of crawl
-        const extractResponse = await firecrawl.extract(record.url_documents, {
-          instruction: "extract only and all the pdf links on this page",
-          scrapeOptions: {
-            selectors: [
-              'a[href$=".pdf"]',
-              'a[href*="/pdf/"]',
-              'a[href*="document"]',
-              'a[href*="planning"]'
-            ]
-          }
-        })
-
-        if (!extractResponse.success) {
-          console.error(`Failed to extract from ${record.url_documents}:`, extractResponse.error)
-          results.failed++
+        if (!record.url_documents) {
+          console.log(`Skipping record ${record.id}: No URL provided`)
           continue
         }
 
-        // Extract PDF URLs from the extract response
-        const pdfUrls = extractResponse.data.links
-          .filter(url => {
-            const urlLower = url.toLowerCase()
-            return urlLower.endsWith('.pdf') || 
-                   urlLower.includes('/pdf/') ||
-                   (urlLower.includes('document') && urlLower.includes('planning'))
+        console.log(`Processing URL: ${record.url_documents}`)
+        
+        try {
+          // Use extract endpoint instead of crawl
+          const extractResponse = await firecrawl.extract(record.url_documents, {
+            instruction: "extract only and all the pdf links on this page",
+            scrapeOptions: {
+              selectors: [
+                'a[href$=".pdf"]',
+                'a[href*="/pdf/"]',
+                'a[href*="document"]',
+                'a[href*="planning"]'
+              ]
+            }
           })
 
-        console.log(`Found ${pdfUrls.length} PDF URLs for record ${record.id}`)
+          console.log('Extract response:', JSON.stringify(extractResponse, null, 2))
 
-        // Update the record with PDF URLs
-        const { error: updateError } = await supabaseClient
-          .from('property_data_api')
-          .update({ pdf_urls: pdfUrls })
-          .eq('id', record.id)
+          if (!extractResponse.success) {
+            console.error(`Failed to extract from ${record.url_documents}:`, extractResponse.error)
+            results.failed++
+            continue
+          }
 
-        if (updateError) {
-          console.error(`Failed to update record ${record.id}:`, updateError)
+          // Extract PDF URLs from the extract response
+          const pdfUrls = (extractResponse.data?.links || [])
+            .filter(url => {
+              if (!url) return false
+              const urlLower = url.toLowerCase()
+              return urlLower.endsWith('.pdf') || 
+                     urlLower.includes('/pdf/') ||
+                     (urlLower.includes('document') && urlLower.includes('planning'))
+            })
+
+          console.log(`Found ${pdfUrls.length} PDF URLs for record ${record.id}`)
+
+          // Update the record with PDF URLs
+          const { error: updateError } = await supabaseClient
+            .from('property_data_api')
+            .update({ pdf_urls: pdfUrls })
+            .eq('id', record.id)
+
+          if (updateError) {
+            console.error(`Failed to update record ${record.id}:`, updateError)
+            results.failed++
+          } else {
+            results.processed++
+          }
+        } catch (extractError) {
+          console.error(`Error extracting from ${record.url_documents}:`, extractError)
           results.failed++
-        } else {
-          results.processed++
         }
       } catch (error) {
         console.error(`Error processing record ${record.id}:`, error)
