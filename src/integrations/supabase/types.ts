@@ -1280,6 +1280,7 @@ export type Database = {
           id: number
           lat: number | null
           lng: number | null
+          pdf_urls: Json[] | null
           postcode: string | null
           proposal: string | null
           reference: string | null
@@ -1304,6 +1305,7 @@ export type Database = {
           id?: number
           lat?: number | null
           lng?: number | null
+          pdf_urls?: Json[] | null
           postcode?: string | null
           proposal?: string | null
           reference?: string | null
@@ -1328,6 +1330,7 @@ export type Database = {
           id?: number
           lat?: number | null
           lng?: number | null
+          pdf_urls?: Json[] | null
           postcode?: string | null
           proposal?: string | null
           reference?: string | null

@@ -22,9 +22,6 @@ export const DocumentProcessing = () => {
 
       const { data, error } = await supabase.functions.invoke('documentation-analysis', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: {
           limit: 10 // Process 10 records at a time
         }
@@ -48,13 +45,13 @@ export const DocumentProcessing = () => {
       setProgress(100);
       toast({
         title: "Success!",
-        description: data.message || "Successfully processed document URLs",
+        description: `${data.message}`,
       });
     } catch (error: any) {
       console.error('Error processing documents:', error);
       toast({
         title: "Error",
-        description: "Failed to process documents. Please try again.",
+        description: error?.message || "Failed to process documents. Please try again.",
         variant: "destructive",
       });
     } finally {
