@@ -12,6 +12,38 @@ interface PropertyData {
   pdf_urls: string[] | null;
 }
 
+// Helper function to delay execution
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Helper function to retry with exponential backoff
+async function retryWithBackoff<T>(
+  operation: () => Promise<T>,
+  retries = 3,
+  initialDelay = 1000
+): Promise<T> {
+  let lastError;
+  let delayTime = initialDelay;
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await operation();
+    } catch (error: any) {
+      lastError = error;
+      
+      // If it's not a rate limit error, don't retry
+      if (error?.statusCode !== 429) {
+        throw error;
+      }
+
+      console.log(`Attempt ${i + 1} failed, retrying in ${delayTime}ms...`);
+      await delay(delayTime);
+      delayTime *= 2; // Exponential backoff
+    }
+  }
+
+  throw lastError;
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -69,18 +101,20 @@ Deno.serve(async (req) => {
         console.log(`Processing URL: ${record.url_documents}`)
         
         try {
-          // Use extract endpoint instead of crawl
-          const extractResponse = await firecrawl.extract(record.url_documents, {
-            instruction: "extract only and all the pdf links on this page",
-            scrapeOptions: {
-              selectors: [
-                'a[href$=".pdf"]',
-                'a[href*="/pdf/"]',
-                'a[href*="document"]',
-                'a[href*="planning"]'
-              ]
-            }
-          })
+          // Use extract endpoint with retry logic
+          const extractResponse = await retryWithBackoff(async () => {
+            return await firecrawl.extract(record.url_documents, {
+              instruction: "extract only and all the pdf links on this page",
+              scrapeOptions: {
+                selectors: [
+                  'a[href$=".pdf"]',
+                  'a[href*="/pdf/"]',
+                  'a[href*="document"]',
+                  'a[href*="planning"]'
+                ]
+              }
+            })
+          });
 
           console.log('Extract response:', JSON.stringify(extractResponse, null, 2))
 
