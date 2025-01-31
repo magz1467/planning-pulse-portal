@@ -20,19 +20,16 @@ export const ScrapingGeneration = () => {
         description: "Scraping PDF URLs from document pages",
       });
 
-      const { data, error } = await supabase.functions.invoke('firecrawl-pdf-scraper', {
-        method: 'POST',
-        body: {
-          limit: 10 // Process 10 records at a time
-        }
+      const { data, error } = await supabase.functions.invoke('extract-pdf-urls', {
+        method: 'POST'
       });
       
       if (error) {
-        console.error('Error from firecrawl pdf scraper function:', error);
+        console.error('Error from extract-pdf-urls function:', error);
         throw error;
       }
 
-      console.log('Firecrawl PDF scraper response:', data);
+      console.log('PDF URL extraction response:', data);
 
       if (data.processed === 0) {
         toast({
