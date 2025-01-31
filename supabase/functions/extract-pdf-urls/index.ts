@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import puppeteer from 'https://deno.land/x/puppeteer@16.2.0/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,34 +12,36 @@ interface PropertyData {
 }
 
 async function extractPdfUrls(url: string): Promise<string[]> {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-  const page = await browser.newPage();
-  
   try {
-    console.log(`Navigating to ${url}`);
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+    console.log(`Fetching ${url}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const html = await response.text();
     
-    // Get all links on the page
-    const links = await page.evaluate(() => {
-      const anchors = document.querySelectorAll('a');
-      return Array.from(anchors).map(a => a.href);
+    // Use regex to find PDF links in the HTML
+    const pdfRegex = /href=["']((?:[^"']*\.pdf|[^"']*\/pdf\/[^"']*|[^"']*document\.ashx[^"']*))/gi;
+    const matches = [...html.matchAll(pdfRegex)];
+    const pdfUrls = matches.map(match => {
+      const href = match[1];
+      // Handle relative URLs
+      if (href.startsWith('/')) {
+        const urlObj = new URL(url);
+        return `${urlObj.origin}${href}`;
+      }
+      // Handle absolute URLs
+      return href;
     });
     
-    // Filter for PDF links
-    const pdfUrls = links.filter(link => 
-      link.toLowerCase().endsWith('.pdf') || 
-      link.toLowerCase().includes('/pdf/') ||
-      link.toLowerCase().includes('document.ashx')
-    );
-    
-    console.log(`Found ${pdfUrls.length} PDF URLs`);
-    return pdfUrls;
+    // Remove duplicates
+    const uniquePdfUrls = [...new Set(pdfUrls)];
+    console.log(`Found ${uniquePdfUrls.length} PDF URLs`);
+    return uniquePdfUrls;
     
   } catch (error) {
     console.error(`Error extracting PDFs from ${url}:`, error);
     throw error;
-  } finally {
-    await browser.close();
   }
 }
 
