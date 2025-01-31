@@ -65,6 +65,22 @@ serve(async (req) => {
         } else {
           processed++;
           console.log(`Successfully processed record ${record.id}`);
+          
+          // Trigger PDF rehosting for this record
+          try {
+            const { data: rehostData, error: rehostError } = await supabase.functions.invoke('rehost-pdfs', {
+              method: 'POST',
+              body: { limit: 1 }  // Process one record at a time
+            });
+            
+            if (rehostError) {
+              console.error(`Error triggering rehost for record ${record.id}:`, rehostError);
+            } else {
+              console.log(`Successfully triggered rehosting for record ${record.id}:`, rehostData);
+            }
+          } catch (rehostError) {
+            console.error(`Failed to trigger rehosting for record ${record.id}:`, rehostError);
+          }
         }
       } catch (error) {
         console.error(`Error processing record ${record.id}:`, error);
