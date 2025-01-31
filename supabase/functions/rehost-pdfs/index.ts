@@ -21,6 +21,8 @@ serve(async (req) => {
     // Get request body
     const { limit = 10 } = await req.json()
 
+    console.log(`Processing up to ${limit} records`)
+
     // Get records that have pdf_urls but haven't been rehosted
     const { data: records, error: fetchError } = await supabase
       .from('property_data_api')
@@ -34,7 +36,7 @@ serve(async (req) => {
       throw fetchError
     }
 
-    console.log(`Processing ${records?.length || 0} records`)
+    console.log(`Found ${records?.length || 0} records to process`)
 
     let processed = 0
     let failed = 0
@@ -43,19 +45,31 @@ serve(async (req) => {
       for (const record of records) {
         try {
           const pdfUrls = record.pdf_urls || []
-          const rehostedUrls = []
+          const rehostedUrls: string[] = []
 
           for (const pdfUrl of pdfUrls) {
             try {
-              // Fetch the PDF
-              const response = await fetch(pdfUrl)
-              if (!response.ok) throw new Error(`Failed to fetch PDF: ${response.statusText}`)
+              console.log(`Fetching PDF from ${pdfUrl}`)
+              
+              // Fetch the PDF with proper headers
+              const response = await fetch(pdfUrl, {
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+              })
+
+              if (!response.ok) {
+                console.error(`Failed to fetch PDF: ${response.statusText}`)
+                throw new Error(`Failed to fetch PDF: ${response.statusText}`)
+              }
               
               const pdfBuffer = await response.arrayBuffer()
               
               // Generate a unique filename
               const filename = `pdfs/${record.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.pdf`
               
+              console.log(`Uploading to ${filename}`)
+
               // Upload to Supabase Storage
               const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('planning-docs')
@@ -64,7 +78,10 @@ serve(async (req) => {
                   upsert: false
                 })
 
-              if (uploadError) throw uploadError
+              if (uploadError) {
+                console.error(`Upload error for ${filename}:`, uploadError)
+                throw uploadError
+              }
 
               // Get public URL
               const { data: publicUrlData } = await supabase.storage
@@ -72,6 +89,7 @@ serve(async (req) => {
                 .getPublicUrl(uploadData.path)
 
               rehostedUrls.push(publicUrlData.publicUrl)
+              console.log(`Successfully rehosted ${pdfUrl} to ${publicUrlData.publicUrl}`)
             } catch (error) {
               console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
               // Add original URL if rehosting fails
@@ -88,9 +106,13 @@ serve(async (req) => {
             })
             .eq('id', record.id)
 
-          if (updateError) throw updateError
+          if (updateError) {
+            console.error(`Failed to update record ${record.id}:`, updateError)
+            throw updateError
+          }
 
           processed++
+          console.log(`Successfully processed record ${record.id}`)
         } catch (error) {
           console.error(`Failed to process record ${record.id}:`, error)
           failed++
