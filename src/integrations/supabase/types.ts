@@ -1278,12 +1278,14 @@ export type Database = {
           endpoint: string | null
           est_construction_cost: string | null
           id: number
+          last_rehosted_at: string | null
           lat: number | null
           lng: number | null
           pdf_urls: Json[] | null
           postcode: string | null
           proposal: string | null
           reference: string | null
+          rehosted_urls: string[] | null
           status: string | null
           url: string | null
           url_documents: string | null
@@ -1303,12 +1305,14 @@ export type Database = {
           endpoint?: string | null
           est_construction_cost?: string | null
           id?: number
+          last_rehosted_at?: string | null
           lat?: number | null
           lng?: number | null
           pdf_urls?: Json[] | null
           postcode?: string | null
           proposal?: string | null
           reference?: string | null
+          rehosted_urls?: string[] | null
           status?: string | null
           url?: string | null
           url_documents?: string | null
@@ -1328,12 +1332,14 @@ export type Database = {
           endpoint?: string | null
           est_construction_cost?: string | null
           id?: number
+          last_rehosted_at?: string | null
           lat?: number | null
           lng?: number | null
           pdf_urls?: Json[] | null
           postcode?: string | null
           proposal?: string | null
           reference?: string | null
+          rehosted_urls?: string[] | null
           status?: string | null
           url?: string | null
           url_documents?: string | null
