@@ -5,74 +5,42 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface PropertyData {
-  id: number;
-  url_documents: string;
-  pdf_urls: string[] | null;
-}
-
-async function extractPdfUrls(url: string): Promise<string[]> {
-  try {
-    console.log(`Fetching ${url}`);
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const html = await response.text();
-    
-    // Use regex to find PDF links in the HTML
-    const pdfRegex = /href=["']((?:[^"']*\.pdf|[^"']*\/pdf\/[^"']*|[^"']*document\.ashx[^"']*))/gi;
-    const matches = [...html.matchAll(pdfRegex)];
-    const pdfUrls = matches.map(match => {
-      const href = match[1];
-      // Handle relative URLs
-      if (href.startsWith('/')) {
-        const urlObj = new URL(url);
-        return `${urlObj.origin}${href}`;
-      }
-      // Handle absolute URLs
-      return href;
-    });
-    
-    // Remove duplicates
-    const uniquePdfUrls = [...new Set(pdfUrls)];
-    console.log(`Found ${uniquePdfUrls.length} PDF URLs`);
-    return uniquePdfUrls;
-    
-  } catch (error) {
-    console.error(`Error extracting PDFs from ${url}:`, error);
-    throw error;
-  }
-}
-
-Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const supabaseClient = createClient(
+    console.log('Starting PDF URL extraction process');
+    
+    const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    )
 
-    // Get records that need processing
-    const { data: records, error: fetchError } = await supabaseClient
+    // Query records that have url_documents but no pdf_urls
+    const { data: records, error: queryError } = await supabase
       .from('property_data_api')
       .select('id, url_documents')
       .is('pdf_urls', null)
       .not('url_documents', 'is', null)
       .limit(5); // Process in small batches
 
-    if (fetchError) {
-      throw fetchError;
+    if (queryError) {
+      console.error('Error querying records:', queryError);
+      throw queryError;
     }
 
     if (!records || records.length === 0) {
+      console.log('No records to process');
       return new Response(
-        JSON.stringify({ message: 'No records to process' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ 
+          message: 'No records to process',
+          processed: 0 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       );
     }
 
@@ -83,12 +51,12 @@ Deno.serve(async (req) => {
     for (const record of records) {
       try {
         if (!record.url_documents) continue;
+
+        const urls = await extractPdfUrls(record.url_documents);
         
-        const pdfUrls = await extractPdfUrls(record.url_documents);
-        
-        const { error: updateError } = await supabaseClient
+        const { error: updateError } = await supabase
           .from('property_data_api')
-          .update({ pdf_urls: pdfUrls })
+          .update({ pdf_urls: urls })
           .eq('id', record.id);
 
         if (updateError) {
@@ -96,6 +64,7 @@ Deno.serve(async (req) => {
           failed++;
         } else {
           processed++;
+          console.log(`Successfully processed record ${record.id}`);
         }
       } catch (error) {
         console.error(`Error processing record ${record.id}:`, error);
@@ -105,21 +74,71 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({
-        message: `Processed ${processed} records`,
+        message: `Processed ${processed} records${failed > 0 ? `, failed: ${failed}` : ''}`,
         processed,
         failed
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     );
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in extract-pdf-urls function:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
   }
-});
+})
+
+async function extractPdfUrls(url: string): Promise<string[]> {
+  try {
+    console.log(`Fetching ${url}`);
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const html = await response.text();
+    
+    // Use regex to find PDF links in the HTML
+    const pdfRegex = /href=["']((?:[^"']*\.pdf|[^"']*\/pdf\/[^"']*|[^"']*document\.ashx[^"']*))/gi;
+    const matches = [...html.matchAll(pdfRegex)];
+    const pdfUrls = matches.map(match => {
+      const href = match[1];
+      try {
+        // Try to construct a full URL
+        return new URL(href, url).href;
+      } catch {
+        // If URL construction fails, return the original href
+        return href;
+      }
+    });
+    
+    // Remove duplicates and filter out invalid URLs
+    const uniquePdfUrls = [...new Set(pdfUrls)].filter(url => {
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
+    console.log(`Found ${uniquePdfUrls.length} PDF URLs`);
+    return uniquePdfUrls;
+    
+  } catch (error) {
+    console.error(`Error extracting PDFs from ${url}:`, error);
+    return []; // Return empty array instead of throwing
+  }
+}
