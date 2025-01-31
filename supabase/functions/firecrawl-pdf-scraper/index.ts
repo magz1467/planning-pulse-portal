@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
     // Get records that have url_documents but no pdf_urls
     const { data: records, error: fetchError } = await supabaseClient
       .from('property_data_api')
-      .select('id, url_documents, pdf_urls')
+      .select('id, url_documents')
       .is('pdf_urls', null)
       .not('url_documents', 'is', null)
       .limit(10) // Process in batches
