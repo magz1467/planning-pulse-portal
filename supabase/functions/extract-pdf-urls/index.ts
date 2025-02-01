@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
+
+console.log("PDF URL extraction function starting")
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -13,41 +15,41 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    // Create Supabase client
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get records that have url_documents but no pdf_urls
-    const { data: records, error: fetchError } = await supabase
+    console.log("Fetching records to process...")
+
+    // Get records that need processing (10 at a time)
+    const { data: records, error: fetchError } = await supabaseClient
       .from('property_data_api')
-      .select('id, url_documents')
+      .select('*')
       .is('pdf_urls', null)
-      .not('url_documents', 'is', null)
-      .limit(10)  // Explicitly process 10 records at a time
+      .limit(10)
 
     if (fetchError) {
       console.error('Error fetching records:', fetchError)
-      throw fetchError
+      throw new Error(`Failed to fetch records: ${fetchError.message}`)
     }
 
-    console.log(`Processing ${records?.length || 0} records`)
-
     if (!records || records.length === 0) {
+      console.log("No records to process")
       return new Response(
-        JSON.stringify({
+        JSON.stringify({ 
+          message: "No records to process",
           processed: 0,
-          failed: 0,
-          message: "No records to process"
+          failed: 0 
         }),
         { 
-          headers: { 
-            ...corsHeaders,
-            'Content-Type': 'application/json' 
-          }
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
+
+    console.log(`Processing ${records.length} records`)
 
     let processed = 0
     let failed = 0
@@ -56,15 +58,55 @@ serve(async (req) => {
       try {
         if (!record.url_documents) {
           console.log(`Skipping record ${record.id} - no url_documents`)
+          failed++
           continue
         }
 
-        const pdfUrls = await extractPdfUrls(record.url_documents)
-        console.log(`Found ${pdfUrls.length} PDFs for record ${record.id}:`, pdfUrls)
+        // Fetch the document page
+        console.log(`Fetching document page for record ${record.id}:`, record.url_documents)
+        const response = await fetch(record.url_documents)
+        const html = await response.text()
+
+        // Extract PDF URLs using multiple patterns
+        const pdfUrls = new Set()
         
-        const { error: updateError } = await supabase
+        // Pattern 1: Direct PDF links
+        const hrefPattern = /href=["'](.*?\.pdf)["']/gi
+        let match
+        while ((match = hrefPattern.exec(html)) !== null) {
+          if (match[1]) pdfUrls.add(match[1])
+        }
+
+        // Pattern 2: URLs in data attributes
+        const dataPattern = /data-[^=]*=["'](.*?\.pdf)["']/gi
+        while ((match = dataPattern.exec(html)) !== null) {
+          if (match[1]) pdfUrls.add(match[1])
+        }
+
+        // Pattern 3: URLs in src attributes
+        const srcPattern = /src=["'](.*?\.pdf)["']/gi
+        while ((match = srcPattern.exec(html)) !== null) {
+          if (match[1]) pdfUrls.add(match[1])
+        }
+
+        // Convert Set to Array and handle relative URLs
+        const pdfUrlsArray = Array.from(pdfUrls).map(url => {
+          if (url.startsWith('/')) {
+            const baseUrl = new URL(record.url_documents)
+            return `${baseUrl.origin}${url}`
+          }
+          return url
+        })
+
+        console.log(`Found ${pdfUrlsArray.length} PDF URLs for record ${record.id}`)
+
+        // Update the record
+        const { error: updateError } = await supabaseClient
           .from('property_data_api')
-          .update({ pdf_urls: pdfUrls })
+          .update({ 
+            pdf_urls: pdfUrlsArray,
+            last_scraped_at: new Date().toISOString()
+          })
           .eq('id', record.id)
 
         if (updateError) {
@@ -72,7 +114,6 @@ serve(async (req) => {
           failed++
         } else {
           processed++
-          console.log(`Successfully processed record ${record.id}`)
         }
       } catch (error) {
         console.error(`Error processing record ${record.id}:`, error)
@@ -80,97 +121,30 @@ serve(async (req) => {
       }
     }
 
+    console.log(`Completed processing. Processed: ${processed}, Failed: ${failed}`)
+
     return new Response(
       JSON.stringify({
+        message: `Processed ${processed} records successfully`,
         processed,
-        failed,
-        message: `Successfully processed ${processed} records. Failed to process ${failed} records.`
+        failed
       }),
       { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json' 
-        }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
 
   } catch (error) {
-    console.error('Error in extract-pdf-urls function:', error)
+    console.error('Function error:', error)
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error.stack 
+      JSON.stringify({
+        error: 'Internal Server Error',
+        details: error.message
       }),
       { 
         status: 500,
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
   }
 })
-
-async function extractPdfUrls(url: string): Promise<string[]> {
-  try {
-    console.log(`Fetching URL: ${url}`)
-    
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      }
-    })
-
-    if (!response.ok) {
-      console.error(`Failed to fetch URL ${url}: ${response.statusText}`)
-      return []
-    }
-
-    const html = await response.text()
-    
-    // Enhanced PDF URL detection patterns
-    const patterns = [
-      // Standard href PDF links
-      /href=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi,
-      // Data attributes containing PDF links
-      /data-[^=]+=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi,
-      // Src attributes for embedded PDFs
-      /src=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi,
-      // URL parameters containing PDF paths
-      /[?&](?:file|pdf|document)=([^"'&]+\.pdf)/gi,
-      // General URLs ending in .pdf
-      /(?:https?:\/\/[^\s"'<>]+\.pdf)/gi
-    ]
-
-    const pdfUrls = new Set<string>()
-
-    for (const pattern of patterns) {
-      const matches = html.matchAll(pattern)
-      for (const match of matches) {
-        let pdfUrl = match[1] || match[0]
-        
-        // Convert relative URLs to absolute
-        if (!pdfUrl.startsWith('http')) {
-          const baseUrl = new URL(url)
-          pdfUrl = new URL(pdfUrl, baseUrl.origin).href
-        }
-        
-        // Clean up URL encoding
-        try {
-          pdfUrl = decodeURIComponent(pdfUrl)
-        } catch (e) {
-          console.warn(`Failed to decode URL: ${pdfUrl}`, e)
-        }
-        
-        pdfUrls.add(pdfUrl)
-      }
-    }
-
-    console.log(`Found ${pdfUrls.size} PDF URLs for ${url}`)
-    return Array.from(pdfUrls)
-  } catch (error) {
-    console.error(`Error extracting PDFs from ${url}:`, error)
-    return []
-  }
-}
