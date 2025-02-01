@@ -55,48 +55,58 @@ serve(async (req) => {
               const controller = new AbortController()
               const timeout = setTimeout(() => controller.abort(), 30000) // 30 second timeout
               
-              const response = await fetch(pdfUrl, {
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                },
-                signal: controller.signal
-              }).finally(() => clearTimeout(timeout))
+              try {
+                const response = await fetch(pdfUrl, {
+                  headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                  },
+                  signal: controller.signal
+                }).finally(() => clearTimeout(timeout))
 
-              if (!response.ok) {
-                console.error(`Failed to fetch PDF: ${response.statusText}`)
-                throw new Error(`Failed to fetch PDF: ${response.statusText}`)
+                if (!response.ok) {
+                  console.error(`Failed to fetch PDF: ${response.statusText}`)
+                  // Keep original URL if fetch fails
+                  rehostedUrls.push(pdfUrl)
+                  continue
+                }
+                
+                const pdfBuffer = await response.arrayBuffer()
+                
+                // Generate a unique filename
+                const filename = `pdfs/${record.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.pdf`
+                
+                console.log(`Uploading to ${filename}`)
+
+                // Upload to Supabase Storage
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                  .from('planning-docs')
+                  .upload(filename, pdfBuffer, {
+                    contentType: 'application/pdf',
+                    upsert: false
+                  })
+
+                if (uploadError) {
+                  console.error(`Upload error for ${filename}:`, uploadError)
+                  // Keep original URL if upload fails
+                  rehostedUrls.push(pdfUrl)
+                  continue
+                }
+
+                // Get public URL
+                const { data: publicUrlData } = await supabase.storage
+                  .from('planning-docs')
+                  .getPublicUrl(uploadData.path)
+
+                rehostedUrls.push(publicUrlData.publicUrl)
+                console.log(`Successfully rehosted ${pdfUrl} to ${publicUrlData.publicUrl}`)
+              } catch (error) {
+                console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
+                // Keep original URL if processing fails
+                rehostedUrls.push(pdfUrl)
               }
-              
-              const pdfBuffer = await response.arrayBuffer()
-              
-              // Generate a unique filename
-              const filename = `pdfs/${record.id}/${Date.now()}_${Math.random().toString(36).substring(7)}.pdf`
-              
-              console.log(`Uploading to ${filename}`)
-
-              // Upload to Supabase Storage
-              const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('planning-docs')
-                .upload(filename, pdfBuffer, {
-                  contentType: 'application/pdf',
-                  upsert: false
-                })
-
-              if (uploadError) {
-                console.error(`Upload error for ${filename}:`, uploadError)
-                throw uploadError
-              }
-
-              // Get public URL
-              const { data: publicUrlData } = await supabase.storage
-                .from('planning-docs')
-                .getPublicUrl(uploadData.path)
-
-              rehostedUrls.push(publicUrlData.publicUrl)
-              console.log(`Successfully rehosted ${pdfUrl} to ${publicUrlData.publicUrl}`)
             } catch (error) {
               console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
-              // Add original URL if rehosting fails
+              // Keep original URL if processing fails
               rehostedUrls.push(pdfUrl)
             }
           }
@@ -112,7 +122,8 @@ serve(async (req) => {
 
           if (updateError) {
             console.error(`Failed to update record ${record.id}:`, updateError)
-            throw updateError
+            failed++
+            continue
           }
 
           processed++
