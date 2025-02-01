@@ -15,20 +15,25 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client
+    // Create Supabase client with better error handling
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          persistSession: false
+        }
+      }
     )
 
     console.log("Fetching records to process...")
 
-    // Get records that need processing (10 at a time)
+    // Get records that need processing (5 at a time to reduce load)
     const { data: records, error: fetchError } = await supabaseClient
       .from('property_data_api')
       .select('*')
       .is('pdf_urls', null)
-      .limit(10)
+      .limit(5)
 
     if (fetchError) {
       console.error('Error fetching records:', fetchError)
@@ -62,9 +67,24 @@ serve(async (req) => {
           continue
         }
 
-        // Fetch the document page
+        // Fetch the document page with timeout and retry
         console.log(`Fetching document page for record ${record.id}:`, record.url_documents)
-        const response = await fetch(record.url_documents)
+        let response
+        let retries = 3
+        while (retries > 0) {
+          try {
+            response = await fetch(record.url_documents, {
+              signal: AbortSignal.timeout(10000) // 10 second timeout
+            })
+            break
+          } catch (error) {
+            console.warn(`Attempt ${4-retries} failed:`, error)
+            retries--
+            if (retries === 0) throw error
+            await new Promise(resolve => setTimeout(resolve, 1000))
+          }
+        }
+
         const html = await response.text()
 
         // Extract PDF URLs using multiple patterns
@@ -100,21 +120,29 @@ serve(async (req) => {
 
         console.log(`Found ${pdfUrlsArray.length} PDF URLs for record ${record.id}`)
 
-        // Update the record
-        const { error: updateError } = await supabaseClient
-          .from('property_data_api')
-          .update({ 
-            pdf_urls: pdfUrlsArray,
-            last_scraped_at: new Date().toISOString()
-          })
-          .eq('id', record.id)
+        // Update the record with retry logic
+        let updateRetries = 3
+        while (updateRetries > 0) {
+          try {
+            const { error: updateError } = await supabaseClient
+              .from('property_data_api')
+              .update({ 
+                pdf_urls: pdfUrlsArray,
+                last_scraped_at: new Date().toISOString()
+              })
+              .eq('id', record.id)
 
-        if (updateError) {
-          console.error(`Error updating record ${record.id}:`, updateError)
-          failed++
-        } else {
-          processed++
+            if (updateError) throw updateError
+            break
+          } catch (error) {
+            console.warn(`Update attempt ${4-updateRetries} failed:`, error)
+            updateRetries--
+            if (updateRetries === 0) throw error
+            await new Promise(resolve => setTimeout(resolve, 1000))
+          }
         }
+
+        processed++
       } catch (error) {
         console.error(`Error processing record ${record.id}:`, error)
         failed++
@@ -127,7 +155,8 @@ serve(async (req) => {
       JSON.stringify({
         message: `Processed ${processed} records successfully`,
         processed,
-        failed
+        failed,
+        timestamp: new Date().toISOString()
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -139,7 +168,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        details: error.message
+        details: error.message,
+        timestamp: new Date().toISOString()
       }),
       { 
         status: 500,

@@ -20,13 +20,29 @@ export const ScrapingGeneration = () => {
         description: "Scraping PDF URLs from document pages",
       });
 
-      const { data, error } = await supabase.functions.invoke('extract-pdf-urls', {
-        method: 'POST'
-      });
-      
-      if (error) {
-        console.error('Error from extract-pdf-urls function:', error);
-        throw error;
+      // Add retry logic for the function call
+      let retries = 3;
+      let data;
+      let error;
+
+      while (retries > 0) {
+        try {
+          const result = await supabase.functions.invoke('extract-pdf-urls', {
+            method: 'POST',
+            body: { timestamp: new Date().toISOString() }
+          });
+          
+          data = result.data;
+          error = result.error;
+          
+          if (error) throw error;
+          break;
+        } catch (e) {
+          console.warn(`Attempt ${4-retries} failed:`, e);
+          retries--;
+          if (retries === 0) throw e;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
 
       console.log('PDF URL extraction response:', data);
