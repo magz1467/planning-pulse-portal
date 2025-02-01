@@ -51,12 +51,16 @@ serve(async (req) => {
             try {
               console.log(`Fetching PDF from ${pdfUrl}`)
               
-              // Fetch the PDF with proper headers
+              // Fetch the PDF with proper headers and timeout
+              const controller = new AbortController()
+              const timeout = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+              
               const response = await fetch(pdfUrl, {
                 headers: {
                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-                }
-              })
+                },
+                signal: controller.signal
+              }).finally(() => clearTimeout(timeout))
 
               if (!response.ok) {
                 console.error(`Failed to fetch PDF: ${response.statusText}`)
