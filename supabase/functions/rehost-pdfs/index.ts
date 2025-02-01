@@ -67,12 +67,14 @@ serve(async (req) => {
                 clearTimeout(timeout)
 
                 if (!response.ok) {
-                  console.error(`Failed to fetch PDF: ${response.statusText} (${response.status})`)
-                  // Keep original URL if fetch fails
-                  rehostedUrls.push(pdfUrl)
-                  continue
+                  throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`)
                 }
                 
+                const contentType = response.headers.get('content-type')
+                if (!contentType?.includes('application/pdf') && !contentType?.includes('application/octet-stream')) {
+                  console.warn(`Warning: Unexpected content type: ${contentType} for ${pdfUrl}`)
+                }
+
                 const pdfBuffer = await response.arrayBuffer()
                 
                 // Generate a unique filename
@@ -89,10 +91,7 @@ serve(async (req) => {
                   })
 
                 if (uploadError) {
-                  console.error(`Upload error for ${filename}:`, uploadError)
-                  // Keep original URL if upload fails
-                  rehostedUrls.push(pdfUrl)
-                  continue
+                  throw uploadError
                 }
 
                 // Get public URL
@@ -102,14 +101,18 @@ serve(async (req) => {
 
                 rehostedUrls.push(publicUrlData.publicUrl)
                 console.log(`Successfully rehosted ${pdfUrl} to ${publicUrlData.publicUrl}`)
+                processed++
+
               } catch (error) {
                 console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
+                failed++
                 // Keep original URL if processing fails
                 rehostedUrls.push(pdfUrl)
                 continue
               }
             } catch (error) {
               console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
+              failed++
               // Keep original URL if processing fails
               rehostedUrls.push(pdfUrl)
               continue
@@ -127,12 +130,9 @@ serve(async (req) => {
 
           if (updateError) {
             console.error(`Failed to update record ${record.id}:`, updateError)
-            failed++
-            continue
+            throw updateError
           }
 
-          processed++
-          console.log(`Successfully processed record ${record.id}`)
         } catch (error) {
           console.error(`Failed to process record ${record.id}:`, error)
           failed++
@@ -146,16 +146,27 @@ serve(async (req) => {
         failed,
         message: `Successfully processed ${processed} records. Failed to process ${failed} records.`
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
     )
 
   } catch (error) {
     console.error('Error in rehost-pdfs function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack
+      }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     )
   }
