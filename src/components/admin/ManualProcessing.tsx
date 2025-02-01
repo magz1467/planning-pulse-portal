@@ -8,6 +8,7 @@ import { LandhawkDataFetching } from "./processing/LandhawkDataFetching";
 import { TrialDataFetching } from "./processing/TrialDataFetching";
 import { DocumentProcessing } from "./processing/DocumentProcessing";
 import { PdfRehosting } from "./processing/PdfRehosting";
+import { TestFunction } from "./processing/TestFunction";
 
 interface ManualProcessingProps {
   isGenerating: boolean;
@@ -34,6 +35,10 @@ export const ManualProcessing = ({
           <DocumentProcessing />
         </div>
       </div>
+
+      <Separator className="my-6" />
+      
+      <TestFunction />
 
       <Separator className="my-6" />
       
