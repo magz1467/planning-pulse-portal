@@ -58,13 +58,14 @@ serve(async (req) => {
               try {
                 const response = await fetch(pdfUrl, {
                   headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                    'Accept': 'application/pdf,*/*'
                   },
                   signal: controller.signal
                 }).finally(() => clearTimeout(timeout))
 
                 if (!response.ok) {
-                  console.error(`Failed to fetch PDF: ${response.statusText}`)
+                  console.error(`Failed to fetch PDF: ${response.statusText} (${response.status})`)
                   // Keep original URL if fetch fails
                   rehostedUrls.push(pdfUrl)
                   continue
