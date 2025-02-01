@@ -8,6 +8,8 @@ const corsHeaders = {
 
 async function extractPdfUrls(url: string): Promise<string[]> {
   try {
+    console.log(`Fetching URL: ${url}`);
+    
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -21,23 +23,45 @@ async function extractPdfUrls(url: string): Promise<string[]> {
 
     const html = await response.text();
     
-    // Match both relative and absolute PDF URLs
-    const pdfRegex = /href=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi;
-    const matches = html.matchAll(pdfRegex);
+    // Enhanced PDF URL detection patterns
+    const patterns = [
+      // Standard href PDF links
+      /href=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi,
+      // Data attributes containing PDF links
+      /data-[^=]+=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi,
+      // Src attributes for embedded PDFs
+      /src=["']((?:https?:\/\/[^"']+\.pdf|[^"']+\.pdf))["']/gi,
+      // URL parameters containing PDF paths
+      /[?&](?:file|pdf|document)=([^"'&]+\.pdf)/gi,
+      // General URLs ending in .pdf
+      /(?:https?:\/\/[^\s"'<>]+\.pdf)/gi
+    ];
+
     const pdfUrls = new Set<string>();
 
-    for (const match of matches) {
-      let pdfUrl = match[1];
-      
-      // Convert relative URLs to absolute
-      if (!pdfUrl.startsWith('http')) {
-        const baseUrl = new URL(url);
-        pdfUrl = new URL(pdfUrl, baseUrl.origin).href;
+    for (const pattern of patterns) {
+      const matches = html.matchAll(pattern);
+      for (const match of matches) {
+        let pdfUrl = match[1] || match[0];
+        
+        // Convert relative URLs to absolute
+        if (!pdfUrl.startsWith('http')) {
+          const baseUrl = new URL(url);
+          pdfUrl = new URL(pdfUrl, baseUrl.origin).href;
+        }
+        
+        // Clean up URL encoding
+        try {
+          pdfUrl = decodeURIComponent(pdfUrl);
+        } catch (e) {
+          console.warn(`Failed to decode URL: ${pdfUrl}`, e);
+        }
+        
+        pdfUrls.add(pdfUrl);
       }
-      
-      pdfUrls.add(pdfUrl);
     }
 
+    console.log(`Found ${pdfUrls.size} PDF URLs for ${url}`);
     return Array.from(pdfUrls);
   } catch (error) {
     console.error(`Error extracting PDFs from ${url}:`, error);
@@ -83,6 +107,7 @@ serve(async (req) => {
           }
 
           const pdfUrls = await extractPdfUrls(record.url_documents)
+          console.log(`Found ${pdfUrls.length} PDFs for record ${record.id}:`, pdfUrls)
           
           const { error: updateError } = await supabase
             .from('property_data_api')
@@ -109,7 +134,12 @@ serve(async (req) => {
         failed,
         message: `Successfully processed ${processed} records. Failed to process ${failed} records.`
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        }
+      }
     )
 
   } catch (error) {
@@ -117,8 +147,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )
   }
