@@ -62,7 +62,9 @@ serve(async (req) => {
                     'Accept': 'application/pdf,*/*'
                   },
                   signal: controller.signal
-                }).finally(() => clearTimeout(timeout))
+                })
+
+                clearTimeout(timeout)
 
                 if (!response.ok) {
                   console.error(`Failed to fetch PDF: ${response.statusText} (${response.status})`)
@@ -104,11 +106,13 @@ serve(async (req) => {
                 console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
                 // Keep original URL if processing fails
                 rehostedUrls.push(pdfUrl)
+                continue
               }
             } catch (error) {
               console.error(`Failed to process PDF ${pdfUrl} for record ${record.id}:`, error)
               // Keep original URL if processing fails
               rehostedUrls.push(pdfUrl)
+              continue
             }
           }
 
