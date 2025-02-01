@@ -10,6 +10,8 @@ export const ScrapingGeneration = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
   const handleScrapeDocuments = async () => {
     try {
       setIsProcessing(true);
@@ -27,27 +29,40 @@ export const ScrapingGeneration = () => {
 
       while (retries > 0) {
         try {
+          console.log(`Attempt ${4-retries} to call extract-pdf-urls function`);
           const result = await supabase.functions.invoke('extract-pdf-urls', {
             method: 'POST',
-            body: { timestamp: new Date().toISOString() }
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: { 
+              timestamp: new Date().toISOString(),
+              batch_size: 5 // Reduced batch size for better reliability
+            }
           });
           
           data = result.data;
           error = result.error;
           
-          if (error) throw error;
+          if (error) {
+            console.error('Function error on attempt', 4-retries, error);
+            throw error;
+          }
+          
+          console.log('Function succeeded on attempt', 4-retries, data);
           break;
         } catch (e) {
           console.warn(`Attempt ${4-retries} failed:`, e);
           retries--;
           if (retries === 0) throw e;
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Exponential backoff
+          await delay(1000 * Math.pow(2, 3-retries));
         }
       }
 
       console.log('PDF URL extraction response:', data);
 
-      if (data.processed === 0) {
+      if (!data || data.processed === 0) {
         toast({
           title: "No records to process",
           description: "All records have been processed",
@@ -62,9 +77,10 @@ export const ScrapingGeneration = () => {
       });
     } catch (error: any) {
       console.error('Error scraping documents:', error);
+      const errorMessage = error?.message || error?.error_description || "Failed to scrape documents. Please try again.";
       toast({
         title: "Error",
-        description: error?.message || "Failed to scrape documents. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
