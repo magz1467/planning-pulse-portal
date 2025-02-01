@@ -86,7 +86,7 @@ serve(async (req) => {
       .select('id, url_documents')
       .is('pdf_urls', null)
       .not('url_documents', 'is', null)
-      .limit(50)  // Process in batches
+      .limit(10)  // Explicitly process 10 records at a time
 
     if (fetchError) {
       console.error('Error fetching records:', fetchError)
