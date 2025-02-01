@@ -12,10 +12,38 @@ export const ScrapingGeneration = () => {
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+  const checkFunctionExists = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('extract-pdf-urls', {
+        method: 'OPTIONS'
+      });
+      
+      if (error) {
+        console.error('Function existence check failed:', error);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.error('Function deployment check error:', e);
+      return false;
+    }
+  };
+
   const handleScrapeDocuments = async () => {
     try {
       setIsProcessing(true);
       setProgress(0);
+
+      // Check if function is deployed
+      const functionExists = await checkFunctionExists();
+      if (!functionExists) {
+        toast({
+          title: "Error",
+          description: "PDF URL extraction function is not properly deployed. Please check the Supabase dashboard.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       toast({
         title: "Processing documents...",
