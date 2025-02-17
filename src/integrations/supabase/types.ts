@@ -225,6 +225,7 @@ export type Database = {
           development_type: string | null
           engaging_title: string | null
           epc_number: string | null
+          est_construction_cost: string | null
           final_impact_score: number | null
           geom: unknown | null
           id: string
@@ -292,6 +293,7 @@ export type Database = {
           development_type?: string | null
           engaging_title?: string | null
           epc_number?: string | null
+          est_construction_cost?: string | null
           final_impact_score?: number | null
           geom?: unknown | null
           id: string
@@ -359,6 +361,7 @@ export type Database = {
           development_type?: string | null
           engaging_title?: string | null
           epc_number?: string | null
+          est_construction_cost?: string | null
           final_impact_score?: number | null
           geom?: unknown | null
           id?: string
@@ -564,6 +567,243 @@ export type Database = {
           last_synced?: string | null
           last_updated?: string | null
           last_updated_by?: string | null
+          locality?: string | null
+          lpa_app_no?: string | null
+          lpa_name?: string | null
+          parking_details?: Json | null
+          polygon?: Json | null
+          postcode?: string | null
+          pp_id?: string | null
+          reference_no_of_permission_being_relied_on?: string | null
+          secondary_street_name?: string | null
+          site_name?: string | null
+          site_number?: string | null
+          status?: string | null
+          street_name?: string | null
+          subdivision_of_building?: string | null
+          title_number?: string | null
+          uprn?: string | null
+          url_planning_app?: string | null
+          valid_date?: string | null
+          ward?: string | null
+          wgs84_polygon?: Json | null
+        }
+        Relationships: []
+      }
+      applications_duplicate: {
+        Row: {
+          actual_commencement_date: string | null
+          actual_completion_date: string | null
+          agent_address: string | null
+          agent_company: string | null
+          agent_name: string | null
+          ai_search_details: Json | null
+          ai_title: string | null
+          appeal_decision: string | null
+          appeal_decision_date: string | null
+          appeal_start_date: string | null
+          appeal_status: string | null
+          application_details: Json | null
+          application_id: number
+          application_type: string | null
+          application_type_full: string | null
+          bo_system: string | null
+          borough: string | null
+          category: string | null
+          centroid: Json | null
+          centroid_easting: string | null
+          centroid_northing: string | null
+          cil_liability: string | null
+          class_3: string | null
+          classification: string | null
+          date_building_work_completed_under_previous_permission: string | null
+          date_building_work_started_under_previous_permission: string | null
+          decision: string | null
+          decision_agency: string | null
+          decision_conditions: Json | null
+          decision_date: string | null
+          decision_process: string | null
+          decision_rating: string | null
+          decision_target_date: string | null
+          decision_text: string | null
+          description: string | null
+          development_type: string | null
+          distance: string | null
+          endpoint: string | null
+          engaging_title: string | null
+          epc_number: string | null
+          est_construction_cost: string | null
+          final_impact_score: number | null
+          geom: unknown | null
+          id: string
+          image_link: Json | null
+          image_map_url: string | null
+          impact_score: number | null
+          impact_score_details: Json | null
+          impacted_services: Json | null
+          lapsed_date: string | null
+          last_date_consultation_comments: string | null
+          last_synced: string | null
+          last_updated: string | null
+          last_updated_by: string | null
+          lat: string | null
+          lng: string | null
+          locality: string | null
+          lpa_app_no: string | null
+          lpa_name: string | null
+          parking_details: Json | null
+          polygon: Json | null
+          postcode: string | null
+          pp_id: string | null
+          reference_no_of_permission_being_relied_on: string | null
+          secondary_street_name: string | null
+          site_name: string | null
+          site_number: string | null
+          status: string | null
+          street_name: string | null
+          subdivision_of_building: string | null
+          title_number: string | null
+          uprn: string | null
+          url_planning_app: string | null
+          valid_date: string | null
+          ward: string | null
+          wgs84_polygon: Json | null
+        }
+        Insert: {
+          actual_commencement_date?: string | null
+          actual_completion_date?: string | null
+          agent_address?: string | null
+          agent_company?: string | null
+          agent_name?: string | null
+          ai_search_details?: Json | null
+          ai_title?: string | null
+          appeal_decision?: string | null
+          appeal_decision_date?: string | null
+          appeal_start_date?: string | null
+          appeal_status?: string | null
+          application_details?: Json | null
+          application_id?: number
+          application_type?: string | null
+          application_type_full?: string | null
+          bo_system?: string | null
+          borough?: string | null
+          category?: string | null
+          centroid?: Json | null
+          centroid_easting?: string | null
+          centroid_northing?: string | null
+          cil_liability?: string | null
+          class_3?: string | null
+          classification?: string | null
+          date_building_work_completed_under_previous_permission?: string | null
+          date_building_work_started_under_previous_permission?: string | null
+          decision?: string | null
+          decision_agency?: string | null
+          decision_conditions?: Json | null
+          decision_date?: string | null
+          decision_process?: string | null
+          decision_rating?: string | null
+          decision_target_date?: string | null
+          decision_text?: string | null
+          description?: string | null
+          development_type?: string | null
+          distance?: string | null
+          endpoint?: string | null
+          engaging_title?: string | null
+          epc_number?: string | null
+          est_construction_cost?: string | null
+          final_impact_score?: number | null
+          geom?: unknown | null
+          id?: string
+          image_link?: Json | null
+          image_map_url?: string | null
+          impact_score?: number | null
+          impact_score_details?: Json | null
+          impacted_services?: Json | null
+          lapsed_date?: string | null
+          last_date_consultation_comments?: string | null
+          last_synced?: string | null
+          last_updated?: string | null
+          last_updated_by?: string | null
+          lat?: string | null
+          lng?: string | null
+          locality?: string | null
+          lpa_app_no?: string | null
+          lpa_name?: string | null
+          parking_details?: Json | null
+          polygon?: Json | null
+          postcode?: string | null
+          pp_id?: string | null
+          reference_no_of_permission_being_relied_on?: string | null
+          secondary_street_name?: string | null
+          site_name?: string | null
+          site_number?: string | null
+          status?: string | null
+          street_name?: string | null
+          subdivision_of_building?: string | null
+          title_number?: string | null
+          uprn?: string | null
+          url_planning_app?: string | null
+          valid_date?: string | null
+          ward?: string | null
+          wgs84_polygon?: Json | null
+        }
+        Update: {
+          actual_commencement_date?: string | null
+          actual_completion_date?: string | null
+          agent_address?: string | null
+          agent_company?: string | null
+          agent_name?: string | null
+          ai_search_details?: Json | null
+          ai_title?: string | null
+          appeal_decision?: string | null
+          appeal_decision_date?: string | null
+          appeal_start_date?: string | null
+          appeal_status?: string | null
+          application_details?: Json | null
+          application_id?: number
+          application_type?: string | null
+          application_type_full?: string | null
+          bo_system?: string | null
+          borough?: string | null
+          category?: string | null
+          centroid?: Json | null
+          centroid_easting?: string | null
+          centroid_northing?: string | null
+          cil_liability?: string | null
+          class_3?: string | null
+          classification?: string | null
+          date_building_work_completed_under_previous_permission?: string | null
+          date_building_work_started_under_previous_permission?: string | null
+          decision?: string | null
+          decision_agency?: string | null
+          decision_conditions?: Json | null
+          decision_date?: string | null
+          decision_process?: string | null
+          decision_rating?: string | null
+          decision_target_date?: string | null
+          decision_text?: string | null
+          description?: string | null
+          development_type?: string | null
+          distance?: string | null
+          endpoint?: string | null
+          engaging_title?: string | null
+          epc_number?: string | null
+          est_construction_cost?: string | null
+          final_impact_score?: number | null
+          geom?: unknown | null
+          id?: string
+          image_link?: Json | null
+          image_map_url?: string | null
+          impact_score?: number | null
+          impact_score_details?: Json | null
+          impacted_services?: Json | null
+          lapsed_date?: string | null
+          last_date_consultation_comments?: string | null
+          last_synced?: string | null
+          last_updated?: string | null
+          last_updated_by?: string | null
+          lat?: string | null
+          lng?: string | null
           locality?: string | null
           lpa_app_no?: string | null
           lpa_name?: string | null
@@ -887,6 +1127,84 @@ export type Database = {
           },
         ]
       }
+      planning_api: {
+        Row: {
+          address: string | null
+          agent_address: string | null
+          agent_email: string | null
+          agent_name: string | null
+          agent_phone: string | null
+          applicant_address: string | null
+          applicant_name: string | null
+          created_at: string
+          description: string | null
+          docs_count: number | null
+          external_link: string | null
+          id: number
+          internal_link: string | null
+          keyval: string | null
+          latitude: number | null
+          longitude: number | null
+          lpa_id: string | null
+          lpa_name: string | null
+          PDF_analysis: string[] | null
+          PDF_links: string[] | null
+          postcode: string | null
+          reference: string | null
+          validated_date: string | null
+        }
+        Insert: {
+          address?: string | null
+          agent_address?: string | null
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
+          applicant_address?: string | null
+          applicant_name?: string | null
+          created_at?: string
+          description?: string | null
+          docs_count?: number | null
+          external_link?: string | null
+          id?: number
+          internal_link?: string | null
+          keyval?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          lpa_id?: string | null
+          lpa_name?: string | null
+          PDF_analysis?: string[] | null
+          PDF_links?: string[] | null
+          postcode?: string | null
+          reference?: string | null
+          validated_date?: string | null
+        }
+        Update: {
+          address?: string | null
+          agent_address?: string | null
+          agent_email?: string | null
+          agent_name?: string | null
+          agent_phone?: string | null
+          applicant_address?: string | null
+          applicant_name?: string | null
+          created_at?: string
+          description?: string | null
+          docs_count?: number | null
+          external_link?: string | null
+          id?: number
+          internal_link?: string | null
+          keyval?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          lpa_id?: string | null
+          lpa_name?: string | null
+          PDF_analysis?: string[] | null
+          PDF_links?: string[] | null
+          postcode?: string | null
+          reference?: string | null
+          validated_date?: string | null
+        }
+        Relationships: []
+      }
       planning_applications: {
         Row: {
           address: Json | null
@@ -941,6 +1259,90 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      property_data_api: {
+        Row: {
+          address: string | null
+          agent_address: string | null
+          agent_company: string | null
+          agent_name: string | null
+          authority: string | null
+          category: string | null
+          created_at: string
+          dates_published_at: string | null
+          decision_rating: string | null
+          decision_text: string | null
+          distance: string | null
+          endpoint: string | null
+          est_construction_cost: string | null
+          id: number
+          last_rehosted_at: string | null
+          lat: number | null
+          lng: number | null
+          pdf_urls: Json[] | null
+          postcode: string | null
+          proposal: string | null
+          reference: string | null
+          rehosted_urls: string[] | null
+          status: string | null
+          url: string | null
+          url_documents: string | null
+        }
+        Insert: {
+          address?: string | null
+          agent_address?: string | null
+          agent_company?: string | null
+          agent_name?: string | null
+          authority?: string | null
+          category?: string | null
+          created_at?: string
+          dates_published_at?: string | null
+          decision_rating?: string | null
+          decision_text?: string | null
+          distance?: string | null
+          endpoint?: string | null
+          est_construction_cost?: string | null
+          id?: number
+          last_rehosted_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          pdf_urls?: Json[] | null
+          postcode?: string | null
+          proposal?: string | null
+          reference?: string | null
+          rehosted_urls?: string[] | null
+          status?: string | null
+          url?: string | null
+          url_documents?: string | null
+        }
+        Update: {
+          address?: string | null
+          agent_address?: string | null
+          agent_company?: string | null
+          agent_name?: string | null
+          authority?: string | null
+          category?: string | null
+          created_at?: string
+          dates_published_at?: string | null
+          decision_rating?: string | null
+          decision_text?: string | null
+          distance?: string | null
+          endpoint?: string | null
+          est_construction_cost?: string | null
+          id?: number
+          last_rehosted_at?: string | null
+          lat?: number | null
+          lng?: number | null
+          pdf_urls?: Json[] | null
+          postcode?: string | null
+          proposal?: string | null
+          reference?: string | null
+          rehosted_urls?: string[] | null
+          status?: string | null
+          url?: string | null
+          url_documents?: string | null
         }
         Relationships: []
       }
@@ -2209,6 +2611,7 @@ export type Database = {
           development_type: string | null
           engaging_title: string | null
           epc_number: string | null
+          est_construction_cost: string | null
           final_impact_score: number | null
           geom: unknown | null
           id: string
