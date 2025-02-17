@@ -21,8 +21,12 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    target: 'es2015',
     rollupOptions: {
-      external: ['@rollup/rollup-linux-x64-gnu', '@rollup/rollup-linux-x64-musl']
+      external: ['@rollup/rollup-linux-x64-gnu', '@rollup/rollup-linux-x64-musl'],
+      output: {
+        manualChunks: undefined
+      }
     }
   }
 }));
