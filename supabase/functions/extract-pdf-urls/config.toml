@@ -1,4 +1,0 @@
-project_id = "jposqxdboetyioymfswd"
-
-[extract-pdf-urls]
-verify_jwt = false
