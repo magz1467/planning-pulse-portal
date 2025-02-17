@@ -1,7 +1,6 @@
 import Index from "@/pages/Index";
 import About from "@/pages/About";
 import Press from "@/pages/Press";
-import Admin2 from "@/pages/Admin2";
 import Profile from "@/pages/Profile";
 import Help from "@/pages/Help";
 import { RouteObject } from "react-router-dom";
@@ -21,11 +20,6 @@ export const mainRoutes: RouteObject[] = [
   {
     path: "/press",
     element: <Press />,
-    errorElement: <RouteErrorBoundary />,
-  },
-  {
-    path: "/admin2",
-    element: <Admin2 />,
     errorElement: <RouteErrorBoundary />,
   },
   {
